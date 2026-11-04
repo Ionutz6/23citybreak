@@ -208,7 +208,7 @@
                            autocomplete="off"
                            placeholder="Scrie direct: Tallinn, Manchester, Islanda, Nisa..."
                            oninput="onDestSearchInput(this.value)"
-                           onfocus="showDestDropdown(true)"
+                           onfocus="this.select(); showDestDropdown(true)"
                            class="w-full bg-transparent text-xs sm:text-sm font-bold text-[#0a0b0d] outline-none font-body placeholder:text-[#94a3b8]" />
                     <button id="dest-clear-btn" type="button" onclick="clearDestSelection()"
                             title="Resetează la Toată Europa"
@@ -498,8 +498,31 @@
           <button id="search-status-dismiss" onclick="document.getElementById('search-status').classList.add('hidden')" class="hidden text-xs font-black px-2 py-0.5 rounded-lg bg-[#0a0b0d] text-[#dfa649] cursor-pointer">✕ Închide</button>
         </div>
       </div>
-        <div id="spotlight-action" class="flex flex-wrap items-center gap-2">
-          <!-- Rendered by JS -->
+    </section>
+
+    <!-- Dedicated Best Weekend Spotlight for Selected City (23AI Theme) -->
+    <div id="city-spotlight-banner" class="hidden space-y-4">
+      <div class="card-23ai bg-[#fce8bd] border-2 border-[#dfa649] rounded-3xl p-5 shadow-sm transition">
+        <div class="flex flex-wrap items-center justify-between gap-4">
+          <div class="space-y-1">
+            <div class="flex items-center gap-2">
+              <span class="text-xs uppercase font-black text-[#5c3b06] tracking-wider font-display">🏆 Cel mai ieftin weekend găsit:</span>
+              <span id="spotlight-badge" class="bg-[#0a0b0d] text-[#dfa649] text-[11px] font-bold px-2 py-0.5 rounded-md font-display">Cea mai bună ofertă</span>
+            </div>
+            <div id="spotlight-title" class="text-lg sm:text-xl font-black text-[#0a0b0d] font-display">
+              <!-- Rendered by JS -->
+            </div>
+            <div id="spotlight-details" class="text-xs sm:text-sm text-[#422904] font-medium font-body">
+              <!-- Rendered by JS -->
+            </div>
+            <!-- Runner-ups for full year scan -->
+            <div id="spotlight-runners" class="hidden text-xs text-[#5c3b06] font-bold pt-1 font-display">
+              <!-- Rendered by JS -->
+            </div>
+          </div>
+          <div id="spotlight-action" class="flex flex-wrap items-center gap-2">
+            <!-- Rendered by JS -->
+          </div>
         </div>
       </div>
     </div>
@@ -537,41 +560,6 @@
           <div id="guide-vibe" class="font-medium text-[#334155] leading-relaxed font-body">
             <!-- Rendered by JS -->
           </div>
-        </div>
-      </div>
-    </div>
-
-      <!-- City Break Guide & Weather (Differentiation Feature) -->
-      <div id="city-guide-card" class="hidden card-23ai bg-[#fdfaf3] border border-[#ecd8b0] rounded-2xl p-4 sm:p-5 text-xs sm:text-sm text-[#0a0b0d] grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div class="space-y-1 border-b md:border-b-0 md:border-r border-[#ecd8b0] pb-3 md:pb-0 md:pr-4">
-          <div class="font-bold uppercase tracking-wider text-[#5c3b06] text-[11px] font-display flex items-center gap-1.5">
-            <span>☀️</span> <span>Vreme & Sezon optim</span>
-          </div>
-          <div id="guide-weather" class="font-medium text-[#334155] leading-relaxed">
-            <!-- Rendered by JS -->
-          </div>
-        </div>
-        <div class="space-y-1 border-b md:border-b-0 md:border-r border-[#ecd8b0] pb-3 md:pb-0 md:pr-4">
-          <div class="font-bold uppercase tracking-wider text-[#5c3b06] text-[11px] font-display flex items-center gap-1.5">
-            <span>🚆</span> <span>Transfer Aeroport → Centru</span>
-          </div>
-          <div id="guide-transfer" class="font-medium text-[#334155] leading-relaxed">
-            <!-- Rendered by JS -->
-          </div>
-        </div>
-        <div class="space-y-1">
-          <div class="font-bold uppercase tracking-wider text-[#5c3b06] text-[11px] font-display flex items-center gap-1.5">
-            <span>🎒</span> <span>Vibe & Ce faci în 48 de ore</span>
-          </div>
-          <div id="guide-vibe" class="font-medium text-[#334155] leading-relaxed">
-            <!-- Rendered by JS -->
-          </div>
-        </div>
-      </div>
-
-    </div>
-        <div id="spotlight-action" class="flex items-center gap-2">
-          <!-- Rendered by JS -->
         </div>
       </div>
     </div>
@@ -882,6 +870,7 @@
     let currentMode = 1; // 1 = per pax, 2 = total grup
     let currentLinkMode = "google"; // Default to Google Flights for 100% reliable live booking
     let currentRows = [];
+    let hasEverSearched = false;
     let selectedCityObj = null;
 
     function carrierName(code) {
@@ -1039,26 +1028,38 @@
     }
 
     // --- Search As You Type Autocomplete Engine ---
+    function normalizeDestQuery(val) {
+      if (!val) return "";
+      const s = val.trim().toLowerCase();
+      if (s.startsWith("🌟") || s.includes("oricare") || s.includes("toată") || s.includes("toata")) {
+        return "";
+      }
+      return s;
+    }
+
     function onDestSearchInput(val) {
-      const q = val.trim().toLowerCase();
+      const q = normalizeDestQuery(val);
       const clearBtn = document.getElementById("dest-clear-btn");
-      if (q.length > 0) clearBtn.classList.remove("hidden");
+      if (val.trim().length > 0 && !val.includes("Oricare")) clearBtn.classList.remove("hidden");
       else clearBtn.classList.add("hidden");
 
       renderDestDropdown(q);
       showDestDropdown(true);
 
       // If user typed an exact or close city name, preview its guide
-      const match = ALL_EUROPE_CITIES.find(c => !c.isAll && (c.name.toLowerCase() === q || c.iata.toLowerCase() === q));
-      if (match) {
-        renderCityGuide(match);
+      if (q) {
+        const match = ALL_EUROPE_CITIES.find(c => !c.isAll && (c.name.toLowerCase() === q || c.iata.toLowerCase() === q));
+        if (match) {
+          renderCityGuide(match);
+        }
       }
     }
 
     function showDestDropdown(show) {
       const drop = document.getElementById("dest-autocomplete-dropdown");
       if (show) {
-        renderDestDropdown(document.getElementById("dest-search-input").value.trim().toLowerCase());
+        const raw = document.getElementById("dest-search-input").value;
+        renderDestDropdown(normalizeDestQuery(raw));
         drop.classList.remove("hidden");
       } else {
         setTimeout(() => drop.classList.add("hidden"), 250);
@@ -1127,8 +1128,8 @@
         clearBtn.classList.add("hidden");
         searchBtnText.textContent = "Caută zboruri";
         scanBtnText.textContent = "Scanează tot anul (52 wk)";
-        document.getElementById("city-spotlight-banner").classList.add("hidden");
-        document.getElementById("city-guide-card").classList.add("hidden");
+        document.getElementById("city-spotlight-banner")?.classList.add("hidden");
+        document.getElementById("city-guide-card")?.classList.add("hidden");
       } else {
         input.value = `${city.flag} ${city.name} (${city.iata}) · ${city.country}`;
         clearBtn.classList.remove("hidden");
@@ -1466,26 +1467,31 @@
         });
       });
 
-      if (destVal !== "any" && globalBestCell && globalBestWk && globalBestRow) {
-        spotlightBanner.classList.remove("hidden");
-        const p1 = Math.round(globalBestCell.perPaxEur);
-        const pTot = Math.round(globalBestCell.totalEur);
-        document.getElementById("spotlight-title").textContent =
-          `${globalBestRow.city} · ${currentMode === 1 ? p1 + ' € / pers.' : pTot + ' € total grup'} în weekendul ${globalBestWk.label}`;
-        document.getElementById("spotlight-details").textContent =
-          `Tur: ${globalBestCell.outRoute} (${globalBestCell.outTime}) | Retur: ${globalBestCell.inRoute} (${globalBestCell.inTime}) · ${globalBestCell.airlineLabel}`;
-        document.getElementById("spotlight-action").innerHTML = `
-          <a href="${globalBestCell.googleFlightsUrl}" target="_blank" rel="noopener noreferrer"
-             class="bg-[#0a0b0d] hover:bg-[#1a1e27] text-[#dfa649] font-black text-xs sm:text-sm px-4 py-2.5 rounded-xl transition shadow-xs font-display flex items-center gap-1.5">
-            Rezervă pe Google Flights (${p1} €) →
-          </a>
-          <a href="${globalBestCell.skyscannerUrl}" target="_blank" rel="noopener noreferrer"
-             class="bg-[#dfa649] hover:bg-[#c98f33] text-[#0a0b0d] font-black text-xs sm:text-sm px-4 py-2.5 rounded-xl transition shadow-xs font-display flex items-center gap-1.5">
-            Skyscanner ↗
-          </a>
-        `;
-      } else if (destVal === "any") {
-        spotlightBanner.classList.add("hidden");
+      if (spotlightBanner) {
+        if (destVal !== "any" && globalBestCell && globalBestWk && globalBestRow) {
+          spotlightBanner.classList.remove("hidden");
+          const p1 = Math.round(globalBestCell.perPaxEur);
+          const pTot = Math.round(globalBestCell.totalEur);
+          const sTitle = document.getElementById("spotlight-title");
+          const sDetails = document.getElementById("spotlight-details");
+          const sAction = document.getElementById("spotlight-action");
+          if (sTitle) sTitle.textContent = `${globalBestRow.city} · ${currentMode === 1 ? p1 + ' € / pers.' : pTot + ' € total grup'} în weekendul ${globalBestWk.label}`;
+          if (sDetails) sDetails.textContent = `Tur: ${globalBestCell.outRoute} (${globalBestCell.outTime}) | Retur: ${globalBestCell.inRoute} (${globalBestCell.inTime}) · ${globalBestCell.airlineLabel}`;
+          if (sAction) {
+            sAction.innerHTML = `
+              <a href="${globalBestCell.googleFlightsUrl}" target="_blank" rel="noopener noreferrer"
+                 class="bg-[#0a0b0d] hover:bg-[#1a1e27] text-[#dfa649] font-black text-xs sm:text-sm px-4 py-2.5 rounded-xl transition shadow-xs font-display flex items-center gap-1.5">
+                Rezervă pe Google Flights (${p1} €) →
+              </a>
+              <a href="${globalBestCell.skyscannerUrl}" target="_blank" rel="noopener noreferrer"
+                 class="bg-[#dfa649] hover:bg-[#c98f33] text-[#0a0b0d] font-black text-xs sm:text-sm px-4 py-2.5 rounded-xl transition shadow-xs font-display flex items-center gap-1.5">
+                Skyscanner ↗
+              </a>
+            `;
+          }
+        } else {
+          spotlightBanner.classList.add("hidden");
+        }
       }
 
       // Find per-weekend cheapest
@@ -1524,19 +1530,45 @@
       tbody.innerHTML = "";
 
       if (filteredRows.length === 0) {
-        const destTitle = selectedCityObj ? `${selectedCityObj.flag} ${selectedCityObj.name}` : "destinația selectată";
+        if (!hasEverSearched) {
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="${activeWks.length + 1}" class="text-center py-12 px-4 text-[#0a0b0d] bg-[#fbf9f4] rounded-2xl">
+                <div class="text-4xl mb-3">✈️</div>
+                <div class="text-base sm:text-lg font-black font-display text-[#0a0b0d]">
+                  Configurează căutarea și apasă pe «Caută zboruri»
+                </div>
+                <div class="text-xs sm:text-sm text-[#5c3b06] mt-1 font-medium font-body max-w-lg mx-auto">
+                  Alege orice oraș din Europa sau lasă pe «🌟 Oricare» pentru cele mai bune oferte. Apasă mai jos pentru a căuta zboruri live.
+                </div>
+                <div class="mt-5 flex flex-wrap items-center justify-center gap-3 font-display">
+                  <button onclick="runLiveSearch()" class="bg-[#dfa649] hover:bg-[#c98f33] active:bg-[#b57f2a] text-[#0a0b0d] text-xs sm:text-sm font-black px-6 py-3 rounded-xl shadow-sm transition inline-flex items-center gap-2 cursor-pointer">
+                    🔍 Caută zboruri în weekendurile alese
+                  </button>
+                  <button onclick="scanEntireYearForDestination()" class="bg-[#0a0b0d] hover:bg-[#1a1e27] text-[#dfa649] text-xs sm:text-sm font-black px-6 py-3 rounded-xl shadow-xs transition inline-flex items-center gap-2 cursor-pointer">
+                    📅 Scanează tot anul (52 weekenduri)
+                  </button>
+                </div>
+              </td>
+            </tr>
+          `;
+          return;
+        }
+
+        const destTitle = selectedCityObj && !selectedCityObj.isAll ? `${selectedCityObj.flag} ${selectedCityObj.name}` : "destinațiile din Europa";
         tbody.innerHTML = `
           <tr>
-            <td colspan="${activeWks.length + 1}" class="text-center py-10 px-4 text-[#0a0b0d] font-bold bg-[#fbf9f4] rounded-2xl font-display">
-              <div class="text-3xl mb-2">✈️</div>
-              <div class="text-sm sm:text-base">Zborurile către ${destTitle} nu sunt încă salvate în memoria cache.</div>
-              <div class="text-xs text-[#64748b] mt-1 font-normal font-body">Apasă pe unul dintre butoanele de mai jos pentru a interoga live zborurile reale.</div>
-              <div class="mt-4 flex flex-wrap items-center justify-center gap-2">
-                <button onclick="runLiveSearch()" class="bg-[#dfa649] hover:bg-[#c98f33] active:bg-[#b57f2a] text-[#0a0b0d] text-xs sm:text-sm font-black px-5 py-2.5 rounded-xl shadow-sm transition inline-flex items-center gap-2 cursor-pointer font-display">
-                  🔍 Caută pe cele ${activeWks.length} weekenduri alese
-                </button>
-                <button onclick="scanEntireYearForDestination()" class="bg-[#0a0b0d] hover:bg-[#1a1e27] text-[#dfa649] text-xs sm:text-sm font-black px-5 py-2.5 rounded-xl shadow-xs transition inline-flex items-center gap-2 cursor-pointer font-display">
-                  📅 Scanează tot anul (52 weekenduri)
+            <td colspan="${activeWks.length + 1}" class="text-center py-12 px-4 text-[#0a0b0d] bg-[#fbf9f4] rounded-2xl">
+              <div class="text-4xl mb-3">🔍</div>
+              <div class="text-base sm:text-lg font-black font-display text-[#0a0b0d]">
+                Nu am găsit zboruri care să respecte toate criteriile pentru ${destTitle}
+              </div>
+              <div class="text-xs sm:text-sm text-[#64748b] mt-1 font-medium font-body max-w-md mx-auto">
+                Filtrele actuale (ore stricte sau fără escale) pot fi prea restrictive pentru aceste date.
+              </div>
+              <div class="mt-5 flex flex-wrap items-center justify-center gap-3 font-display">
+                <button onclick="resetToPermissive(); runLiveSearch();" class="bg-[#dfa649] hover:bg-[#c98f33] active:bg-[#b57f2a] text-[#0a0b0d] text-xs sm:text-sm font-black px-6 py-3 rounded-xl shadow-sm transition inline-flex items-center gap-2 cursor-pointer">
+                  🔓 Caută în Mod Permisiv (permite 1 escală / ore flexibile)
                 </button>
               </div>
             </td>
@@ -1745,7 +1777,12 @@
       document.getElementById("subtitle-summary").textContent =
         "🔓 Mod permisiv activat: buget max. 350 €, permite 1 escală, plecare vineri oricând, retur duminică oricând. Găsește garantat variante pentru orice oraș din Europa!";
 
-      updateSearchStatus("Mod permisiv activat. Zborurile vor apărea chiar și cu escale sau ore flexibile.", 100, "success");
+      currentRows = [];
+      hasEverSearched = false;
+      document.getElementById("city-spotlight-banner")?.classList.add("hidden");
+      document.getElementById("city-guide-card")?.classList.add("hidden");
+
+      updateSearchStatus("Mod permisiv configurat. Apasă pe «Caută zboruri» sau «Scanează tot anul» pentru a căuta variantele disponibile.", 100, "success");
       renderMatrix();
     }
 
@@ -1765,7 +1802,16 @@
       document.getElementById("f-in-arr").value = "01:00";
       document.getElementById("f-domestic").checked = false;
       selectPreset('2026_no_xmas');
-      loadDefaultRows();
+
+      currentRows = [];
+      hasEverSearched = false;
+      document.getElementById("subtitle-summary").textContent =
+        "Plecare vineri după 18:00 (aterizare max. 01:00), retur duminică după 18:00 (aterizare acasă max. 01:00), buget ≤ 150 €/pers., doar zboruri directe.";
+
+      document.getElementById("search-status")?.classList.add("hidden");
+      document.getElementById("city-spotlight-banner")?.classList.add("hidden");
+      document.getElementById("city-guide-card")?.classList.add("hidden");
+
       renderMatrix();
     }
 
@@ -1849,6 +1895,8 @@
         showDestDropdown(true);
         return;
       }
+
+      hasEverSearched = true;
 
       const cityName = selectedCityObj?.name || "destinație";
       const originSelect = document.getElementById("f-origin");
@@ -2181,144 +2229,148 @@
           const pct = Math.round(((i) / activeWks.length) * 100);
           updateSearchStatus(`Căutăm destinații deschise pentru ${wk.label} (${i+1}/${activeWks.length})...`, pct, "loading");
 
-          const resOut = await fetch("https://api.skypicker.com/umbrella/v2/graphql", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              query: QUERY_ONEWAY,
-              variables: {
-                search: {
-                  passengers: { adults: adults, adultsHandBags: handBags, adultsHoldBags: holdBags },
-                  cabinClass: { cabinClass: "ECONOMY" },
-                  itinerary: {
-                    source: { ids: [originCityId] },
-                    outboundDepartureDate: { start: `${wk.fri}T${friDep}:00`, end: `${wk.fri}T23:59:59` }
-                  }
-                },
-                filter: { transportTypes: ["FLIGHT"] },
-                options: { partner: "skypicker", sortBy: "QUALITY" }
-              }
-            })
-          });
+          try {
+            const resOut = await fetch("https://api.skypicker.com/umbrella/v2/graphql", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                query: QUERY_ONEWAY,
+                variables: {
+                  search: {
+                    passengers: { adults: adults, adultsHandBags: handBags, adultsHoldBags: holdBags },
+                    cabinClass: { cabinClass: "ECONOMY" },
+                    itinerary: {
+                      source: { ids: [originCityId] },
+                      outboundDepartureDate: { start: `${wk.fri}T${friDep}:00`, end: `${wk.fri}T23:59:59` }
+                    }
+                  },
+                  filter: { transportTypes: ["FLIGHT"] },
+                  options: { partner: "skypicker", sortBy: "QUALITY" }
+                }
+              })
+            });
 
-          const jsonOut = await resOut.json();
-          const outItins = jsonOut?.data?.onewayItineraries?.itineraries || [];
+            const jsonOut = await resOut.json();
+            const outItins = jsonOut?.data?.onewayItineraries?.itineraries || [];
 
-          const destCityIds = new Set();
-          for (const it of outItins) {
-            const segs = it.sector?.sectorSegments || [];
-            if (maxStops === 0 && segs.length > 1) continue;
-            if (it.sector?.duration > maxDurMin * 60) continue;
-            const lastSeg = segs[segs.length - 1]?.segment;
-            if (!lastSeg) continue;
-            const destCity = lastSeg.destination?.station?.city;
-            const destCountry = lastSeg.destination?.station?.city?.country?.code;
-            if (!includeDomestic && destCountry === "RO") continue;
-            if (destCity?.id) destCityIds.add(destCity.id);
-          }
-
-          if (destCityIds.size === 0) continue;
-
-          const resRet = await fetch("https://api.skypicker.com/umbrella/v2/graphql", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              query: QUERY_RETURN,
-              variables: {
-                search: {
-                  passengers: { adults: adults, adultsHandBags: handBags, adultsHoldBags: holdBags },
-                  cabinClass: { cabinClass: "ECONOMY" },
-                  itinerary: {
-                    source: { ids: [originCityId] },
-                    destination: { ids: [...destCityIds].slice(0, 30) },
-                    outboundDepartureDate: { start: `${wk.fri}T${friDep}:00`, end: `${wk.fri}T23:59:59` },
-                    inboundDepartureDate: { start: `${wk.sun}T${sunDep}:00`, end: `${wk.sun}T23:59:59` }
-                  }
-                },
-                filter: {
-                  allowChangeInboundSource: true,
-                  allowChangeInboundDestination: true,
-                  transportTypes: ["FLIGHT"]
-                },
-                options: { partner: "skypicker", sortBy: "PRICE" }
-              }
-            })
-          });
-
-          const jsonRet = await resRet.json();
-          const retItins = jsonRet?.data?.returnItineraries?.itineraries || [];
-
-          for (const it of retItins) {
-            const outSegs = it.outbound?.sectorSegments || [];
-            const inSegs = it.inbound?.sectorSegments || [];
-
-            if (maxStops === 0 && (outSegs.length > 1 || inSegs.length > 1)) continue;
-            if (it.outbound?.duration > maxDurMin * 60 || it.inbound?.duration > maxDurMin * 60) continue;
-
-            const outFirst = outSegs[0]?.segment;
-            const outLast = outSegs[outSegs.length - 1]?.segment;
-            const inFirst = inSegs[0]?.segment;
-            const inLast = inSegs[inSegs.length - 1]?.segment;
-            if (!outFirst || !outLast || !inFirst || !inLast) continue;
-
-            const outOrig = outFirst.source.station.code;
-            const outDest = outLast.destination.station.code;
-            const destCity = outLast.destination.station.city;
-            const destCountry = outLast.destination.station.city?.country?.code;
-
-            if (!includeDomestic && destCountry === "RO") continue;
-
-            const outArrTime = outLast.destination.localTime.slice(11, 16);
-            if (outArrLimit !== "03:00" && outArrTime > outArrLimit && outArrTime < "04:00") continue;
-
-            const inArrTime = inLast.destination.localTime.slice(11, 16);
-            if (inArrLimit !== "03:00" && inArrTime > inArrLimit && inArrTime < "04:00") continue;
-
-            const totalEur = parseFloat(it.priceEur?.amount) || 9999;
-            const perPaxEur = totalEur / adults;
-
-            if (perPaxEur > maxPrice1Pax * 1.5) continue;
-
-            const outCarrier = outFirst.carrier?.code || "FR";
-            const inCarrier = inFirst.carrier?.code || "FR";
-            const same = (outCarrier === inCarrier);
-            const airlineLabel = same ? carrierName(outCarrier) : `${carrierName(outCarrier)} + ${carrierName(inCarrier)}`;
-
-            const links = buildFlightLinks(outOrig, outDest, wk.fri, wk.sun, adults, outCarrier);
-
-            const cellObj = {
-              perPaxEur: perPaxEur,
-              totalEur: totalEur,
-              outRoute: `${outOrig} → ${outDest}`,
-              outTime: `${outFirst.source.localTime.slice(11, 16)} → ${outArrTime}`,
-              inRoute: `${inFirst.source.station.code} → ${inLast.destination.station.code}`,
-              inTime: `${inFirst.source.localTime.slice(11, 16)} → ${inArrTime}`,
-              airlineLabel: airlineLabel,
-              bookingUrl: links.googleFlightsUrl,
-              googleFlightsUrl: links.googleFlightsUrl,
-              skyscannerUrl: links.skyscannerUrl,
-              kayakUrl: links.kayakUrl,
-              kiwiSearchUrl: links.kiwiSearchUrl,
-              airlineUrl: links.airlineDirectUrl
-            };
-
-            const key = outDest.toLowerCase();
-            if (!cityRowsMap.has(key)) {
-              cityRowsMap.set(key, {
-                city: destCity?.name || outDest,
-                sub: `${outDest} · ${airlineLabel}`,
-                code: key,
-                iata: outDest,
-                cityId: destCity?.id || "",
-                skyTo: outDest.toLowerCase(),
-                cellsMap: {}
-              });
+            const destCityIds = new Set();
+            for (const it of outItins) {
+              const segs = it.sector?.sectorSegments || [];
+              if (maxStops === 0 && segs.length > 1) continue;
+              if (it.sector?.duration > maxDurMin * 60) continue;
+              const lastSeg = segs[segs.length - 1]?.segment;
+              if (!lastSeg) continue;
+              const destCity = lastSeg.destination?.station?.city;
+              const destCountry = lastSeg.destination?.station?.city?.country?.code;
+              if (!includeDomestic && destCountry === "RO") continue;
+              if (destCity?.id) destCityIds.add(destCity.id);
             }
-            const row = cityRowsMap.get(key);
-            if (!row.cellsMap[wk.id] || cellObj.perPaxEur < row.cellsMap[wk.id].perPaxEur) {
-              row.cellsMap[wk.id] = cellObj;
-              totalFound++;
+
+            if (destCityIds.size === 0) continue;
+
+            const resRet = await fetch("https://api.skypicker.com/umbrella/v2/graphql", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                query: QUERY_RETURN,
+                variables: {
+                  search: {
+                    passengers: { adults: adults, adultsHandBags: handBags, adultsHoldBags: holdBags },
+                    cabinClass: { cabinClass: "ECONOMY" },
+                    itinerary: {
+                      source: { ids: [originCityId] },
+                      destination: { ids: [...destCityIds].slice(0, 30) },
+                      outboundDepartureDate: { start: `${wk.fri}T${friDep}:00`, end: `${wk.fri}T23:59:59` },
+                      inboundDepartureDate: { start: `${wk.sun}T${sunDep}:00`, end: `${wk.sun}T23:59:59` }
+                    }
+                  },
+                  filter: {
+                    allowChangeInboundSource: true,
+                    allowChangeInboundDestination: true,
+                    transportTypes: ["FLIGHT"]
+                  },
+                  options: { partner: "skypicker", sortBy: "PRICE" }
+                }
+              })
+            });
+
+            const jsonRet = await resRet.json();
+            const retItins = jsonRet?.data?.returnItineraries?.itineraries || [];
+
+            for (const it of retItins) {
+              const outSegs = it.outbound?.sectorSegments || [];
+              const inSegs = it.inbound?.sectorSegments || [];
+
+              if (maxStops === 0 && (outSegs.length > 1 || inSegs.length > 1)) continue;
+              if (it.outbound?.duration > maxDurMin * 60 || it.inbound?.duration > maxDurMin * 60) continue;
+
+              const outFirst = outSegs[0]?.segment;
+              const outLast = outSegs[outSegs.length - 1]?.segment;
+              const inFirst = inSegs[0]?.segment;
+              const inLast = inSegs[inSegs.length - 1]?.segment;
+              if (!outFirst || !outLast || !inFirst || !inLast) continue;
+
+              const outOrig = outFirst.source.station.code;
+              const outDest = outLast.destination.station.code;
+              const destCity = outLast.destination.station.city;
+              const destCountry = outLast.destination.station.city?.country?.code;
+
+              if (!includeDomestic && destCountry === "RO") continue;
+
+              const outArrTime = outLast.destination.localTime.slice(11, 16);
+              if (outArrLimit !== "03:00" && outArrTime > outArrLimit && outArrTime < "04:00") continue;
+
+              const inArrTime = inLast.destination.localTime.slice(11, 16);
+              if (inArrLimit !== "03:00" && inArrTime > inArrLimit && inArrTime < "04:00") continue;
+
+              const totalEur = parseFloat(it.priceEur?.amount) || 9999;
+              const perPaxEur = totalEur / adults;
+
+              if (perPaxEur > maxPrice1Pax * 1.5) continue;
+
+              const outCarrier = outFirst.carrier?.code || "FR";
+              const inCarrier = inFirst.carrier?.code || "FR";
+              const same = (outCarrier === inCarrier);
+              const airlineLabel = same ? carrierName(outCarrier) : `${carrierName(outCarrier)} + ${carrierName(inCarrier)}`;
+
+              const links = buildFlightLinks(outOrig, outDest, wk.fri, wk.sun, adults, outCarrier);
+
+              const cellObj = {
+                perPaxEur: perPaxEur,
+                totalEur: totalEur,
+                outRoute: `${outOrig} → ${outDest}`,
+                outTime: `${outFirst.source.localTime.slice(11, 16)} → ${outArrTime}`,
+                inRoute: `${inFirst.source.station.code} → ${inLast.destination.station.code}`,
+                inTime: `${inFirst.source.localTime.slice(11, 16)} → ${inArrTime}`,
+                airlineLabel: airlineLabel,
+                bookingUrl: links.googleFlightsUrl,
+                googleFlightsUrl: links.googleFlightsUrl,
+                skyscannerUrl: links.skyscannerUrl,
+                kayakUrl: links.kayakUrl,
+                kiwiSearchUrl: links.kiwiSearchUrl,
+                airlineUrl: links.airlineDirectUrl
+              };
+
+              const key = outDest.toLowerCase();
+              if (!cityRowsMap.has(key)) {
+                cityRowsMap.set(key, {
+                  city: destCity?.name || outDest,
+                  sub: `${outDest} · ${airlineLabel}`,
+                  code: key,
+                  iata: outDest,
+                  cityId: destCity?.id || "",
+                  skyTo: outDest.toLowerCase(),
+                  cellsMap: {}
+                });
+              }
+              const row = cityRowsMap.get(key);
+              if (!row.cellsMap[wk.id] || cellObj.perPaxEur < row.cellsMap[wk.id].perPaxEur) {
+                row.cellsMap[wk.id] = cellObj;
+                totalFound++;
+              }
             }
+          } catch (wkErr) {
+            console.warn("Eroare la căutarea weekendului", wk.label, wkErr);
           }
         }
 
@@ -2337,12 +2389,13 @@
         renderMatrix();
       } catch (err) {
         console.error(err);
-        updateSearchStatus("A apărut o problemă la căutare. Se afișează datele curente.", 100, "empty");
+        updateSearchStatus("A apărut o problemă la căutare. Încearcă [🔓 Mod permisiv].", 100, "empty");
       }
     }
 
     // Initialize Page
-    loadDefaultRows();
+    currentRows = [];
+    hasEverSearched = false;
     renderWeekendSelectorUI();
     renderCrossEngineBar();
     renderMatrix();
