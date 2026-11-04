@@ -135,6 +135,44 @@
                 </select>
               </div>
 
+              <!-- Destinație dorită (Default Any) -->
+              <div class="bg-white p-3 rounded-xl border border-blue-100/90 shadow-2xs hover:border-blue-300 transition">
+                <label class="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
+                  <span class="text-blue-600">🎯</span> Destinație dorită
+                </label>
+                <select id="f-destination" onchange="renderMatrix()" class="w-full rounded-lg border border-slate-200 bg-slate-50/60 px-3 py-2 text-xs sm:text-sm font-bold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition">
+                  <option value="any" selected>Oricare (Toată Europa) — Default</option>
+                  <optgroup label="Destinații populare">
+                    <option value="mil">Milano (BGY / MXP)</option>
+                    <option value="blq">Bologna (BLQ)</option>
+                    <option value="rom">Roma (FCO / CIA)</option>
+                    <option value="vce">Veneția (VCE / TSF)</option>
+                    <option value="nap">Napoli (NAP)</option>
+                    <option value="par">Paris (BVA / CDG)</option>
+                    <option value="lon">Londra (LTN / STN / LGW)</option>
+                    <option value="bcn">Barcelona (BCN)</option>
+                    <option value="mad">Madrid (MAD)</option>
+                    <option value="crl">Bruxelles (CRL / BRU)</option>
+                    <option value="vie">Viena (VIE)</option>
+                    <option value="muc">München (MUC)</option>
+                    <option value="ber">Berlin (BER)</option>
+                    <option value="waw">Varșovia (WAW)</option>
+                    <option value="ist">Istanbul (IST / SAW)</option>
+                    <option value="ath">Atena (ATH)</option>
+                    <option value="prg">Praga (PRG)</option>
+                    <option value="bud">Budapesta (BUD)</option>
+                    <option value="lis">Lisabona (LIS)</option>
+                  </optgroup>
+                  <optgroup label="Filtrează după țară">
+                    <option value="it">Italia (toate orașele)</option>
+                    <option value="es">Spania (toate orașele)</option>
+                    <option value="de">Germania (toate orașele)</option>
+                    <option value="fr">Franța (toate orașele)</option>
+                    <option value="gb">Marea Britanie (toate orașele)</option>
+                  </optgroup>
+                </select>
+              </div>
+
               <!-- Tip zbor & Escale -->
               <div class="bg-white p-3 rounded-xl border border-blue-100/90 shadow-2xs hover:border-blue-300 transition">
                 <label class="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
@@ -889,8 +927,45 @@
 
       // Render Body
       tbody.innerHTML = "";
-      const visibleRows = currentRows.filter(r => activeWks.some(wk => r.cellsMap[wk.id] && r.cellsMap[wk.id].perPaxEur <= maxBudget));
-      const rowsToRender = visibleRows.length > 0 ? visibleRows : currentRows;
+      const destFilter = (document.getElementById("f-destination")?.value || "any").toLowerCase();
+
+      let filteredRows = currentRows;
+      if (destFilter !== "any") {
+        filteredRows = currentRows.filter(r => {
+          const code = (r.code || "").toLowerCase();
+          const city = (r.city || "").toLowerCase();
+          const sub = (r.sub || "").toLowerCase();
+          
+          if (destFilter === "mil") return code === "bgy" || code === "mxp" || code === "lin" || city.includes("milan");
+          if (destFilter === "rom") return code === "fco" || code === "cia" || city.includes("rom");
+          if (destFilter === "par") return code === "bva" || code === "cdg" || code === "ory" || city.includes("paris");
+          if (destFilter === "lon") return code === "ltn" || code === "stn" || code === "lgw" || code === "lhr" || city.includes("lond");
+          if (destFilter === "vce") return code === "vce" || code === "tsf" || city.includes("vene");
+          if (destFilter === "it") return ["bgy","mxp","lin","blq","fco","cia","vce","tsf","nap"].includes(code) || sub.includes("italia") || city.includes("milano") || city.includes("bologna") || city.includes("roma") || city.includes("venetia") || city.includes("napoli");
+          if (destFilter === "es") return ["bcn","mad","vlc","agp"].includes(code) || city.includes("barcelona") || city.includes("madrid");
+          if (destFilter === "de") return ["muc","ber","fra","dmm","mem"].includes(code) || city.includes("münchen") || city.includes("berlin") || city.includes("frankfurt");
+          if (destFilter === "fr") return ["bva","cdg","ory","nce"].includes(code) || city.includes("paris") || city.includes("nisa");
+          if (destFilter === "gb") return ["ltn","stn","lgw","lhr"].includes(code) || city.includes("londra");
+          
+          return code === destFilter || city.includes(destFilter) || sub.includes(destFilter);
+        });
+      }
+
+      const visibleRows = filteredRows.filter(r => activeWks.some(wk => r.cellsMap[wk.id] && r.cellsMap[wk.id].perPaxEur <= maxBudget));
+      const rowsToRender = visibleRows.length > 0 ? visibleRows : filteredRows;
+
+      if (rowsToRender.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="${activeWks.length + 1}" class="text-center py-10 px-4 text-slate-500 font-medium bg-slate-50/50 rounded-2xl">
+              <div class="text-3xl mb-2">🎯</div>
+              <div class="font-bold text-slate-800 text-sm sm:text-base">Nu s-au găsit zboruri pentru destinația selectată în criteriile actuale.</div>
+              <div class="text-xs text-slate-500 mt-1">Încearcă să selectezi „Oricare (Toată Europa)” sau să crești bugetul maxim.</div>
+            </td>
+          </tr>
+        `;
+        return;
+      }
 
       rowsToRender.forEach((r) => {
         const origRowIdx = currentRows.indexOf(r);
@@ -1019,6 +1094,7 @@
 
     function resetToDefaults() {
       document.getElementById("f-origin").value = "City:bucharest_ro";
+      if (document.getElementById("f-destination")) document.getElementById("f-destination").value = "any";
       document.getElementById("f-max-price").value = 150;
       document.getElementById("lbl-max-price").textContent = "150 €";
       document.getElementById("f-adults").value = "2";
