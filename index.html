@@ -85,146 +85,232 @@
   <main class="flex-1 max-w-[96rem] w-full mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-7 space-y-6">
 
     <!-- 1. Interactive Filter Configurator -->
-    <section id="configurator" class="bg-white border border-slate-200 rounded-2xl p-5 sm:p-6 shadow-sm space-y-5">
-      <div class="flex flex-wrap items-start justify-between gap-4 border-b border-slate-100 pb-4">
+    <section id="configurator" class="bg-white border border-slate-200/90 rounded-3xl p-5 sm:p-7 shadow-sm space-y-6">
+      
+      <!-- Section Header -->
+      <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 pb-4">
         <div>
-          <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight text-slate-900">
-            Filtre zboruri de weekend
-          </h1>
+          <div class="flex items-center gap-2.5">
+            <span class="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-blue-600 text-white text-base shadow-xs">
+              ⚡
+            </span>
+            <h1 class="text-xl sm:text-2xl font-black tracking-tight text-slate-900">
+              Filtre & Criterii de Căutare
+            </h1>
+          </div>
           <p id="subtitle-summary" class="text-xs sm:text-sm text-slate-500 mt-1">
-            Personalizează criteriile de zbor și alege orice weekenduri dorești din 2026 sau 2027.
+            Personalizează criteriile de zbor grupate pe traseu, buget și orare, apoi alege weekendurile dorite.
           </p>
         </div>
-        <button onclick="resetToDefaults()" class="text-xs font-semibold text-blue-600 hover:text-blue-800 hover:underline cursor-pointer">
-          ↺ Resetează la filtrele implicite
+        <button onclick="resetToDefaults()" class="inline-flex items-center gap-1.5 text-xs font-bold text-slate-600 hover:text-blue-700 bg-slate-100 hover:bg-blue-50 px-3.5 py-2 rounded-xl border border-slate-200 hover:border-blue-200 transition cursor-pointer">
+          ↺ Resetează filtrele implicite
         </button>
       </div>
 
-      <!-- 10 Dedicated Responsive Filter Boxes -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3.5 sm:gap-4">
+      <!-- 3 Themed Visual Cards -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
 
-        <!-- 1. Oras plecare -->
-        <div class="space-y-1.5 flex flex-col justify-between">
-          <label class="block text-xs font-bold uppercase tracking-wider text-slate-500">Oraș de plecare</label>
-          <select id="f-origin" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-xs sm:text-sm font-semibold text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600">
-            <option value="City:bucharest_ro" data-sky="otp" data-iata="OTP" selected>București (OTP / BBU)</option>
-            <option value="City:cluj-napoca_ro" data-sky="clj" data-iata="CLJ">Cluj-Napoca (CLJ)</option>
-            <option value="City:iasi_ro" data-sky="ias" data-iata="IAS">Iași (IAS)</option>
-            <option value="City:timisoara_ro" data-sky="tsr" data-iata="TSR">Timișoara (TSR)</option>
-          </select>
-        </div>
+        <!-- CARD 1: Traseu & Destinație (Albastru / Blue) -->
+        <div class="lg:col-span-4 bg-gradient-to-b from-blue-50/70 via-sky-50/30 to-white border-2 border-blue-200/80 rounded-2xl p-4 sm:p-5 shadow-xs flex flex-col justify-between space-y-4">
+          <div>
+            <div class="flex items-center justify-between mb-3.5">
+              <div class="flex items-center gap-2">
+                <span class="w-7 h-7 rounded-lg bg-blue-600 text-white flex items-center justify-center text-sm shadow-xs font-bold">🛫</span>
+                <h2 class="text-xs sm:text-sm font-extrabold uppercase tracking-wider text-blue-950">1. Traseu & Destinație</h2>
+              </div>
+              <span class="text-[11px] font-bold text-blue-700 bg-blue-100/80 px-2 py-0.5 rounded-full border border-blue-200/60">Zbor</span>
+            </div>
 
-        <!-- 2. Buget maxim -->
-        <div class="space-y-1.5 flex flex-col justify-between">
-          <div class="flex justify-between items-center">
-            <label class="text-xs font-bold uppercase tracking-wider text-slate-500">Buget max / persoană</label>
-            <span id="lbl-max-price" class="text-xs font-extrabold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md">150 €</span>
+            <div class="space-y-3">
+              <!-- Oraș plecare -->
+              <div class="bg-white p-3 rounded-xl border border-blue-100/90 shadow-2xs hover:border-blue-300 transition">
+                <label class="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
+                  <span class="text-blue-600">📍</span> Oraș de plecare
+                </label>
+                <select id="f-origin" class="w-full rounded-lg border border-slate-200 bg-slate-50/60 px-3 py-2 text-xs sm:text-sm font-bold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition">
+                  <option value="City:bucharest_ro" data-sky="otp" data-iata="OTP" selected>București (OTP / BBU)</option>
+                  <option value="City:cluj-napoca_ro" data-sky="clj" data-iata="CLJ">Cluj-Napoca (CLJ)</option>
+                  <option value="City:iasi_ro" data-sky="ias" data-iata="IAS">Iași (IAS)</option>
+                  <option value="City:timisoara_ro" data-sky="tsr" data-iata="TSR">Timișoara (TSR)</option>
+                </select>
+              </div>
+
+              <!-- Tip zbor & Escale -->
+              <div class="bg-white p-3 rounded-xl border border-blue-100/90 shadow-2xs hover:border-blue-300 transition">
+                <label class="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
+                  <span class="text-blue-600">✈️</span> Tip zbor & escale
+                </label>
+                <select id="f-stops" class="w-full rounded-lg border border-slate-200 bg-slate-50/60 px-3 py-2 text-xs sm:text-sm font-bold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition">
+                  <option value="0" selected>Doar zboruri directe (fără escală)</option>
+                  <option value="1">Permite și 1 escală scurtă</option>
+                </select>
+              </div>
+
+              <!-- Durată maximă zbor -->
+              <div class="bg-white p-3 rounded-xl border border-blue-100/90 shadow-2xs hover:border-blue-300 transition">
+                <label class="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
+                  <span class="text-blue-600">⏱️</span> Durată maximă pe sens
+                </label>
+                <select id="f-max-dur" class="w-full rounded-lg border border-slate-200 bg-slate-50/60 px-3 py-2 text-xs sm:text-sm font-bold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition">
+                  <option value="120">Maximum 2 ore / sens</option>
+                  <option value="180" selected>Maximum 3 ore / sens</option>
+                  <option value="240">Maximum 4 ore / sens</option>
+                  <option value="360">Maximum 6 ore / sens</option>
+                </select>
+              </div>
+            </div>
           </div>
-          <input id="f-max-price" type="range" min="50" max="350" step="10" value="150"
-                 oninput="document.getElementById('lbl-max-price').textContent = this.value + ' €'"
-                 class="w-full accent-blue-600 cursor-pointer h-2.5 bg-slate-200 rounded-lg" />
-          <div class="flex justify-between text-[11px] text-slate-400 font-medium">
-            <span>50 €</span>
-            <span>150 €</span>
-            <span>250 €</span>
-            <span>350 €</span>
+
+          <!-- Domestic flight toggle inside Card 1 -->
+          <div class="pt-2 border-t border-blue-100">
+            <label class="inline-flex items-center gap-2 text-xs font-semibold text-blue-900 cursor-pointer bg-white/80 hover:bg-white px-3 py-2 rounded-xl border border-blue-100 transition w-full">
+              <input type="checkbox" id="f-domestic" class="accent-blue-600 rounded w-4 h-4" onchange="runLiveSearch()" />
+              <span>Include zboruri interne în RO (Cluj, Iași etc.)</span>
+            </label>
           </div>
         </div>
 
-        <!-- 3. Pasageri -->
-        <div class="space-y-1.5 flex flex-col justify-between">
-          <label class="block text-xs font-bold uppercase tracking-wider text-slate-500">Număr pasageri</label>
-          <select id="f-adults" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-xs sm:text-sm font-semibold text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600">
-            <option value="1">1 Adult (individual)</option>
-            <option value="2" selected>2 Adulți (cuplu / pereche)</option>
-            <option value="3">3 Adulți (grup mic)</option>
-            <option value="4">4 Adulți (grup)</option>
-          </select>
+        <!-- CARD 2: Buget & Călători (Verde Smarald / Emerald) -->
+        <div class="lg:col-span-4 bg-gradient-to-b from-emerald-50/70 via-teal-50/30 to-white border-2 border-emerald-200/80 rounded-2xl p-4 sm:p-5 shadow-xs flex flex-col justify-between space-y-4">
+          <div>
+            <div class="flex items-center justify-between mb-3.5">
+              <div class="flex items-center gap-2">
+                <span class="w-7 h-7 rounded-lg bg-emerald-600 text-white flex items-center justify-center text-sm shadow-xs font-bold">💶</span>
+                <h2 class="text-xs sm:text-sm font-extrabold uppercase tracking-wider text-emerald-950">2. Buget & Confort</h2>
+              </div>
+              <span class="text-[11px] font-bold text-emerald-700 bg-emerald-100/80 px-2 py-0.5 rounded-full border border-emerald-200/60">Preț & Bagaj</span>
+            </div>
+
+            <div class="space-y-3">
+              <!-- Buget maxim -->
+              <div class="bg-white p-3 rounded-xl border border-emerald-100/90 shadow-2xs hover:border-emerald-300 transition space-y-2">
+                <div class="flex justify-between items-center">
+                  <label class="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-slate-600">
+                    <span class="text-emerald-600">💰</span> Buget max / persoană
+                  </label>
+                  <span id="lbl-max-price" class="text-xs font-black text-emerald-800 bg-emerald-100 px-2.5 py-0.5 rounded-lg border border-emerald-200">150 €</span>
+                </div>
+                <input id="f-max-price" type="range" min="50" max="350" step="10" value="150"
+                       oninput="document.getElementById('lbl-max-price').textContent = this.value + ' €'"
+                       class="w-full accent-emerald-600 cursor-pointer h-2 bg-slate-200 rounded-lg" />
+                <div class="flex justify-between text-[11px] text-slate-400 font-semibold px-0.5">
+                  <span>50 €</span>
+                  <span class="text-emerald-700 font-bold">150 €</span>
+                  <span>250 €</span>
+                  <span>350 €</span>
+                </div>
+              </div>
+
+              <!-- Număr pasageri -->
+              <div class="bg-white p-3 rounded-xl border border-emerald-100/90 shadow-2xs hover:border-emerald-300 transition">
+                <label class="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
+                  <span class="text-emerald-600">👥</span> Număr pasageri
+                </label>
+                <select id="f-adults" class="w-full rounded-lg border border-slate-200 bg-slate-50/60 px-3 py-2 text-xs sm:text-sm font-bold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-transparent transition">
+                  <option value="1">1 Adult (individual)</option>
+                  <option value="2" selected>2 Adulți (cuplu / pereche)</option>
+                  <option value="3">3 Adulți (grup mic)</option>
+                  <option value="4">4 Adulți (grup)</option>
+                </select>
+              </div>
+
+              <!-- Bagaje incluse -->
+              <div class="bg-white p-3 rounded-xl border border-emerald-100/90 shadow-2xs hover:border-emerald-300 transition">
+                <label class="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
+                  <span class="text-emerald-600">🧳</span> Bagaje incluse
+                </label>
+                <select id="f-bags" class="w-full rounded-lg border border-slate-200 bg-slate-50/60 px-3 py-2 text-xs sm:text-sm font-bold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-transparent transition">
+                  <option value="small" selected>Rucsac mic sub scaun (inclus)</option>
+                  <option value="cabin">Troller de cabină (10 kg)</option>
+                  <option value="hold">Bagaj mare de cală (20 kg)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="pt-2 border-t border-emerald-100 text-[11px] text-emerald-800 font-medium px-1 flex items-center gap-1.5">
+            <span>✨</span> <span>Prețurile din tabel se calculează pentru bagajul ales</span>
+          </div>
         </div>
 
-        <!-- 4. Bagaje -->
-        <div class="space-y-1.5 flex flex-col justify-between">
-          <label class="block text-xs font-bold uppercase tracking-wider text-slate-500">Bagaje incluse</label>
-          <select id="f-bags" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-xs sm:text-sm font-semibold text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600">
-            <option value="small" selected>Rucsac mic sub scaun (inclus)</option>
-            <option value="cabin">Troller de cabină (10 kg)</option>
-            <option value="hold">Bagaj mare de cală (20 kg)</option>
-          </select>
+        <!-- CARD 3: Orare Weekend (Tur & Retur) (Chihlimbar / Amber-Orange) -->
+        <div class="lg:col-span-4 bg-gradient-to-b from-amber-50/70 via-orange-50/30 to-white border-2 border-amber-200/80 rounded-2xl p-4 sm:p-5 shadow-xs flex flex-col justify-between space-y-4">
+          <div>
+            <div class="flex items-center justify-between mb-3.5">
+              <div class="flex items-center gap-2">
+                <span class="w-7 h-7 rounded-lg bg-amber-600 text-white flex items-center justify-center text-sm shadow-xs font-bold">⏰</span>
+                <h2 class="text-xs sm:text-sm font-extrabold uppercase tracking-wider text-amber-950">3. Orare de Weekend</h2>
+              </div>
+              <span class="text-[11px] font-bold text-amber-800 bg-amber-100/80 px-2 py-0.5 rounded-full border border-amber-200/60">Fără timp pierdut</span>
+            </div>
+
+            <!-- 2 Sub-Sections: Tur Vineri & Retur Duminica -->
+            <div class="space-y-3">
+              
+              <!-- Sub-bloc Tur Vineri -->
+              <div class="bg-white p-3 rounded-xl border border-amber-100/90 shadow-2xs hover:border-amber-300 transition space-y-2">
+                <div class="flex items-center gap-1.5 text-xs font-black text-amber-900 border-b border-amber-50 pb-1">
+                  <span>🛫</span> <span>TUR (Vineri)</span>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <div>
+                    <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">Plecare min.</label>
+                    <select id="f-fri-dep" class="w-full rounded-lg border border-slate-200 bg-slate-50/60 px-2 py-1.5 text-xs font-bold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-500 transition">
+                      <option value="06:00">De la 06:00</option>
+                      <option value="12:00">După 12:00</option>
+                      <option value="15:00">După 15:00</option>
+                      <option value="18:00" selected>După 18:00 (seară)</option>
+                      <option value="20:00">După 20:00</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">Aterizare max.</label>
+                    <select id="f-out-arr" class="w-full rounded-lg border border-slate-200 bg-slate-50/60 px-2 py-1.5 text-xs font-bold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-500 transition">
+                      <option value="23:00">Până la 23:00</option>
+                      <option value="23:59">Până la 24:00</option>
+                      <option value="01:00" selected>Până la 01:00 (sâm)</option>
+                      <option value="03:00">Fără limită</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Sub-bloc Retur Duminica -->
+              <div class="bg-white p-3 rounded-xl border border-amber-100/90 shadow-2xs hover:border-amber-300 transition space-y-2">
+                <div class="flex items-center gap-1.5 text-xs font-black text-amber-900 border-b border-amber-50 pb-1">
+                  <span>🛬</span> <span>RETUR (Duminică)</span>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <div>
+                    <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">Plecare min.</label>
+                    <select id="f-sun-dep" class="w-full rounded-lg border border-slate-200 bg-slate-50/60 px-2 py-1.5 text-xs font-bold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-500 transition">
+                      <option value="12:00">După 12:00</option>
+                      <option value="15:00">După 15:00</option>
+                      <option value="17:00">După 17:00</option>
+                      <option value="18:00" selected>După 18:00 (seară)</option>
+                      <option value="20:00">După 20:00</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">Acasă până la</label>
+                    <select id="f-in-arr" class="w-full rounded-lg border border-slate-200 bg-slate-50/60 px-2 py-1.5 text-xs font-bold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-500 transition">
+                      <option value="23:00">Până la 23:00</option>
+                      <option value="23:59">Până la 24:00</option>
+                      <option value="01:00" selected>Până la 01:00 (luni)</option>
+                      <option value="03:00">Până la 03:00 (luni)</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="pt-2 border-t border-amber-100 text-[11px] text-amber-800 font-medium px-1 flex items-center gap-1.5">
+            <span>💡</span> <span>Pleci vineri după serviciu și te întorci duminică noaptea</span>
+          </div>
         </div>
 
-        <!-- 5. Durată maximă zbor -->
-        <div class="space-y-1.5 flex flex-col justify-between">
-          <label class="block text-xs font-bold uppercase tracking-wider text-slate-500">Durată maximă zbor</label>
-          <select id="f-max-dur" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-xs sm:text-sm font-semibold text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600">
-            <option value="120">Maximum 2 ore / sens</option>
-            <option value="180" selected>Maximum 3 ore / sens</option>
-            <option value="240">Maximum 4 ore / sens</option>
-            <option value="360">Maximum 6 ore / sens</option>
-          </select>
-        </div>
-
-        <!-- 6. Escale permise -->
-        <div class="space-y-1.5 flex flex-col justify-between">
-          <label class="block text-xs font-bold uppercase tracking-wider text-slate-500">Tip zbor & Escale</label>
-          <select id="f-stops" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-xs sm:text-sm font-semibold text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600">
-            <option value="0" selected>Doar zboruri directe (fără escală)</option>
-            <option value="1">Permite și 1 escală scurtă</option>
-          </select>
-        </div>
-
-        <!-- 7. Plecare Vineri -->
-        <div class="space-y-1.5 flex flex-col justify-between">
-          <label class="block text-xs font-bold uppercase tracking-wider text-slate-500">Plecare Vineri (ora min.)</label>
-          <select id="f-fri-dep" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-xs sm:text-sm font-semibold text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600">
-            <option value="06:00">Oricând vineri (de la 06:00)</option>
-            <option value="12:00">După prânz (după 12:00)</option>
-            <option value="15:00">După-amiaza (după 15:00)</option>
-            <option value="18:00" selected>După program (după 18:00)</option>
-            <option value="20:00">Seara târziu (după 20:00)</option>
-          </select>
-        </div>
-
-        <!-- 8. Aterizare Tur la destinatie -->
-        <div class="space-y-1.5 flex flex-col justify-between">
-          <label class="block text-xs font-bold uppercase tracking-wider text-slate-500">Aterizare Tur la destinație</label>
-          <select id="f-out-arr" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-xs sm:text-sm font-semibold text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600">
-            <option value="23:00">Până la ora 23:00 vineri</option>
-            <option value="23:59">Până la miezul nopții (24:00)</option>
-            <option value="01:00" selected>Până la ora 01:00 sâmbătă</option>
-            <option value="03:00">Fără limită nocturnă</option>
-          </select>
-        </div>
-
-        <!-- 9. Plecare Duminica -->
-        <div class="space-y-1.5 flex flex-col justify-between">
-          <label class="block text-xs font-bold uppercase tracking-wider text-slate-500">Retur Duminică (ora min.)</label>
-          <select id="f-sun-dep" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-xs sm:text-sm font-semibold text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600">
-            <option value="12:00">După 12:00 (după prânz)</option>
-            <option value="15:00">După 15:00 (după-amiaza)</option>
-            <option value="17:00">După 17:00</option>
-            <option value="18:00" selected>Seara (după 18:00)</option>
-            <option value="20:00">Seara târziu (după 20:00)</option>
-          </select>
-        </div>
-
-        <!-- 10. Aterizare Retur acasa -->
-        <div class="space-y-1.5 flex flex-col justify-between">
-          <label class="block text-xs font-bold uppercase tracking-wider text-slate-500">Aterizare Retur (acasă)</label>
-          <select id="f-in-arr" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-xs sm:text-sm font-semibold text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600">
-            <option value="23:00">Până la 23:00 duminică</option>
-            <option value="23:59">Până la miezul nopții</option>
-            <option value="01:00" selected>Până la 01:00 luni</option>
-            <option value="03:00">Până la 03:00 luni</option>
-          </select>
-        </div>
-
-      </div>
-
-      <div class="flex items-center gap-2 pt-1">
-        <label class="inline-flex items-center gap-2 text-xs sm:text-sm font-medium text-slate-600 cursor-pointer">
-          <input type="checkbox" id="f-domestic" class="accent-blue-600 rounded" onchange="runLiveSearch()" />
-          Include și zboruri interne în România (ex. Cluj, Iași, Timișoara)
-        </label>
       </div>
     </section>
 
