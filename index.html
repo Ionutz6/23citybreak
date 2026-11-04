@@ -149,9 +149,16 @@
             Personalizează criteriile de zbor grupate pe traseu, buget și orare, apoi alege weekendurile dorite.
           </p>
         </div>
-        <button onclick="resetToDefaults()" class="inline-flex items-center gap-1.5 text-xs font-bold text-[#0a0b0d] hover:text-[#dfa649] bg-[#f4f5f8] hover:bg-[#eaeef3] px-3.5 py-2 rounded-xl border border-[#dce1e7] transition cursor-pointer font-display">
-          ↺ Resetează filtrele implicite
-        </button>
+        <div class="flex flex-wrap items-center gap-2">
+          <button onclick="resetToPermissive()" title="Setează filtre permisive pentru a găsi garantat zboruri către orice destinație aleasă"
+                  class="inline-flex items-center gap-1.5 text-xs font-black text-[#0a0b0d] bg-[#dfa649] hover:bg-[#c98f33] active:bg-[#b57f2a] px-3.5 py-2 rounded-xl shadow-2xs transition cursor-pointer font-display">
+            🔓 Resetează filtre (Mod permisiv · găsește garantat)
+          </button>
+          <button onclick="resetToStrict()" title="Revino la selecția strictă de weekend: vineri seară după 18:00, zbor direct"
+                  class="inline-flex items-center gap-1.5 text-xs font-bold text-[#475569] hover:text-[#0a0b0d] bg-[#f4f5f8] hover:bg-[#eaeef3] px-3 py-2 rounded-xl border border-[#dce1e7] transition cursor-pointer font-display">
+            ⚡ Preset Weekend Clasic (după 18:00)
+          </button>
+        </div>
       </div>
 
       <!-- 3 Themed Cards: All light non-white backgrounds, 23ai yellow & dark borders -->
@@ -187,35 +194,125 @@
                 <label class="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#0a0b0d] mb-1.5 font-display">
                   <span>🎯</span> Destinație dorită
                 </label>
-                <select id="f-destination" onchange="renderMatrix()" class="w-full rounded-lg border border-[#e4d3b5] bg-[#fffdf8] px-3 py-2 text-xs sm:text-sm font-bold text-[#0a0b0d] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#dfa649] focus:border-transparent transition font-body">
-                  <option value="any" selected>Oricare (Toată Europa) — Default</option>
-                  <optgroup label="Destinații populare">
-                    <option value="mil">Milano (BGY / MXP)</option>
-                    <option value="blq">Bologna (BLQ)</option>
-                    <option value="rom">Roma (FCO / CIA)</option>
-                    <option value="vce">Veneția (VCE / TSF)</option>
-                    <option value="nap">Napoli (NAP)</option>
-                    <option value="par">Paris (BVA / CDG)</option>
-                    <option value="lon">Londra (LTN / STN / LGW)</option>
-                    <option value="bcn">Barcelona (BCN)</option>
-                    <option value="mad">Madrid (MAD)</option>
-                    <option value="crl">Bruxelles (CRL / BRU)</option>
-                    <option value="vie">Viena (VIE)</option>
-                    <option value="muc">München (MUC)</option>
-                    <option value="ber">Berlin (BER)</option>
-                    <option value="waw">Varșovia (WAW)</option>
-                    <option value="ist">Istanbul (IST / SAW)</option>
-                    <option value="ath">Atena (ATH)</option>
-                    <option value="prg">Praga (PRG)</option>
-                    <option value="bud">Budapesta (BUD)</option>
-                    <option value="lis">Lisabona (LIS)</option>
+                <select id="f-destination" onchange="onDestinationChange()" class="w-full rounded-lg border border-[#e4d3b5] bg-[#fffdf8] px-3 py-2 text-xs sm:text-sm font-bold text-[#0a0b0d] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#dfa649] focus:border-transparent transition font-body">
+                  <option value="any" selected>🌟 Oricare (Toată Europa) — Caută cele mai bune prețuri</option>
+                  <optgroup label="🔥 Destinații populare de weekend">
+                    <option value="City:milan_it" data-iata="MIL" data-city="Milano">Milano (BGY / MXP)</option>
+                    <option value="City:bologna_it" data-iata="BLQ" data-city="Bologna">Bologna (BLQ)</option>
+                    <option value="City:rome_it" data-iata="ROM" data-city="Roma">Roma (FCO / CIA)</option>
+                    <option value="City:venice_it" data-iata="VCE" data-city="Veneția">Veneția (VCE / TSF)</option>
+                    <option value="City:paris_fr" data-iata="PAR" data-city="Paris">Paris (BVA / CDG / ORY)</option>
+                    <option value="City:london_gb" data-iata="LON" data-city="Londra">Londra (LTN / STN / LGW)</option>
+                    <option value="City:barcelona_es" data-iata="BCN" data-city="Barcelona">Barcelona (BCN)</option>
+                    <option value="City:madrid_es" data-iata="MAD" data-city="Madrid">Madrid (MAD)</option>
+                    <option value="City:brussels_be" data-iata="BRU" data-city="Bruxelles">Bruxelles (CRL / BRU)</option>
+                    <option value="City:vienna_at" data-iata="VIE" data-city="Viena">Viena (VIE)</option>
+                    <option value="City:munich_de" data-iata="MUC" data-city="München">München (MUC)</option>
+                    <option value="City:berlin_de" data-iata="BER" data-city="Berlin">Berlin (BER)</option>
+                    <option value="City:warsaw_pl" data-iata="WAW" data-city="Varșovia">Varșovia (WAW / WMI)</option>
+                    <option value="City:chisinau_md" data-iata="RMO" data-city="Chișinău">Chișinău (RMO)</option>
+                    <option value="City:athens_gr" data-iata="ATH" data-city="Atena">Atena (ATH)</option>
+                    <option value="City:prague_cz" data-iata="PRG" data-city="Praga">Praga (PRG)</option>
+                    <option value="City:budapest_hu" data-iata="BUD" data-city="Budapesta">Budapesta (BUD)</option>
+                    <option value="City:lisbon_pt" data-iata="LIS" data-city="Lisabona">Lisabona (LIS)</option>
+                    <option value="City:istanbul_tr" data-iata="IST" data-city="Istanbul">Istanbul (IST / SAW)</option>
                   </optgroup>
-                  <optgroup label="Filtrează după țară">
-                    <option value="it">Italia (toate orașele)</option>
-                    <option value="es">Spania (toate orașele)</option>
-                    <option value="de">Germania (toate orașele)</option>
-                    <option value="fr">Franța (toate orașele)</option>
-                    <option value="gb">Marea Britanie (toate orașele)</option>
+                  <optgroup label="🇪🇺 Toate țările & orașele din Europa (A–Z)">
+                    <option value="City:tirana_al" data-iata="TIA" data-city="Tirana">🇦🇱 Albania — Tirana (TIA)</option>
+                    <option value="City:vienna_at" data-iata="VIE" data-city="Viena">🇦🇹 Austria — Viena (VIE)</option>
+                    <option value="City:salzburg_at" data-iata="SZG" data-city="Salzburg">🇦🇹 Austria — Salzburg (SZG)</option>
+                    <option value="City:brussels_be" data-iata="BRU" data-city="Bruxelles">🇧🇪 Belgia — Bruxelles (BRU / CRL)</option>
+                    <option value="City:sofia_bg" data-iata="SOF" data-city="Sofia">🇧🇬 Bulgaria — Sofia (SOF)</option>
+                    <option value="City:varna_bg" data-iata="VAR" data-city="Varna">🇧🇬 Bulgaria — Varna (VAR)</option>
+                    <option value="City:prague_cz" data-iata="PRG" data-city="Praga">🇨🇿 Cehia — Praga (PRG)</option>
+                    <option value="City:larnaca_cy" data-iata="LCA" data-city="Larnaca">🇨🇾 Cipru — Larnaca (LCA)</option>
+                    <option value="City:paphos_cy" data-iata="PFO" data-city="Paphos">🇨🇾 Cipru — Paphos (PFO)</option>
+                    <option value="City:zagreb_hr" data-iata="ZAG" data-city="Zagreb">🇭🇷 Croația — Zagreb (ZAG)</option>
+                    <option value="City:dubrovnik_hr" data-iata="DBV" data-city="Dubrovnik">🇭🇷 Croația — Dubrovnik (DBV)</option>
+                    <option value="City:split_hr" data-iata="SPU" data-city="Split">🇭🇷 Croația — Split (SPU)</option>
+                    <option value="City:copenhagen_dk" data-iata="CPH" data-city="Copenhaga">🇩🇰 Danemarca — Copenhaga (CPH)</option>
+                    <option value="City:billund_dk" data-iata="BLL" data-city="Billund">🇩🇰 Danemarca — Billund (BLL)</option>
+                    <option value="City:zurich_ch" data-iata="ZRH" data-city="Zürich">🇨🇭 Elveția — Zürich (ZRH)</option>
+                    <option value="City:geneva_ch" data-iata="GVA" data-city="Geneva">🇨🇭 Elveția — Geneva (GVA)</option>
+                    <option value="City:basel_ch" data-iata="BSL" data-city="Basel">🇨🇭 Elveția — Basel (BSL)</option>
+                    <option value="City:tallinn_ee" data-iata="TLL" data-city="Tallinn">🇪🇪 Estonia — Tallinn (TLL)</option>
+                    <option value="City:helsinki_fi" data-iata="HEL" data-city="Helsinki">🇫🇮 Finlanda — Helsinki (HEL)</option>
+                    <option value="City:paris_fr" data-iata="PAR" data-city="Paris">🇫🇷 Franța — Paris (BVA / CDG / ORY)</option>
+                    <option value="City:nice_fr" data-iata="NCE" data-city="Nisa">🇫🇷 Franța — Nisa (NCE)</option>
+                    <option value="City:lyon_fr" data-iata="LYS" data-city="Lyon">🇫🇷 Franța — Lyon (LYS)</option>
+                    <option value="City:marseille_fr" data-iata="MRS" data-city="Marsilia">🇫🇷 Franța — Marsilia (MRS)</option>
+                    <option value="City:bordeaux_fr" data-iata="BOD" data-city="Bordeaux">🇫🇷 Franța — Bordeaux (BOD)</option>
+                    <option value="City:berlin_de" data-iata="BER" data-city="Berlin">🇩🇪 Germania — Berlin (BER)</option>
+                    <option value="City:munich_de" data-iata="MUC" data-city="München">🇩🇪 Germania — München (MUC)</option>
+                    <option value="City:frankfurt_de" data-iata="FRA" data-city="Frankfurt">🇩🇪 Germania — Frankfurt (FRA)</option>
+                    <option value="City:memmingen_de" data-iata="FMM" data-city="Memmingen">🇩🇪 Germania — Memmingen / Allgäu (FMM)</option>
+                    <option value="City:dortmund_de" data-iata="DTM" data-city="Dortmund">🇩🇪 Germania — Dortmund (DTM)</option>
+                    <option value="City:hamburg_de" data-iata="HAM" data-city="Hamburg">🇩🇪 Germania — Hamburg (HAM)</option>
+                    <option value="City:cologne_de" data-iata="CGN" data-city="Köln">🇩🇪 Germania — Köln / Bonn (CGN)</option>
+                    <option value="City:nuremberg_de" data-iata="NUE" data-city="Nürnberg">🇩🇪 Germania — Nürnberg (NUE)</option>
+                    <option value="City:stuttgart_de" data-iata="STR" data-city="Stuttgart">🇩🇪 Germania — Stuttgart (STR)</option>
+                    <option value="City:athens_gr" data-iata="ATH" data-city="Atena">🇬🇷 Grecia — Atena (ATH)</option>
+                    <option value="City:thessaloniki_gr" data-iata="SKG" data-city="Salonic">🇬🇷 Grecia — Salonic (SKG)</option>
+                    <option value="City:heraklion_gr" data-iata="HER" data-city="Heraklion">🇬🇷 Grecia — Heraklion Creta (HER)</option>
+                    <option value="City:kerkyra_gr" data-iata="CFU" data-city="Corfu">🇬🇷 Grecia — Corfu (CFU)</option>
+                    <option value="City:rhodes_gr" data-iata="RHO" data-city="Rodos">🇬🇷 Grecia — Rodos (RHO)</option>
+                    <option value="City:dublin_ie" data-iata="DUB" data-city="Dublin">🇮🇪 Irlanda — Dublin (DUB)</option>
+                    <option value="City:reykjavik_is" data-iata="KEF" data-city="Reykjavik">🇮🇸 Islanda — Reykjavik (KEF)</option>
+                    <option value="City:milan_it" data-iata="MIL" data-city="Milano">🇮🇹 Italia — Milano (BGY / MXP)</option>
+                    <option value="City:bologna_it" data-iata="BLQ" data-city="Bologna">🇮🇹 Italia — Bologna (BLQ)</option>
+                    <option value="City:rome_it" data-iata="ROM" data-city="Roma">🇮🇹 Italia — Roma (FCO / CIA)</option>
+                    <option value="City:venice_it" data-iata="VCE" data-city="Veneția">🇮🇹 Italia — Veneția (VCE / TSF)</option>
+                    <option value="City:naples_it" data-iata="NAP" data-city="Napoli">🇮🇹 Italia — Napoli (NAP)</option>
+                    <option value="City:bari_it" data-iata="BRI" data-city="Bari">🇮🇹 Italia — Bari (BRI)</option>
+                    <option value="City:catania_it" data-iata="CTA" data-city="Catania">🇮🇹 Italia — Catania Sicilia (CTA)</option>
+                    <option value="City:palermo_it" data-iata="PMO" data-city="Palermo">🇮🇹 Italia — Palermo Sicilia (PMO)</option>
+                    <option value="City:pisa_it" data-iata="PSA" data-city="Pisa">🇮🇹 Italia — Florența / Pisa (PSA)</option>
+                    <option value="City:turin_it" data-iata="TRN" data-city="Torino">🇮🇹 Italia — Torino (TRN)</option>
+                    <option value="City:riga_lv" data-iata="RIX" data-city="Riga">🇱🇻 Letonia — Riga (RIX)</option>
+                    <option value="City:vilnius_lt" data-iata="VNO" data-city="Vilnius">🇱🇹 Lituania — Vilnius (VNO)</option>
+                    <option value="City:kaunas_lt" data-iata="KUN" data-city="Kaunas">🇱🇹 Lituania — Kaunas (KUN)</option>
+                    <option value="City:luxembourg_lu" data-iata="LUX" data-city="Luxemburg">🇱🇺 Luxemburg — Luxemburg (LUX)</option>
+                    <option value="City:luqa_mt" data-iata="MLA" data-city="Malta">🇲🇹 Malta — La Valletta / Luqa (MLA)</option>
+                    <option value="City:manchester_gb" data-iata="MAN" data-city="Manchester">🇬🇧 Marea Britanie — Manchester (MAN)</option>
+                    <option value="City:london_gb" data-iata="LON" data-city="Londra">🇬🇧 Marea Britanie — Londra (LTN / STN / LGW)</option>
+                    <option value="City:birmingham_gb" data-iata="BHX" data-city="Birmingham">🇬🇧 Marea Britanie — Birmingham (BHX)</option>
+                    <option value="City:edinburgh_gb" data-iata="EDI" data-city="Edinburgh">🇬🇧 Marea Britanie — Edinburgh (EDI)</option>
+                    <option value="City:liverpool_gb" data-iata="LPL" data-city="Liverpool">🇬🇧 Marea Britanie — Liverpool (LPL)</option>
+                    <option value="City:bristol_gb" data-iata="BRS" data-city="Bristol">🇬🇧 Marea Britanie — Bristol (BRS)</option>
+                    <option value="City:chisinau_md" data-iata="RMO" data-city="Chișinău">🇲🇩 Moldova — Chișinău (RMO)</option>
+                    <option value="City:podgorica_me" data-iata="TGD" data-city="Podgorica">🇲🇪 Muntenegru — Podgorica (TGD)</option>
+                    <option value="City:tivat_me" data-iata="TIV" data-city="Tivat">🇲🇪 Muntenegru — Tivat (TIV)</option>
+                    <option value="City:oslo_no" data-iata="OSL" data-city="Oslo">🇳🇴 Norvegia — Oslo (OSL / TRF)</option>
+                    <option value="City:bergen_no" data-iata="BGO" data-city="Bergen">🇳🇴 Norvegia — Bergen (BGO)</option>
+                    <option value="City:amsterdam_nl" data-iata="AMS" data-city="Amsterdam">🇳🇱 Olanda — Amsterdam (AMS)</option>
+                    <option value="City:eindhoven_nl" data-iata="EIN" data-city="Eindhoven">🇳🇱 Olanda — Eindhoven (EIN)</option>
+                    <option value="City:warsaw_pl" data-iata="WAW" data-city="Varșovia">🇵🇱 Polonia — Varșovia (WAW / WMI)</option>
+                    <option value="City:krakow_pl" data-iata="KRK" data-city="Cracovia">🇵🇱 Polonia — Cracovia (KRK)</option>
+                    <option value="City:katowice_pl" data-iata="KTW" data-city="Katowice">🇵🇱 Polonia — Katowice (KTW)</option>
+                    <option value="City:gdansk_pl" data-iata="GDN" data-city="Gdansk">🇵🇱 Polonia — Gdansk (GDN)</option>
+                    <option value="City:wroclaw_pl" data-iata="WRO" data-city="Wroclaw">🇵🇱 Polonia — Wroclaw (WRO)</option>
+                    <option value="City:lisbon_pt" data-iata="LIS" data-city="Lisabona">🇵🇹 Portugalia — Lisabona (LIS)</option>
+                    <option value="City:porto_pt" data-iata="OPO" data-city="Porto">🇵🇹 Portugalia — Porto (OPO)</option>
+                    <option value="City:faro_pt" data-iata="FAO" data-city="Faro">🇵🇹 Portugalia — Faro Algarve (FAO)</option>
+                    <option value="City:cluj-napoca_ro" data-iata="CLJ" data-city="Cluj-Napoca">🇷🇴 România — Cluj-Napoca (CLJ)</option>
+                    <option value="City:timisoara_ro" data-iata="TSR" data-city="Timișoara">🇷🇴 România — Timișoara (TSR)</option>
+                    <option value="City:iasi_ro" data-iata="IAS" data-city="Iași">🇷🇴 România — Iași (IAS)</option>
+                    <option value="City:suceava_ro" data-iata="SCV" data-city="Suceava">🇷🇴 România — Suceava (SCV)</option>
+                    <option value="City:belgrade_rs" data-iata="BEG" data-city="Belgrad">🇷🇸 Serbia — Belgrad (BEG)</option>
+                    <option value="City:bratislava_sk" data-iata="BTS" data-city="Bratislava">🇸🇰 Slovacia — Bratislava (BTS)</option>
+                    <option value="City:madrid_es" data-iata="MAD" data-city="Madrid">🇪🇸 Spania — Madrid (MAD)</option>
+                    <option value="City:barcelona_es" data-iata="BCN" data-city="Barcelona">🇪🇸 Spania — Barcelona (BCN)</option>
+                    <option value="City:valencia_es" data-iata="VLC" data-city="Valencia">🇪🇸 Spania — Valencia (VLC)</option>
+                    <option value="City:malaga_es" data-iata="AGP" data-city="Malaga">🇪🇸 Spania — Malaga Costa del Sol (AGP)</option>
+                    <option value="City:seville_es" data-iata="SVQ" data-city="Sevilla">🇪🇸 Spania — Sevilla (SVQ)</option>
+                    <option value="City:alicante_es" data-iata="ALC" data-city="Alicante">🇪🇸 Spania — Alicante (ALC)</option>
+                    <option value="City:palma_es" data-iata="PMI" data-city="Palma">🇪🇸 Spania — Palma de Mallorca (PMI)</option>
+                    <option value="City:santa-cruz-de-tenerife_es" data-iata="TFS" data-city="Tenerife">🇪🇸 Spania — Tenerife (TFS)</option>
+                    <option value="City:stockholm_se" data-iata="ARN" data-city="Stockholm">🇸🇪 Suedia — Stockholm (ARN / NYO)</option>
+                    <option value="City:gothenburg_se" data-iata="GOT" data-city="Göteborg">🇸🇪 Suedia — Göteborg (GOT)</option>
+                    <option value="City:istanbul_tr" data-iata="IST" data-city="Istanbul">🇹🇷 Turcia — Istanbul (IST / SAW)</option>
+                    <option value="City:antalya_tr" data-iata="AYT" data-city="Antalya">🇹🇷 Turcia — Antalya (AYT)</option>
+                    <option value="City:budapest_hu" data-iata="BUD" data-city="Budapesta">🇭🇺 Ungaria — Budapesta (BUD)</option>
                   </optgroup>
                 </select>
               </div>
@@ -478,6 +575,28 @@
       </div>
     </section>
 
+    
+    <!-- Dedicated Best Weekend Spotlight for Selected City (23AI Theme) -->
+    <div id="city-spotlight-banner" class="hidden card-23ai bg-[#fce8bd] border-2 border-[#dfa649] rounded-3xl p-5 shadow-sm transition">
+      <div class="flex flex-wrap items-center justify-between gap-4">
+        <div class="space-y-1">
+          <div class="flex items-center gap-2">
+            <span class="text-xs uppercase font-black text-[#5c3b06] tracking-wider font-display">🏆 Cel mai ieftin weekend găsit:</span>
+            <span id="spotlight-badge" class="bg-[#0a0b0d] text-[#dfa649] text-[11px] font-bold px-2 py-0.5 rounded-md font-display">Recomandare</span>
+          </div>
+          <div id="spotlight-title" class="text-lg sm:text-xl font-black text-[#0a0b0d] font-display">
+            <!-- Rendered by JS -->
+          </div>
+          <div id="spotlight-details" class="text-xs sm:text-sm text-[#422904] font-medium font-body">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+        <div id="spotlight-action" class="flex items-center gap-2">
+          <!-- Rendered by JS -->
+        </div>
+      </div>
+    </div>
+
     <!-- Controls Bar Above Table -->
     <div class="flex flex-wrap items-center justify-between gap-4">
       <div class="flex flex-wrap items-center gap-3">
@@ -647,9 +766,10 @@
     let currentMonthFilter = "all";
     let currentMode = 1; // 1 = per pax, 2 = total grup
     let currentLinkMode = "kiwi";
+    let currentRows = [];
 
-        function carrierName(code) {
-      const map = { W4: "Wizz Air", W6: "Wizz Air", FR: "Ryanair", RO: "Tarom", H4: "HiSky", LH: "Lufthansa", TK: "Turkish Airlines", OS: "Austrian", LO: "LOT" };
+    function carrierName(code) {
+      const map = { W4: "Wizz Air", W6: "Wizz Air", FR: "Ryanair", RO: "Tarom", H4: "HiSky", LH: "Lufthansa", TK: "Turkish Airlines", OS: "Austrian", LO: "LOT", LX: "Swiss", KL: "KLM", AF: "Air France", BA: "British Airways", VY: "Vueling", U2: "easyJet" };
       return map[code] || code;
     }
 
@@ -666,11 +786,13 @@
       }
       if (carrier === "RO") return "https://www.tarom.ro/";
       if (carrier === "H4") return "https://hisky.aero/";
+      if (carrier === "TK") return "https://www.turkishairlines.com";
+      if (carrier === "LH") return "https://www.lufthansa.com";
       return `https://www.google.com/travel/flights?hl=ro&curr=EUR&q=Flights%20from%20${fromCode}%20to%20${toCode}%20on%20${dateOut}%20through%20${dateIn}`;
     }
 
     // Enrich static cells with direct deep links
-    function enrichStaticRow(arr, skyFrom, skyTo) {
+    function enrichStaticRow(arr, skyFrom, skyTo, cityId) {
       const map = {};
       if (!arr || !Array.isArray(arr)) return map;
       const baseWkIds = ["2026-11-13", "2026-11-20", "2026-11-27", "2026-12-04", "2026-12-11", "2026-12-18"];
@@ -692,76 +814,85 @@
         map[wkId] = {
           totalEur: item.totalEur,
           perPaxEur: item.totalEur / 2,
-          outRoute: item.outRoute ? item.outRoute.replace("->", " → ") : `${outOrig} → ${outDest}`,
-          inRoute: item.inRoute ? item.inRoute.replace("->", " → ") : `${inOrig} → ${inDest}`,
-          outTime: item.outTime ? item.outTime.replace("->", " → ") : "",
-          inTime: item.inTime ? item.inTime.replace("->", " → ") : "",
-          outCarrier: item.outCarrier,
-          inCarrier: item.inCarrier,
-          airlineLabel,
-          kiwiBookingUrl: item.bookingUrl,
+          outRoute: item.outRoute,
+          outTime: item.outTime,
+          inRoute: item.inRoute,
+          inTime: item.inTime,
+          airlineLabel: airlineLabel,
           bookingUrl: item.bookingUrl,
-          airlineDirectUrl,
+          kiwiCheckoutUrl: item.bookingUrl,
           airlineUrl: airlineDirectUrl,
-          skyscannerUrl,
-          googleFlightsUrl
+          skyscannerUrl: skyscannerUrl,
+          googleFlightsUrl: googleFlightsUrl
         };
       });
       return map;
     }
 
-    let currentRows = [];
-
     function loadDefaultRows() {
       currentRows = [
         {
           city: "Milano Bergamo",
-          sub: "BGY · Wizz Air (19:30 → 21:00)",
-          code: "BGY",
+          sub: "BGY · Wizz Air",
+          code: "bgy",
+          iata: "BGY",
+          cityId: "City:milan_it",
           skyTo: "bgy",
-          cellsMap: enrichStaticRow(INITIAL_CELL_LINKS.bgy_wizz, "otp", "bgy")
+          cellsMap: enrichStaticRow(INITIAL_CELL_LINKS.bgy_wizz, "otp", "bgy", "City:milan_it")
         },
         {
           city: "Milano (Toate aeroporturile)",
-          sub: "BGY / MXP · Ryanair + Wizz Air",
-          code: "MIL",
-          skyTo: "mila",
-          cellsMap: enrichStaticRow(INITIAL_CELL_LINKS.milan_all, "otp", "mila")
+          sub: "MIL (BGY + MXP) · Wizz & Ryanair",
+          code: "mil",
+          iata: "MIL",
+          cityId: "City:milan_it",
+          skyTo: "milan",
+          cellsMap: enrichStaticRow(INITIAL_CELL_LINKS.milan_all, "otp", "milan", "City:milan_it")
         },
         {
           city: "Bologna",
-          sub: "BLQ · Wizz Air / Ryanair",
-          code: "BLQ",
+          sub: "BLQ · Wizz Air",
+          code: "blq",
+          iata: "BLQ",
+          cityId: "City:bologna_it",
           skyTo: "blq",
-          cellsMap: enrichStaticRow(INITIAL_CELL_LINKS.bologna, "otp", "blq")
+          cellsMap: enrichStaticRow(INITIAL_CELL_LINKS.bologna, "otp", "blq", "City:bologna_it")
         },
         {
           city: "Chișinău",
           sub: "RMO · Wizz Air",
-          code: "RMO",
+          code: "rmo",
+          iata: "RMO",
+          cityId: "City:chisinau_md",
           skyTo: "rmo",
-          cellsMap: enrichStaticRow(INITIAL_CELL_LINKS.chisinau, "otp", "rmo")
+          cellsMap: enrichStaticRow(INITIAL_CELL_LINKS.chisinau, "otp", "rmo", "City:chisinau_md")
         },
         {
           city: "Varșovia",
-          sub: "WAW · Wizz Air (Băneasa BBU)",
-          code: "WAW",
+          sub: "WAW / BBU · Wizz Air",
+          code: "waw",
+          iata: "WAW",
+          cityId: "City:warsaw_pl",
           skyTo: "waw",
-          cellsMap: enrichStaticRow(INITIAL_CELL_LINKS.warsaw, "bbu", "waw")
+          cellsMap: enrichStaticRow(INITIAL_CELL_LINKS.warsaw, "otp", "waw", "City:warsaw_pl")
         },
         {
           city: "Copenhaga",
           sub: "CPH · Wizz Air",
-          code: "CPH",
+          code: "cph",
+          iata: "CPH",
+          cityId: "City:copenhagen_dk",
           skyTo: "cph",
-          cellsMap: enrichStaticRow(INITIAL_CELL_LINKS.copenhagen, "otp", "cph")
+          cellsMap: enrichStaticRow(INITIAL_CELL_LINKS.copenhagen, "otp", "cph", "City:copenhagen_dk")
         },
         {
           city: "Bruxelles",
-          sub: "CRL / BRU · Ryanair + Tarom",
-          code: "BRU",
-          skyTo: "brus",
-          cellsMap: enrichStaticRow(INITIAL_CELL_LINKS.brussels, "otp", "brus")
+          sub: "CRL / BRU · Ryanair & Tarom",
+          code: "crl",
+          iata: "BRU",
+          cityId: "City:brussels_be",
+          skyTo: "crl",
+          cellsMap: enrichStaticRow(INITIAL_CELL_LINKS.brussels, "otp", "crl", "City:brussels_be")
         }
       ];
     }
@@ -770,30 +901,31 @@
       return ALL_WEEKENDS.filter(w => selectedWkIds.has(w.id));
     }
 
+    // Render Month Tabs & Chips
     function renderWeekendSelectorUI() {
       // 1. Render Month Tabs
-      const monthsMap = new Map();
+      const tabsEl = document.getElementById("month-tabs");
+      const monthMap = new Map();
       ALL_WEEKENDS.forEach(w => {
-        if (!monthsMap.has(w.monthKey)) {
-          monthsMap.set(w.monthKey, { name: w.monthName, count: 0, selectedCount: 0 });
+        if (!monthMap.has(w.monthKey)) {
+          monthMap.set(w.monthKey, { key: w.monthKey, name: w.monthName, count: 0 });
         }
-        const m = monthsMap.get(w.monthKey);
-        m.count++;
-        if (selectedWkIds.has(w.id)) m.selectedCount++;
+        monthMap.get(w.monthKey).count++;
       });
 
-      const tabsEl = document.getElementById("month-tabs");
       let tabsHtml = `
-        <button onclick="setMonthFilter('all')" class="whitespace-nowrap px-3.5 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer border font-display ${currentMonthFilter === 'all' ? 'bg-[#0a0b0d] text-[#dfa649] border-[#0a0b0d] shadow-xs' : 'bg-[#f4f5f8] text-[#0a0b0d] border-[#dce1e7] hover:bg-[#e4e7eb]'}">
-          Toate lunile (${ALL_WEEKENDS.length})
+        <button onclick="setMonthFilter('all')"
+                class="px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition cursor-pointer font-display ${currentMonthFilter === 'all' ? 'bg-[#0a0b0d] text-[#dfa649] shadow-xs' : 'bg-[#f4f5f8] text-[#475569] hover:bg-[#e2e8f0]'}">
+          Toate (${ALL_WEEKENDS.length})
         </button>
       `;
-      for (const [key, m] of monthsMap.entries()) {
-        const isActive = currentMonthFilter === key;
-        const selBadge = m.selectedCount > 0 ? `<span class="ml-1 px-1.5 py-0.2 rounded-full text-[10px] ${isActive ? 'bg-[#dfa649] text-[#0a0b0d]' : 'bg-[#0a0b0d] text-[#dfa649]'}">${m.selectedCount}</span>` : "";
+
+      for (const m of monthMap.values()) {
+        const isAct = currentMonthFilter === m.key;
         tabsHtml += `
-          <button onclick="setMonthFilter('${key}')" class="whitespace-nowrap px-3 py-1.5 rounded-xl text-xs font-semibold transition cursor-pointer border font-display ${isActive ? 'bg-[#0a0b0d] text-[#dfa649] border-[#0a0b0d] shadow-xs font-bold' : 'bg-[#f4f5f8] text-[#0a0b0d] border-[#dce1e7] hover:bg-[#e4e7eb]'}">
-            ${m.name} ${selBadge}
+          <button onclick="setMonthFilter('${m.key}')"
+                  class="px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition cursor-pointer font-display ${isAct ? 'bg-[#0a0b0d] text-[#dfa649] shadow-xs' : 'bg-[#f4f5f8] text-[#475569] hover:bg-[#e2e8f0]'}">
+            ${m.name}
           </button>
         `;
       }
@@ -928,11 +1060,28 @@
       `;
     }
 
+    // When Destination Selector changes
+    function onDestinationChange() {
+      const destSelect = document.getElementById("f-destination");
+      const val = destSelect.value;
+      const opt = destSelect.selectedOptions[0];
+      const cityName = opt ? (opt.dataset.city || opt.textContent.split("—")[0].trim()) : "";
+
+      const btnText = document.getElementById("btn-search-text");
+      if (val === "any") {
+        btnText.textContent = "Caută zboruri live";
+        document.getElementById("city-spotlight-banner").classList.add("hidden");
+      } else {
+        btnText.textContent = `Găsește cel mai ieftin weekend către ${cityName}`;
+      }
+      renderMatrix();
+    }
+
     // Render Matrix Table
     function renderMatrix() {
       const thead = document.getElementById("matrix-head");
       const tbody = document.getElementById("matrix-body");
-      const maxBudget = parseFloat(document.getElementById("f-max-price").value) || 150;
+      const maxBudget = parseFloat(document.getElementById("f-max-price").value) || 350;
       const adults = parseInt(document.getElementById("f-adults").value, 10) || 2;
       document.getElementById("lbl-group-count").textContent = adults;
 
@@ -952,6 +1101,65 @@
         return;
       }
 
+      // Filter rows based on destination selection
+      const destSelect = document.getElementById("f-destination");
+      const destVal = destSelect?.value || "any";
+      const destOpt = destSelect?.selectedOptions[0];
+      const destIata = (destOpt?.dataset?.iata || "").toLowerCase();
+      const destCityName = (destOpt?.dataset?.city || "").toLowerCase();
+
+      let filteredRows = currentRows;
+      if (destVal !== "any") {
+        filteredRows = currentRows.filter(r => {
+          const rCode = (r.code || "").toLowerCase();
+          const rIata = (r.iata || "").toLowerCase();
+          const rCity = (r.city || "").toLowerCase();
+          const rSub = (r.sub || "").toLowerCase();
+          const rCityId = r.cityId || "";
+
+          return (rCityId === destVal) ||
+                 (destIata && (rCode === destIata || rIata === destIata)) ||
+                 (destCityName && (rCity.includes(destCityName) || rSub.includes(destCityName)));
+        });
+      }
+
+      // Calculate cheapest flight across selected weekends for spotlight banner
+      const spotlightBanner = document.getElementById("city-spotlight-banner");
+      let globalBestCell = null;
+      let globalBestWk = null;
+      let globalBestRow = null;
+
+      filteredRows.forEach(r => {
+        activeWks.forEach(wk => {
+          const c = r.cellsMap[wk.id];
+          if (c && c.perPaxEur <= maxBudget) {
+            if (!globalBestCell || c.perPaxEur < globalBestCell.perPaxEur) {
+              globalBestCell = c;
+              globalBestWk = wk;
+              globalBestRow = r;
+            }
+          }
+        });
+      });
+
+      if (destVal !== "any" && globalBestCell && globalBestWk && globalBestRow) {
+        spotlightBanner.classList.remove("hidden");
+        const p1 = Math.round(globalBestCell.perPaxEur);
+        const pTot = Math.round(globalBestCell.totalEur);
+        document.getElementById("spotlight-title").textContent =
+          `${globalBestRow.city} · ${currentMode === 1 ? p1 + ' € / pers.' : pTot + ' € total grup'} în weekendul ${globalBestWk.label}`;
+        document.getElementById("spotlight-details").textContent =
+          `Tur: ${globalBestCell.outRoute} (${globalBestCell.outTime}) | Retur: ${globalBestCell.inRoute} (${globalBestCell.inTime}) · ${globalBestCell.airlineLabel}`;
+        document.getElementById("spotlight-action").innerHTML = `
+          <a href="${globalBestCell.bookingUrl}" target="_blank" rel="noopener noreferrer"
+             class="bg-[#0a0b0d] hover:bg-[#1a1e27] text-[#dfa649] font-black text-xs sm:text-sm px-5 py-2.5 rounded-xl transition shadow-xs font-display flex items-center gap-1.5">
+            Rezervă cel mai ieftin weekend (${p1} €) →
+          </a>
+        `;
+      } else {
+        spotlightBanner.classList.add("hidden");
+      }
+
       // Find per-weekend cheapest
       const minPerWk = {};
       activeWks.forEach(wk => {
@@ -959,7 +1167,7 @@
         let minCode = "—";
         let minCell = null;
         let minCity = "";
-        currentRows.forEach(r => {
+        filteredRows.forEach(r => {
           const c = r.cellsMap[wk.id];
           if (c && c.perPaxEur <= maxBudget && c.perPaxEur < minVal) {
             minVal = c.perPaxEur;
@@ -984,49 +1192,29 @@
       headHtml += `</tr>`;
       thead.innerHTML = headHtml;
 
-      // Render Body with Destination Filtering
+      // Render Body
       tbody.innerHTML = "";
-      const destFilter = (document.getElementById("f-destination")?.value || "any").toLowerCase();
 
-      let filteredRows = currentRows;
-      if (destFilter !== "any") {
-        filteredRows = currentRows.filter(r => {
-          const code = (r.code || "").toLowerCase();
-          const city = (r.city || "").toLowerCase();
-          const sub = (r.sub || "").toLowerCase();
-          
-          if (destFilter === "mil") return code === "bgy" || code === "mxp" || code === "lin" || city.includes("milan");
-          if (destFilter === "rom") return code === "fco" || code === "cia" || city.includes("rom");
-          if (destFilter === "par") return code === "bva" || code === "cdg" || code === "ory" || city.includes("paris");
-          if (destFilter === "lon") return code === "ltn" || code === "stn" || code === "lgw" || code === "lhr" || city.includes("lond");
-          if (destFilter === "vce") return code === "vce" || code === "tsf" || city.includes("vene");
-          if (destFilter === "it") return ["bgy","mxp","lin","blq","fco","cia","vce","tsf","nap"].includes(code) || sub.includes("italia") || city.includes("milano") || city.includes("bologna") || city.includes("roma") || city.includes("venetia") || city.includes("napoli");
-          if (destFilter === "es") return ["bcn","mad","vlc","agp"].includes(code) || city.includes("barcelona") || city.includes("madrid");
-          if (destFilter === "de") return ["muc","ber","fra","dmm","mem"].includes(code) || city.includes("münchen") || city.includes("berlin") || city.includes("frankfurt");
-          if (destFilter === "fr") return ["bva","cdg","ory","nce"].includes(code) || city.includes("paris") || city.includes("nisa");
-          if (destFilter === "gb") return ["ltn","stn","lgw","lhr"].includes(code) || city.includes("londra");
-          
-          return code === destFilter || city.includes(destFilter) || sub.includes(destFilter);
-        });
-      }
-
-      const visibleRows = filteredRows.filter(r => activeWks.some(wk => r.cellsMap[wk.id] && r.cellsMap[wk.id].perPaxEur <= maxBudget));
-      const rowsToRender = visibleRows.length > 0 ? visibleRows : filteredRows;
-
-      if (rowsToRender.length === 0) {
+      if (filteredRows.length === 0) {
+        const destTitle = destOpt?.textContent || "destinația selectată";
         tbody.innerHTML = `
           <tr>
             <td colspan="${activeWks.length + 1}" class="text-center py-10 px-4 text-[#0a0b0d] font-bold bg-[#fbf9f4] rounded-2xl font-display">
-              <div class="text-3xl mb-2">🎯</div>
-              <div class="text-sm sm:text-base">Nu s-au găsit zboruri pentru destinația selectată în criteriile actuale.</div>
-              <div class="text-xs text-[#64748b] mt-1 font-normal font-body">Încearcă să selectezi „Oricare (Toată Europa)” sau să crești bugetul maxim.</div>
+              <div class="text-3xl mb-2">✈️</div>
+              <div class="text-sm sm:text-base">Zborurile către ${destTitle} nu sunt încă încărcate în cache.</div>
+              <div class="text-xs text-[#64748b] mt-1 font-normal font-body">Apasă pe butonul de mai jos pentru a căuta live cele mai ieftine bilete și weekenduri.</div>
+              <div class="mt-4">
+                <button onclick="runLiveSearch()" class="bg-[#dfa649] hover:bg-[#c98f33] active:bg-[#b57f2a] text-[#0a0b0d] text-xs sm:text-sm font-black px-5 py-2.5 rounded-xl shadow-sm transition inline-flex items-center gap-2 cursor-pointer font-display">
+                  🔍 Caută acum pe toate weekendurile
+                </button>
+              </div>
             </td>
           </tr>
         `;
         return;
       }
 
-      rowsToRender.forEach((r) => {
+      filteredRows.forEach((r) => {
         const origRowIdx = currentRows.indexOf(r);
         const tr = document.createElement("tr");
 
@@ -1117,12 +1305,12 @@
           url: "https://wizzair.com/ro-ro#/booking/select-flight"
         },
         {
-          city: "Istanbul",
-          iata: "IST",
-          airline: "Turkish Airlines",
-          out: "21:35 → 00:05",
-          in: "19:55 → 20:15",
-          url: "https://www.turkishairlines.com"
+          city: "Manchester",
+          iata: "MAN",
+          airline: "Ryanair",
+          out: "Vineri direct / conexiune",
+          in: "Duminică seară",
+          url: "https://www.ryanair.com"
         },
         {
           city: "München",
@@ -1208,9 +1396,31 @@
       renderMatrix();
     }
 
-    function resetToDefaults() {
+    // 1) Permissive Reset (User requested: guarantee results for any European destination)
+    function resetToPermissive() {
       document.getElementById("f-origin").value = "City:bucharest_ro";
-      if (document.getElementById("f-destination")) document.getElementById("f-destination").value = "any";
+      document.getElementById("f-max-price").value = 350;
+      document.getElementById("lbl-max-price").textContent = "350 €";
+      document.getElementById("f-adults").value = "2";
+      document.getElementById("f-bags").value = "small";
+      document.getElementById("f-max-dur").value = "360"; // 6 hours
+      document.getElementById("f-stops").value = "1";     // 1 escală scurtă
+      document.getElementById("f-fri-dep").value = "06:00"; // de dimineață
+      document.getElementById("f-out-arr").value = "03:00"; // fără limită
+      document.getElementById("f-sun-dep").value = "12:00";
+      document.getElementById("f-in-arr").value = "03:00";  // fără limită
+      document.getElementById("f-domestic").checked = true;
+
+      document.getElementById("subtitle-summary").textContent =
+        "🔓 Mod permisiv activat: buget max. 350 €, permite 1 escală, plecare vineri oricând, retur duminică oricând. Găsește garantat variante pentru orice oraș din Europa!";
+
+      renderMatrix();
+    }
+
+    // 2) Strict Classic Reset (Friday evening after 18:00, nonstop)
+    function resetToStrict() {
+      document.getElementById("f-origin").value = "City:bucharest_ro";
+      document.getElementById("f-destination").value = "any";
       document.getElementById("f-max-price").value = 150;
       document.getElementById("lbl-max-price").textContent = "150 €";
       document.getElementById("f-adults").value = "2";
@@ -1222,12 +1432,13 @@
       document.getElementById("f-sun-dep").value = "18:00";
       document.getElementById("f-in-arr").value = "01:00";
       document.getElementById("f-domestic").checked = false;
+      document.getElementById("city-spotlight-banner").classList.add("hidden");
       selectPreset('2026_no_xmas');
       loadDefaultRows();
       renderMatrix();
     }
 
-    // Live GraphQL Search against Kiwi Umbrella API for ANY selected weekends (including 2027)
+    // GraphQL Queries
     const QUERY_ONEWAY = `
       query SearchOneway($search: SearchOnewayInput, $filter: ItinerariesFilterInput, $options: ItinerariesOptionsInput) {
         onewayItineraries(search: $search, filter: $filter, options: $options) {
@@ -1296,21 +1507,28 @@
       }
     `;
 
+    // Live Parallel Search Engine
     async function runLiveSearch() {
       const originSelect = document.getElementById("f-origin");
       const originCityId = originSelect.value;
       const originSky = originSelect.selectedOptions[0].dataset.sky || "otp";
-      const maxPrice1Pax = parseFloat(document.getElementById("f-max-price").value) || 150;
+      const originIata = originSelect.selectedOptions[0].dataset.iata || "OTP";
+      const maxPrice1Pax = parseFloat(document.getElementById("f-max-price").value) || 350;
       const adults = parseInt(document.getElementById("f-adults").value, 10) || 2;
       const bagType = document.getElementById("f-bags").value;
-      const maxDurMin = parseInt(document.getElementById("f-max-dur").value, 10) || 180;
+      const maxDurMin = parseInt(document.getElementById("f-max-dur").value, 10) || 360;
       const maxStops = parseInt(document.getElementById("f-stops").value, 10) || 0;
       const friDep = document.getElementById("f-fri-dep").value;
       const outArrLimit = document.getElementById("f-out-arr").value;
       const sunDep = document.getElementById("f-sun-dep").value;
       const inArrLimit = document.getElementById("f-in-arr").value;
       const includeDomestic = document.getElementById("f-domestic").checked;
-      const destFilter = (document.getElementById("f-destination")?.value || "any").toLowerCase();
+
+      const destSelect = document.getElementById("f-destination");
+      const destVal = destSelect.value;
+      const destOpt = destSelect.selectedOptions[0];
+      const destIata = destOpt?.dataset?.iata || "";
+      const destCityName = destOpt?.dataset?.city || (destOpt ? destOpt.textContent.split("—")[0].trim() : "");
 
       const activeWks = getSelectedWeekendsList();
       if (activeWks.length === 0) {
@@ -1325,26 +1543,165 @@
       const statusText = document.getElementById("search-status-text");
       const statusPct = document.getElementById("search-status-pct");
       statusBox.classList.remove("hidden");
-
-      const cityRowsMap = new Map();
-      currentRows.forEach(r => {
-        cityRowsMap.set(r.code, {
-          city: r.city,
-          sub: r.sub,
-          code: r.code,
-          skyTo: r.skyTo,
-          cellsMap: { ...r.cellsMap }
-        });
-      });
+      statusPct.textContent = "10%";
 
       try {
+        // CASE A: Specific City Targeted Search (e.g. Manchester, Tallinn, Reykjavik, Nice, etc.)
+        if (destVal !== "any") {
+          statusText.textContent = `Interogăm live toate weekendurile selectate pentru ${destCityName}...`;
+
+          const promises = activeWks.map(async (wk, i) => {
+            try {
+              const res = await fetch("https://api.skypicker.com/umbrella/v2/graphql", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  query: QUERY_RETURN,
+                  variables: {
+                    search: {
+                      passengers: { adults: adults, adultsHandBags: handBags, adultsHoldBags: holdBags },
+                      cabinClass: { cabinClass: "ECONOMY" },
+                      itinerary: {
+                        source: { ids: [originCityId] },
+                        destination: { ids: [destVal] },
+                        outboundDepartureDate: { start: `${wk.fri}T${friDep}:00`, end: `${wk.fri}T23:59:59` },
+                        inboundDepartureDate: { start: `${wk.sun}T${sunDep}:00`, end: `${wk.sun}T23:59:59` }
+                      }
+                    },
+                    filter: {
+                      allowChangeInboundSource: true,
+                      allowChangeInboundDestination: true,
+                      allowDifferentStationConnection: false,
+                      transportTypes: ["FLIGHT"]
+                    },
+                    options: { partner: "skypicker", sortBy: "PRICE" }
+                  }
+                })
+              });
+              const json = await res.json();
+              return { wk, itins: json?.data?.returnItineraries?.itineraries || [] };
+            } catch (e) {
+              console.warn("Error querying weekend", wk.id, e);
+              return { wk, itins: [] };
+            }
+          });
+
+          const results = await Promise.all(promises);
+          statusPct.textContent = "80%";
+
+          const targetCellsMap = {};
+          let targetCityTitle = destCityName;
+          let targetIata = destIata;
+          let targetAirline = "Companie aeriană";
+
+          results.forEach(({ wk, itins }) => {
+            for (const it of itins) {
+              const outSegs = it.outbound?.sectorSegments || [];
+              const inSegs = it.inbound?.sectorSegments || [];
+
+              // Check stops
+              if (maxStops === 0 && (outSegs.length > 1 || inSegs.length > 1)) continue;
+              if (it.outbound?.duration > maxDurMin * 60 || it.inbound?.duration > maxDurMin * 60) continue;
+
+              const outFirst = outSegs[0]?.segment;
+              const outLast = outSegs[outSegs.length - 1]?.segment;
+              const inFirst = inSegs[0]?.segment;
+              const inLast = inSegs[inSegs.length - 1]?.segment;
+              if (!outFirst || !outLast || !inFirst || !inLast) continue;
+
+              const outOrig = outFirst.source.station.code;
+              const outDest = outLast.destination.station.code;
+              targetIata = outDest;
+              targetCityTitle = outLast.destination.station.city?.name || destCityName;
+
+              const outArrTime = outLast.destination.localTime.slice(11, 16);
+              if (outArrLimit !== "03:00" && outArrTime > outArrLimit && outArrTime < "04:00") continue;
+
+              const inArrTime = inLast.destination.localTime.slice(11, 16);
+              if (inArrLimit !== "03:00" && inArrTime > inArrLimit && inArrTime < "04:00") continue;
+
+              const totalEur = parseFloat(it.priceEur?.amount) || 9999;
+              const perPaxEur = totalEur / adults;
+
+              const outCarrier = outFirst.carrier?.code || "FR";
+              const inCarrier = inFirst.carrier?.code || "FR";
+              const same = (outCarrier === inCarrier);
+              const airlineLabel = same ? carrierName(outCarrier) : `${carrierName(outCarrier)} + ${carrierName(inCarrier)}`;
+              targetAirline = airlineLabel;
+
+              const bookingUrl = it.bookingOptions?.edges?.[0]?.node?.bookingUrl ||
+                                 `https://www.kiwi.com/ro/booking?token=${encodeURIComponent(it.id)}&passengers=${adults}`;
+
+              const airlineDirectUrl = buildAirlineUrl(outCarrier, outOrig, outDest, wk.fri, wk.sun, adults, !same);
+              const skyOut = wk.fri.replace(/-/g, "").slice(2);
+              const skyIn = wk.sun.replace(/-/g, "").slice(2);
+              const skyscannerUrl = `https://www.skyscanner.ro/transport/zboruri/${originSky}/${outDest.toLowerCase()}/${skyOut}/${skyIn}/?adults=${adults}`;
+              const googleFlightsUrl = `https://www.google.com/travel/flights?hl=ro&curr=EUR&q=Flights%20from%20${outOrig}%20to%20${outDest}%20on%20${wk.fri}%20through%20${wk.sun}%20for%20${adults}%20adults`;
+
+              const cellObj = {
+                totalEur: totalEur,
+                perPaxEur: perPaxEur,
+                outRoute: `${outOrig} → ${outDest}`,
+                outTime: `${outFirst.source.localTime.slice(11, 16)} → ${outArrTime}`,
+                inRoute: `${inFirst.source.station.code} → ${inLast.destination.station.code}`,
+                inTime: `${inFirst.source.localTime.slice(11, 16)} → ${inArrTime}`,
+                airlineLabel: airlineLabel,
+                bookingUrl: bookingUrl,
+                kiwiCheckoutUrl: bookingUrl,
+                airlineUrl: airlineDirectUrl,
+                skyscannerUrl: skyscannerUrl,
+                googleFlightsUrl: googleFlightsUrl
+              };
+
+              if (!targetCellsMap[wk.id] || cellObj.perPaxEur < targetCellsMap[wk.id].perPaxEur) {
+                targetCellsMap[wk.id] = cellObj;
+              }
+            }
+          });
+
+          // Insert or update target city row at the top
+          const newRow = {
+            city: targetCityTitle,
+            sub: `${targetIata} · ${targetAirline}`,
+            code: targetIata.toLowerCase(),
+            iata: targetIata,
+            cityId: destVal,
+            skyTo: targetIata.toLowerCase(),
+            cellsMap: targetCellsMap
+          };
+
+          // Remove any existing duplicate row for this city
+          currentRows = currentRows.filter(r => r.cityId !== destVal && r.code !== targetIata.toLowerCase());
+          currentRows.unshift(newRow);
+
+          statusPct.textContent = "100%";
+          setTimeout(() => statusBox.classList.add("hidden"), 500);
+
+          renderMatrix();
+          return;
+        }
+
+        // CASE B: "any" Destination Search (Discovers reachable European cities)
+        const cityRowsMap = new Map();
+        currentRows.forEach(r => {
+          cityRowsMap.set(r.code, {
+            city: r.city,
+            sub: r.sub,
+            code: r.code,
+            iata: r.iata || r.code.toUpperCase(),
+            cityId: r.cityId || "",
+            skyTo: r.skyTo,
+            cellsMap: { ...r.cellsMap }
+          });
+        });
+
         for (let i = 0; i < activeWks.length; i++) {
           const wk = activeWks[i];
           const pct = Math.round(((i) / activeWks.length) * 100);
-          statusText.textContent = `Se caută zboruri reale pentru weekendul ${wk.label} (${i+1}/${activeWks.length})...`;
+          statusText.textContent = `Căutăm destinații deschise pentru ${wk.label} (${i+1}/${activeWks.length})...`;
           statusPct.textContent = `${pct}%`;
 
-          // Step 1: Discover reachable destinations
+          // Step 1: Discover outbound reachable cities
           const resOut = await fetch("https://api.skypicker.com/umbrella/v2/graphql", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -1352,20 +1709,15 @@
               query: QUERY_ONEWAY,
               variables: {
                 search: {
-                  passengers: { adults: adults, handBags: handBags, holdBags: holdBags },
+                  passengers: { adults: adults, adultsHandBags: handBags, adultsHoldBags: holdBags },
                   cabinClass: { cabinClass: "ECONOMY" },
                   itinerary: {
                     source: { ids: [originCityId] },
-                    outboundDate: { start: `${wk.fri}T${friDep}:00`, end: `${wk.fri}T23:59:59` }
+                    outboundDepartureDate: { start: `${wk.fri}T${friDep}:00`, end: `${wk.fri}T23:59:59` }
                   }
                 },
-                filter: {
-                  allowChangeInboundSource: true,
-                  allowChangeInboundDestination: true,
-                  allowDifferentStationConnection: false,
-                  transportTypes: ["FLIGHT"]
-                },
-                options: { sortBy: "QUALITY" }
+                filter: { transportTypes: ["FLIGHT"] },
+                options: { partner: "skypicker", sortBy: "QUALITY" }
               }
             })
           });
@@ -1388,7 +1740,7 @@
 
           if (destCityIds.size === 0) continue;
 
-          // Step 2: Query return itineraries
+          // Step 2: Return query
           const resRet = await fetch("https://api.skypicker.com/umbrella/v2/graphql", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -1396,13 +1748,13 @@
               query: QUERY_RETURN,
               variables: {
                 search: {
-                  passengers: { adults: adults, handBags: handBags, holdBags: holdBags },
+                  passengers: { adults: adults, adultsHandBags: handBags, adultsHoldBags: holdBags },
                   cabinClass: { cabinClass: "ECONOMY" },
                   itinerary: {
                     source: { ids: [originCityId] },
-                    destination: { ids: [...destCityIds] },
-                    outboundDate: { start: `${wk.fri}T${friDep}:00`, end: `${wk.fri}T23:59:59` },
-                    inboundDate: { start: `${wk.sun}T${sunDep}:00`, end: `${wk.sun}T23:59:59` }
+                    destination: { ids: [...destCityIds].slice(0, 30) },
+                    outboundDepartureDate: { start: `${wk.fri}T${friDep}:00`, end: `${wk.fri}T23:59:59` },
+                    inboundDepartureDate: { start: `${wk.sun}T${sunDep}:00`, end: `${wk.sun}T23:59:59` }
                   }
                 },
                 filter: {
@@ -1411,7 +1763,7 @@
                   allowDifferentStationConnection: false,
                   transportTypes: ["FLIGHT"]
                 },
-                options: { sortBy: "PRICE" }
+                options: { partner: "skypicker", sortBy: "PRICE" }
               }
             })
           });
@@ -1430,7 +1782,6 @@
             const outLast = outSegs[outSegs.length - 1]?.segment;
             const inFirst = inSegs[0]?.segment;
             const inLast = inSegs[inSegs.length - 1]?.segment;
-
             if (!outFirst || !outLast || !inFirst || !inLast) continue;
 
             const outOrig = outFirst.source.station.code;
@@ -1449,25 +1800,19 @@
             const totalEur = parseFloat(it.priceEur?.amount) || 9999;
             const perPaxEur = totalEur / adults;
 
-            if (perPaxEur > maxPrice1Pax * 1.35) continue;
+            if (perPaxEur > maxPrice1Pax * 1.5) continue;
+
+            const outCarrier = outFirst.carrier?.code || "FR";
+            const inCarrier = inFirst.carrier?.code || "FR";
+            const same = (outCarrier === inCarrier);
+            const airlineLabel = same ? carrierName(outCarrier) : `${carrierName(outCarrier)} + ${carrierName(inCarrier)}`;
 
             const bookingUrl = it.bookingOptions?.edges?.[0]?.node?.bookingUrl ||
                                `https://www.kiwi.com/ro/booking?token=${encodeURIComponent(it.id)}&passengers=${adults}`;
 
-            const airlineLabel = outFirst.carrier?.name || inFirst.carrier?.name || "Companie aeriană";
-            const airlineCode = (outFirst.carrier?.code || "w6").toLowerCase();
-
-            let airlineUrl = "https://wizzair.com/ro-ro#/booking/select-flight";
-            if (airlineCode === "fr" || airlineLabel.toLowerCase().includes("ryan")) {
-              airlineUrl = "https://www.ryanair.com/ro/ro/trip/flights";
-            } else if (airlineCode === "tk" || airlineLabel.toLowerCase().includes("turkish")) {
-              airlineUrl = "https://www.turkishairlines.com";
-            } else if (airlineCode === "lh" || airlineLabel.toLowerCase().includes("lufthansa")) {
-              airlineUrl = "https://www.lufthansa.com";
-            }
-
-            const outSkyDate = wk.fri.replace(/-/g, "").slice(2);
-            const inSkyDate = wk.sun.replace(/-/g, "").slice(2);
+            const airlineDirectUrl = buildAirlineUrl(outCarrier, outOrig, outDest, wk.fri, wk.sun, adults, !same);
+            const skyOut = wk.fri.replace(/-/g, "").slice(2);
+            const skyIn = wk.sun.replace(/-/g, "").slice(2);
 
             const cellObj = {
               perPaxEur: perPaxEur,
@@ -1479,17 +1824,19 @@
               airlineLabel: airlineLabel,
               bookingUrl: bookingUrl,
               kiwiCheckoutUrl: bookingUrl,
-              airlineUrl: airlineUrl,
-              skyscannerUrl: `https://www.skyscanner.ro/transport/dflights/${outOrig.toLowerCase()}/${outDest.toLowerCase()}/${outSkyDate}/${inSkyDate}/?adultsv2=${adults}&cabinclass=economy&childrenv2=&inboundaltsenabled=false&outboundaltsenabled=false&preferdirects=true&ref=home`,
+              airlineUrl: airlineDirectUrl,
+              skyscannerUrl: `https://www.skyscanner.ro/transport/zboruri/${originSky}/${outDest.toLowerCase()}/${skyOut}/${skyIn}/?adults=${adults}`,
               googleFlightsUrl: `https://www.google.com/travel/flights?hl=ro&curr=EUR&q=Flights%20from%20${outOrig}%20to%20${outDest}%20on%20${wk.fri}%20through%20${wk.sun}%20for%20${adults}%20adults`
             };
 
-            const key = outDest;
+            const key = outDest.toLowerCase();
             if (!cityRowsMap.has(key)) {
               cityRowsMap.set(key, {
-                city: destCity.name,
+                city: destCity?.name || outDest,
                 sub: `${outDest} · ${airlineLabel}`,
-                code: outDest,
+                code: key,
+                iata: outDest,
+                cityId: destCity?.id || "",
                 skyTo: outDest.toLowerCase(),
                 cellsMap: {}
               });
@@ -1510,13 +1857,10 @@
           return minA - minB;
         });
 
-        document.getElementById("subtitle-summary").textContent =
-          `Plecare vineri ≥ ${friDep}, retur duminică ≥ ${sunDep} (aterizare max. ${inArrLimit}), buget ≤ ${maxPrice1Pax} €/pers., durată ≤ ${Math.round(maxDurMin/60)}h.`;
-
         renderMatrix();
       } catch (err) {
         console.error(err);
-        statusText.textContent = "Eroare la interogarea live. Se afișează datele curente.";
+        statusText.textContent = "A apărut o problemă la căutare. Se afișează datele curente.";
         setTimeout(() => statusBox.classList.add("hidden"), 2500);
       }
     }
@@ -1525,6 +1869,7 @@
     loadDefaultRows();
     renderWeekendSelectorUI();
     renderMatrix();
+
   </script>
 </body>
 </html>
