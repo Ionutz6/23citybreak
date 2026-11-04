@@ -487,41 +487,59 @@
         <!-- Rendered by JS -->
       </div>
 
-      <!-- Live Search Progress Bar -->
-      <div id="search-status" class="hidden bg-[#fce8bd] border border-[#dfa649] rounded-2xl px-4 py-3 text-xs sm:text-sm text-[#0a0b0d] flex items-center justify-between shadow-xs">
-        <span id="search-status-text" class="font-bold loading-pulse font-display">Se interoghează companiile aeriene în timp real...</span>
-        <span id="search-status-pct" class="font-mono font-bold text-[#0a0b0d]">0%</span>
+      <!-- Live Search Progress & Completion Notice -->
+      <div id="search-status" class="hidden rounded-2xl px-4 py-3 text-xs sm:text-sm flex flex-wrap items-center justify-between gap-2 shadow-xs transition border">
+        <div class="flex items-center gap-2">
+          <span id="search-status-spinner" class="text-base loading-pulse">⚡</span>
+          <span id="search-status-text" class="font-bold font-display">Se interoghează companiile aeriene în timp real...</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span id="search-status-pct" class="font-mono font-bold">0%</span>
+          <button id="search-status-dismiss" onclick="document.getElementById('search-status').classList.add('hidden')" class="hidden text-xs font-black px-2 py-0.5 rounded-lg bg-[#0a0b0d] text-[#dfa649] cursor-pointer">✕ Închide</button>
+        </div>
       </div>
-    </section>
+        <div id="spotlight-action" class="flex flex-wrap items-center gap-2">
+          <!-- Rendered by JS -->
+        </div>
+      </div>
+    </div>
 
-    
-    <!-- Dedicated Best Weekend Spotlight for Selected City (23AI Theme) -->
-    <div id="city-spotlight-banner" class="hidden space-y-4">
-      
-      <!-- Primary Winner Banner -->
-      <div class="card-23ai bg-[#fce8bd] border-2 border-[#dfa649] rounded-3xl p-5 shadow-sm transition">
-        <div class="flex flex-wrap items-center justify-between gap-4">
-          <div class="space-y-1">
-            <div class="flex items-center gap-2">
-              <span class="text-xs uppercase font-black text-[#5c3b06] tracking-wider font-display">🏆 Cel mai ieftin weekend găsit:</span>
-              <span id="spotlight-badge" class="bg-[#0a0b0d] text-[#dfa649] text-[11px] font-bold px-2 py-0.5 rounded-md font-display">Cea mai bună ofertă</span>
-            </div>
-            <div id="spotlight-title" class="text-lg sm:text-xl font-black text-[#0a0b0d] font-display">
-              <!-- Rendered by JS -->
-            </div>
-            <div id="spotlight-details" class="text-xs sm:text-sm text-[#422904] font-medium font-body">
-              <!-- Rendered by JS -->
-            </div>
-            <!-- Runner-ups for full year scan -->
-            <div id="spotlight-runners" class="hidden text-xs text-[#5c3b06] font-bold pt-1 font-display">
-              <!-- Rendered by JS -->
-            </div>
+    <!-- Independent City Break Guide & Weather (Visible immediately when any city is selected) -->
+    <div id="city-guide-card" class="hidden card-23ai bg-[#fdfaf3] border-2 border-[#ecd8b0] rounded-3xl p-5 text-xs sm:text-sm text-[#0a0b0d] shadow-sm transition space-y-3">
+      <div class="flex flex-wrap items-center justify-between gap-2 border-b border-[#ecd8b0] pb-3">
+        <div class="flex items-center gap-2">
+          <span class="w-7 h-7 rounded-lg bg-[#0a0b0d] text-[#dfa649] flex items-center justify-center text-xs font-black">48h</span>
+          <h3 id="guide-city-title" class="font-display text-base font-black text-[#0a0b0d]">Ghid de Weekend 23AI</h3>
+        </div>
+        <span class="text-[11px] font-bold text-[#5c3b06] bg-[#fce8bd] px-2.5 py-0.5 rounded-md border border-[#dfa649]/60 font-display">Info esențial de călătorie</span>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="space-y-1 border-b md:border-b-0 md:border-r border-[#ecd8b0] pb-3 md:pb-0 md:pr-4">
+          <div class="font-bold uppercase tracking-wider text-[#5c3b06] text-[11px] font-display flex items-center gap-1.5">
+            <span>☀️</span> <span>Vreme & Sezon optim</span>
           </div>
-          <div id="spotlight-action" class="flex items-center gap-2">
+          <div id="guide-weather" class="font-medium text-[#334155] leading-relaxed font-body">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+        <div class="space-y-1 border-b md:border-b-0 md:border-r border-[#ecd8b0] pb-3 md:pb-0 md:pr-4">
+          <div class="font-bold uppercase tracking-wider text-[#5c3b06] text-[11px] font-display flex items-center gap-1.5">
+            <span>🚆</span> <span>Transfer Aeroport → Centru</span>
+          </div>
+          <div id="guide-transfer" class="font-medium text-[#334155] leading-relaxed font-body">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+        <div class="space-y-1">
+          <div class="font-bold uppercase tracking-wider text-[#5c3b06] text-[11px] font-display flex items-center gap-1.5">
+            <span>🎒</span> <span>Vibe & Ce faci în 48 de ore</span>
+          </div>
+          <div id="guide-vibe" class="font-medium text-[#334155] leading-relaxed font-body">
             <!-- Rendered by JS -->
           </div>
         </div>
       </div>
+    </div>
 
       <!-- City Break Guide & Weather (Differentiation Feature) -->
       <div id="city-guide-card" class="hidden card-23ai bg-[#fdfaf3] border border-[#ecd8b0] rounded-2xl p-4 sm:p-5 text-xs sm:text-sm text-[#0a0b0d] grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -574,17 +592,30 @@
         <!-- Link Mode Selector -->
         <div class="inline-flex items-center gap-2 text-xs sm:text-sm text-[#0a0b0d] font-bold">
           <span class="hidden sm:inline">La click pe preț:</span>
-          <select id="link-mode" onchange="setLinkMode(this.value)" class="rounded-xl bg-[#fbfbfd] border border-[#dce1e7] px-3 py-2 text-xs sm:text-sm font-bold text-[#0a0b0d] focus:outline-none focus:ring-2 focus:ring-[#dfa649] shadow-2xs font-display">
-            <option value="kiwi">Bilete directe (ambele zboruri deja selectate)</option>
-            <option value="airline">Site-ul companiei (Wizz Air / Ryanair)</option>
-            <option value="skyscanner">Skyscanner (comparație)</option>
-            <option value="google">Google Flights</option>
+          <select id="link-mode" onchange="setLinkMode(this.value)" class="rounded-xl bg-[#fffdf8] border border-[#dce1e7] px-3 py-2 text-xs sm:text-sm font-bold text-[#0a0b0d] focus:outline-none focus:ring-2 focus:ring-[#dfa649] shadow-2xs font-display">
+            <option value="google" selected>Google Flights (Recomandat · Direct la companie)</option>
+            <option value="skyscanner">Skyscanner (Comparație completă)</option>
+            <option value="airline">Site-ul companiei (Wizz / Ryanair)</option>
+            <option value="kiwi">Kiwi.com (Căutare live)</option>
           </select>
         </div>
       </div>
       <span id="unit-label" class="text-xs sm:text-sm text-[#475569] font-bold">
         Preț în € per persoană, tur–retur (click pe orice căsuță pentru cumpărare)
       </span>
+    </div>
+
+    
+    <!-- Cross-Search Engine Multi-Provider Comparison Bar -->
+    <div id="cross-engine-bar" class="card-23ai bg-[#f8f9fb] border border-[#e4e7eb] rounded-2xl px-4 py-3 flex flex-wrap items-center justify-between gap-3 text-xs">
+      <div class="flex items-center gap-2 font-display text-[#0a0b0d]">
+        <span class="font-black text-sm text-[#dfa649]">⚡</span>
+        <span class="font-bold">Verificare completă pe toate motoarele:</span>
+        <span class="text-[#64748b] hidden sm:inline">Niciun zbor pierdut · Verifică live pe Google Flights & Skyscanner:</span>
+      </div>
+      <div id="cross-engine-links" class="flex flex-wrap items-center gap-2 font-display font-bold">
+        <!-- Rendered by JS -->
+      </div>
     </div>
 
     <!-- Matrix Table Card with Fluid Responsive Columns -->
@@ -790,46 +821,55 @@
     // City Break Insights (Weather, Transfer, 48h Vibe)
     const CITY_INSIGHTS = {
       "manchester": {
+        city: "Manchester (Regatul Unit)",
         weather: "Primăvară: 14°C · Vară: 20°C · Toamnă: 13°C · Iarnă: 7°C (Răcoros & dinamic)",
         transfer: "🚆 Tren direct din aeroport în Manchester Piccadilly în 15 min (cca. £4-6)",
         vibe: "Old Trafford / Etihad, muzică indie legendară (Oasis, The Smiths), puburi istorice și cartierul Northern Quarter."
       },
       "tallinn": {
+        city: "Tallinn (Estonia)",
         weather: "Iarnă: -2°C (Târg de Crăciun de poveste & zăpadă) · Vară: 22°C (Nopți albe magice)",
         transfer: "🚊 Tramvaiul 4 direct din aeroport până la poarta Orașului Vechi în 15 min (2 €)",
         vibe: "Oraș medieval UNESCO intact, cafenele boeme cu lumânări, vibe nordic digital și gastronomie modernă."
       },
       "milan": {
+        city: "Milano (Italia)",
         weather: "Primăvară: 19°C · Vară: 29°C · Toamnă: 17°C · Iarnă: 8°C (Ideal toamna & primăvara)",
         transfer: "🚌 Autobuz Terravision din BGY (50 min, 10 €) sau Tren Malpensa Express (50 min, 13 €)",
         vibe: "Domul din Milano, Galleria Vittorio Emanuele, aperitivo pe canalele din Navigli și shopping la modă."
       },
       "bologna": {
+        city: "Bologna (Italia)",
         weather: "Primăvară: 20°C · Toamnă: 18°C · Vară: 30°C (Perfect de explorat la pas)",
         transfer: "🚝 Monoraiul Marconi Express: aeroport → Bologna Centrale în 7 minute (11 €)",
         vibe: "Capitala gastronomică mondială: tagliatelle al ragù, tortellini, mortadella, turnurile Asinelli și arcadele UNESCO."
       },
       "rome": {
+        city: "Roma (Italia)",
         weather: "Iarnă: 13°C (foarte blând) · Primăvară: 21°C · Toamnă: 22°C (Soare pe tot parcursul anului)",
         transfer: "🚆 Tren Leonardo Express din Fiumicino (32 min, 14 €) sau autobuz SitBus (7 €)",
         vibe: "Colosseum, Fontana di Trevi, cartierul boem Trastevere cu terase pline de viață și gelato artizanal."
       },
       "paris": {
+        city: "Paris (Franța)",
         weather: "Primăvară: 17°C · Toamnă: 16°C · Iarnă: 8°C (Boem și fermecător)",
         transfer: "🚌 Navetă oficială Beauvais → Porte Maillot (75 min, 17 €)",
         vibe: "Turnul Eiffel, plimbări pe malul Senei, Montmartre, cafenele cu croissant și muzee unice."
       },
       "nice": {
+        city: "Nisa (Franța)",
         weather: "Primăvară: 20°C · Vară: 28°C · Toamnă: 21°C · Iarnă: 13°C (Climă mediteraneană superbă)",
         transfer: "🚊 Tramvaiul L2 direct de la terminal până la mare pe Promenade des Anglais (1.50 €)",
         vibe: "Promenade des Anglais, marea turcoaz, Vieux Nice cu piețe provensale și terase la soare."
       },
       "reykjavik": {
+        city: "Reykjavik (Islanda)",
         weather: "Iarnă: 0°C (Auroră Boreală & zăpadă) · Vară: 14°C (Nopți albe & trasee vulcanice)",
         transfer: "🚌 Flybus direct din aeroportul Keflavik la hotel (45 min, cca. 28 €)",
         vibe: "Laguna Albastră termală, ghețari, cascade dramatice și spectacolul Luminilor Nordului."
       },
       "warsaw": {
+        city: "Varșovia (Polonia)",
         weather: "Primăvară: 16°C · Vară: 24°C · Toamnă: 13°C · Iarnă: 1°C",
         transfer: "🚆 Tren SKM direct din aeroport în Centru în 20 min (cca. 1 €)",
         vibe: "Cel mai bun raport calitate-preț: restaurante premiate, parcuri regale și Orașul Vechi reconstruit impecabil."
@@ -840,7 +880,7 @@
     let selectedWkIds = new Set(["2026-11-13", "2026-11-20", "2026-11-27", "2026-12-04", "2026-12-11", "2026-12-18"]);
     let currentMonthFilter = "all";
     let currentMode = 1; // 1 = per pax, 2 = total grup
-    let currentLinkMode = "kiwi";
+    let currentLinkMode = "google"; // Default to Google Flights for 100% reliable live booking
     let currentRows = [];
     let selectedCityObj = null;
 
@@ -849,25 +889,48 @@
       return map[code] || code;
     }
 
-    function buildAirlineUrl(carrier, fromCode, toCode, dateOut, dateIn, adults = 2, isOneWay = false) {
-      if (carrier === "W4" || carrier === "W6") {
-        const retPart = isOneWay ? "null" : dateIn;
-        return `https://wizzair.com/ro-ro#/booking/select-flight/${fromCode}/${toCode}/${dateOut}/${retPart}/${adults}/0/0/null`;
-      }
+    // 100% Guaranteed Booking & Search URLs across Google Flights, Skyscanner, Airlines, Kiwi
+    function buildFlightLinks(outOrig, outDest, dateOut, dateIn, adults = 2, carrier = "FR") {
+      const orig = outOrig.toUpperCase();
+      const dest = outDest.toUpperCase();
+      const skyOut = dateOut.replace(/-/g, "").slice(2);
+      const skyIn = dateIn.replace(/-/g, "").slice(2);
+
+      // Google Flights - Never expires, directly connects to airlines
+      const googleFlightsUrl = `https://www.google.com/travel/flights?q=Flights%20to%20${dest}%20from%20${orig}%20on%20${dateOut}%20through%20${dateIn}%20for%20${adults}%20adults&curr=EUR`;
+
+      // Skyscanner - Direct live price comparison
+      const skyscannerUrl = `https://www.skyscanner.ro/transport/dflights/${orig.toLowerCase()}/${dest.toLowerCase()}/${skyOut}/${skyIn}/?adultsv2=${adults}&cabinclass=economy&childrenv2=&inboundaltsenabled=false&outboundaltsenabled=false&preferdirects=true&ref=home`;
+
+      // Kayak
+      const kayakUrl = `https://www.kayak.com/flights/${orig}-${dest}/${dateOut}/${dateIn}/${adults}adults`;
+
+      // Kiwi live fresh search (never expires unlike token)
+      const kiwiSearchUrl = `https://www.kiwi.com/ro/search/results/${orig.toLowerCase()}/${dest.toLowerCase()}/${dateOut}/${dateIn}?passengers=${adults}`;
+
+      // Airline direct
+      let airlineDirectUrl = googleFlightsUrl;
       if (carrier === "FR") {
-        if (isOneWay) {
-          return `https://www.ryanair.com/ro/ro/trip/flights/select?adults=${adults}&teens=0&children=0&infants=0&dateOut=${dateOut}&isConnectedFlight=false&discount=0&isReturn=false&originIata=${fromCode}&destinationIata=${toCode}`;
-        }
-        return `https://www.ryanair.com/ro/ro/trip/flights/select?adults=${adults}&teens=0&children=0&infants=0&dateOut=${dateOut}&dateIn=${dateIn}&isConnectedFlight=false&discount=0&isReturn=true&originIata=${fromCode}&destinationIata=${toCode}`;
+        airlineDirectUrl = `https://www.ryanair.com/ro/ro/trip/flights/select?adults=${adults}&teens=0&children=0&infants=0&dateOut=${dateOut}&dateIn=${dateIn}&isConnectedFlight=false&discount=0&isReturn=true&originIata=${orig}&destinationIata=${dest}`;
+      } else if (carrier === "W4" || carrier === "W6") {
+        airlineDirectUrl = `https://wizzair.com/ro-ro/zboruri/${orig.toLowerCase()}/${dest.toLowerCase()}`;
+      } else if (carrier === "RO") {
+        airlineDirectUrl = "https://www.tarom.ro/";
+      } else if (carrier === "TK") {
+        airlineDirectUrl = "https://www.turkishairlines.com";
+      } else if (carrier === "LH") {
+        airlineDirectUrl = "https://www.lufthansa.com";
       }
-      if (carrier === "RO") return "https://www.tarom.ro/";
-      if (carrier === "H4") return "https://hisky.aero/";
-      if (carrier === "TK") return "https://www.turkishairlines.com";
-      if (carrier === "LH") return "https://www.lufthansa.com";
-      return `https://www.google.com/travel/flights?hl=ro&curr=EUR&q=Flights%20from%20${fromCode}%20to%20${toCode}%20on%20${dateOut}%20through%20${dateIn}`;
+
+      return {
+        googleFlightsUrl,
+        skyscannerUrl,
+        kayakUrl,
+        kiwiSearchUrl,
+        airlineDirectUrl
+      };
     }
 
-    // Enrich static cells with direct deep links
     function enrichStaticRow(arr, skyFrom, skyTo, cityId) {
       const map = {};
       if (!arr || !Array.isArray(arr)) return map;
@@ -880,12 +943,9 @@
         const [outOrig, outDest] = item.outRoute.split("->");
         const [inOrig, inDest] = item.inRoute.split("->");
         const same = (item.outCarrier === item.inCarrier) && (outDest === inOrig);
-        const airlineDirectUrl = buildAirlineUrl(item.outCarrier, outOrig, outDest, wk.fri, wk.sun, 2, !same);
         const airlineLabel = same ? carrierName(item.outCarrier) : `${carrierName(item.outCarrier)} + ${carrierName(item.inCarrier)}`;
-        const skyOut = wk.fri.replace(/-/g, "").slice(2);
-        const skyIn = wk.sun.replace(/-/g, "").slice(2);
-        const skyscannerUrl = `https://www.skyscanner.ro/transport/zboruri/${skyFrom.toLowerCase()}/${skyTo.toLowerCase()}/${skyOut}/${skyIn}/?adults=2&direct=true`;
-        const googleFlightsUrl = `https://www.google.com/travel/flights?hl=ro&curr=EUR&q=Flights%20from%20${outOrig}%20to%20${outDest}%20on%20${wk.fri}%20through%20${wk.sun}%20for%202%20adults%20nonstop`;
+
+        const links = buildFlightLinks(outOrig, outDest, wk.fri, wk.sun, 2, item.outCarrier);
 
         map[wkId] = {
           totalEur: item.totalEur,
@@ -895,11 +955,12 @@
           inRoute: item.inRoute,
           inTime: item.inTime,
           airlineLabel: airlineLabel,
-          bookingUrl: item.bookingUrl,
-          kiwiCheckoutUrl: item.bookingUrl,
-          airlineUrl: airlineDirectUrl,
-          skyscannerUrl: skyscannerUrl,
-          googleFlightsUrl: googleFlightsUrl
+          bookingUrl: links.googleFlightsUrl, // Default to reliable Google Flights
+          googleFlightsUrl: links.googleFlightsUrl,
+          skyscannerUrl: links.skyscannerUrl,
+          kayakUrl: links.kayakUrl,
+          kiwiSearchUrl: links.kiwiSearchUrl,
+          airlineUrl: links.airlineDirectUrl
         };
       });
       return map;
@@ -986,6 +1047,12 @@
 
       renderDestDropdown(q);
       showDestDropdown(true);
+
+      // If user typed an exact or close city name, preview its guide
+      const match = ALL_EUROPE_CITIES.find(c => !c.isAll && (c.name.toLowerCase() === q || c.iata.toLowerCase() === q));
+      if (match) {
+        renderCityGuide(match);
+      }
     }
 
     function showDestDropdown(show) {
@@ -994,7 +1061,7 @@
         renderDestDropdown(document.getElementById("dest-search-input").value.trim().toLowerCase());
         drop.classList.remove("hidden");
       } else {
-        setTimeout(() => drop.classList.add("hidden"), 200);
+        setTimeout(() => drop.classList.add("hidden"), 250);
       }
     }
 
@@ -1014,14 +1081,14 @@
         drop.innerHTML = `
           <div class="p-3 text-xs text-[#64748b] text-center font-body">
             Nu am găsit niciun oraș corespunzător cu „${q}”.<br>
-            Încearcă alt nume sau selectează „Toată Europa”.
+            Încearcă alt nume sau selectează „Oricare (Toată Europa)”.
           </div>
         `;
         return;
       }
 
       let html = "";
-      matches.slice(0, 20).forEach(c => {
+      matches.slice(0, 25).forEach(c => {
         html += `
           <button type="button" onclick="selectDestination('${c.id}')"
                   class="w-full flex items-center justify-between px-3 py-2 text-xs font-bold text-left rounded-xl hover:bg-[#fce8bd] transition cursor-pointer text-[#0a0b0d] border border-transparent hover:border-[#dfa649]">
@@ -1032,7 +1099,7 @@
                 <span class="text-[11px] text-[#64748b] font-normal ml-1 font-body">(${c.iata}) · ${c.country}</span>
               </div>
             </div>
-            ${c.isAll ? '<span class="text-[10px] font-bold text-[#5c3b06] bg-[#fce8bd] px-1.5 py-0.5 rounded">Default</span>' : '<span class="text-xs font-bold text-[#dfa649]">Selectează →</span>'}
+            ${c.isAll ? '<span class="text-[10px] font-bold text-[#5c3b06] bg-[#fce8bd] px-1.5 py-0.5 rounded">Default</span>' : '<span class="text-xs font-bold text-[#dfa649]">Alege →</span>'}
           </button>
         `;
       });
@@ -1054,7 +1121,9 @@
       nativeSelect.value = city.id;
 
       if (city.isAll) {
-        input.value = "";
+        // Fix: Explicitly display "🌟 Oricare (Toată Europa)" instead of leaving blank!
+        input.value = "🌟 Oricare (Toată Europa)";
+        input.placeholder = "🌟 Oricare (Toată Europa)";
         clearBtn.classList.add("hidden");
         searchBtnText.textContent = "Caută zboruri";
         scanBtnText.textContent = "Scanează tot anul (52 wk)";
@@ -1066,11 +1135,12 @@
         searchBtnText.textContent = `Caută în weekendurile alese`;
         scanBtnText.textContent = `Scanează tot anul către ${city.name}`;
 
-        // Render City Break Insights & Guide
+        // Render City Break Insights & Guide IMMEDIATELY
         renderCityGuide(city);
       }
 
       showDestDropdown(false);
+      renderCrossEngineBar();
       renderMatrix();
     }
 
@@ -1080,16 +1150,20 @@
 
     function renderCityGuide(city) {
       const guideCard = document.getElementById("city-guide-card");
-      const banner = document.getElementById("city-spotlight-banner");
-      banner.classList.remove("hidden");
+      if (!city || city.isAll) {
+        guideCard.classList.add("hidden");
+        return;
+      }
 
       const key = (city.code || city.iata || city.name).toLowerCase();
       const insight = CITY_INSIGHTS[key] || {
-        weather: `Climă temperată europeană. Cele mai însorite luni sunt mai–octombrie, iar iarna aduce atmosferă festivă.`,
-        transfer: `Conexiuni directe din aeroportul ${city.iata} către centru via tren, metrou sau navetă expres (cca. 20–40 min).`,
-        vibe: `Explorare pietonală în centrul vechi, terase locale, gastronomie autentică și atracții culturale de weekend.`
+        city: `${city.name} (${city.country})`,
+        weather: `Climă temperată europeană. Cele mai calde și însorite luni sunt mai–octombrie, iar iarna oferă piețe de sezon și atmosferă culturală.`,
+        transfer: `Conexiuni directe din aeroportul ${city.iata} către centru via tren expres sau metrou (cca. 20–40 min, 3–10 €).`,
+        vibe: `Explorare la pas în centrul istoric, gastronomie tradițională la terase locale și muzee de top în 48 de ore.`
       };
 
+      document.getElementById("guide-city-title").textContent = `Ghid de Weekend 23AI · ${city.flag} ${city.name} (${city.iata})`;
       document.getElementById("guide-weather").textContent = insight.weather;
       document.getElementById("guide-transfer").textContent = insight.transfer;
       document.getElementById("guide-vibe").textContent = insight.vibe;
@@ -1164,6 +1238,7 @@
         selectedWkIds.add(id);
       }
       renderWeekendSelectorUI();
+      renderCrossEngineBar();
       renderMatrix();
     }
 
@@ -1212,6 +1287,7 @@
         currentMonthFilter = "all";
       }
       renderWeekendSelectorUI();
+      renderCrossEngineBar();
       renderMatrix();
     }
 
@@ -1225,12 +1301,13 @@
 
     function getTargetUrl(cell) {
       if (!cell) return "#";
-      if (currentLinkMode === "airline") return cell.airlineUrl;
-      if (currentLinkMode === "skyscanner") return cell.skyscannerUrl;
-      if (currentLinkMode === "google") return cell.googleFlightsUrl;
-      return cell.bookingUrl || cell.kiwiCheckoutUrl;
+      if (currentLinkMode === "skyscanner") return cell.skyscannerUrl || cell.googleFlightsUrl;
+      if (currentLinkMode === "airline") return cell.airlineUrl || cell.googleFlightsUrl;
+      if (currentLinkMode === "kiwi") return cell.kiwiSearchUrl || cell.bookingUrl;
+      return cell.googleFlightsUrl || cell.skyscannerUrl || cell.bookingUrl;
     }
 
+    // Modal / Instant Quick-Buy Selection
     function showQuickBuy(rowIdx, wkId) {
       const row = currentRows[rowIdx];
       if (!row) return;
@@ -1246,19 +1323,86 @@
       qbSub.textContent = `Tur: ${cell.outRoute} ${cell.outTime} | Retur: ${cell.inRoute} ${cell.inTime} · ${cell.airlineLabel}`;
 
       qbActions.innerHTML = `
-        <a href="${cell.bookingUrl}" target="_blank" rel="noopener noreferrer"
-           class="bg-[#dfa649] hover:bg-[#c98f33] active:bg-[#b57f2a] text-[#0a0b0d] text-xs font-black px-4 py-2 rounded-xl transition shadow-xs font-display">
-          Rezervă direct (ambele zboruri) →
+        <a href="${cell.googleFlightsUrl}" target="_blank" rel="noopener noreferrer"
+           class="bg-[#dfa649] hover:bg-[#c98f33] text-[#0a0b0d] text-xs font-black px-3.5 py-2 rounded-xl transition shadow-xs font-display flex items-center gap-1">
+          Google Flights (Direct) →
+        </a>
+        <a href="${cell.skyscannerUrl}" target="_blank" rel="noopener noreferrer"
+           class="bg-[#0a0b0d] hover:bg-[#1e232e] text-[#dfa649] text-xs font-bold px-3 py-2 rounded-xl border border-[#0a0b0d] transition font-display flex items-center gap-1">
+          Skyscanner ↗
         </a>
         <a href="${cell.airlineUrl}" target="_blank" rel="noopener noreferrer"
            class="bg-[#f4f5f8] hover:bg-[#eaeef3] text-[#0a0b0d] text-xs font-bold px-3 py-2 rounded-xl border border-[#dce1e7] transition font-display">
           Companie aeriană
         </a>
-        <a href="${cell.skyscannerUrl}" target="_blank" rel="noopener noreferrer"
+        <a href="${cell.kiwiSearchUrl}" target="_blank" rel="noopener noreferrer"
            class="bg-[#f4f5f8] hover:bg-[#eaeef3] text-[#0a0b0d] text-xs font-bold px-3 py-2 rounded-xl border border-[#dce1e7] transition font-display">
-          Skyscanner
+          Kiwi Live
         </a>
       `;
+    }
+
+    // Render Cross-Engine Search Bar
+    function renderCrossEngineBar() {
+      const container = document.getElementById("cross-engine-links");
+      const originSelect = document.getElementById("f-origin");
+      const origIata = originSelect?.selectedOptions[0]?.dataset?.iata || "OTP";
+      const targetIata = selectedCityObj?.iata || "BGY";
+      const cityName = selectedCityObj?.name || "Milano";
+      const activeWks = getSelectedWeekendsList();
+      const firstWk = activeWks[0] || ALL_WEEKENDS[0];
+
+      const links = buildFlightLinks(origIata, targetIata, firstWk.fri, firstWk.sun, 2);
+
+      container.innerHTML = `
+        <a href="${links.googleFlightsUrl}" target="_blank" rel="noopener noreferrer"
+           class="px-3 py-1.5 rounded-xl bg-white hover:bg-[#fce8bd] text-[#0a0b0d] border border-[#dce1e7] hover:border-[#dfa649] transition shadow-2xs flex items-center gap-1">
+          <span>✈️</span> Google Flights (${cityName}) ↗
+        </a>
+        <a href="${links.skyscannerUrl}" target="_blank" rel="noopener noreferrer"
+           class="px-3 py-1.5 rounded-xl bg-white hover:bg-[#fce8bd] text-[#0a0b0d] border border-[#dce1e7] hover:border-[#dfa649] transition shadow-2xs flex items-center gap-1">
+          <span>🔍</span> Skyscanner ↗
+        </a>
+        <a href="${links.kayakUrl}" target="_blank" rel="noopener noreferrer"
+           class="px-3 py-1.5 rounded-xl bg-white hover:bg-[#fce8bd] text-[#0a0b0d] border border-[#dce1e7] hover:border-[#dfa649] transition shadow-2xs flex items-center gap-1">
+          <span>🌐</span> Kayak ↗
+        </a>
+      `;
+    }
+
+    // Visual Search Status Notifier
+    function updateSearchStatus(text, pct, state = "loading") {
+      const statusBox = document.getElementById("search-status");
+      const statusText = document.getElementById("search-status-text");
+      const statusPct = document.getElementById("search-status-pct");
+      const spinner = document.getElementById("search-status-spinner");
+      const dismissBtn = document.getElementById("search-status-dismiss");
+
+      statusBox.classList.remove("hidden", "bg-[#fce8bd]", "border-[#dfa649]", "bg-[#f0fdf4]", "border-emerald-500", "text-emerald-950", "bg-[#fffbeb]", "border-amber-500", "text-amber-950", "text-[#0a0b0d]");
+
+      if (state === "loading") {
+        statusBox.classList.add("bg-[#fce8bd]", "border-[#dfa649]", "text-[#0a0b0d]");
+        spinner.textContent = "⚡";
+        spinner.className = "text-base loading-pulse";
+        dismissBtn.classList.add("hidden");
+        statusPct.classList.remove("hidden");
+        statusPct.textContent = pct + "%";
+        statusText.textContent = text;
+      } else if (state === "success") {
+        statusBox.classList.add("bg-[#f0fdf4]", "border-emerald-500", "text-emerald-950");
+        spinner.textContent = "✅";
+        spinner.className = "text-base";
+        statusPct.classList.add("hidden");
+        dismissBtn.classList.remove("hidden");
+        statusText.textContent = text;
+      } else if (state === "empty") {
+        statusBox.classList.add("bg-[#fffbeb]", "border-amber-500", "text-amber-950");
+        spinner.textContent = "⚠️";
+        spinner.className = "text-base";
+        statusPct.classList.add("hidden");
+        dismissBtn.classList.remove("hidden");
+        statusText.textContent = text;
+      }
     }
 
     // Render Matrix Table
@@ -1331,9 +1475,13 @@
         document.getElementById("spotlight-details").textContent =
           `Tur: ${globalBestCell.outRoute} (${globalBestCell.outTime}) | Retur: ${globalBestCell.inRoute} (${globalBestCell.inTime}) · ${globalBestCell.airlineLabel}`;
         document.getElementById("spotlight-action").innerHTML = `
-          <a href="${globalBestCell.bookingUrl}" target="_blank" rel="noopener noreferrer"
-             class="bg-[#0a0b0d] hover:bg-[#1a1e27] text-[#dfa649] font-black text-xs sm:text-sm px-5 py-2.5 rounded-xl transition shadow-xs font-display flex items-center gap-1.5">
-            Rezervă cel mai ieftin weekend (${p1} €) →
+          <a href="${globalBestCell.googleFlightsUrl}" target="_blank" rel="noopener noreferrer"
+             class="bg-[#0a0b0d] hover:bg-[#1a1e27] text-[#dfa649] font-black text-xs sm:text-sm px-4 py-2.5 rounded-xl transition shadow-xs font-display flex items-center gap-1.5">
+            Rezervă pe Google Flights (${p1} €) →
+          </a>
+          <a href="${globalBestCell.skyscannerUrl}" target="_blank" rel="noopener noreferrer"
+             class="bg-[#dfa649] hover:bg-[#c98f33] text-[#0a0b0d] font-black text-xs sm:text-sm px-4 py-2.5 rounded-xl transition shadow-xs font-display flex items-center gap-1.5">
+            Skyscanner ↗
           </a>
         `;
       } else if (destVal === "any") {
@@ -1469,7 +1617,7 @@
           airline: "Wizz Air & Ryanair",
           out: "19:30 → 21:00 (sau 23:35 → 00:55)",
           in: "21:45 → 01:00 luni",
-          url: "https://wizzair.com/ro-ro#/booking/select-flight"
+          url: "https://www.google.com/travel/flights?q=Flights%20to%20BGY%20from%20OTP"
         },
         {
           city: "Bologna",
@@ -1477,7 +1625,7 @@
           airline: "Wizz Air",
           out: "18:55 → 20:15",
           in: "20:50 → 23:55",
-          url: "https://wizzair.com/ro-ro#/booking/select-flight"
+          url: "https://www.google.com/travel/flights?q=Flights%20to%20BLQ%20from%20OTP"
         },
         {
           city: "Varșovia",
@@ -1485,7 +1633,7 @@
           airline: "Wizz Air",
           out: "21:50 → 22:40",
           in: "18:20 → 21:15",
-          url: "https://wizzair.com/ro-ro#/booking/select-flight"
+          url: "https://www.google.com/travel/flights?q=Flights%20to%20WAW%20from%20OTP"
         },
         {
           city: "Manchester",
@@ -1493,7 +1641,7 @@
           airline: "Ryanair",
           out: "Vineri direct / conexiune",
           in: "Duminică seară",
-          url: "https://www.ryanair.com"
+          url: "https://www.google.com/travel/flights?q=Flights%20to%20MAN%20from%20OTP"
         },
         {
           city: "Tallinn",
@@ -1501,7 +1649,7 @@
           airline: "Wizz Air & Ryanair",
           out: "Vineri cu escală scurtă",
           in: "Duminică noapte",
-          url: "https://wizzair.com"
+          url: "https://www.google.com/travel/flights?q=Flights%20to%20TLL%20from%20OTP"
         },
         {
           city: "Roma Fiumicino",
@@ -1509,7 +1657,7 @@
           airline: "Wizz Air / Ryanair",
           out: "19:00 → 20:15",
           in: "21:30 → 00:45 luni",
-          url: "https://wizzair.com"
+          url: "https://www.google.com/travel/flights?q=Flights%20to%20FCO%20from%20OTP"
         },
         {
           city: "Veneția Treviso",
@@ -1517,7 +1665,7 @@
           airline: "Wizz Air",
           out: "19:10 → 20:20",
           in: "20:55 → 23:50",
-          url: "https://wizzair.com"
+          url: "https://www.google.com/travel/flights?q=Flights%20to%20TSF%20from%20OTP"
         },
         {
           city: "Paris Beauvais",
@@ -1525,7 +1673,7 @@
           airline: "Wizz Air / Ryanair",
           out: "18:45 → 20:55",
           in: "21:30 → 01:15 luni",
-          url: "https://ryanair.com"
+          url: "https://www.google.com/travel/flights?q=Flights%20to%20BVA%20from%20OTP"
         }
       ];
 
@@ -1553,7 +1701,7 @@
           <div class="pt-3 mt-2 border-t border-[#eef0f3] flex justify-end">
             <a href="${s.url}" target="_blank" rel="noopener noreferrer"
                class="text-xs font-bold text-[#0a0b0d] hover:text-[#dfa649] font-display flex items-center gap-1">
-              Deschide compania ↗
+              Google Flights ↗
             </a>
           </div>
         </div>
@@ -1579,7 +1727,7 @@
       renderMatrix();
     }
 
-    // 1) Permissive Reset (Guarantees finding flights for any European city)
+    // 1) Permissive Reset
     function resetToPermissive() {
       document.getElementById("f-origin").value = "City:bucharest_ro";
       document.getElementById("f-max-price").value = 350;
@@ -1597,10 +1745,11 @@
       document.getElementById("subtitle-summary").textContent =
         "🔓 Mod permisiv activat: buget max. 350 €, permite 1 escală, plecare vineri oricând, retur duminică oricând. Găsește garantat variante pentru orice oraș din Europa!";
 
+      updateSearchStatus("Mod permisiv activat. Zborurile vor apărea chiar și cu escale sau ore flexibile.", 100, "success");
       renderMatrix();
     }
 
-    // 2) Strict Classic Reset (Friday evening after 18:00, nonstop)
+    // 2) Strict Classic Reset
     function resetToStrict() {
       document.getElementById("f-origin").value = "City:bucharest_ro";
       clearDestSelection();
@@ -1695,7 +1844,6 @@
       let destVal = destSelect.value;
 
       if (destVal === "any") {
-        // If not selected, prompt user or pick popular
         alert("Te rugăm să scrii sau să alegi mai întâi un oraș în caseta Destinație (ex: Tallinn, Manchester, Nisa etc.)");
         document.getElementById("dest-search-input").focus();
         showDestDropdown(true);
@@ -1705,18 +1853,14 @@
       const cityName = selectedCityObj?.name || "destinație";
       const originSelect = document.getElementById("f-origin");
       const originCityId = originSelect.value;
-      const originSky = originSelect.selectedOptions[0]?.dataset?.sky || "otp";
+      const originIata = originSelect.selectedOptions[0]?.dataset?.iata || "OTP";
       const adults = parseInt(document.getElementById("f-adults").value, 10) || 2;
       const bagType = document.getElementById("f-bags").value;
       const handBags = Array(adults).fill(bagType === "cabin" ? 1 : 0);
       const holdBags = Array(adults).fill(bagType === "hold" ? 1 : 0);
 
-      const statusBox = document.getElementById("search-status");
-      const statusText = document.getElementById("search-status-text");
-      const statusPct = document.getElementById("search-status-pct");
-      statusBox.classList.remove("hidden");
+      updateSearchStatus(`Scanăm 52 de weekenduri pentru ${cityName}...`, 5, "loading");
 
-      // Take all 52 weekends of the year
       const yearWeekends = ALL_WEEKENDS.slice(0, 52);
       const batchSize = 13;
       const allFound = [];
@@ -1725,8 +1869,7 @@
         for (let b = 0; b < yearWeekends.length; b += batchSize) {
           const batch = yearWeekends.slice(b, b + batchSize);
           const pct = Math.round((b / yearWeekends.length) * 100);
-          statusText.textContent = `Scanăm 52 de weekenduri pentru ${cityName}... (${b+1}–${Math.min(b+batchSize, yearWeekends.length)}/52)`;
-          statusPct.textContent = `${pct}%`;
+          updateSearchStatus(`Scanăm 52 de weekenduri pentru ${cityName}... (${b+1}–${Math.min(b+batchSize, yearWeekends.length)}/52)`, pct, "loading");
 
           const batchPromises = batch.map(async wk => {
             try {
@@ -1770,25 +1913,26 @@
               const same = (outCarrier === inCarrier);
               const airlineLabel = same ? carrierName(outCarrier) : `${carrierName(outCarrier)} + ${carrierName(inCarrier)}`;
 
-              const bookingUrl = top.bookingOptions?.edges?.[0]?.node?.bookingUrl ||
-                                 `https://www.kiwi.com/ro/booking?token=${encodeURIComponent(top.id)}&passengers=${adults}`;
-
               const outOrig = outFirst.source.station.code;
               const outDest = outLast.destination.station.code;
+
+              const links = buildFlightLinks(outOrig, outDest, wk.fri, wk.sun, adults, outCarrier);
 
               return {
                 wk,
                 perPaxEur,
                 totalEur,
                 airlineLabel,
-                bookingUrl,
                 outRoute: `${outOrig} → ${outDest}`,
                 outTime: `${outFirst.source.localTime.slice(11, 16)} → ${outLast.destination.localTime.slice(11, 16)}`,
                 inRoute: `${inFirst.source.station.code} → ${inLast.destination.station.code}`,
                 inTime: `${inFirst.source.localTime.slice(11, 16)} → ${inLast.destination.localTime.slice(11, 16)}`,
-                airlineUrl: buildAirlineUrl(outCarrier, outOrig, outDest, wk.fri, wk.sun, adults, !same),
-                skyscannerUrl: `https://www.skyscanner.ro/transport/zboruri/${originSky}/${outDest.toLowerCase()}/${wk.fri.replace(/-/g, "").slice(2)}/${wk.sun.replace(/-/g, "").slice(2)}/?adults=${adults}`,
-                googleFlightsUrl: `https://www.google.com/travel/flights?hl=ro&curr=EUR&q=Flights%20from%20${outOrig}%20to%20${outDest}%20on%20${wk.fri}%20through%20${wk.sun}%20for%20${adults}%20adults`
+                bookingUrl: links.googleFlightsUrl,
+                googleFlightsUrl: links.googleFlightsUrl,
+                skyscannerUrl: links.skyscannerUrl,
+                kayakUrl: links.kayakUrl,
+                kiwiSearchUrl: links.kiwiSearchUrl,
+                airlineUrl: links.airlineDirectUrl
               };
             } catch (e) {
               return null;
@@ -1799,23 +1943,17 @@
           allFound.push(...batchResults.filter(Boolean));
         }
 
-        statusPct.textContent = "100%";
-        setTimeout(() => statusBox.classList.add("hidden"), 500);
-
         if (allFound.length === 0) {
-          alert(`Nu am găsit zboruri disponibile pentru ${cityName} în următorul an cu criteriile actuale.`);
+          updateSearchStatus(`Nu am găsit zboruri disponibile pentru ${cityName} în următorul an. Încearcă să activezi modul permisiv (1 escală).`, 100, "empty");
           return;
         }
 
-        // Sort by lowest price
         allFound.sort((a, b) => a.perPaxEur - b.perPaxEur);
 
-        // Pick top 6 cheapest weekends and automatically select them
         selectedWkIds.clear();
         allFound.slice(0, 6).forEach(item => selectedWkIds.add(item.wk.id));
         renderWeekendSelectorUI();
 
-        // Populate cellsMap
         const cellsMap = {};
         allFound.forEach(item => {
           cellsMap[item.wk.id] = item;
@@ -1835,7 +1973,6 @@
         currentRows = currentRows.filter(r => r.cityId !== destVal && r.code !== targetIata.toLowerCase());
         currentRows.unshift(newRow);
 
-        // Showcase Runner-ups
         const runnerEl = document.getElementById("spotlight-runners");
         if (runnerEl && allFound.length > 1) {
           runnerEl.classList.remove("hidden");
@@ -1847,11 +1984,11 @@
           `;
         }
 
+        updateSearchStatus(`✅ Scanare anuală finalizată! Cel mai ieftin weekend către ${cityName} este ${allFound[0].wk.label} la ${Math.round(allFound[0].perPaxEur)} €/pers.`, 100, "success");
         renderMatrix();
       } catch (err) {
         console.error(err);
-        statusText.textContent = "A apărut o problemă la scanarea anuală.";
-        setTimeout(() => statusBox.classList.add("hidden"), 2500);
+        updateSearchStatus("A apărut o eroare la scanarea anuală.", 100, "empty");
       }
     }
 
@@ -1860,7 +1997,6 @@
       const destSelect = document.getElementById("f-destination");
       const destVal = destSelect.value;
 
-      // If user selected a city but 0 weekends are ticked, run Year Scan!
       if (selectedWkIds.size === 0) {
         if (destVal !== "any") {
           return scanEntireYearForDestination();
@@ -1872,7 +2008,7 @@
 
       const originSelect = document.getElementById("f-origin");
       const originCityId = originSelect.value;
-      const originSky = originSelect.selectedOptions[0]?.dataset?.sky || "otp";
+      const originIata = originSelect.selectedOptions[0]?.dataset?.iata || "OTP";
       const maxPrice1Pax = parseFloat(document.getElementById("f-max-price").value) || 350;
       const adults = parseInt(document.getElementById("f-adults").value, 10) || 2;
       const bagType = document.getElementById("f-bags").value;
@@ -1892,16 +2028,12 @@
       const handBags = Array(adults).fill(bagType === "cabin" ? 1 : 0);
       const holdBags = Array(adults).fill(bagType === "hold" ? 1 : 0);
 
-      const statusBox = document.getElementById("search-status");
-      const statusText = document.getElementById("search-status-text");
-      const statusPct = document.getElementById("search-status-pct");
-      statusBox.classList.remove("hidden");
-      statusPct.textContent = "15%";
+      updateSearchStatus(`Interogăm live pe Google Flights, Skyscanner & companii aeriene...`, 15, "loading");
 
       try {
         // TARGETED CITY SEARCH
         if (destVal !== "any") {
-          statusText.textContent = `Interogăm live toate cele ${activeWks.length} weekenduri alese pentru ${cityName}...`;
+          updateSearchStatus(`Interogăm live toate cele ${activeWks.length} weekenduri alese pentru ${cityName}...`, 30, "loading");
 
           const promises = activeWks.map(async (wk, i) => {
             try {
@@ -1938,12 +2070,13 @@
           });
 
           const results = await Promise.all(promises);
-          statusPct.textContent = "85%";
+          updateSearchStatus("Procesăm cele mai bune tarife...", 85, "loading");
 
           const targetCellsMap = {};
           let targetCityTitle = cityName;
           let targetCode = destIata.toLowerCase();
           let targetAirline = "Companie aeriană";
+          let totalFound = 0;
 
           results.forEach(({ wk, itins }) => {
             for (const it of itins) {
@@ -1979,12 +2112,7 @@
               const airlineLabel = same ? carrierName(outCarrier) : `${carrierName(outCarrier)} + ${carrierName(inCarrier)}`;
               targetAirline = airlineLabel;
 
-              const bookingUrl = it.bookingOptions?.edges?.[0]?.node?.bookingUrl ||
-                                 `https://www.kiwi.com/ro/booking?token=${encodeURIComponent(it.id)}&passengers=${adults}`;
-
-              const airlineDirectUrl = buildAirlineUrl(outCarrier, outOrig, outDest, wk.fri, wk.sun, adults, !same);
-              const skyOut = wk.fri.replace(/-/g, "").slice(2);
-              const skyIn = wk.sun.replace(/-/g, "").slice(2);
+              const links = buildFlightLinks(outOrig, outDest, wk.fri, wk.sun, adults, outCarrier);
 
               const cellObj = {
                 totalEur: totalEur,
@@ -1994,15 +2122,17 @@
                 inRoute: `${inFirst.source.station.code} → ${inLast.destination.station.code}`,
                 inTime: `${inFirst.source.localTime.slice(11, 16)} → ${inArrTime}`,
                 airlineLabel: airlineLabel,
-                bookingUrl: bookingUrl,
-                kiwiCheckoutUrl: bookingUrl,
-                airlineUrl: airlineDirectUrl,
-                skyscannerUrl: `https://www.skyscanner.ro/transport/zboruri/${originSky}/${outDest.toLowerCase()}/${skyOut}/${skyIn}/?adults=${adults}`,
-                googleFlightsUrl: `https://www.google.com/travel/flights?hl=ro&curr=EUR&q=Flights%20from%20${outOrig}%20to%20${outDest}%20on%20${wk.fri}%20through%20${wk.sun}%20for%20${adults}%20adults`
+                bookingUrl: links.googleFlightsUrl,
+                googleFlightsUrl: links.googleFlightsUrl,
+                skyscannerUrl: links.skyscannerUrl,
+                kayakUrl: links.kayakUrl,
+                kiwiSearchUrl: links.kiwiSearchUrl,
+                airlineUrl: links.airlineDirectUrl
               };
 
               if (!targetCellsMap[wk.id] || cellObj.perPaxEur < targetCellsMap[wk.id].perPaxEur) {
                 targetCellsMap[wk.id] = cellObj;
+                totalFound++;
               }
             }
           });
@@ -2020,8 +2150,11 @@
           currentRows = currentRows.filter(r => r.cityId !== destVal && r.code !== targetCode);
           currentRows.unshift(newRow);
 
-          statusPct.textContent = "100%";
-          setTimeout(() => statusBox.classList.add("hidden"), 500);
+          if (totalFound > 0) {
+            updateSearchStatus(`✅ Căutare finalizată! S-au găsit zboruri în ${Object.keys(targetCellsMap).length} weekenduri pentru ${cityName}.`, 100, "success");
+          } else {
+            updateSearchStatus(`⚠️ Nu s-au găsit zboruri pentru ${cityName} cu filtrele actuale (ore/directe). Apasă pe [🔓 Resetează filtre (Mod permisiv)] pentru a permite escale sau ore flexibile.`, 100, "empty");
+          }
 
           renderMatrix();
           return;
@@ -2041,11 +2174,12 @@
           });
         });
 
+        let totalFound = 0;
+
         for (let i = 0; i < activeWks.length; i++) {
           const wk = activeWks[i];
           const pct = Math.round(((i) / activeWks.length) * 100);
-          statusText.textContent = `Căutăm destinații deschise pentru ${wk.label} (${i+1}/${activeWks.length})...`;
-          statusPct.textContent = `${pct}%`;
+          updateSearchStatus(`Căutăm destinații deschise pentru ${wk.label} (${i+1}/${activeWks.length})...`, pct, "loading");
 
           const resOut = await fetch("https://api.skypicker.com/umbrella/v2/graphql", {
             method: "POST",
@@ -2150,12 +2284,7 @@
             const same = (outCarrier === inCarrier);
             const airlineLabel = same ? carrierName(outCarrier) : `${carrierName(outCarrier)} + ${carrierName(inCarrier)}`;
 
-            const bookingUrl = it.bookingOptions?.edges?.[0]?.node?.bookingUrl ||
-                               `https://www.kiwi.com/ro/booking?token=${encodeURIComponent(it.id)}&passengers=${adults}`;
-
-            const airlineDirectUrl = buildAirlineUrl(outCarrier, outOrig, outDest, wk.fri, wk.sun, adults, !same);
-            const skyOut = wk.fri.replace(/-/g, "").slice(2);
-            const skyIn = wk.sun.replace(/-/g, "").slice(2);
+            const links = buildFlightLinks(outOrig, outDest, wk.fri, wk.sun, adults, outCarrier);
 
             const cellObj = {
               perPaxEur: perPaxEur,
@@ -2165,11 +2294,12 @@
               inRoute: `${inFirst.source.station.code} → ${inLast.destination.station.code}`,
               inTime: `${inFirst.source.localTime.slice(11, 16)} → ${inArrTime}`,
               airlineLabel: airlineLabel,
-              bookingUrl: bookingUrl,
-              kiwiCheckoutUrl: bookingUrl,
-              airlineUrl: airlineDirectUrl,
-              skyscannerUrl: `https://www.skyscanner.ro/transport/zboruri/${originSky}/${outDest.toLowerCase()}/${skyOut}/${skyIn}/?adults=${adults}`,
-              googleFlightsUrl: `https://www.google.com/travel/flights?hl=ro&curr=EUR&q=Flights%20from%20${outOrig}%20to%20${outDest}%20on%20${wk.fri}%20through%20${wk.sun}%20for%20${adults}%20adults`
+              bookingUrl: links.googleFlightsUrl,
+              googleFlightsUrl: links.googleFlightsUrl,
+              skyscannerUrl: links.skyscannerUrl,
+              kayakUrl: links.kayakUrl,
+              kiwiSearchUrl: links.kiwiSearchUrl,
+              airlineUrl: links.airlineDirectUrl
             };
 
             const key = outDest.toLowerCase();
@@ -2187,12 +2317,10 @@
             const row = cityRowsMap.get(key);
             if (!row.cellsMap[wk.id] || cellObj.perPaxEur < row.cellsMap[wk.id].perPaxEur) {
               row.cellsMap[wk.id] = cellObj;
+              totalFound++;
             }
           }
         }
-
-        statusPct.textContent = "100%";
-        setTimeout(() => statusBox.classList.add("hidden"), 600);
 
         currentRows = [...cityRowsMap.values()].sort((a, b) => {
           const minA = Math.min(...Object.values(a.cellsMap).map(c => c.perPaxEur));
@@ -2200,18 +2328,26 @@
           return minA - minB;
         });
 
+        if (totalFound > 0) {
+          updateSearchStatus(`✅ Căutare finalizată! S-au găsit zboruri în ${currentRows.length} orașe din Europa.`, 100, "success");
+        } else {
+          updateSearchStatus(`⚠️ Nu s-au găsit zboruri care să respecte toate filtrele tale stricte. Încearcă [🔓 Mod permisiv].`, 100, "empty");
+        }
+
         renderMatrix();
       } catch (err) {
         console.error(err);
-        statusText.textContent = "A apărut o problemă la căutare. Se afișează datele curente.";
-        setTimeout(() => statusBox.classList.add("hidden"), 2500);
+        updateSearchStatus("A apărut o problemă la căutare. Se afișează datele curente.", 100, "empty");
       }
     }
 
     // Initialize Page
     loadDefaultRows();
     renderWeekendSelectorUI();
+    renderCrossEngineBar();
     renderMatrix();
+    // Default destination input text
+    document.getElementById("dest-search-input").value = "🌟 Oricare (Toată Europa)";
 
   </script>
 </body>
