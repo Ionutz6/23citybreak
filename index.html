@@ -7,26 +7,31 @@
   <meta name="description" content="Caută rapid bilete de avion de weekend din București sau alte orașe: filtrare după ora de plecare vineri, ora de retur duminică, buget per persoană, durată și bagaje." />
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
+    :root {
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
     body {
       background-color: #f8fafc;
       color: #0f172a;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-family: var(--font-sans);
     }
+    /* Fluid, responsive price badge */
     .price-cell {
-      transition: transform 0.12s ease, box-shadow 0.12s ease;
+      transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
     }
     .price-cell:hover {
       transform: translateY(-2px);
-      box-shadow: 0 6px 14px rgba(37, 99, 235, 0.18);
+      box-shadow: 0 8px 18px rgba(37, 99, 235, 0.2);
     }
+    /* Color tiers */
     .tier-1 { background-color: #bbf7d0; color: #14532d; }
     .tier-2 { background-color: #d9f99d; color: #365314; }
     .tier-3 { background-color: #fef08a; color: #713f12; }
     .tier-4 { background-color: #fed7aa; color: #7c2d12; }
     .tier-empty { background-color: #f1f5f9; color: #94a3b8; }
     .best-weekend-outline {
-      outline: 2px solid #2563eb;
-      outline-offset: -2px;
+      outline: 2.5px solid #2563eb;
+      outline-offset: -2.5px;
     }
     @keyframes pulse-fast {
       0%, 100% { opacity: 1; }
@@ -35,58 +40,76 @@
     .loading-pulse {
       animation: pulse-fast 1.2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
     }
+    /* Custom sleek scrollbar for horizontal overflow */
+    .custom-scrollbar::-webkit-scrollbar {
+      height: 8px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #f1f5f9;
+      border-radius: 9999px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
   </style>
 </head>
 <body class="antialiased min-h-screen flex flex-col">
 
   <!-- Top Navbar -->
-  <header class="bg-white border-b border-slate-200 sticky top-0 z-30">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-3.5 flex flex-wrap items-center justify-between gap-3">
-      <div class="flex items-center gap-2.5">
-        <div class="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold text-lg shadow-sm">
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs">
+    <div class="max-w-[96rem] w-full mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold text-xl shadow-sm">
           ✈️
         </div>
         <div>
-          <span class="font-extrabold text-lg tracking-tight text-slate-900">Weekend<span class="text-blue-600">Fly</span></span>
-          <span class="hidden sm:inline-block ml-2 text-xs bg-blue-50 text-blue-700 font-semibold px-2 py-0.5 rounded-full border border-blue-200">
-            Live Flight Scanner
-          </span>
+          <div class="flex items-center gap-2">
+            <span class="font-extrabold text-xl tracking-tight text-slate-900">Weekend<span class="text-blue-600">Fly</span></span>
+            <span class="hidden sm:inline-block text-xs bg-blue-50 text-blue-700 font-semibold px-2.5 py-0.5 rounded-full border border-blue-200">
+              Live Flight Scanner
+            </span>
+          </div>
+          <p class="text-xs text-slate-400 hidden sm:block">Zboruri de weekend optimizate fără timp pierdut</p>
         </div>
       </div>
-      <div class="flex items-center gap-3 text-xs text-slate-500">
-        <span>Date în timp real · Fără comisioane ascunse</span>
-        <a href="#configurator" class="bg-slate-900 hover:bg-slate-800 text-white font-semibold px-3.5 py-1.5 rounded-lg transition">
-          Configurează filtrele ↓
+      <div class="flex items-center gap-3 text-xs sm:text-sm text-slate-500">
+        <span class="hidden md:inline">Actualizare live din companiile aeriene</span>
+        <a href="#configurator" class="bg-slate-900 hover:bg-slate-800 text-white font-semibold px-4 py-2 rounded-xl transition shadow-xs">
+          Filtre & Criterii ↓
         </a>
       </div>
     </div>
   </header>
 
-  <main class="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6">
+  <main class="flex-1 max-w-[96rem] w-full mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-7 space-y-6">
 
     <!-- Hero + Interactive Filter Configurator -->
     <section id="configurator" class="bg-white border border-slate-200 rounded-2xl p-5 sm:p-6 shadow-sm space-y-5">
       <div class="flex flex-wrap items-start justify-between gap-4 border-b border-slate-100 pb-4">
         <div>
           <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight text-slate-900">
-            Găsește escapada perfectă de weekend în Europa
+            Configurează căutarea de weekend în Europa
           </h1>
-          <p id="subtitle-summary" class="text-sm text-slate-500 mt-1">
-            Plecare vineri după 18:00, retur duminică după 18:00 (aterizare max. 01:00 luni). Doar zboruri care nu îți pierd weekendul.
+          <p id="subtitle-summary" class="text-xs sm:text-sm text-slate-500 mt-1">
+            Fiecare casetă se adaptează dinamic la ecranul tău. Modifică criteriile mai jos și apasă Caută zboruri live.
           </p>
         </div>
-        <button onclick="resetToDefaults()" class="text-xs font-semibold text-slate-500 hover:text-blue-600 underline">
-          Resetează la filtrele implicite
+        <button onclick="resetToDefaults()" class="text-xs font-semibold text-blue-600 hover:text-blue-800 hover:underline cursor-pointer">
+          ↺ Resetează toate filtrele
         </button>
       </div>
 
-      <!-- Filter Grid -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <!-- 10 Dedicated Responsive Filter Boxes -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3.5 sm:gap-4">
 
         <!-- 1. Oras plecare -->
-        <div class="space-y-1.5">
+        <div class="space-y-1.5 flex flex-col justify-between">
           <label class="block text-xs font-bold uppercase tracking-wider text-slate-500">Oraș de plecare</label>
-          <select id="f-origin" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-semibold text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600">
+          <select id="f-origin" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-xs sm:text-sm font-semibold text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600">
             <option value="City:bucharest_ro" data-sky="otp" data-iata="OTP" selected>București (OTP / BBU)</option>
             <option value="City:cluj-napoca_ro" data-sky="clj" data-iata="CLJ">Cluj-Napoca (CLJ)</option>
             <option value="City:iasi_ro" data-sky="ias" data-iata="IAS">Iași (IAS)</option>
@@ -94,16 +117,16 @@
           </select>
         </div>
 
-        <!-- 2. Buget maxim / bilet -->
-        <div class="space-y-1.5">
+        <!-- 2. Buget maxim -->
+        <div class="space-y-1.5 flex flex-col justify-between">
           <div class="flex justify-between items-center">
             <label class="text-xs font-bold uppercase tracking-wider text-slate-500">Buget max / persoană</label>
             <span id="lbl-max-price" class="text-xs font-extrabold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md">150 €</span>
           </div>
           <input id="f-max-price" type="range" min="50" max="350" step="10" value="150"
                  oninput="document.getElementById('lbl-max-price').textContent = this.value + ' €'"
-                 class="w-full accent-blue-600 cursor-pointer h-2 bg-slate-200 rounded-lg" />
-          <div class="flex justify-between text-xs text-slate-400">
+                 class="w-full accent-blue-600 cursor-pointer h-2.5 bg-slate-200 rounded-lg" />
+          <div class="flex justify-between text-[11px] text-slate-400 font-medium">
             <span>50 €</span>
             <span>150 €</span>
             <span>250 €</span>
@@ -111,236 +134,246 @@
           </div>
         </div>
 
-        <!-- 3. Pasageri & Bagaje -->
-        <div class="space-y-1.5">
-          <label class="block text-xs font-bold uppercase tracking-wider text-slate-500">Pasageri & Bagaje</label>
-          <div class="grid grid-cols-2 gap-2">
-            <select id="f-adults" class="rounded-xl border border-slate-200 bg-slate-50 px-2.5 py-2 text-xs font-semibold text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600">
-              <option value="1">1 Adult</option>
-              <option value="2" selected>2 Adulți</option>
-              <option value="3">3 Adulți</option>
-              <option value="4">4 Adulți</option>
-            </select>
-            <select id="f-bags" class="rounded-xl border border-slate-200 bg-slate-50 px-2.5 py-2 text-xs font-semibold text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600">
-              <option value="small" selected>Rucsac mic (inclus)</option>
-              <option value="cabin">Troller cabină (10kg)</option>
-              <option value="hold">Bagaj de cală (20kg)</option>
-            </select>
-          </div>
-        </div>
-
-        <!-- 4. Durata max & Escale -->
-        <div class="space-y-1.5">
-          <label class="block text-xs font-bold uppercase tracking-wider text-slate-500">Durată max & Escale</label>
-          <div class="grid grid-cols-2 gap-2">
-            <select id="f-max-dur" class="rounded-xl border border-slate-200 bg-slate-50 px-2.5 py-2 text-xs font-semibold text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600">
-              <option value="120">Max 2 ore</option>
-              <option value="180" selected>Max 3 ore</option>
-              <option value="240">Max 4 ore</option>
-              <option value="360">Max 6 ore</option>
-            </select>
-            <select id="f-stops" class="rounded-xl border border-slate-200 bg-slate-50 px-2.5 py-2 text-xs font-semibold text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600">
-              <option value="0" selected>Doar directe</option>
-              <option value="1">Până la 1 escală</option>
-            </select>
-          </div>
-        </div>
-
-        <!-- 5. Ora plecare Vineri -->
-        <div class="space-y-1.5">
-          <label class="block text-xs font-bold uppercase tracking-wider text-slate-500">Plecare Vineri (min.)</label>
-          <select id="f-fri-dep" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600">
-            <option value="06:00">Oricând (de la 06:00)</option>
-            <option value="12:00">După prânz (≥ 12:00)</option>
-            <option value="15:00">După-amiaza (≥ 15:00)</option>
-            <option value="18:00" selected>Seara (≥ 18:00)</option>
-            <option value="20:00">Seara târziu (≥ 20:00)</option>
+        <!-- 3. Pasageri -->
+        <div class="space-y-1.5 flex flex-col justify-between">
+          <label class="block text-xs font-bold uppercase tracking-wider text-slate-500">Număr pasageri</label>
+          <select id="f-adults" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-xs sm:text-sm font-semibold text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600">
+            <option value="1">1 Adult (individual)</option>
+            <option value="2" selected>2 Adulți (cuplu / pereche)</option>
+            <option value="3">3 Adulți (grup mic)</option>
+            <option value="4">4 Adulți (grup)</option>
           </select>
         </div>
 
-        <!-- 6. Aterizare la destinatie -->
-        <div class="space-y-1.5">
-          <label class="block text-xs font-bold uppercase tracking-wider text-slate-500">Aterizare Tur (ora locală)</label>
-          <select id="f-out-arr" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600">
-            <option value="23:00">Cel târziu 23:00 vineri</option>
-            <option value="23:59">Cel târziu 24:00 vineri</option>
-            <option value="01:00" selected>Cel târziu 01:00 sâmbătă</option>
-            <option value="03:00">Fără limită de noapte</option>
+        <!-- 4. Bagaje -->
+        <div class="space-y-1.5 flex flex-col justify-between">
+          <label class="block text-xs font-bold uppercase tracking-wider text-slate-500">Bagaje incluse</label>
+          <select id="f-bags" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-xs sm:text-sm font-semibold text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600">
+            <option value="small" selected>Rucsac mic sub scaun (inclus)</option>
+            <option value="cabin">Troller de cabină (10 kg)</option>
+            <option value="hold">Bagaj mare de cală (20 kg)</option>
           </select>
         </div>
 
-        <!-- 7. Ora intoarcere Duminica -->
-        <div class="space-y-1.5">
-          <label class="block text-xs font-bold uppercase tracking-wider text-slate-500">Plecare Duminică (min.)</label>
-          <select id="f-sun-dep" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600">
-            <option value="12:00">După 12:00 (prânz)</option>
+        <!-- 5. Durată maximă zbor -->
+        <div class="space-y-1.5 flex flex-col justify-between">
+          <label class="block text-xs font-bold uppercase tracking-wider text-slate-500">Durată maximă zbor</label>
+          <select id="f-max-dur" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-xs sm:text-sm font-semibold text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600">
+            <option value="120">Maximum 2 ore / sens</option>
+            <option value="180" selected>Maximum 3 ore / sens</option>
+            <option value="240">Maximum 4 ore / sens</option>
+            <option value="360">Maximum 6 ore / sens</option>
+          </select>
+        </div>
+
+        <!-- 6. Escale permise -->
+        <div class="space-y-1.5 flex flex-col justify-between">
+          <label class="block text-xs font-bold uppercase tracking-wider text-slate-500">Tip zbor & Escale</label>
+          <select id="f-stops" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-xs sm:text-sm font-semibold text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600">
+            <option value="0" selected>Doar zboruri directe (fără escală)</option>
+            <option value="1">Permite și 1 escală scurtă</option>
+          </select>
+        </div>
+
+        <!-- 7. Plecare Vineri -->
+        <div class="space-y-1.5 flex flex-col justify-between">
+          <label class="block text-xs font-bold uppercase tracking-wider text-slate-500">Plecare Vineri (ora min.)</label>
+          <select id="f-fri-dep" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-xs sm:text-sm font-semibold text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600">
+            <option value="06:00">Oricând vineri (de la 06:00)</option>
+            <option value="12:00">După prânz (după 12:00)</option>
+            <option value="15:00">După-amiaza (după 15:00)</option>
+            <option value="18:00" selected>După program (după 18:00)</option>
+            <option value="20:00">Seara târziu (după 20:00)</option>
+          </select>
+        </div>
+
+        <!-- 8. Aterizare Tur la destinatie -->
+        <div class="space-y-1.5 flex flex-col justify-between">
+          <label class="block text-xs font-bold uppercase tracking-wider text-slate-500">Aterizare Tur la destinație</label>
+          <select id="f-out-arr" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-xs sm:text-sm font-semibold text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600">
+            <option value="23:00">Până la ora 23:00 vineri</option>
+            <option value="23:59">Până la miezul nopții (24:00)</option>
+            <option value="01:00" selected>Până la ora 01:00 sâmbătă</option>
+            <option value="03:00">Fără limită nocturnă</option>
+          </select>
+        </div>
+
+        <!-- 9. Plecare Duminica -->
+        <div class="space-y-1.5 flex flex-col justify-between">
+          <label class="block text-xs font-bold uppercase tracking-wider text-slate-500">Retur Duminică (ora min.)</label>
+          <select id="f-sun-dep" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-xs sm:text-sm font-semibold text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600">
+            <option value="12:00">După 12:00 (după prânz)</option>
             <option value="15:00">După 15:00 (după-amiaza)</option>
             <option value="17:00">După 17:00</option>
-            <option value="18:00" selected>Seara (≥ 18:00)</option>
-            <option value="20:00">Seara târziu (≥ 20:00)</option>
+            <option value="18:00" selected>Seara (după 18:00)</option>
+            <option value="20:00">Seara târziu (după 20:00)</option>
           </select>
         </div>
 
-        <!-- 8. Aterizare la intoarcere -->
-        <div class="space-y-1.5">
+        <!-- 10. Aterizare Retur acasa -->
+        <div class="space-y-1.5 flex flex-col justify-between">
           <label class="block text-xs font-bold uppercase tracking-wider text-slate-500">Aterizare Retur (acasă)</label>
-          <select id="f-in-arr" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600">
-            <option value="23:00">Cel târziu 23:00 duminică</option>
-            <option value="23:59">Cel târziu 24:00 duminică</option>
-            <option value="01:00" selected>Cel târziu 01:00 luni</option>
-            <option value="03:00">Cel târziu 03:00 luni</option>
+          <select id="f-in-arr" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-xs sm:text-sm font-semibold text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600">
+            <option value="23:00">Până la 23:00 duminică</option>
+            <option value="23:59">Până la miezul nopții</option>
+            <option value="01:00" selected>Până la 01:00 luni</option>
+            <option value="03:00">Până la 03:00 luni</option>
           </select>
         </div>
 
       </div>
 
-      <!-- Weekend Checkboxes + Search Action -->
-      <div class="pt-2 border-t border-slate-100 flex flex-wrap items-center justify-between gap-4">
+      <!-- Weekend Checkboxes + Action Button -->
+      <div class="pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-4">
         <div class="flex flex-wrap items-center gap-3">
-          <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Weekenduri:</span>
-          <label class="inline-flex items-center gap-1.5 text-xs font-medium text-slate-700 cursor-pointer">
+          <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Selectează weekenduri:</span>
+          <label class="inline-flex items-center gap-1.5 text-xs sm:text-sm font-medium text-slate-700 cursor-pointer bg-slate-50 px-2.5 py-1 rounded-lg border border-slate-200 hover:bg-slate-100">
             <input type="checkbox" class="wk-check accent-blue-600 rounded" value="0" checked onchange="renderMatrix()" /> 13–15 nov
           </label>
-          <label class="inline-flex items-center gap-1.5 text-xs font-medium text-slate-700 cursor-pointer">
+          <label class="inline-flex items-center gap-1.5 text-xs sm:text-sm font-medium text-slate-700 cursor-pointer bg-slate-50 px-2.5 py-1 rounded-lg border border-slate-200 hover:bg-slate-100">
             <input type="checkbox" class="wk-check accent-blue-600 rounded" value="1" checked onchange="renderMatrix()" /> 20–22 nov
           </label>
-          <label class="inline-flex items-center gap-1.5 text-xs font-medium text-slate-700 cursor-pointer">
+          <label class="inline-flex items-center gap-1.5 text-xs sm:text-sm font-medium text-slate-700 cursor-pointer bg-slate-50 px-2.5 py-1 rounded-lg border border-slate-200 hover:bg-slate-100">
             <input type="checkbox" class="wk-check accent-blue-600 rounded" value="2" checked onchange="renderMatrix()" /> 27–29 nov
           </label>
-          <label class="inline-flex items-center gap-1.5 text-xs font-medium text-slate-700 cursor-pointer">
+          <label class="inline-flex items-center gap-1.5 text-xs sm:text-sm font-medium text-slate-700 cursor-pointer bg-slate-50 px-2.5 py-1 rounded-lg border border-slate-200 hover:bg-slate-100">
             <input type="checkbox" class="wk-check accent-blue-600 rounded" value="3" checked onchange="renderMatrix()" /> 4–6 dec
           </label>
-          <label class="inline-flex items-center gap-1.5 text-xs font-medium text-slate-700 cursor-pointer">
+          <label class="inline-flex items-center gap-1.5 text-xs sm:text-sm font-medium text-slate-700 cursor-pointer bg-slate-50 px-2.5 py-1 rounded-lg border border-slate-200 hover:bg-slate-100">
             <input type="checkbox" class="wk-check accent-blue-600 rounded" value="4" checked onchange="renderMatrix()" /> 11–13 dec
           </label>
-          <label class="inline-flex items-center gap-1.5 text-xs font-medium text-slate-700 cursor-pointer">
+          <label class="inline-flex items-center gap-1.5 text-xs sm:text-sm font-medium text-slate-700 cursor-pointer bg-slate-50 px-2.5 py-1 rounded-lg border border-slate-200 hover:bg-slate-100">
             <input type="checkbox" class="wk-check accent-blue-600 rounded" value="5" checked onchange="renderMatrix()" /> 18–20 dec
           </label>
-          <label class="inline-flex items-center gap-1.5 text-xs font-medium text-slate-500 cursor-pointer" title="Debifat implicit (Crăciun)">
+          <label class="inline-flex items-center gap-1.5 text-xs sm:text-sm font-medium text-slate-500 cursor-pointer bg-slate-50 px-2.5 py-1 rounded-lg border border-slate-200 hover:bg-slate-100" title="Debifat implicit (Crăciun)">
             <input type="checkbox" class="wk-check accent-blue-600 rounded" value="6" onchange="onChristmasToggle(this)" /> 25–27 dec (Crăciun)
           </label>
-          <label class="inline-flex items-center gap-1.5 text-xs font-medium text-slate-500 cursor-pointer ml-2">
+          <label class="inline-flex items-center gap-1.5 text-xs sm:text-sm font-medium text-slate-600 cursor-pointer ml-1">
             <input type="checkbox" id="f-domestic" class="accent-blue-600 rounded" onchange="runLiveSearch()" /> Include zboruri interne (RO)
           </label>
         </div>
 
         <button id="btn-search" onclick="runLiveSearch()"
-                class="bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white text-sm font-bold px-5 py-2.5 rounded-xl shadow-sm transition flex items-center gap-2">
+                class="bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white text-sm font-bold px-6 py-3 rounded-xl shadow-sm transition flex items-center gap-2 cursor-pointer">
           <span id="btn-search-icon">🔍</span>
           <span id="btn-search-text">Caută zboruri live</span>
         </button>
       </div>
 
-      <!-- Progress bar during live API query -->
-      <div id="search-status" class="hidden bg-blue-50 border border-blue-200 rounded-xl px-4 py-2.5 text-xs text-blue-800 flex items-center justify-between">
+      <!-- Live Search Progress Bar -->
+      <div id="search-status" class="hidden bg-blue-50 border border-blue-200 rounded-xl px-4 py-2.5 text-xs sm:text-sm text-blue-800 flex items-center justify-between">
         <span id="search-status-text" class="font-semibold loading-pulse">Se interoghează companiile aeriene în timp real...</span>
         <span id="search-status-pct" class="font-mono font-bold">0%</span>
       </div>
     </section>
 
     <!-- Best Choice Banner -->
-    <div id="best-banner" class="bg-white border border-slate-200 border-l-4 border-l-blue-600 rounded-xl px-5 py-3.5 flex flex-wrap items-center justify-between gap-4 shadow-sm">
+    <div id="best-banner" class="bg-white border border-slate-200 border-l-4 border-l-blue-600 rounded-2xl p-4 sm:p-5 flex flex-wrap items-center justify-between gap-4 shadow-sm">
       <div class="flex flex-wrap items-baseline gap-3">
-        <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Cea mai bună alegere</span>
-        <span id="banner-title" class="text-base font-bold text-slate-900">11–13 dec · Milano Bergamo (BGY) · Ryanair + Wizz Air</span>
-        <span id="banner-price" class="text-lg font-extrabold text-blue-600">51 €</span>
-        <span id="banner-note" class="text-xs text-slate-500">(sau 63 € doar cu Wizz Air, plecare 19:30)</span>
+        <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Cea mai bună alegere</span>
+        <span id="banner-title" class="text-base sm:text-lg font-bold text-slate-900">11–13 dec · Milano Bergamo (BGY) · Ryanair + Wizz Air</span>
+        <span id="banner-price" class="text-xl sm:text-2xl font-black text-blue-600">51 €</span>
+        <span id="banner-note" class="text-xs sm:text-sm text-slate-500">(sau 63 € doar cu Wizz Air, plecare 19:30)</span>
       </div>
       <div id="banner-actions" class="flex items-center gap-2">
         <a id="banner-link-primary" href="#" target="_blank" rel="noopener noreferrer"
-           class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-3.5 py-2 rounded-lg transition">
+           class="bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-bold px-4 py-2.5 rounded-xl transition shadow-xs">
           Cumpără acum →
         </a>
       </div>
     </div>
 
-    <!-- Controls Bar Above Matrix -->
-    <div class="flex flex-wrap items-center justify-between gap-3">
+    <!-- Controls Bar Above Table -->
+    <div class="flex flex-wrap items-center justify-between gap-4">
       <div class="flex flex-wrap items-center gap-3">
-        <div class="inline-flex rounded-lg bg-white border border-slate-200 p-0.5 shadow-sm">
-          <button id="btn-1pax" onclick="setMode(1)" class="px-3.5 py-1.5 text-xs font-semibold rounded-md bg-blue-600 text-white transition">
+        <!-- Switch 1pax / 2pax -->
+        <div class="inline-flex rounded-xl bg-white border border-slate-200 p-1 shadow-xs">
+          <button id="btn-1pax" onclick="setMode(1)" class="px-4 py-2 text-xs sm:text-sm font-bold rounded-lg bg-blue-600 text-white transition cursor-pointer">
             Per persoană
           </button>
-          <button id="btn-2pax" onclick="setMode(2)" class="px-3.5 py-1.5 text-xs font-semibold rounded-md text-slate-600 hover:text-slate-900 transition">
+          <button id="btn-2pax" onclick="setMode(2)" class="px-4 py-2 text-xs sm:text-sm font-bold rounded-lg text-slate-600 hover:text-slate-900 transition cursor-pointer">
             Total grup (<span id="lbl-group-count">2</span> pers.)
           </button>
         </div>
 
-        <div class="inline-flex items-center gap-1.5 text-xs text-slate-500">
-          <span>La click pe preț deschide:</span>
-          <select id="link-mode" onchange="setLinkMode(this.value)" class="rounded-lg bg-white border border-slate-200 px-2.5 py-1.5 text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-600">
-            <option value="kiwi">Checkout direct bilete (Kiwi Booking cu zborurile selectate)</option>
+        <!-- Link Mode Selector -->
+        <div class="inline-flex items-center gap-2 text-xs sm:text-sm text-slate-600">
+          <span class="font-medium hidden sm:inline">La click pe preț deschide:</span>
+          <select id="link-mode" onchange="setLinkMode(this.value)" class="rounded-xl bg-white border border-slate-200 px-3 py-2 text-xs sm:text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-600 shadow-xs">
+            <option value="kiwi">Checkout direct bilete (ambele zboruri gata selectate)</option>
             <option value="airline">Site-ul companiei aeriene (Wizz Air / Ryanair)</option>
-            <option value="skyscanner">Skyscanner (comparație pe ruta și datele respective)</option>
-            <option value="google">Google Flights (comparație pe ruta și datele respective)</option>
+            <option value="skyscanner">Skyscanner (comparație pe dată și rută)</option>
+            <option value="google">Google Flights (comparație pe dată și rută)</option>
           </select>
         </div>
       </div>
-      <span id="unit-label" class="text-xs text-slate-500">Preț în € per persoană, tur–retur (click pe orice preț pentru cumpărare)</span>
+      <span id="unit-label" class="text-xs sm:text-sm text-slate-500 font-medium">
+        Preț în € per persoană, tur–retur (click pe orice căsuță pentru cumpărare)
+      </span>
     </div>
 
-    <!-- Matrix Table Card -->
-    <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm overflow-x-auto">
-      <table class="w-full border-separate" style="border-spacing: 6px;">
+    <!-- Matrix Table Card with Fluid Responsive Columns -->
+    <div class="bg-white border border-slate-200 rounded-2xl p-4 sm:p-6 shadow-sm overflow-x-auto custom-scrollbar">
+      <table id="main-matrix-table" class="w-full border-separate" style="border-spacing: 6px 8px; min-width: 820px;">
         <thead id="matrix-head">
-          <!-- Rendered by JS -->
+          <!-- Rendered dynamically -->
         </thead>
         <tbody id="matrix-body">
-          <!-- Rendered by JS -->
+          <!-- Rendered dynamically -->
         </tbody>
         <tfoot>
           <tr id="cheapest-row" class="border-t border-slate-200">
-            <!-- Rendered by JS -->
+            <!-- Rendered dynamically -->
           </tr>
         </tfoot>
       </table>
     </div>
 
     <!-- Selected Flight Quick-Buy Bar -->
-    <div id="quick-buy-bar" class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm flex flex-wrap items-center justify-between gap-3">
-      <div class="space-y-0.5">
-        <div id="qb-title" class="text-sm font-bold text-slate-900">
+    <div id="quick-buy-bar" class="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-sm flex flex-wrap items-center justify-between gap-4">
+      <div class="space-y-1">
+        <div id="qb-title" class="text-sm sm:text-base font-bold text-slate-900">
           💡 Fiecare căsuță de preț din tabel are link direct de cumpărare în spate!
         </div>
-        <div id="qb-sub" class="text-xs text-slate-500">
-          Dă click pe orice preț pentru a deschide pagina de achiziție a biletelor, sau treci cu mouse-ul peste un preț pentru a vedea toate linkurile directe (Checkout direct, Wizz Air / Ryanair, Skyscanner, Google Flights).
+        <div id="qb-sub" class="text-xs sm:text-sm text-slate-500">
+          Dă click pe orice preț pentru a deschide pagina de achiziție a biletelor, sau treci cu mouse-ul peste un preț pentru a vedea toate linkurile directe.
         </div>
       </div>
       <div id="qb-actions" class="flex flex-wrap items-center gap-2"></div>
     </div>
 
     <!-- Color Legend -->
-    <div class="flex flex-wrap items-center gap-4 text-xs text-slate-600">
-      <div class="flex items-center gap-1.5">
-        <span class="w-3.5 h-3.5 rounded tier-1 inline-block"></span>
+    <div class="flex flex-wrap items-center gap-4 text-xs sm:text-sm text-slate-600 pt-1">
+      <div class="flex items-center gap-2">
+        <span class="w-4 h-4 rounded-md tier-1 inline-block shadow-xs"></span>
         <span id="leg-1">până la 75 €</span>
       </div>
-      <div class="flex items-center gap-1.5">
-        <span class="w-3.5 h-3.5 rounded tier-2 inline-block"></span>
+      <div class="flex items-center gap-2">
+        <span class="w-4 h-4 rounded-md tier-2 inline-block shadow-xs"></span>
         <span id="leg-2">76–100 €</span>
       </div>
-      <div class="flex items-center gap-1.5">
-        <span class="w-3.5 h-3.5 rounded tier-3 inline-block"></span>
+      <div class="flex items-center gap-2">
+        <span class="w-4 h-4 rounded-md tier-3 inline-block shadow-xs"></span>
         <span id="leg-3">101–125 €</span>
       </div>
-      <div class="flex items-center gap-1.5">
-        <span class="w-3.5 h-3.5 rounded tier-4 inline-block"></span>
+      <div class="flex items-center gap-2">
+        <span class="w-4 h-4 rounded-md tier-4 inline-block shadow-xs"></span>
         <span id="leg-4">126–150 €</span>
       </div>
-      <div class="flex items-center gap-1.5">
-        <span class="w-3.5 h-3.5 rounded tier-empty border border-slate-200 inline-block"></span>
+      <div class="flex items-center gap-2">
+        <span class="w-4 h-4 rounded-md tier-empty border border-slate-200 inline-block shadow-xs"></span>
         <span>nicio variantă în filtre</span>
       </div>
-      <div class="flex items-center gap-1.5">
-        <span class="w-3.5 h-3.5 rounded border-2 border-blue-600 inline-block"></span>
+      <div class="flex items-center gap-2">
+        <span class="w-4 h-4 rounded-md border-2 border-blue-600 inline-block shadow-xs"></span>
         <span>cel mai ieftin din weekend</span>
       </div>
     </div>
 
     <!-- Flight Schedules Cards -->
-    <section class="pt-2">
-      <h2 class="text-sm font-bold text-slate-900 mb-3">Orele zborurilor și linkuri rapide către companiile aeriene</h2>
-      <div id="schedule-cards" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+    <section class="pt-3">
+      <h2 class="text-base sm:text-lg font-bold text-slate-900 mb-3">Orele zborurilor și linkuri rapide către companiile aeriene</h2>
+      <div id="schedule-cards" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         <!-- Rendered dynamically by JS -->
       </div>
     </section>
@@ -348,9 +381,9 @@
   </main>
 
   <footer class="bg-white border-t border-slate-200 mt-12 py-6">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 flex flex-wrap items-center justify-between gap-4 text-xs text-slate-400">
+    <div class="max-w-[96rem] w-full mx-auto px-4 sm:px-6 lg:px-8 flex flex-wrap items-center justify-between gap-4 text-xs sm:text-sm text-slate-400">
       <div>WeekendFly · Căutare inteligentă de zboruri de weekend în Europa (2026)</div>
-      <div>Prețuri actualizate în timp real prin Kiwi / Skyscanner / Wizz Air / Ryanair</div>
+      <div>Prețuri verificate și actualizate prin Kiwi, Skyscanner, Wizz Air și Ryanair</div>
     </div>
   </footer>
 
@@ -389,7 +422,6 @@
     }
 
     function enrichStaticRow(arr, skyFrom, skyTo) {
-      // Pad index 6 (Christmas) with null initially unless live searched
       const padded = [...arr, null];
       return padded.map((item, idx) => {
         if (!item) return null;
@@ -504,24 +536,24 @@
       const p1 = Math.round(cell.perPaxEur);
       const pTotal = Math.round(cell.totalEur);
 
-      document.getElementById("qb-title").innerHTML = `✈️ ${r.city} (${wk.label}) · <span class="text-blue-600">${p1} € / pers.</span> (${pTotal} € total pt. ${adults} pers.)`;
+      document.getElementById("qb-title").innerHTML = `✈️ ${r.city} (${wk.label}) · <span class="text-blue-600 font-extrabold">${p1} € / pers.</span> (${pTotal} € total pt. ${adults} pers.)`;
       document.getElementById("qb-sub").textContent = `Tur vineri ${cell.outRoute} (${cell.outTime}) · Retur duminică ${cell.inRoute} (${cell.inTime}) · Companie: ${cell.airlineLabel}`;
 
       document.getElementById("qb-actions").innerHTML = `
         <a href="${cell.kiwiBookingUrl}" target="_blank" rel="noopener noreferrer"
-           class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition">
+           class="bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-bold px-3.5 py-2 rounded-xl transition shadow-xs">
           Cumpără acum (Checkout direct) ↗
         </a>
         <a href="${cell.airlineDirectUrl}" target="_blank" rel="noopener noreferrer"
-           class="border border-blue-600 text-blue-600 hover:bg-blue-50 text-xs font-semibold px-3 py-1.5 rounded-lg transition">
+           class="border border-blue-600 text-blue-600 hover:bg-blue-50 text-xs sm:text-sm font-bold px-3.5 py-2 rounded-xl transition">
           ${cell.airlineLabel} ↗
         </a>
         <a href="${cell.skyscannerUrl}" target="_blank" rel="noopener noreferrer"
-           class="border border-slate-300 text-slate-700 hover:bg-slate-100 text-xs font-semibold px-3 py-1.5 rounded-lg transition">
+           class="border border-slate-300 text-slate-700 hover:bg-slate-100 text-xs sm:text-sm font-bold px-3.5 py-2 rounded-xl transition">
           Skyscanner ↗
         </a>
         <a href="${cell.googleFlightsUrl}" target="_blank" rel="noopener noreferrer"
-           class="border border-slate-300 text-slate-700 hover:bg-slate-100 text-xs font-semibold px-3 py-1.5 rounded-lg transition">
+           class="border border-slate-300 text-slate-700 hover:bg-slate-100 text-xs sm:text-sm font-bold px-3.5 py-2 rounded-xl transition">
           Google Flights ↗
         </a>
       `;
@@ -560,14 +592,14 @@
         }
       });
 
-      // Render Header
-      let headHtml = `<tr><th class="text-left py-2 px-2 w-60"></th>`;
+      // Render Header with ample responsive min-widths
+      let headHtml = `<tr><th class="text-left py-3 px-3 min-w-[220px] sm:min-w-[260px] text-xs font-bold uppercase tracking-wider text-slate-400">Destinație / Aeroport</th>`;
       activeWks.forEach(wk => {
         const isGlobalBestWk = globalBest && globalBest.wk.idx === wk.idx;
         const thCls = isGlobalBestWk
-          ? "text-center py-2 px-2 rounded-lg text-xs font-semibold bg-blue-600 text-white"
-          : "text-center py-2 px-2 rounded-lg text-xs font-semibold text-slate-800";
-        const subCls = isGlobalBestWk ? "font-normal opacity-90" : "text-slate-400 font-normal";
+          ? "text-center py-2.5 px-2 rounded-xl text-xs sm:text-sm font-bold bg-blue-600 text-white min-w-[95px] sm:min-w-[115px]"
+          : "text-center py-2.5 px-2 rounded-xl text-xs sm:text-sm font-bold text-slate-800 min-w-[95px] sm:min-w-[115px]";
+        const subCls = isGlobalBestWk ? "font-normal opacity-90 text-xs" : "text-slate-400 font-normal text-xs";
         headHtml += `
           <th class="${thCls}">
             <div>${wk.dLabel}</div>
@@ -578,7 +610,7 @@
       headHtml += `</tr>`;
       thead.innerHTML = headHtml;
 
-      // Render Body
+      // Render Body with fluid cell text
       tbody.innerHTML = "";
       const visibleRows = currentRows.filter(r => activeWks.some(wk => r.cells[wk.idx] && r.cells[wk.idx].perPaxEur <= maxBudget));
       const rowsToRender = visibleRows.length > 0 ? visibleRows : currentRows;
@@ -588,21 +620,21 @@
         const tr = document.createElement("tr");
 
         const tdLabel = document.createElement("td");
-        tdLabel.className = "py-2 px-2 align-middle";
+        tdLabel.className = "py-2.5 px-3 align-middle min-w-[220px] sm:min-w-[260px]";
         tdLabel.innerHTML = `
-          <div class="font-bold text-sm text-slate-900 leading-tight">${r.city}</div>
-          <div class="text-xs text-slate-400 mt-0.5">${r.sub}</div>
+          <div class="font-extrabold text-sm sm:text-base text-slate-900 leading-snug">${r.city}</div>
+          <div class="text-xs text-slate-500 font-medium mt-0.5 leading-tight">${r.sub}</div>
         `;
         tr.appendChild(tdLabel);
 
         activeWks.forEach(wk => {
           const td = document.createElement("td");
-          td.className = "p-0 align-middle";
+          td.className = "p-0 align-middle min-w-[95px] sm:min-w-[115px]";
           const cell = r.cells[wk.idx];
 
           if (!cell || cell.perPaxEur > maxBudget) {
             td.innerHTML = `
-              <div class="h-12 rounded-lg tier-empty flex items-center justify-center text-sm font-medium select-none">
+              <div class="h-12 sm:h-14 rounded-xl tier-empty flex items-center justify-center text-sm sm:text-base font-semibold select-none">
                 —
               </div>
             `;
@@ -619,8 +651,10 @@
             td.innerHTML = `
               <a href="${url}" target="_blank" rel="noopener noreferrer" title="${tooltip}"
                  onmouseenter="showQuickBuy(${origRowIdx}, ${wk.idx})"
-                 class="price-cell h-12 rounded-lg ${tierClass} ${outlineClass} flex flex-col items-center justify-center no-underline cursor-pointer">
-                <span class="font-bold text-base leading-none">${displayPrice} <span class="text-xs font-normal opacity-75">↗</span></span>
+                 class="price-cell h-12 sm:h-14 rounded-xl ${tierClass} ${outlineClass} flex items-center justify-center no-underline cursor-pointer px-2">
+                <span class="font-extrabold text-sm sm:text-base md:text-lg leading-none whitespace-nowrap">
+                  ${displayPrice} <span class="text-xs font-semibold">€</span> <span class="text-xs font-normal opacity-75">↗</span>
+                </span>
               </a>
             `;
           }
@@ -631,19 +665,19 @@
       });
 
       // Render Footer
-      let footerHtml = `<td class="py-3 px-2 text-xs font-medium text-slate-400">Cel mai ieftin</td>`;
+      let footerHtml = `<td class="py-3 px-3 text-xs sm:text-sm font-bold text-slate-400 uppercase tracking-wider">Cel mai ieftin</td>`;
       activeWks.forEach(wk => {
         const m = minPerWk[wk.idx];
         if (!m || !m.minCell) {
-          footerHtml += `<td class="py-3 px-2 text-center text-xs text-slate-400">—</td>`;
+          footerHtml += `<td class="py-3 px-2 text-center text-xs text-slate-400 font-semibold">—</td>`;
         } else {
           const displayMin = currentMode === 1 ? Math.round(m.minCell.perPaxEur) : Math.round(m.minCell.totalEur);
           const url = getTargetUrl(m.minCell);
           footerHtml += `
-            <td class="py-3 px-2 text-center">
+            <td class="py-3 px-2 text-center min-w-[95px] sm:min-w-[115px]">
               <a href="${url}" target="_blank" rel="noopener noreferrer" class="no-underline hover:underline block">
-                <div class="text-xs text-slate-400 font-medium">${m.minCode}</div>
-                <div class="text-sm font-extrabold text-blue-600">${displayMin} € ↗</div>
+                <div class="text-xs text-slate-400 font-bold tracking-wider uppercase">${m.minCode}</div>
+                <div class="text-sm sm:text-base font-black text-blue-600 whitespace-nowrap mt-0.5">${displayMin} € ↗</div>
               </a>
             </td>
           `;
@@ -682,7 +716,6 @@
       const container = document.getElementById("schedule-cards");
       container.innerHTML = "";
       rowsToRender.forEach(r => {
-        // Find best sample cell in active weekends
         let bestCell = null;
         let bestWk = null;
         activeWks.forEach(wk => {
@@ -695,25 +728,25 @@
         if (!bestCell) return;
 
         const card = document.createElement("div");
-        card.className = "bg-white border border-slate-200 rounded-xl p-4 space-y-1.5 shadow-sm";
+        card.className = "bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 space-y-2 shadow-xs";
         card.innerHTML = `
-          <div class="flex items-baseline justify-between">
-            <span class="font-bold text-sm text-slate-900">${r.city} <span class="text-xs font-normal text-slate-400">${r.code}</span></span>
-            <a href="${bestCell.airlineDirectUrl}" target="_blank" rel="noopener noreferrer" class="text-xs font-semibold text-blue-600 hover:underline">
+          <div class="flex items-baseline justify-between gap-2 border-b border-slate-100 pb-2">
+            <span class="font-extrabold text-sm sm:text-base text-slate-900">${r.city} <span class="text-xs font-semibold text-slate-400">${r.code}</span></span>
+            <a href="${bestCell.airlineDirectUrl}" target="_blank" rel="noopener noreferrer" class="text-xs font-bold text-blue-600 hover:underline whitespace-nowrap">
               ${bestCell.airlineLabel} ↗
             </a>
           </div>
-          <div class="text-xs text-slate-500 flex justify-between">
-            <span>Tur vineri (${bestCell.outRoute})</span>
-            <span class="font-mono font-semibold text-slate-800">${bestCell.outTime}</span>
+          <div class="text-xs sm:text-sm text-slate-600 flex justify-between items-center gap-2">
+            <span class="text-slate-400">Tur vineri:</span>
+            <span class="font-mono font-bold text-slate-800 text-right">${bestCell.outRoute} ${bestCell.outTime}</span>
           </div>
-          <div class="text-xs text-slate-500 flex justify-between">
-            <span>Retur duminică (${bestCell.inRoute})</span>
-            <span class="font-mono font-semibold text-slate-800">${bestCell.inTime}</span>
+          <div class="text-xs sm:text-sm text-slate-600 flex justify-between items-center gap-2">
+            <span class="text-slate-400">Retur duminică:</span>
+            <span class="font-mono font-bold text-slate-800 text-right">${bestCell.inRoute} ${bestCell.inTime}</span>
           </div>
-          <div class="pt-1 flex justify-between items-center border-t border-slate-100 text-xs">
-            <span class="text-slate-400">Cel mai ieftin (${bestWk.label}):</span>
-            <a href="${getTargetUrl(bestCell)}" target="_blank" class="font-bold text-blue-600 hover:underline">
+          <div class="pt-2 flex justify-between items-center border-t border-slate-100 text-xs sm:text-sm">
+            <span class="text-slate-400 font-medium">Cel mai bun preț (${bestWk.label}):</span>
+            <a href="${getTargetUrl(bestCell)}" target="_blank" class="font-extrabold text-blue-600 hover:underline">
               ${Math.round(bestCell.perPaxEur)} € / pers. ↗
             </a>
           </div>
@@ -727,11 +760,11 @@
       const b1 = document.getElementById("btn-1pax");
       const b2 = document.getElementById("btn-2pax");
       if (m === 1) {
-        b1.className = "px-3.5 py-1.5 text-xs font-semibold rounded-md bg-blue-600 text-white transition";
-        b2.className = "px-3.5 py-1.5 text-xs font-semibold rounded-md text-slate-600 hover:text-slate-900 transition";
+        b1.className = "px-4 py-2 text-xs sm:text-sm font-bold rounded-lg bg-blue-600 text-white transition cursor-pointer";
+        b2.className = "px-4 py-2 text-xs sm:text-sm font-bold rounded-lg text-slate-600 hover:text-slate-900 transition cursor-pointer";
       } else {
-        b2.className = "px-3.5 py-1.5 text-xs font-semibold rounded-md bg-blue-600 text-white transition";
-        b1.className = "px-3.5 py-1.5 text-xs font-semibold rounded-md text-slate-600 hover:text-slate-900 transition";
+        b2.className = "px-4 py-2 text-xs sm:text-sm font-bold rounded-lg bg-blue-600 text-white transition cursor-pointer";
+        b1.className = "px-4 py-2 text-xs sm:text-sm font-bold rounded-lg text-slate-600 hover:text-slate-900 transition cursor-pointer";
       }
       renderMatrix();
     }
