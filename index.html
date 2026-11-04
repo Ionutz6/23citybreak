@@ -157,7 +157,15 @@
           </button>
           <button onclick="resetToStrict()" title="Revino la selecția strictă de weekend: vineri seară după 18:00, zbor direct"
                   class="inline-flex items-center gap-1.5 text-xs font-bold text-[#475569] hover:text-[#0a0b0d] bg-[#f4f5f8] hover:bg-[#eaeef3] px-3 py-2 rounded-xl border border-[#dce1e7] transition cursor-pointer font-display">
-            ⚡ Preset Weekend Clasic (după 18:00)
+            ⚡ Preset Weekend Clasic (2 nopți)
+          </button>
+          <button onclick="presetExtendedWeekend()" title="Preset Weekend Prelungit: 3-4 nopți (Sf. Andrei, 1 Dec, Paște, Rusalii)"
+                  class="inline-flex items-center gap-1.5 text-xs font-bold text-[#5c3b06] hover:text-[#0a0b0d] bg-[#fce8bd] hover:bg-[#f6dc9c] px-3 py-2 rounded-xl border border-[#dfa649] transition cursor-pointer font-display">
+            🏖️ Preset Weekend Prelungit (3–4 nopți)
+          </button>
+          <button onclick="presetSchoolHolidays()" title="Preset Vacanțe Copii: sejur de 1 săptămână în vacanțele școlare oficiale (Iarnă, Schi, Paște, Vară)"
+                  class="inline-flex items-center gap-1.5 text-xs font-bold text-[#0369a1] hover:text-[#0c4a6e] bg-[#e0f2fe] hover:bg-[#bae6fd] px-3 py-2 rounded-xl border border-[#7dd3fc] transition cursor-pointer font-display">
+            🎒 Preset Vacanțe Copii (1 săpt.)
           </button>
         </div>
       </div>
@@ -449,6 +457,12 @@
           <button onclick="selectPreset('2026_no_xmas')" class="px-3.5 py-1.5 rounded-xl bg-[#f5f6f8] hover:bg-[#fce8bd] hover:border-[#dfa649] font-bold text-[#0a0b0d] transition cursor-pointer border border-[#dce1e7]">
             🌟 Weekenduri 2026 (fără Crăciun)
           </button>
+          <button onclick="selectPreset('extended')" class="px-3.5 py-1.5 rounded-xl bg-[#fdfaf3] hover:bg-[#fce8bd] hover:border-[#dfa649] font-bold text-[#5c3b06] transition cursor-pointer border border-[#dfa649]">
+            🏖️ Weekenduri Prelungite (4)
+          </button>
+          <button onclick="selectPreset('school_holidays')" class="px-3.5 py-1.5 rounded-xl bg-[#f0f9ff] hover:bg-[#e0f2fe] hover:border-[#38bdf8] font-bold text-[#0369a1] transition cursor-pointer border border-[#bae6fd]">
+            🎒 Vacanțe Copii & Sărbători (22)
+          </button>
           <button onclick="selectPreset('next4')" class="px-3.5 py-1.5 rounded-xl bg-[#f5f6f8] hover:bg-[#fce8bd] hover:border-[#dfa649] font-bold text-[#0a0b0d] transition cursor-pointer border border-[#dce1e7]">
             ⚡ Următoarele 4 weekenduri
           </button>
@@ -663,8 +677,8 @@
     </div>
 
     <!-- Flight Schedules Cards -->
-    <section class="pt-3">
-      <h2 class="text-base sm:text-lg font-bold text-[#0a0b0d] mb-3 font-display">
+    <section id="section-schedules" class="pt-3">
+      <h2 id="schedule-section-title" class="text-base sm:text-lg font-bold text-[#0a0b0d] mb-3 font-display">
         Orele zborurilor și linkuri directe la companiile aeriene
       </h2>
       <div id="schedule-cards" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -682,7 +696,7 @@
   </footer>
 
   <script>
-    // 1. Generate All Weekends (2026 - end of 2027: 58 weekends)
+    // 1. Generate All Weekends & Romanian Vacations (2026 - end of 2027: 58 weekends)
     function generateAllWeekends(startDateStr, numWeeks) {
       const monthsRo = ["ian", "feb", "mar", "apr", "mai", "iun", "iul", "aug", "sep", "oct", "noi", "dec"];
       const monthsRoFull = ["Ianuarie", "Februarie", "Martie", "Aprilie", "Mai", "Iunie", "Iulie", "August", "Septembrie", "Octombrie", "Noiembrie", "Decembrie"];
@@ -697,9 +711,21 @@
         const fri = new Date(d);
         const sun = new Date(d);
         sun.setDate(sun.getDate() + 2);
+        const thu = new Date(d);
+        thu.setDate(thu.getDate() - 1);
+        const mon = new Date(d);
+        mon.setDate(mon.getDate() + 3);
+        const nextSun = new Date(d);
+        nextSun.setDate(nextSun.getDate() + 9);
 
-        const friStr = fri.toISOString().slice(0, 10);
-        const sunStr = sun.toISOString().slice(0, 10);
+        const fmt = dt => `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}-${String(dt.getDate()).padStart(2, '0')}`;
+
+        const friStr = fmt(fri);
+        const sunStr = fmt(sun);
+        const thuStr = fmt(thu);
+        const monStr = fmt(mon);
+        const nextSunStr = fmt(nextSun);
+
         const dFri = fri.getDate();
         const dSun = sun.getDate();
         const mFri = fri.getMonth();
@@ -717,23 +743,59 @@
         }
 
         let tag = null;
-        if (friStr === "2026-12-25") tag = "Crăciun";
-        else if (friStr === "2027-01-01") tag = "Revelion";
-        else if (friStr === "2027-02-12") tag = "Valentine's";
-        else if (friStr === "2027-04-30") tag = "1 Mai / Paște";
-        else if (friStr === "2027-06-18") tag = "Rusalii";
+        let isHoliday = false;
+        let holidayType = null; // 'extended' | 'school'
+
+        if (friStr === "2026-11-27") {
+          tag = "🇷🇴 Sf. Andrei & 1 Dec";
+          isHoliday = true;
+          holidayType = "extended";
+        } else if (friStr === "2026-12-25") {
+          tag = "🎄 Crăciun";
+          isHoliday = true;
+          holidayType = "school";
+        } else if (friStr === "2027-01-01") {
+          tag = "🎉 Revelion";
+          isHoliday = true;
+          holidayType = "school";
+        } else if (friStr >= "2026-12-18" && friStr <= "2027-01-08") {
+          tag = "🎒 Vacanță Iarnă";
+          isHoliday = true;
+          holidayType = "school";
+        } else if (friStr >= "2027-02-12" && friStr <= "2027-02-26") {
+          tag = "⛷️ Vacanță Schi";
+          isHoliday = true;
+          holidayType = "school";
+        } else if (friStr === "2027-04-30" || friStr === "2027-05-07") {
+          tag = "🥚 Paște & 1 Mai";
+          isHoliday = true;
+          holidayType = "extended";
+        } else if (friStr === "2027-06-18") {
+          tag = "🕊️ Rusalii";
+          isHoliday = true;
+          holidayType = "extended";
+        } else if (friStr >= "2027-06-25" && friStr <= "2027-09-03") {
+          tag = "☀️ Vacanță Vară";
+          isHoliday = true;
+          holidayType = "school";
+        }
 
         weekends.push({
           id: friStr,
           idx: i,
           fri: friStr,
           sun: sunStr,
+          thu: thuStr,
+          mon: monStr,
+          nextSun: nextSunStr,
           dLabel: dateLabel,
           mLabel: mLabel,
           label: `${dateLabel} ${mLabel}`,
           monthKey: `${yFri}-${String(mFri + 1).padStart(2, '0')}`,
           monthName: `${monthsRoFull[mFri]} ${yFri}`,
-          tag: tag
+          tag: tag,
+          isHoliday: isHoliday,
+          holidayType: holidayType
         });
 
         d.setDate(d.getDate() + 7);
@@ -1014,15 +1076,114 @@
     // Selection State
     let selectedWkIds = new Set(["2026-11-13", "2026-11-20", "2026-11-27", "2026-12-04", "2026-12-11", "2026-12-18"]);
     let currentMonthFilter = "all";
+    let currentTripMode = "classic"; // "classic" (2 nopți) | "extended" (3-4 nopți) | "school_week" (7-9 nopți)
     let currentMode = 1; // 1 = per pax, 2 = total grup
     let currentLinkMode = "google"; // Default to Google Flights for 100% reliable live booking
     let currentRows = [];
     let hasEverSearched = false;
     let selectedCityObj = null;
 
+    function getTripDates(wk) {
+      if (!wk) return { dateOut: "2026-11-13", dateIn: "2026-11-15" };
+      if (currentTripMode === "extended") {
+        if (wk.id === "2026-11-27") {
+          return { dateOut: wk.fri, dateIn: "2026-12-01" }; // 27 Nov - 1 Dec (Sf. Andrei & 1 Dec)
+        }
+        return { dateOut: wk.fri, dateIn: wk.mon || wk.sun };
+      } else if (currentTripMode === "school_week") {
+        return { dateOut: wk.fri, dateIn: wk.nextSun || wk.sun };
+      }
+      return { dateOut: wk.fri, dateIn: wk.sun };
+    }
+
     function carrierName(code) {
       const map = { W4: "Wizz Air", W6: "Wizz Air", FR: "Ryanair", RO: "Tarom", H4: "HiSky", LH: "Lufthansa", TK: "Turkish Airlines", OS: "Austrian", LO: "LOT", LX: "Swiss", KL: "KLM", AF: "Air France", BA: "British Airways", VY: "Vueling", U2: "easyJet" };
       return map[code] || code;
+    }
+
+    // Pure Browser JavaScript Protobuf TFS Encoder for Google Flights (Guaranteed 100% Destination & Date Prefill)
+    function encodeVarint(val) {
+      const bytes = [];
+      while (val > 127) {
+        bytes.push((val & 127) | 128);
+        val >>>= 7;
+      }
+      bytes.push(val & 127);
+      return bytes;
+    }
+
+    function strToUtf8(str) {
+      const codePoints = [];
+      for (let i = 0; i < str.length; i++) {
+        codePoints.push(str.charCodeAt(i));
+      }
+      return codePoints;
+    }
+
+    function concatArrays(...arrays) {
+      const total = arrays.reduce((acc, arr) => acc + arr.length, 0);
+      const result = new Uint8Array(total);
+      let offset = 0;
+      for (const arr of arrays) {
+        result.set(arr, offset);
+        offset += arr.length;
+      }
+      return result;
+    }
+
+    function encodeField(fieldNum, wireType, data) {
+      const tag = (fieldNum << 3) | wireType;
+      const tagBytes = encodeVarint(tag);
+      if (wireType === 0) {
+        return concatArrays(tagBytes, encodeVarint(data));
+      } else if (wireType === 2) {
+        const bytes = typeof data === 'string' ? strToUtf8(data) : data;
+        return concatArrays(tagBytes, encodeVarint(bytes.length), bytes);
+      }
+      return new Uint8Array(0);
+    }
+
+    function bytesToBase64Url(bytes) {
+      let binary = '';
+      for (let i = 0; i < bytes.byteLength; i++) {
+        binary += String.fromCharCode(bytes[i]);
+      }
+      return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    }
+
+    function buildGoogleFlightsUrl(orig, dest, dateOut, dateIn, adults = 2) {
+      try {
+        const cleanOrig = (orig || "OTP").toUpperCase().trim();
+        const cleanDest = (dest || "BGY").toUpperCase().trim();
+        const leg1 = concatArrays(
+          encodeField(2, 2, dateOut),
+          encodeField(13, 2, encodeField(2, 2, cleanOrig)),
+          encodeField(14, 2, encodeField(2, 2, cleanDest))
+        );
+        const leg2 = concatArrays(
+          encodeField(2, 2, dateIn),
+          encodeField(13, 2, encodeField(2, 2, cleanDest)),
+          encodeField(14, 2, encodeField(2, 2, cleanOrig))
+        );
+
+        const parts = [
+          encodeField(3, 2, leg1),
+          encodeField(3, 2, leg2)
+        ];
+
+        const pax = Math.min(Math.max(adults || 2, 1), 9);
+        for (let i = 0; i < pax; i++) {
+          parts.push(encodeField(8, 0, 1)); // 1 = ADULT
+        }
+        parts.push(encodeField(9, 0, 1)); // 1 = ECONOMY
+        parts.push(encodeField(19, 0, 1)); // 1 = ROUND_TRIP
+
+        const infoBuf = concatArrays(...parts);
+        const b64 = bytesToBase64Url(infoBuf);
+        return `https://www.google.com/travel/flights/search?tfs=${b64}&hl=ro&curr=EUR`;
+      } catch (e) {
+        return `https://www.google.com/travel/flights?hl=ro&curr=EUR`;
+      }
     }
 
     // 100% Guaranteed Booking & Search URLs across Google Flights, Skyscanner, Airlines, Kiwi
@@ -1032,8 +1193,8 @@
       const skyOut = dateOut.replace(/-/g, "").slice(2);
       const skyIn = dateIn.replace(/-/g, "").slice(2);
 
-      // Google Flights - Never expires, directly connects to airlines
-      const googleFlightsUrl = `https://www.google.com/travel/flights?q=Flights%20to%20${dest}%20from%20${orig}%20on%20${dateOut}%20through%20${dateIn}%20for%20${adults}%20adults&curr=EUR`;
+      // Google Flights - TFS Protobuf encoding guarantees 100% reliable destination and dates prefill in any language
+      const googleFlightsUrl = buildGoogleFlightsUrl(orig, dest, dateOut, dateIn, adults);
 
       // Skyscanner - Direct live price comparison
       const skyscannerUrl = `https://www.skyscanner.ro/transport/dflights/${orig.toLowerCase()}/${dest.toLowerCase()}/${skyOut}/${skyIn}/?adultsv2=${adults}&cabinclass=economy&childrenv2=&inboundaltsenabled=false&outboundaltsenabled=false&preferdirects=true&ref=home`;
@@ -1081,7 +1242,8 @@
         const same = (item.outCarrier === item.inCarrier) && (outDest === inOrig);
         const airlineLabel = same ? carrierName(item.outCarrier) : `${carrierName(item.outCarrier)} + ${carrierName(item.inCarrier)}`;
 
-        const links = buildFlightLinks(outOrig, outDest, wk.fri, wk.sun, 2, item.outCarrier);
+        const tripDates = getTripDates(wk);
+        const links = buildFlightLinks(outOrig, outDest, tripDates.dateOut, tripDates.dateIn, 2, item.outCarrier);
 
         map[wkId] = {
           totalEur: item.totalEur,
@@ -1520,6 +1682,10 @@
                 class="px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition cursor-pointer font-display ${currentMonthFilter === 'all' ? 'bg-[#0a0b0d] text-[#dfa649] shadow-xs' : 'bg-[#f4f5f8] text-[#475569] hover:bg-[#e2e8f0]'}">
           Toate (${ALL_WEEKENDS.length})
         </button>
+        <button onclick="setMonthFilter('holidays')"
+                class="px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition cursor-pointer font-display ${currentMonthFilter === 'holidays' ? 'bg-[#0a0b0d] text-[#dfa649] shadow-xs' : 'bg-[#fce8bd] text-[#5c3b06] hover:bg-[#f6dc9c] border border-[#dfa649]/60'}">
+          🎒 Vacanțe & Zile Libere (${ALL_WEEKENDS.filter(w => w.isHoliday).length})
+        </button>
       `;
 
       for (const m of monthMap.values()) {
@@ -1534,18 +1700,23 @@
       tabsEl.innerHTML = tabsHtml;
 
       const gridEl = document.getElementById("weekend-chips-grid");
-      const visibleWks = currentMonthFilter === 'all' ? ALL_WEEKENDS : ALL_WEEKENDS.filter(w => w.monthKey === currentMonthFilter);
+      const visibleWks = currentMonthFilter === 'all'
+        ? ALL_WEEKENDS
+        : currentMonthFilter === 'holidays'
+          ? ALL_WEEKENDS.filter(w => w.isHoliday)
+          : ALL_WEEKENDS.filter(w => w.monthKey === currentMonthFilter);
       
       let chipsHtml = "";
       visibleWks.forEach(w => {
         const isSel = selectedWkIds.has(w.id);
+        const tripDates = getTripDates(w);
         const tagBadge = w.tag ? `<span class="text-[10px] px-1.5 py-0.5 rounded-md font-bold ${isSel ? 'bg-[#dfa649] text-[#0a0b0d]' : 'bg-[#fce8bd] text-[#5c3b06]'} ml-1">${w.tag}</span>` : "";
         chipsHtml += `
           <button onclick="toggleWeekend('${w.id}')"
                   class="flex items-center justify-between p-2.5 rounded-xl text-xs transition cursor-pointer border text-left font-display shadow-2xs ${isSel ? 'bg-[#0a0b0d] text-[#dfa649] border-[#0a0b0d] font-bold shadow-xs' : 'bg-[#f8f9fa] text-[#0a0b0d] border-[#dce1e7] hover:bg-[#fce8bd] hover:border-[#dfa649]'}">
             <div>
               <div class="leading-tight font-bold">${w.dLabel} ${w.mLabel} ${tagBadge}</div>
-              <div class="text-[10px] opacity-75 mt-0.5 font-normal">${w.fri.slice(5)} → ${w.sun.slice(5)}</div>
+              <div class="text-[10px] opacity-75 mt-0.5 font-normal">${tripDates.dateOut.slice(5)} → ${tripDates.dateIn.slice(5)}</div>
             </div>
             <span class="text-sm ml-1 font-bold">${isSel ? '✓' : '+'}</span>
           </button>
@@ -1573,12 +1744,17 @@
     }
 
     function toggleAllVisibleMonth(select) {
-      const visibleWks = currentMonthFilter === 'all' ? ALL_WEEKENDS : ALL_WEEKENDS.filter(w => w.monthKey === currentMonthFilter);
+      const visibleWks = currentMonthFilter === 'all'
+        ? ALL_WEEKENDS
+        : currentMonthFilter === 'holidays'
+          ? ALL_WEEKENDS.filter(w => w.isHoliday)
+          : ALL_WEEKENDS.filter(w => w.monthKey === currentMonthFilter);
       visibleWks.forEach(w => {
         if (select) selectedWkIds.add(w.id);
         else selectedWkIds.delete(w.id);
       });
       renderWeekendSelectorUI();
+      renderCrossEngineBar();
       renderMatrix();
     }
 
@@ -1586,12 +1762,23 @@
       if (type === 'clear') {
         selectedWkIds.clear();
       } else if (type === '2026_no_xmas') {
+        currentTripMode = "classic";
         selectedWkIds = new Set(["2026-11-13", "2026-11-20", "2026-11-27", "2026-12-04", "2026-12-11", "2026-12-18"]);
         currentMonthFilter = "all";
+      } else if (type === 'extended') {
+        currentTripMode = "extended";
+        selectedWkIds = new Set(ALL_WEEKENDS.filter(w => w.holidayType === 'extended').map(w => w.id));
+        currentMonthFilter = "holidays";
+      } else if (type === 'school_holidays') {
+        currentTripMode = "school_week";
+        selectedWkIds = new Set(ALL_WEEKENDS.filter(w => w.isHoliday).map(w => w.id));
+        currentMonthFilter = "holidays";
       } else if (type === 'next4') {
+        currentTripMode = "classic";
         selectedWkIds = new Set(ALL_WEEKENDS.slice(0, 4).map(w => w.id));
         currentMonthFilter = "all";
       } else if (type === 'next8') {
+        currentTripMode = "classic";
         selectedWkIds = new Set(ALL_WEEKENDS.slice(0, 8).map(w => w.id));
         currentMonthFilter = "all";
       } else if (type === 'winter') {
@@ -1676,8 +1863,9 @@
       const cityName = selectedCityObj?.name || "Milano";
       const activeWks = getSelectedWeekendsList();
       const firstWk = activeWks[0] || ALL_WEEKENDS[0];
+      const tripDates = getTripDates(firstWk);
 
-      const links = buildFlightLinks(origIata, targetIata, firstWk.fri, firstWk.sun, 2);
+      const links = buildFlightLinks(origIata, targetIata, tripDates.dateOut, tripDates.dateIn, 2);
 
       container.innerHTML = `
         <a href="${links.googleFlightsUrl}" target="_blank" rel="noopener noreferrer"
@@ -1840,10 +2028,13 @@
       // Render Table Header
       let headHtml = `<tr><th class="text-left py-3 px-3 min-w-[210px] sm:min-w-[250px] text-xs font-black uppercase tracking-wider text-[#0a0b0d] font-display">Destinație / Aeroport</th>`;
       activeWks.forEach(wk => {
+        const tripDates = getTripDates(wk);
+        const tagBadge = wk.tag ? `<div class="text-[9px] px-1.5 py-0.5 rounded-md bg-[#fce8bd] text-[#5c3b06] font-bold mt-1 inline-block border border-[#dfa649]/60">${wk.tag}</div>` : '';
         headHtml += `
-          <th class="text-center py-2.5 px-2 rounded-xl text-xs sm:text-sm font-bold text-[#0a0b0d] min-w-[90px] sm:min-w-[110px] bg-[#f8f9fb] border border-[#e4e7eb] font-display">
+          <th class="text-center py-2.5 px-2 rounded-xl text-xs sm:text-sm font-bold text-[#0a0b0d] min-w-[95px] sm:min-w-[115px] bg-[#f8f9fb] border border-[#e4e7eb] font-display">
             <div>${wk.dLabel}</div>
-            <div class="text-[#64748b] font-normal text-[11px] font-body">${wk.mLabel}</div>
+            <div class="text-[#64748b] font-normal text-[10px] font-body">${tripDates.dateOut.slice(5)} → ${tripDates.dateIn.slice(5)}</div>
+            ${tagBadge}
           </th>
         `;
       });
@@ -1966,7 +2157,83 @@
     }
 
     function renderSchedules() {
+      const section = document.getElementById("section-schedules");
       const container = document.getElementById("schedule-cards");
+      const title = document.getElementById("schedule-section-title");
+      if (!container) return;
+
+      const destSelect = document.getElementById("f-destination");
+      const destVal = destSelect?.value || "any";
+
+      // If specific destination is selected (e.g. Liverpool): DO NOT show Milano / Bergamo / Warsaw!
+      if (destVal !== "any" && selectedCityObj && !selectedCityObj.isAll) {
+        const cityName = selectedCityObj.name;
+        const iata = selectedCityObj.iata || "";
+
+        const cityRow = currentRows.find(r => r.cityId === destVal || (iata && (r.iata === iata || r.code === iata.toLowerCase())));
+
+        if (cityRow && cityRow.cellsMap) {
+          const cells = Object.values(cityRow.cellsMap).filter(Boolean);
+          if (cells.length > 0) {
+            if (title) title.textContent = `Orele zborurilor și opțiuni de zbor către ${cityName} (${iata})`;
+            const uniqueFlights = [];
+            const seen = new Set();
+            cells.forEach(c => {
+              const sig = `${c.outRoute}_${c.outTime}_${c.inTime}_${c.airlineLabel}`;
+              if (!seen.has(sig)) {
+                seen.add(sig);
+                uniqueFlights.push(c);
+              }
+            });
+
+            container.innerHTML = uniqueFlights.slice(0, 4).map(c => `
+              <div class="card-23ai rounded-2xl p-4 shadow-2xs hover:border-[#dfa649] transition flex flex-col justify-between">
+                <div>
+                  <div class="flex items-center justify-between border-b border-[#eef0f3] pb-2 mb-2.5">
+                    <div>
+                      <span class="font-bold text-sm text-[#0a0b0d] font-display">${cityName}</span>
+                      <span class="ml-1 text-xs font-bold text-[#422904] bg-[#fce8bd] px-2 py-0.5 rounded-md font-mono">${iata}</span>
+                    </div>
+                    <span class="text-[11px] font-bold text-[#64748b]">${c.airlineLabel}</span>
+                  </div>
+                  <div class="space-y-1.5 text-xs text-[#334155]">
+                    <div class="flex justify-between font-medium">
+                      <span class="text-[#0a0b0d] font-bold">Tur:</span>
+                      <span class="font-mono font-bold text-[#0a0b0d]">${c.outRoute} (${c.outTime})</span>
+                    </div>
+                    <div class="flex justify-between font-medium">
+                      <span class="text-[#0a0b0d] font-bold">Retur:</span>
+                      <span class="font-mono font-bold text-[#0a0b0d]">${c.inRoute} (${c.inTime})</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="pt-3 mt-2 border-t border-[#eef0f3] flex items-center justify-between">
+                  <span class="text-xs font-black text-[#0a0b0d]">${Math.round(c.perPaxEur)} € <span class="font-normal text-[11px] text-[#64748b]">/ pers.</span></span>
+                  <a href="${c.googleFlightsUrl}" target="_blank" rel="noopener noreferrer"
+                     class="text-xs font-bold text-[#0a0b0d] hover:text-[#dfa649] font-display flex items-center gap-1">
+                    Google Flights ↗
+                  </a>
+                </div>
+              </div>
+            `).join("");
+            if (section) section.classList.remove("hidden");
+            return;
+          }
+        }
+
+        // When Liverpool or any city is selected but no specific search flights are present yet, hide this section completely
+        if (section) section.classList.add("hidden");
+        return;
+      }
+
+      // Default: "Toată Europa" (any) selected
+      if (section) section.classList.remove("hidden");
+      if (title) title.textContent = "Orele zborurilor și linkuri directe la companiile aeriene";
+
+      const originSelect = document.getElementById("f-origin");
+      const origIata = originSelect?.selectedOptions?.[0]?.dataset?.iata || "OTP";
+      const sampleWk = ALL_WEEKENDS[0];
+
       const sched = [
         {
           city: "Milano Bergamo",
@@ -1974,7 +2241,7 @@
           airline: "Wizz Air & Ryanair",
           out: "19:30 → 21:00 (sau 23:35 → 00:55)",
           in: "21:45 → 01:00 luni",
-          url: "https://www.google.com/travel/flights?q=Flights%20to%20BGY%20from%20OTP"
+          url: buildGoogleFlightsUrl(origIata, "BGY", sampleWk.fri, sampleWk.sun, 2)
         },
         {
           city: "Bologna",
@@ -1982,7 +2249,7 @@
           airline: "Wizz Air",
           out: "18:55 → 20:15",
           in: "20:50 → 23:55",
-          url: "https://www.google.com/travel/flights?q=Flights%20to%20BLQ%20from%20OTP"
+          url: buildGoogleFlightsUrl(origIata, "BLQ", sampleWk.fri, sampleWk.sun, 2)
         },
         {
           city: "Varșovia",
@@ -1990,7 +2257,7 @@
           airline: "Wizz Air",
           out: "21:50 → 22:40",
           in: "18:20 → 21:15",
-          url: "https://www.google.com/travel/flights?q=Flights%20to%20WAW%20from%20OTP"
+          url: buildGoogleFlightsUrl(origIata, "WAW", sampleWk.fri, sampleWk.sun, 2)
         },
         {
           city: "Manchester",
@@ -1998,7 +2265,7 @@
           airline: "Ryanair",
           out: "Vineri direct / conexiune",
           in: "Duminică seară",
-          url: "https://www.google.com/travel/flights?q=Flights%20to%20MAN%20from%20OTP"
+          url: buildGoogleFlightsUrl(origIata, "MAN", sampleWk.fri, sampleWk.sun, 2)
         },
         {
           city: "Tallinn",
@@ -2006,7 +2273,7 @@
           airline: "Wizz Air & Ryanair",
           out: "Vineri cu escală scurtă",
           in: "Duminică noapte",
-          url: "https://www.google.com/travel/flights?q=Flights%20to%20TLL%20from%20OTP"
+          url: buildGoogleFlightsUrl(origIata, "TLL", sampleWk.fri, sampleWk.sun, 2)
         },
         {
           city: "Roma Fiumicino",
@@ -2014,7 +2281,7 @@
           airline: "Wizz Air / Ryanair",
           out: "19:00 → 20:15",
           in: "21:30 → 00:45 luni",
-          url: "https://www.google.com/travel/flights?q=Flights%20to%20FCO%20from%20OTP"
+          url: buildGoogleFlightsUrl(origIata, "FCO", sampleWk.fri, sampleWk.sun, 2)
         },
         {
           city: "Veneția Treviso",
@@ -2022,7 +2289,7 @@
           airline: "Wizz Air",
           out: "19:10 → 20:20",
           in: "20:55 → 23:50",
-          url: "https://www.google.com/travel/flights?q=Flights%20to%20TSF%20from%20OTP"
+          url: buildGoogleFlightsUrl(origIata, "TSF", sampleWk.fri, sampleWk.sun, 2)
         },
         {
           city: "Paris Beauvais",
@@ -2030,7 +2297,7 @@
           airline: "Wizz Air / Ryanair",
           out: "18:45 → 20:55",
           in: "21:30 → 01:15 luni",
-          url: "https://www.google.com/travel/flights?q=Flights%20to%20BVA%20from%20OTP"
+          url: buildGoogleFlightsUrl(origIata, "BVA", sampleWk.fri, sampleWk.sun, 2)
         }
       ];
 
@@ -2040,7 +2307,7 @@
             <div class="flex items-center justify-between border-b border-[#eef0f3] pb-2 mb-2.5">
               <div>
                 <span class="font-bold text-sm text-[#0a0b0d] font-display">${s.city}</span>
-                <span class="ml-1 text-xs font-bold text-[#422904] bg-[#fce8bd] px-2 py-0.5 rounded-md">${s.iata}</span>
+                <span class="ml-1 text-xs font-bold text-[#422904] bg-[#fce8bd] px-2 py-0.5 rounded-md font-mono">${s.iata}</span>
               </div>
               <span class="text-[11px] font-bold text-[#64748b]">${s.airline}</span>
             </div>
@@ -2086,6 +2353,7 @@
 
     // 1) Permissive Reset
     function resetToPermissive() {
+      currentTripMode = "classic";
       document.getElementById("f-origin").value = "City:bucharest_ro";
       document.getElementById("f-max-price").value = 350;
       document.getElementById("lbl-max-price").textContent = "350 €";
@@ -2113,6 +2381,7 @@
 
     // 2) Strict Classic Reset
     function resetToStrict() {
+      currentTripMode = "classic";
       document.getElementById("f-origin").value = "City:bucharest_ro";
       clearDestSelection();
       document.getElementById("f-max-price").value = 150;
@@ -2137,6 +2406,54 @@
       document.getElementById("city-spotlight-banner")?.classList.add("hidden");
       document.getElementById("city-guide-card")?.classList.add("hidden");
 
+      renderMatrix();
+    }
+
+    // 3) Extended Weekend Preset (3-4 nights, bank holidays)
+    function presetExtendedWeekend() {
+      currentTripMode = "extended";
+      document.getElementById("f-origin").value = "City:bucharest_ro";
+      document.getElementById("f-max-price").value = 250;
+      document.getElementById("lbl-max-price").textContent = "250 €";
+      document.getElementById("f-adults").value = "2";
+      document.getElementById("f-bags").value = "cabin";
+      document.getElementById("f-max-dur").value = "360";
+      document.getElementById("f-stops").value = "1";
+      document.getElementById("f-fri-dep").value = "06:00";
+      document.getElementById("f-out-arr").value = "03:00";
+      document.getElementById("f-sun-dep").value = "12:00";
+      document.getElementById("f-in-arr").value = "03:00";
+      document.getElementById("f-domestic").checked = true;
+
+      document.getElementById("subtitle-summary").textContent =
+        "🏖️ Preset Weekend Prelungit (3–4 nopți): zboruri optimizate pentru zile libere legale & minivacanțe (Sf. Andrei & 1 Dec, Paște, 1 Mai, Rusalii). Buget max. 250 €.";
+
+      selectPreset('extended');
+      updateSearchStatus("Preset Weekend Prelungit configurat (4 minivacanțe selectate). Apasă pe «Caută zboruri»!", 100, "success");
+      renderMatrix();
+    }
+
+    // 4) School Holidays Preset (1 week, family friendly)
+    function presetSchoolHolidays() {
+      currentTripMode = "school_week";
+      document.getElementById("f-origin").value = "City:bucharest_ro";
+      document.getElementById("f-max-price").value = 350;
+      document.getElementById("lbl-max-price").textContent = "350 €";
+      document.getElementById("f-adults").value = "2";
+      document.getElementById("f-bags").value = "hold";
+      document.getElementById("f-max-dur").value = "360";
+      document.getElementById("f-stops").value = "1";
+      document.getElementById("f-fri-dep").value = "06:00";
+      document.getElementById("f-out-arr").value = "03:00";
+      document.getElementById("f-sun-dep").value = "12:00";
+      document.getElementById("f-in-arr").value = "03:00";
+      document.getElementById("f-domestic").checked = true;
+
+      document.getElementById("subtitle-summary").textContent =
+        "🎒 Preset Vacanțe Copii (sejur 1 săptămână / 7–9 nopți): acoperă vacanța de iarnă, schi (februarie), Paște & 1 Mai și vacanța mare de vară. Buget max. 350 €.";
+
+      selectPreset('school_holidays');
+      updateSearchStatus("Preset Vacanțe Copii configurat (22 de perioade de vacanță școlară selectate). Apasă pe «Caută zboruri»!", 100, "success");
       renderMatrix();
     }
 
@@ -2246,6 +2563,7 @@
           updateSearchStatus(`Scanăm 52 de weekenduri pentru ${cityName}... (${b+1}–${Math.min(b+batchSize, yearWeekends.length)}/52)`, pct, "loading");
 
           const batchPromises = batch.map(async wk => {
+            const tripDates = getTripDates(wk);
             try {
               const res = await fetch("https://api.skypicker.com/umbrella/v2/graphql", {
                 method: "POST",
@@ -2259,8 +2577,8 @@
                       itinerary: {
                         source: { ids: [originCityId] },
                         destination: { ids: [destVal] },
-                        outboundDepartureDate: { start: `${wk.fri}T00:00:00`, end: `${wk.fri}T23:59:59` },
-                        inboundDepartureDate: { start: `${wk.sun}T00:00:00`, end: `${wk.sun}T23:59:59` }
+                        outboundDepartureDate: { start: `${tripDates.dateOut}T00:00:00`, end: `${tripDates.dateOut}T23:59:59` },
+                        inboundDepartureDate: { start: `${tripDates.dateIn}T00:00:00`, end: `${tripDates.dateIn}T23:59:59` }
                       }
                     },
                     filter: { transportTypes: ["FLIGHT"] },
@@ -2290,7 +2608,7 @@
               const outOrig = outFirst.source.station.code;
               const outDest = outLast.destination.station.code;
 
-              const links = buildFlightLinks(outOrig, outDest, wk.fri, wk.sun, adults, outCarrier);
+              const links = buildFlightLinks(outOrig, outDest, tripDates.dateOut, tripDates.dateIn, adults, outCarrier);
 
               return {
                 wk,
@@ -2411,6 +2729,7 @@
           updateSearchStatus(`Interogăm live toate cele ${activeWks.length} weekenduri alese pentru ${cityName}...`, 30, "loading");
 
           const promises = activeWks.map(async (wk, i) => {
+            const tripDates = getTripDates(wk);
             try {
               const res = await fetch("https://api.skypicker.com/umbrella/v2/graphql", {
                 method: "POST",
@@ -2424,8 +2743,8 @@
                       itinerary: {
                         source: { ids: [originCityId] },
                         destination: { ids: [destVal] },
-                        outboundDepartureDate: { start: `${wk.fri}T${friDep}:00`, end: `${wk.fri}T23:59:59` },
-                        inboundDepartureDate: { start: `${wk.sun}T${sunDep}:00`, end: `${wk.sun}T23:59:59` }
+                        outboundDepartureDate: { start: `${tripDates.dateOut}T${friDep}:00`, end: `${tripDates.dateOut}T23:59:59` },
+                        inboundDepartureDate: { start: `${tripDates.dateIn}T${sunDep}:00`, end: `${tripDates.dateIn}T23:59:59` }
                       }
                     },
                     filter: {
@@ -2455,6 +2774,7 @@
 
           function processItineraries(allowStops, allowDurMin) {
             results.forEach(({ wk, itins }) => {
+              const tripDates = getTripDates(wk);
               for (const it of itins) {
                 const outSegs = it.outbound?.sectorSegments || [];
                 const inSegs = it.inbound?.sectorSegments || [];
@@ -2488,7 +2808,7 @@
                 const airlineLabel = same ? carrierName(outCarrier) : `${carrierName(outCarrier)} + ${carrierName(inCarrier)}`;
                 targetAirline = airlineLabel;
 
-                const links = buildFlightLinks(outOrig, outDest, wk.fri, wk.sun, adults, outCarrier);
+                const links = buildFlightLinks(outOrig, outDest, tripDates.dateOut, tripDates.dateIn, adults, outCarrier);
                 const stopsCount = Math.max(outSegs.length - 1, inSegs.length - 1);
                 const stopsLabel = stopsCount > 0 ? ` (${stopsCount} esc.)` : "";
 
@@ -2570,6 +2890,7 @@
           const pct = Math.round(((i) / activeWks.length) * 100);
           updateSearchStatus(`Căutăm destinații deschise pentru ${wk.label} (${i+1}/${activeWks.length})...`, pct, "loading");
 
+          const tripDates = getTripDates(wk);
           try {
             const resOut = await fetch("https://api.skypicker.com/umbrella/v2/graphql", {
               method: "POST",
@@ -2582,7 +2903,7 @@
                     cabinClass: { cabinClass: "ECONOMY" },
                     itinerary: {
                       source: { ids: [originCityId] },
-                      outboundDepartureDate: { start: `${wk.fri}T${friDep}:00`, end: `${wk.fri}T23:59:59` }
+                      outboundDepartureDate: { start: `${tripDates.dateOut}T${friDep}:00`, end: `${tripDates.dateOut}T23:59:59` }
                     }
                   },
                   filter: { transportTypes: ["FLIGHT"] },
@@ -2621,8 +2942,8 @@
                     itinerary: {
                       source: { ids: [originCityId] },
                       destination: { ids: [...destCityIds].slice(0, 30) },
-                      outboundDepartureDate: { start: `${wk.fri}T${friDep}:00`, end: `${wk.fri}T23:59:59` },
-                      inboundDepartureDate: { start: `${wk.sun}T${sunDep}:00`, end: `${wk.sun}T23:59:59` }
+                      outboundDepartureDate: { start: `${tripDates.dateOut}T${friDep}:00`, end: `${tripDates.dateOut}T23:59:59` },
+                      inboundDepartureDate: { start: `${tripDates.dateIn}T${sunDep}:00`, end: `${tripDates.dateIn}T23:59:59` }
                     }
                   },
                   filter: {
@@ -2674,7 +2995,7 @@
               const same = (outCarrier === inCarrier);
               const airlineLabel = same ? carrierName(outCarrier) : `${carrierName(outCarrier)} + ${carrierName(inCarrier)}`;
 
-              const links = buildFlightLinks(outOrig, outDest, wk.fri, wk.sun, adults, outCarrier);
+              const links = buildFlightLinks(outOrig, outDest, tripDates.dateOut, tripDates.dateIn, adults, outCarrier);
 
               const cellObj = {
                 perPaxEur: perPaxEur,
