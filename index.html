@@ -3,65 +3,72 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CityBreak · Evadări de Weekend & Zboruri Ieftine în Europa</title>
-  <meta name="description" content="CityBreak: Găsește rapid cele mai ieftine bilete de avion pentru weekend în Europa. Plecare vineri după birou, retur duminică noaptea, zboruri directe." />
+  <title>CityBreak · Căutare Inteligentă Zboruri de Weekend (23AI Edition)</title>
+  <meta name="description" content="CityBreak: Găsește rapid zboruri de weekend în Europa. Criterii optimizate: plecare vineri după 18:00, retur duminică noaptea, zboruri directe." />
   
-  <!-- Fun, Vacation & Non-AI Google Fonts -->
+  <!-- Google Fonts with FULL Romanian Diacritics Support (latin-ext) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@600;700&family=Fredoka:wght@500;600;700;800&family=Pacifico&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@500;600;700;800&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;0,800;1,400&family=Space+Grotesk:wght@500;600;700&family=Syne:wght@700;800&display=swap&subset=latin,latin-ext" rel="stylesheet">
   
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     :root {
-      --font-brand: 'Pacifico', 'Forte', 'Brush Script MT', cursive;
-      --font-fun: 'Fredoka', 'Comfortaa', 'Jokerman', cursive, sans-serif;
-      --font-body: 'Quicksand', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      /* 23ai Brand Colors */
+      --ai-gold: #dfa649;
+      --ai-gold-hover: #c98f33;
+      --ai-gold-light: #fef8ec;
+      --ai-gold-border: #f0caa3;
+      --ai-black: #0a0b0d;
+      --ai-dark: #111318;
+      --ai-surface: #181b22;
+      --font-display: 'Space Grotesk', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-body: 'Source Sans 3', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-num: 'Bebas Neue', 'Space Grotesk', sans-serif;
     }
+    
     body {
       font-family: var(--font-body);
-      color: #1e293b;
+      color: #0a0b0d;
+      background-color: #ffffff;
       min-height: 100vh;
-      background-size: cover;
-      background-position: center center;
-      background-attachment: fixed;
-      transition: background-image 0.5s ease-in-out;
     }
     
-    .font-brand { font-family: var(--font-brand); }
-    .font-fun { font-family: var(--font-fun); }
+    .font-display { font-family: var(--font-display); }
     .font-body { font-family: var(--font-body); }
+    .font-num { font-family: var(--font-num); }
     
-    /* Vacation Glass Cards (Never Pure White) */
-    .vacation-card {
-      background: rgba(254, 251, 243, 0.94);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      border: 2px solid rgba(251, 191, 36, 0.4);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.07);
+    /* 23AI Themed Cards (Light non-white tones) */
+    .card-23ai {
+      background: #fbfbfd;
+      border: 1.5px solid #e4e7eb;
+      box-shadow: 0 4px 20px -2px rgba(10, 11, 13, 0.05);
     }
-    
-    /* Interactive Price cell hover */
+    .card-23ai:hover {
+      border-color: #d1d6dc;
+    }
+
+    /* Interactive Price Cell */
     .price-cell {
-      transition: all 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
-      font-family: var(--font-fun);
+      transition: all 0.16s cubic-bezier(0.4, 0, 0.2, 1);
+      font-family: var(--font-display);
     }
     .price-cell:hover {
-      transform: translateY(-3px) scale(1.03);
-      box-shadow: 0 10px 22px rgba(245, 158, 11, 0.35);
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 8px 18px rgba(10, 11, 13, 0.15);
     }
     
-    /* Cheerful Color Tiers */
-    .tier-1 { background-color: #a7f3d0; color: #064e3b; border: 1.5px solid #6ee7b7; }
-    .tier-2 { background-color: #d9f99d; color: #365314; border: 1.5px solid #bef264; }
-    .tier-3 { background-color: #fef08a; color: #713f12; border: 1.5px solid #fde047; }
-    .tier-4 { background-color: #fed7aa; color: #7c2d12; border: 1.5px solid #fdba74; }
-    .tier-empty { background-color: #f1eddf; color: #94a3b8; border: 1px dashed #cbd5e1; }
+    /* 23AI Gold & Yellow Tiers */
+    .tier-1 { background-color: #fce8bd; color: #422904; border: 1.5px solid #dfa649; }
+    .tier-2 { background-color: #fef3d8; color: #5c3b06; border: 1.5px solid #ebd096; }
+    .tier-3 { background-color: #fff9ea; color: #714a08; border: 1.5px solid #fae7ba; }
+    .tier-4 { background-color: #f5f6f8; color: #475569; border: 1.5px solid #e2e8f0; }
+    .tier-empty { background-color: #f8f9fa; color: #94a3b8; border: 1px dashed #cbd5e1; }
     
     .best-weekend-outline {
-      outline: 3px solid #f59e0b;
-      outline-offset: -3px;
-      box-shadow: 0 0 14px rgba(245, 158, 11, 0.4);
+      outline: 2.5px solid #0a0b0d;
+      outline-offset: -2.5px;
+      box-shadow: 0 0 10px rgba(223, 166, 73, 0.45);
     }
     
     @keyframes pulse-fast {
@@ -72,561 +79,507 @@
       animation: pulse-fast 1.2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
     }
     
-    /* Sleek Custom Scrollbar */
+    /* Custom Sleek Scrollbar */
     .custom-scrollbar::-webkit-scrollbar {
-      height: 9px;
-      width: 8px;
+      height: 8px;
+      width: 7px;
     }
     .custom-scrollbar::-webkit-scrollbar-track {
-      background: #fdf6e7;
+      background: #f4f5f7;
       border-radius: 9999px;
     }
     .custom-scrollbar::-webkit-scrollbar-thumb {
-      background: #f59e0b;
+      background: #dfa649;
       border-radius: 9999px;
     }
     .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-      background: #d97706;
+      background: #c98f33;
     }
   </style>
 </head>
-<body id="page-body" class="antialiased min-h-screen flex flex-col relative">
+<body class="antialiased min-h-screen flex flex-col bg-white text-[#0a0b0d]">
 
-  <!-- Background Ambient Tint Overlay for Guaranteed Readability -->
-  <div class="fixed inset-0 bg-gradient-to-b from-amber-900/35 via-amber-50/75 to-amber-100/90 pointer-events-none z-0"></div>
-
-  <!-- Content Layer -->
-  <div class="relative z-10 flex-1 flex flex-col">
-
-    <!-- Top Navbar with Vacation Brand & Theme Switcher -->
-    <header class="bg-[#fff9ee]/95 border-b-2 border-amber-200/90 sticky top-0 z-40 shadow-sm backdrop-blur-md">
-      <div class="max-w-[96rem] w-full mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-wrap items-center justify-between gap-4">
-        
-        <!-- Logo -->
-        <div class="flex items-center gap-3">
-          <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-amber-500 via-orange-500 to-rose-500 text-white flex items-center justify-center font-bold text-2xl shadow-md rotate-[-3deg] hover:rotate-0 transition cursor-pointer">
-            🏖️
-          </div>
-          <div>
-            <div class="flex items-center gap-2.5">
-              <span class="font-brand text-2xl sm:text-3xl tracking-wide text-slate-900 drop-shadow-xs">City<span class="text-amber-500">Break</span></span>
-              <span class="text-xs bg-amber-200/90 text-amber-950 font-extrabold px-3 py-0.5 rounded-full border border-amber-300 font-fun">
-                🌴 Weekend Escapes
-              </span>
-            </div>
-            <p class="text-xs text-amber-900/80 font-semibold hidden sm:block">Zboruri de weekend directe · Zero timp pierdut · Vacanțe spontane</p>
-          </div>
+  <!-- Top Header with 23AI Black & Gold Theme -->
+  <header class="bg-[#0a0b0d] text-white border-b border-[#232730] sticky top-0 z-40 shadow-sm">
+    <div class="max-w-[96rem] w-full mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-wrap items-center justify-between gap-4">
+      
+      <!-- Brand Logo -->
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-[#dfa649] text-[#0a0b0d] flex items-center justify-center font-black text-xl shadow-md">
+          ✈
         </div>
-
-        <!-- Wallpaper Switcher & Navigation -->
-        <div class="flex flex-wrap items-center gap-2 sm:gap-3 text-xs sm:text-sm">
-          <div class="bg-[#fef4de] border border-amber-300 rounded-2xl px-2.5 py-1 flex items-center gap-1 shadow-2xs">
-            <span class="text-xs font-bold text-amber-900 mr-1 hidden md:inline">Fundal vacanță:</span>
-            <button onclick="setVacationTheme('beach')" title="Plajă & Umbreluțe" class="theme-btn px-2 py-1 rounded-xl text-xs font-bold transition hover:bg-amber-200 text-slate-800">🏖️ Plajă</button>
-            <button onclick="setVacationTheme('amalfi')" title="Amalfi & Mediterana" class="theme-btn px-2 py-1 rounded-xl text-xs font-bold transition hover:bg-amber-200 text-slate-800">🏛️ Mediterana</button>
-            <button onclick="setVacationTheme('mountain')" title="Alpi & Lac Alpin" class="theme-btn px-2 py-1 rounded-xl text-xs font-bold transition hover:bg-amber-200 text-slate-800">🏔️ Munte</button>
-            <button onclick="setVacationTheme('sunset')" title="Apus Tropical" class="theme-btn px-2 py-1 rounded-xl text-xs font-bold transition hover:bg-amber-200 text-slate-800">🌅 Apus</button>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="font-display text-2xl font-black tracking-tight text-white">City<span class="text-[#dfa649]">Break</span></span>
+            <span class="text-[11px] bg-[#1e222b] text-[#dfa649] font-bold px-2.5 py-0.5 rounded-md border border-[#373d4c] font-display">
+              23AI Edition
+            </span>
           </div>
-
-          <a href="#configurator" class="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-fun font-bold px-4 py-2 rounded-xl transition shadow-sm">
-            Filtrează Zboruri ↓
-          </a>
+          <p class="text-xs text-[#8a95a6] font-medium hidden sm:block">Zboruri de weekend directe · Fără timp pierdut · București & România</p>
         </div>
       </div>
-    </header>
 
-    <main class="flex-1 max-w-[96rem] w-full mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-7 space-y-6">
+      <!-- Quick Action Navigation -->
+      <div class="flex items-center gap-3 text-xs sm:text-sm">
+        <span class="hidden md:inline text-[#b0bac8]">Plecare vineri după 18:00 · Retur duminică noaptea</span>
+        <a href="#configurator" class="bg-[#dfa649] hover:bg-[#c98f33] active:bg-[#b57f2a] text-[#0a0b0d] font-display font-bold px-4 py-2 rounded-xl transition shadow-xs">
+          Filtrează Zboruri ↓
+        </a>
+      </div>
+    </div>
+  </header>
 
-      <!-- 1. Interactive Filter Configurator (Never Pure White!) -->
-      <section id="configurator" class="vacation-card rounded-3xl p-5 sm:p-7 space-y-6">
-        
-        <!-- Section Header -->
-        <div class="flex flex-wrap items-center justify-between gap-4 border-b border-amber-200/70 pb-4">
+  <main class="flex-1 max-w-[96rem] w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+    <!-- 1. Interactive Filter Configurator (23AI Yellow & Black on Non-White Warm Surface) -->
+    <section id="configurator" class="card-23ai rounded-3xl p-5 sm:p-7 space-y-6 border border-[#e4e7eb]">
+      
+      <!-- Section Header -->
+      <div class="flex flex-wrap items-center justify-between gap-4 border-b border-[#eef0f3] pb-4">
+        <div>
+          <div class="flex items-center gap-2.5">
+            <span class="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-[#0a0b0d] text-[#dfa649] text-base font-black shadow-xs">
+              ⚡
+            </span>
+            <h1 class="font-display text-xl sm:text-2xl font-bold tracking-tight text-[#0a0b0d]">
+              Filtre & Criterii de Căutare
+            </h1>
+          </div>
+          <p id="subtitle-summary" class="text-xs sm:text-sm text-[#475569] font-medium mt-1">
+            Personalizează criteriile de zbor grupate pe traseu, buget și orare, apoi alege weekendurile dorite.
+          </p>
+        </div>
+        <button onclick="resetToDefaults()" class="inline-flex items-center gap-1.5 text-xs font-bold text-[#0a0b0d] hover:text-[#dfa649] bg-[#f4f5f8] hover:bg-[#eaeef3] px-3.5 py-2 rounded-xl border border-[#dce1e7] transition cursor-pointer font-display">
+          ↺ Resetează filtrele implicite
+        </button>
+      </div>
+
+      <!-- 3 Themed Cards: All light non-white backgrounds, 23ai yellow & dark borders -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+
+        <!-- CARD 1: Traseu & Destinație (23AI Warm Sand Tint) -->
+        <div class="lg:col-span-4 bg-[#fbf9f4] border-2 border-[#ecd8b0] rounded-2xl p-4 sm:p-5 shadow-2xs flex flex-col justify-between space-y-4">
           <div>
-            <div class="flex items-center gap-2.5">
-              <span class="inline-flex items-center justify-center w-9 h-9 rounded-2xl bg-amber-500 text-white text-lg shadow-sm font-bold">
-                ✈️
-              </span>
-              <h1 class="font-fun text-xl sm:text-2xl font-bold tracking-tight text-slate-900">
-                Unde vrei să evadezi în weekend?
-              </h1>
+            <div class="flex items-center justify-between mb-3.5">
+              <div class="flex items-center gap-2">
+                <span class="w-7 h-7 rounded-lg bg-[#0a0b0d] text-[#dfa649] flex items-center justify-center text-xs font-black shadow-xs">01</span>
+                <h2 class="font-display text-sm font-bold uppercase tracking-wider text-[#0a0b0d]">Traseu & Destinație</h2>
+              </div>
+              <span class="text-[11px] font-bold text-[#5c3b06] bg-[#fce8bd] px-2.5 py-0.5 rounded-md border border-[#dfa649]/60 font-display">Zbor</span>
             </div>
-            <p id="subtitle-summary" class="text-xs sm:text-sm text-amber-950/80 font-medium mt-1">
-              Setează-ți dorințele de călătorie. Totul este pregătit pe culori calde de vacanță, ușor de urmărit.
+
+            <div class="space-y-3">
+              <!-- Oraș plecare -->
+              <div class="bg-[#fdfaf3] p-3 rounded-xl border border-[#ecd8b0] shadow-2xs hover:border-[#dfa649] transition">
+                <label class="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#0a0b0d] mb-1.5 font-display">
+                  <span>📍</span> Oraș de plecare
+                </label>
+                <select id="f-origin" class="w-full rounded-lg border border-[#e4d3b5] bg-[#fffdf8] px-3 py-2 text-xs sm:text-sm font-bold text-[#0a0b0d] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#dfa649] focus:border-transparent transition font-body">
+                  <option value="City:bucharest_ro" data-sky="otp" data-iata="OTP" selected>București (OTP / BBU)</option>
+                  <option value="City:cluj-napoca_ro" data-sky="clj" data-iata="CLJ">Cluj-Napoca (CLJ)</option>
+                  <option value="City:iasi_ro" data-sky="ias" data-iata="IAS">Iași (IAS)</option>
+                  <option value="City:timisoara_ro" data-sky="tsr" data-iata="TSR">Timișoara (TSR)</option>
+                </select>
+              </div>
+
+              <!-- Destinație dorită (Default Any) -->
+              <div class="bg-[#fdfaf3] p-3 rounded-xl border border-[#ecd8b0] shadow-2xs hover:border-[#dfa649] transition">
+                <label class="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#0a0b0d] mb-1.5 font-display">
+                  <span>🎯</span> Destinație dorită
+                </label>
+                <select id="f-destination" onchange="renderMatrix()" class="w-full rounded-lg border border-[#e4d3b5] bg-[#fffdf8] px-3 py-2 text-xs sm:text-sm font-bold text-[#0a0b0d] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#dfa649] focus:border-transparent transition font-body">
+                  <option value="any" selected>Oricare (Toată Europa) — Default</option>
+                  <optgroup label="Destinații populare">
+                    <option value="mil">Milano (BGY / MXP)</option>
+                    <option value="blq">Bologna (BLQ)</option>
+                    <option value="rom">Roma (FCO / CIA)</option>
+                    <option value="vce">Veneția (VCE / TSF)</option>
+                    <option value="nap">Napoli (NAP)</option>
+                    <option value="par">Paris (BVA / CDG)</option>
+                    <option value="lon">Londra (LTN / STN / LGW)</option>
+                    <option value="bcn">Barcelona (BCN)</option>
+                    <option value="mad">Madrid (MAD)</option>
+                    <option value="crl">Bruxelles (CRL / BRU)</option>
+                    <option value="vie">Viena (VIE)</option>
+                    <option value="muc">München (MUC)</option>
+                    <option value="ber">Berlin (BER)</option>
+                    <option value="waw">Varșovia (WAW)</option>
+                    <option value="ist">Istanbul (IST / SAW)</option>
+                    <option value="ath">Atena (ATH)</option>
+                    <option value="prg">Praga (PRG)</option>
+                    <option value="bud">Budapesta (BUD)</option>
+                    <option value="lis">Lisabona (LIS)</option>
+                  </optgroup>
+                  <optgroup label="Filtrează după țară">
+                    <option value="it">Italia (toate orașele)</option>
+                    <option value="es">Spania (toate orașele)</option>
+                    <option value="de">Germania (toate orașele)</option>
+                    <option value="fr">Franța (toate orașele)</option>
+                    <option value="gb">Marea Britanie (toate orașele)</option>
+                  </optgroup>
+                </select>
+              </div>
+
+              <!-- Tip zbor & Escale -->
+              <div class="bg-[#fdfaf3] p-3 rounded-xl border border-[#ecd8b0] shadow-2xs hover:border-[#dfa649] transition">
+                <label class="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#0a0b0d] mb-1.5 font-display">
+                  <span>✈️</span> Tip zbor & escale
+                </label>
+                <select id="f-stops" class="w-full rounded-lg border border-[#e4d3b5] bg-[#fffdf8] px-3 py-2 text-xs sm:text-sm font-bold text-[#0a0b0d] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#dfa649] focus:border-transparent transition font-body">
+                  <option value="0" selected>Doar zboruri directe (fără escală)</option>
+                  <option value="1">Permite și 1 escală scurtă</option>
+                </select>
+              </div>
+
+              <!-- Durată maximă zbor -->
+              <div class="bg-[#fdfaf3] p-3 rounded-xl border border-[#ecd8b0] shadow-2xs hover:border-[#dfa649] transition">
+                <label class="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#0a0b0d] mb-1.5 font-display">
+                  <span>⏱️</span> Durată maximă pe sens
+                </label>
+                <select id="f-max-dur" class="w-full rounded-lg border border-[#e4d3b5] bg-[#fffdf8] px-3 py-2 text-xs sm:text-sm font-bold text-[#0a0b0d] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#dfa649] focus:border-transparent transition font-body">
+                  <option value="120">Maximum 2 ore / sens</option>
+                  <option value="180" selected>Maximum 3 ore / sens</option>
+                  <option value="240">Maximum 4 ore / sens</option>
+                  <option value="360">Maximum 6 ore / sens</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Domestic flight toggle inside Card 1 -->
+          <div class="pt-2 border-t border-[#ecd8b0]">
+            <label class="inline-flex items-center gap-2 text-xs font-bold text-[#0a0b0d] cursor-pointer bg-[#fdfaf3] hover:bg-[#faeed8] px-3 py-2 rounded-xl border border-[#ecd8b0] transition w-full font-body">
+              <input type="checkbox" id="f-domestic" class="accent-[#dfa649] rounded w-4 h-4 cursor-pointer" onchange="runLiveSearch()" />
+              <span>Include zboruri interne în RO (Cluj, Iași etc.)</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- CARD 2: Buget & Călători (23AI Warm Cream Tint) -->
+        <div class="lg:col-span-4 bg-[#fbf9f4] border-2 border-[#ecd8b0] rounded-2xl p-4 sm:p-5 shadow-2xs flex flex-col justify-between space-y-4">
+          <div>
+            <div class="flex items-center justify-between mb-3.5">
+              <div class="flex items-center gap-2">
+                <span class="w-7 h-7 rounded-lg bg-[#0a0b0d] text-[#dfa649] flex items-center justify-center text-xs font-black shadow-xs">02</span>
+                <h2 class="font-display text-sm font-bold uppercase tracking-wider text-[#0a0b0d]">Buget & Călători</h2>
+              </div>
+              <span class="text-[11px] font-bold text-[#5c3b06] bg-[#fce8bd] px-2.5 py-0.5 rounded-md border border-[#dfa649]/60 font-display">Preț & Bagaj</span>
+            </div>
+
+            <div class="space-y-3">
+              <!-- Buget maxim -->
+              <div class="bg-[#fdfaf3] p-3 rounded-xl border border-[#ecd8b0] shadow-2xs hover:border-[#dfa649] transition space-y-2">
+                <div class="flex justify-between items-center">
+                  <label class="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#0a0b0d] font-display">
+                    <span>💰</span> Buget max / persoană
+                  </label>
+                  <span id="lbl-max-price" class="font-display text-xs font-black text-[#0a0b0d] bg-[#dfa649] px-2.5 py-0.5 rounded-lg border border-[#c98f33]">150 €</span>
+                </div>
+                <input id="f-max-price" type="range" min="50" max="350" step="10" value="150"
+                       oninput="document.getElementById('lbl-max-price').textContent = this.value + ' €'"
+                       class="w-full accent-[#dfa649] cursor-pointer h-2 bg-[#ecd8b0] rounded-lg" />
+                <div class="flex justify-between text-[11px] text-[#5c3b06] font-bold px-0.5 font-display">
+                  <span>50 €</span>
+                  <span class="text-[#0a0b0d] font-black">150 €</span>
+                  <span>250 €</span>
+                  <span>350 €</span>
+                </div>
+              </div>
+
+              <!-- Număr pasageri -->
+              <div class="bg-[#fdfaf3] p-3 rounded-xl border border-[#ecd8b0] shadow-2xs hover:border-[#dfa649] transition">
+                <label class="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#0a0b0d] mb-1.5 font-display">
+                  <span>👥</span> Număr călători
+                </label>
+                <select id="f-adults" class="w-full rounded-lg border border-[#e4d3b5] bg-[#fffdf8] px-3 py-2 text-xs sm:text-sm font-bold text-[#0a0b0d] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#dfa649] focus:border-transparent transition font-body">
+                  <option value="1">1 Adult (individual)</option>
+                  <option value="2" selected>2 Adulți (cuplu / pereche)</option>
+                  <option value="3">3 Adulți (grup mic)</option>
+                  <option value="4">4 Adulți (grup prieteni)</option>
+                </select>
+              </div>
+
+              <!-- Bagaje incluse -->
+              <div class="bg-[#fdfaf3] p-3 rounded-xl border border-[#ecd8b0] shadow-2xs hover:border-[#dfa649] transition">
+                <label class="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#0a0b0d] mb-1.5 font-display">
+                  <span>🧳</span> Bagaje incluse
+                </label>
+                <select id="f-bags" class="w-full rounded-lg border border-[#e4d3b5] bg-[#fffdf8] px-3 py-2 text-xs sm:text-sm font-bold text-[#0a0b0d] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#dfa649] focus:border-transparent transition font-body">
+                  <option value="small" selected>Rucsac mic sub scaun (inclus)</option>
+                  <option value="cabin">Troller de cabină (10 kg)</option>
+                  <option value="hold">Bagaj mare de cală (20 kg)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="pt-2 border-t border-[#ecd8b0] text-xs text-[#5c3b06] font-bold px-1 flex items-center gap-1.5 font-body">
+            <span>✨</span> <span>Prețurile din tabel sunt calculate pentru bagajul ales</span>
+          </div>
+        </div>
+
+        <!-- CARD 3: Orare Weekend (23AI Warm Honey Tint) -->
+        <div class="lg:col-span-4 bg-[#fbf9f4] border-2 border-[#ecd8b0] rounded-2xl p-4 sm:p-5 shadow-2xs flex flex-col justify-between space-y-4">
+          <div>
+            <div class="flex items-center justify-between mb-3.5">
+              <div class="flex items-center gap-2">
+                <span class="w-7 h-7 rounded-lg bg-[#0a0b0d] text-[#dfa649] flex items-center justify-center text-xs font-black shadow-xs">03</span>
+                <h2 class="font-display text-sm font-bold uppercase tracking-wider text-[#0a0b0d]">Orare de Weekend</h2>
+              </div>
+              <span class="text-[11px] font-bold text-[#5c3b06] bg-[#fce8bd] px-2.5 py-0.5 rounded-md border border-[#dfa649]/60 font-display">Timp optim</span>
+            </div>
+
+            <div class="space-y-3">
+              <!-- Sub-bloc Tur Vineri -->
+              <div class="bg-[#fdfaf3] p-3 rounded-xl border border-[#ecd8b0] shadow-2xs hover:border-[#dfa649] transition space-y-2">
+                <div class="flex items-center gap-1.5 text-xs font-black text-[#0a0b0d] border-b border-[#ecd8b0] pb-1 font-display">
+                  <span>🛫</span> <span>TUR (Vineri)</span>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 font-body">
+                  <div>
+                    <label class="block text-[11px] font-bold uppercase tracking-wider text-[#5c3b06] mb-1 font-display">Plecare min.</label>
+                    <select id="f-fri-dep" class="w-full rounded-lg border border-[#e4d3b5] bg-[#fffdf8] px-2 py-1.5 text-xs font-bold text-[#0a0b0d] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#dfa649] transition">
+                      <option value="06:00">De la 06:00</option>
+                      <option value="12:00">După 12:00</option>
+                      <option value="15:00">După 15:00</option>
+                      <option value="18:00" selected>După 18:00 (seară)</option>
+                      <option value="20:00">După 20:00</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-[11px] font-bold uppercase tracking-wider text-[#5c3b06] mb-1 font-display">Aterizare max.</label>
+                    <select id="f-out-arr" class="w-full rounded-lg border border-[#e4d3b5] bg-[#fffdf8] px-2 py-1.5 text-xs font-bold text-[#0a0b0d] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#dfa649] transition">
+                      <option value="23:00">Până la 23:00</option>
+                      <option value="23:59">Până la 24:00</option>
+                      <option value="01:00" selected>Până la 01:00 (sâm)</option>
+                      <option value="03:00">Fără limită</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Sub-bloc Retur Duminica -->
+              <div class="bg-[#fdfaf3] p-3 rounded-xl border border-[#ecd8b0] shadow-2xs hover:border-[#dfa649] transition space-y-2">
+                <div class="flex items-center gap-1.5 text-xs font-black text-[#0a0b0d] border-b border-[#ecd8b0] pb-1 font-display">
+                  <span>🛬</span> <span>RETUR (Duminică)</span>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 font-body">
+                  <div>
+                    <label class="block text-[11px] font-bold uppercase tracking-wider text-[#5c3b06] mb-1 font-display">Plecare min.</label>
+                    <select id="f-sun-dep" class="w-full rounded-lg border border-[#e4d3b5] bg-[#fffdf8] px-2 py-1.5 text-xs font-bold text-[#0a0b0d] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#dfa649] transition">
+                      <option value="12:00">După 12:00</option>
+                      <option value="15:00">După 15:00</option>
+                      <option value="17:00">După 17:00</option>
+                      <option value="18:00" selected>După 18:00 (seară)</option>
+                      <option value="20:00">După 20:00</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-[11px] font-bold uppercase tracking-wider text-[#5c3b06] mb-1 font-display">Acasă până la</label>
+                    <select id="f-in-arr" class="w-full rounded-lg border border-[#e4d3b5] bg-[#fffdf8] px-2 py-1.5 text-xs font-bold text-[#0a0b0d] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#dfa649] transition">
+                      <option value="23:00">Până la 23:00</option>
+                      <option value="23:59">Până la 24:00</option>
+                      <option value="01:00" selected>Până la 01:00 (luni)</option>
+                      <option value="03:00">Până la 03:00 (luni)</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="pt-2 border-t border-[#ecd8b0] text-xs text-[#5c3b06] font-bold px-1 flex items-center gap-1.5 font-body">
+            <span>💡</span> <span>Pleci vineri după birou și te întorci duminică noaptea</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 2. Multi-Weekend Selector (2026 - 2027) -->
+    <section class="card-23ai rounded-3xl p-5 sm:p-7 space-y-4 border border-[#e4e7eb]">
+      <div class="flex flex-wrap items-center justify-between gap-3 border-b border-[#eef0f3] pb-3">
+        <div class="flex items-center gap-2.5">
+          <span class="w-8 h-8 rounded-xl bg-[#0a0b0d] text-[#dfa649] flex items-center justify-center text-sm font-black shadow-xs">📅</span>
+          <div>
+            <h2 class="font-display text-base sm:text-lg font-bold text-[#0a0b0d] tracking-tight">
+              Alege weekendurile dorite (2026 – 2027)
+            </h2>
+            <p class="text-xs text-[#475569] font-medium">
+              Alege rapid din scurtături sau bifează oricâte weekenduri dorești din lista de mai jos.
             </p>
           </div>
-          <button onclick="resetToDefaults()" class="inline-flex items-center gap-1.5 text-xs font-bold text-amber-900 hover:text-amber-950 bg-[#faedd8] hover:bg-[#f6dfba] px-3.5 py-2 rounded-xl border border-amber-300 transition cursor-pointer font-fun">
-            ↺ Resetează la filtrele implicite
+        </div>
+        <div class="flex items-center gap-2">
+          <span id="selected-wk-badge" class="bg-[#fce8bd] text-[#422904] font-bold text-xs sm:text-sm px-3.5 py-1.5 rounded-xl border border-[#dfa649] font-display shadow-2xs">
+            6 weekenduri selectate
+          </span>
+          <button id="btn-search" onclick="runLiveSearch()"
+                  class="bg-[#dfa649] hover:bg-[#c98f33] active:bg-[#b57f2a] text-[#0a0b0d] text-xs sm:text-sm font-black px-5 py-2.5 rounded-xl shadow-sm transition flex items-center gap-2 cursor-pointer font-display">
+            <span id="btn-search-icon">🔍</span>
+            <span id="btn-search-text">Caută zboruri live</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick Preset Buttons (Non-white soft surface) -->
+      <div class="space-y-2">
+        <div class="text-xs font-bold uppercase tracking-wider text-[#475569] font-display">Scurtături rapide:</div>
+        <div class="flex flex-wrap items-center gap-2 text-xs font-display">
+          <button onclick="selectPreset('2026_no_xmas')" class="px-3.5 py-1.5 rounded-xl bg-[#f5f6f8] hover:bg-[#fce8bd] hover:border-[#dfa649] font-bold text-[#0a0b0d] transition cursor-pointer border border-[#dce1e7]">
+            🌟 Weekenduri 2026 (fără Crăciun)
+          </button>
+          <button onclick="selectPreset('next4')" class="px-3.5 py-1.5 rounded-xl bg-[#f5f6f8] hover:bg-[#fce8bd] hover:border-[#dfa649] font-bold text-[#0a0b0d] transition cursor-pointer border border-[#dce1e7]">
+            ⚡ Următoarele 4 weekenduri
+          </button>
+          <button onclick="selectPreset('next8')" class="px-3.5 py-1.5 rounded-xl bg-[#f5f6f8] hover:bg-[#fce8bd] hover:border-[#dfa649] font-bold text-[#0a0b0d] transition cursor-pointer border border-[#dce1e7]">
+            ⚡ Următoarele 8 weekenduri
+          </button>
+          <button onclick="selectPreset('winter')" class="px-3.5 py-1.5 rounded-xl bg-[#f5f6f8] hover:bg-[#fce8bd] hover:border-[#dfa649] font-bold text-[#0a0b0d] transition cursor-pointer border border-[#dce1e7]">
+            ❄️ Toată Iarna (Dec '26 – Feb '27)
+          </button>
+          <button onclick="selectPreset('spring27')" class="px-3.5 py-1.5 rounded-xl bg-[#f5f6f8] hover:bg-[#fce8bd] hover:border-[#dfa649] font-bold text-[#0a0b0d] transition cursor-pointer border border-[#dce1e7]">
+            🌸 Primăvară 2027 (Mar – Mai)
+          </button>
+          <button onclick="selectPreset('summer27')" class="px-3.5 py-1.5 rounded-xl bg-[#f5f6f8] hover:bg-[#fce8bd] hover:border-[#dfa649] font-bold text-[#0a0b0d] transition cursor-pointer border border-[#dce1e7]">
+            ☀️ Vară 2027 (Iun – Aug)
+          </button>
+          <button onclick="selectPreset('clear')" class="px-3.5 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 font-bold text-rose-800 transition cursor-pointer border border-rose-200">
+            ✕ Deselectează tot
+          </button>
+        </div>
+      </div>
+
+      <!-- Month Filter Tabs -->
+      <div class="pt-1">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-bold uppercase tracking-wider text-[#475569] font-display">Navighează pe luni (2026 – 2027):</span>
+          <div class="flex items-center gap-2 text-xs font-bold">
+            <button onclick="toggleAllVisibleMonth(true)" class="text-[#0a0b0d] hover:text-[#dfa649] hover:underline cursor-pointer">Bifează luna curentă</button>
+            <span class="text-[#cbd5e1]">|</span>
+            <button onclick="toggleAllVisibleMonth(false)" class="text-[#64748b] hover:text-[#0a0b0d] hover:underline cursor-pointer">Debifează luna</button>
+          </div>
+        </div>
+        <div id="month-tabs" class="flex gap-2 overflow-x-auto custom-scrollbar pb-2">
+          <!-- Rendered by JS -->
+        </div>
+      </div>
+
+      <!-- Weekend Interactive Chips Container -->
+      <div id="weekend-chips-grid" class="pt-1 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2.5">
+        <!-- Rendered by JS -->
+      </div>
+
+      <!-- Live Search Progress Bar -->
+      <div id="search-status" class="hidden bg-[#fce8bd] border border-[#dfa649] rounded-2xl px-4 py-3 text-xs sm:text-sm text-[#0a0b0d] flex items-center justify-between shadow-xs">
+        <span id="search-status-text" class="font-bold loading-pulse font-display">Se interoghează companiile aeriene în timp real...</span>
+        <span id="search-status-pct" class="font-mono font-bold text-[#0a0b0d]">0%</span>
+      </div>
+    </section>
+
+    <!-- Controls Bar Above Table -->
+    <div class="flex flex-wrap items-center justify-between gap-4">
+      <div class="flex flex-wrap items-center gap-3">
+        <!-- Switch 1pax / 2pax -->
+        <div class="inline-flex rounded-xl bg-[#f4f5f8] border border-[#dce1e7] p-1 shadow-2xs font-display">
+          <button id="btn-1pax" onclick="setMode(1)" class="px-4 py-2 text-xs sm:text-sm font-bold rounded-lg bg-[#0a0b0d] text-[#dfa649] transition cursor-pointer shadow-xs">
+            Per persoană
+          </button>
+          <button id="btn-2pax" onclick="setMode(2)" class="px-4 py-2 text-xs sm:text-sm font-bold rounded-lg text-[#475569] hover:text-[#0a0b0d] transition cursor-pointer">
+            Total grup (<span id="lbl-group-count">2</span> pers.)
           </button>
         </div>
 
-        <!-- 3 Themed Visual Cards (Light pastel tints, NEVER white) -->
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
-
-          <!-- CARD 1: Traseu & Destinație (Light Azure / Sky Tint) -->
-          <div class="lg:col-span-4 bg-gradient-to-b from-[#e8f3fe] via-[#edf6ff] to-[#f4f9ff] border-2 border-sky-300 rounded-2xl p-4 sm:p-5 shadow-xs flex flex-col justify-between space-y-4">
-            <div>
-              <div class="flex items-center justify-between mb-3.5">
-                <div class="flex items-center gap-2">
-                  <span class="w-8 h-8 rounded-xl bg-sky-600 text-white flex items-center justify-center text-sm shadow-xs font-bold">🛫</span>
-                  <h2 class="font-fun text-sm sm:text-base font-bold uppercase tracking-wider text-sky-950">1. Traseu & Rută</h2>
-                </div>
-                <span class="text-[11px] font-bold text-sky-800 bg-sky-200/90 px-2.5 py-0.5 rounded-full border border-sky-300">Zboruri</span>
-              </div>
-
-              <div class="space-y-3">
-                <!-- Oraș plecare -->
-                <div class="bg-[#f0f7ff] p-3 rounded-xl border border-sky-200 shadow-2xs hover:border-sky-400 transition">
-                  <label class="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-sky-900 mb-1.5">
-                    <span class="text-sky-600">📍</span> Oraș de plecare
-                  </label>
-                  <select id="f-origin" class="w-full rounded-xl border border-sky-200 bg-[#fbfdff] px-3 py-2 text-xs sm:text-sm font-bold text-slate-900 focus:bg-[#f2f8ff] focus:outline-none focus:ring-2 focus:ring-sky-500 transition font-fun">
-                    <option value="City:bucharest_ro" data-sky="otp" data-iata="OTP" selected>București (OTP / BBU)</option>
-                    <option value="City:cluj-napoca_ro" data-sky="clj" data-iata="CLJ">Cluj-Napoca (CLJ)</option>
-                    <option value="City:iasi_ro" data-sky="ias" data-iata="IAS">Iași (IAS)</option>
-                    <option value="City:timisoara_ro" data-sky="tsr" data-iata="TSR">Timișoara (TSR)</option>
-                  </select>
-                </div>
-
-                <!-- Destinație dorită (Default Any) -->
-                <div class="bg-[#f0f7ff] p-3 rounded-xl border border-sky-200 shadow-2xs hover:border-sky-400 transition">
-                  <label class="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-sky-900 mb-1.5">
-                    <span class="text-sky-600">🎯</span> Destinație dorită
-                  </label>
-                  <select id="f-destination" onchange="renderMatrix()" class="w-full rounded-xl border border-sky-200 bg-[#fbfdff] px-3 py-2 text-xs sm:text-sm font-bold text-slate-900 focus:bg-[#f2f8ff] focus:outline-none focus:ring-2 focus:ring-sky-500 transition font-fun">
-                    <option value="any" selected>Oricare (Toată Europa) — Default</option>
-                    <optgroup label="Destinații populare">
-                      <option value="mil">Milano (BGY / MXP)</option>
-                      <option value="blq">Bologna (BLQ)</option>
-                      <option value="rom">Roma (FCO / CIA)</option>
-                      <option value="vce">Veneția (VCE / TSF)</option>
-                      <option value="nap">Napoli (NAP)</option>
-                      <option value="par">Paris (BVA / CDG)</option>
-                      <option value="lon">Londra (LTN / STN / LGW)</option>
-                      <option value="bcn">Barcelona (BCN)</option>
-                      <option value="mad">Madrid (MAD)</option>
-                      <option value="crl">Bruxelles (CRL / BRU)</option>
-                      <option value="vie">Viena (VIE)</option>
-                      <option value="muc">München (MUC)</option>
-                      <option value="ber">Berlin (BER)</option>
-                      <option value="waw">Varșovia (WAW)</option>
-                      <option value="ist">Istanbul (IST / SAW)</option>
-                      <option value="ath">Atena (ATH)</option>
-                      <option value="prg">Praga (PRG)</option>
-                      <option value="bud">Budapesta (BUD)</option>
-                      <option value="lis">Lisabona (LIS)</option>
-                    </optgroup>
-                    <optgroup label="Filtrează după țară">
-                      <option value="it">Italia (toate orașele)</option>
-                      <option value="es">Spania (toate orașele)</option>
-                      <option value="de">Germania (toate orașele)</option>
-                      <option value="fr">Franța (toate orașele)</option>
-                      <option value="gb">Marea Britanie (toate orașele)</option>
-                    </optgroup>
-                  </select>
-                </div>
-
-                <!-- Tip zbor & Escale -->
-                <div class="bg-[#f0f7ff] p-3 rounded-xl border border-sky-200 shadow-2xs hover:border-sky-400 transition">
-                  <label class="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-sky-900 mb-1.5">
-                    <span class="text-sky-600">✈️</span> Tip zbor & escale
-                  </label>
-                  <select id="f-stops" class="w-full rounded-xl border border-sky-200 bg-[#fbfdff] px-3 py-2 text-xs sm:text-sm font-bold text-slate-900 focus:bg-[#f2f8ff] focus:outline-none focus:ring-2 focus:ring-sky-500 transition font-fun">
-                    <option value="0" selected>Doar zboruri directe (fără escală)</option>
-                    <option value="1">Permite și 1 escală scurtă</option>
-                  </select>
-                </div>
-
-                <!-- Durată maximă zbor -->
-                <div class="bg-[#f0f7ff] p-3 rounded-xl border border-sky-200 shadow-2xs hover:border-sky-400 transition">
-                  <label class="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-sky-900 mb-1.5">
-                    <span class="text-sky-600">⏱️</span> Durată maximă pe sens
-                  </label>
-                  <select id="f-max-dur" class="w-full rounded-xl border border-sky-200 bg-[#fbfdff] px-3 py-2 text-xs sm:text-sm font-bold text-slate-900 focus:bg-[#f2f8ff] focus:outline-none focus:ring-2 focus:ring-sky-500 transition font-fun">
-                    <option value="120">Maximum 2 ore / sens</option>
-                    <option value="180" selected>Maximum 3 ore / sens</option>
-                    <option value="240">Maximum 4 ore / sens</option>
-                    <option value="360">Maximum 6 ore / sens</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-
-            <!-- Domestic flight toggle inside Card 1 -->
-            <div class="pt-2 border-t border-sky-200">
-              <label class="inline-flex items-center gap-2 text-xs font-bold text-sky-950 cursor-pointer bg-[#f0f7ff] hover:bg-[#e4effd] px-3 py-2 rounded-xl border border-sky-200 transition w-full">
-                <input type="checkbox" id="f-domestic" class="accent-sky-600 rounded w-4 h-4 cursor-pointer" onchange="runLiveSearch()" />
-                <span>Include zboruri interne în RO (Cluj, Iași etc.)</span>
-              </label>
-            </div>
-          </div>
-
-          <!-- CARD 2: Buget & Călători (Light Honeydew / Mint Tint) -->
-          <div class="lg:col-span-4 bg-gradient-to-b from-[#eafaf1] via-[#effcf4] to-[#f4fdf8] border-2 border-emerald-300 rounded-2xl p-4 sm:p-5 shadow-xs flex flex-col justify-between space-y-4">
-            <div>
-              <div class="flex items-center justify-between mb-3.5">
-                <div class="flex items-center gap-2">
-                  <span class="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center text-sm shadow-xs font-bold">💶</span>
-                  <h2 class="font-fun text-sm sm:text-base font-bold uppercase tracking-wider text-emerald-950">2. Buget & Confort</h2>
-                </div>
-                <span class="text-[11px] font-bold text-emerald-800 bg-emerald-200/90 px-2.5 py-0.5 rounded-full border border-emerald-300">Cost & Bagaj</span>
-              </div>
-
-              <div class="space-y-3">
-                <!-- Buget maxim -->
-                <div class="bg-[#edf9f2] p-3 rounded-xl border border-emerald-200 shadow-2xs hover:border-emerald-400 transition space-y-2">
-                  <div class="flex justify-between items-center">
-                    <label class="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-emerald-950">
-                      <span class="text-emerald-600">💰</span> Buget max / persoană
-                    </label>
-                    <span id="lbl-max-price" class="font-fun text-xs font-extrabold text-emerald-900 bg-emerald-200 px-3 py-0.5 rounded-lg border border-emerald-300 shadow-2xs">150 €</span>
-                  </div>
-                  <input id="f-max-price" type="range" min="50" max="350" step="10" value="150"
-                         oninput="document.getElementById('lbl-max-price').textContent = this.value + ' €'"
-                         class="w-full accent-emerald-600 cursor-pointer h-2 bg-emerald-100 rounded-lg" />
-                  <div class="flex justify-between text-[11px] text-emerald-800 font-bold px-0.5">
-                    <span>50 €</span>
-                    <span class="text-emerald-700 font-extrabold">150 €</span>
-                    <span>250 €</span>
-                    <span>350 €</span>
-                  </div>
-                </div>
-
-                <!-- Număr pasageri -->
-                <div class="bg-[#edf9f2] p-3 rounded-xl border border-emerald-200 shadow-2xs hover:border-emerald-400 transition">
-                  <label class="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-emerald-950 mb-1.5">
-                    <span class="text-emerald-600">👥</span> Număr călători
-                  </label>
-                  <select id="f-adults" class="w-full rounded-xl border border-emerald-200 bg-[#fbfefc] px-3 py-2 text-xs sm:text-sm font-bold text-slate-900 focus:bg-[#f0faf3] focus:outline-none focus:ring-2 focus:ring-emerald-500 transition font-fun">
-                    <option value="1">1 Adult (individual)</option>
-                    <option value="2" selected>2 Adulți (cuplu / pereche)</option>
-                    <option value="3">3 Adulți (grup mic)</option>
-                    <option value="4">4 Adulți (grup prieteni)</option>
-                  </select>
-                </div>
-
-                <!-- Bagaje incluse -->
-                <div class="bg-[#edf9f2] p-3 rounded-xl border border-emerald-200 shadow-2xs hover:border-emerald-400 transition">
-                  <label class="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-emerald-950 mb-1.5">
-                    <span class="text-emerald-600">🧳</span> Bagaje incluse
-                  </label>
-                  <select id="f-bags" class="w-full rounded-xl border border-emerald-200 bg-[#fbfefc] px-3 py-2 text-xs sm:text-sm font-bold text-slate-900 focus:bg-[#f0faf3] focus:outline-none focus:ring-2 focus:ring-emerald-500 transition font-fun">
-                    <option value="small" selected>Rucsac mic sub scaun (inclus)</option>
-                    <option value="cabin">Troller de cabină (10 kg)</option>
-                    <option value="hold">Bagaj mare de cală (20 kg)</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-
-            <div class="pt-2 border-t border-emerald-200 text-xs text-emerald-900 font-bold px-1 flex items-center gap-1.5">
-              <span>✨</span> <span>Prețurile din tabel sunt calculate pentru bagajul ales</span>
-            </div>
-          </div>
-
-          <!-- CARD 3: Orare Weekend (Light Apricot / Warm Peach Buttercup) -->
-          <div class="lg:col-span-4 bg-gradient-to-b from-[#fef4e8] via-[#fdf7ee] to-[#fffbf5] border-2 border-amber-300 rounded-2xl p-4 sm:p-5 shadow-xs flex flex-col justify-between space-y-4">
-            <div>
-              <div class="flex items-center justify-between mb-3.5">
-                <div class="flex items-center gap-2">
-                  <span class="w-8 h-8 rounded-xl bg-amber-500 text-white flex items-center justify-center text-sm shadow-xs font-bold">⏰</span>
-                  <h2 class="font-fun text-sm sm:text-base font-bold uppercase tracking-wider text-amber-950">3. Orare de Weekend</h2>
-                </div>
-                <span class="text-[11px] font-bold text-amber-900 bg-amber-200/90 px-2.5 py-0.5 rounded-full border border-amber-300">Fără timp pierdut</span>
-              </div>
-
-              <!-- 2 Sub-Sections: Tur Vineri & Retur Duminica -->
-              <div class="space-y-3">
-                
-                <!-- Sub-bloc Tur Vineri -->
-                <div class="bg-[#fef6ec] p-3 rounded-xl border border-amber-200 shadow-2xs hover:border-amber-400 transition space-y-2">
-                  <div class="flex items-center gap-1.5 text-xs font-extrabold text-amber-950 border-b border-amber-200 pb-1 font-fun">
-                    <span>🛫</span> <span>TUR (Vineri seară)</span>
-                  </div>
-                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    <div>
-                      <label class="block text-[11px] font-bold uppercase tracking-wider text-amber-900 mb-1">Plecare min.</label>
-                      <select id="f-fri-dep" class="w-full rounded-xl border border-amber-200 bg-[#fffdfa] px-2 py-1.5 text-xs font-bold text-slate-900 focus:bg-[#fef8f0] focus:outline-none focus:ring-2 focus:ring-amber-500 transition font-fun">
-                        <option value="06:00">De la 06:00</option>
-                        <option value="12:00">După 12:00</option>
-                        <option value="15:00">După 15:00</option>
-                        <option value="18:00" selected>După 18:00 (seară)</option>
-                        <option value="20:00">După 20:00</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label class="block text-[11px] font-bold uppercase tracking-wider text-amber-900 mb-1">Aterizare max.</label>
-                      <select id="f-out-arr" class="w-full rounded-xl border border-amber-200 bg-[#fffdfa] px-2 py-1.5 text-xs font-bold text-slate-900 focus:bg-[#fef8f0] focus:outline-none focus:ring-2 focus:ring-amber-500 transition font-fun">
-                        <option value="23:00">Până la 23:00</option>
-                        <option value="23:59">Până la 24:00</option>
-                        <option value="01:00" selected>Până la 01:00 (sâm)</option>
-                        <option value="03:00">Fără limită</option>
-                      </select>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Sub-bloc Retur Duminica -->
-                <div class="bg-[#fef6ec] p-3 rounded-xl border border-amber-200 shadow-2xs hover:border-amber-400 transition space-y-2">
-                  <div class="flex items-center gap-1.5 text-xs font-extrabold text-amber-950 border-b border-amber-200 pb-1 font-fun">
-                    <span>🛬</span> <span>RETUR (Duminică noapte)</span>
-                  </div>
-                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    <div>
-                      <label class="block text-[11px] font-bold uppercase tracking-wider text-amber-900 mb-1">Plecare min.</label>
-                      <select id="f-sun-dep" class="w-full rounded-xl border border-amber-200 bg-[#fffdfa] px-2 py-1.5 text-xs font-bold text-slate-900 focus:bg-[#fef8f0] focus:outline-none focus:ring-2 focus:ring-amber-500 transition font-fun">
-                        <option value="12:00">După 12:00</option>
-                        <option value="15:00">După 15:00</option>
-                        <option value="17:00">După 17:00</option>
-                        <option value="18:00" selected>După 18:00 (seară)</option>
-                        <option value="20:00">După 20:00</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label class="block text-[11px] font-bold uppercase tracking-wider text-amber-900 mb-1">Acasă până la</label>
-                      <select id="f-in-arr" class="w-full rounded-xl border border-amber-200 bg-[#fffdfa] px-2 py-1.5 text-xs font-bold text-slate-900 focus:bg-[#fef8f0] focus:outline-none focus:ring-2 focus:ring-amber-500 transition font-fun">
-                        <option value="23:00">Până la 23:00</option>
-                        <option value="23:59">Până la 24:00</option>
-                        <option value="01:00" selected>Până la 01:00 (luni)</option>
-                        <option value="03:00">Până la 03:00 (luni)</option>
-                      </select>
-                    </div>
-                  </div>
-                </div>
-
-              </div>
-            </div>
-
-            <div class="pt-2 border-t border-amber-200 text-xs text-amber-900 font-bold px-1 flex items-center gap-1.5">
-              <span>💡</span> <span>Pleci vineri după serviciu și te întorci duminică noaptea</span>
-            </div>
-          </div>
-
-        </div>
-      </section>
-
-      <!-- 2. Multi-Weekend Selector (2026 - 2027) -->
-      <section class="vacation-card rounded-3xl p-5 sm:p-7 space-y-4">
-        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-amber-200/70 pb-3">
-          <div class="flex items-center gap-2.5">
-            <span class="w-9 h-9 rounded-2xl bg-amber-500 text-white flex items-center justify-center text-lg shadow-sm font-bold">📅</span>
-            <div>
-              <h2 class="font-fun text-base sm:text-lg font-bold text-slate-900 tracking-tight">
-                Alege weekendurile dorite (2026 – 2027)
-              </h2>
-              <p class="text-xs text-amber-900 font-medium">
-                Alege rapid din scurtături sau bifează oricâte weekenduri dorești din lista de mai jos.
-              </p>
-            </div>
-          </div>
-          <div class="flex items-center gap-2">
-            <span id="selected-wk-badge" class="bg-amber-100 text-amber-900 font-extrabold text-xs sm:text-sm px-3.5 py-1.5 rounded-xl border border-amber-300 font-fun shadow-2xs">
-              6 weekenduri selectate
-            </span>
-            <button id="btn-search" onclick="runLiveSearch()"
-                    class="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 active:scale-95 text-white text-xs sm:text-sm font-bold px-5 py-2.5 rounded-xl shadow-md transition flex items-center gap-2 cursor-pointer font-fun">
-              <span id="btn-search-icon">🔍</span>
-              <span id="btn-search-text">Caută zboruri live</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- Quick Preset Buttons (Non-white light biscuit) -->
-        <div class="space-y-2">
-          <div class="text-xs font-bold uppercase tracking-wider text-amber-900">Scurtături rapide:</div>
-          <div class="flex flex-wrap items-center gap-2 text-xs font-fun">
-            <button onclick="selectPreset('2026_no_xmas')" class="px-3.5 py-1.5 rounded-xl bg-[#faeed8] hover:bg-[#f6dfba] font-bold text-amber-950 transition cursor-pointer border border-amber-300 shadow-2xs">
-              🌟 Weekenduri 2026 (fără Crăciun)
-            </button>
-            <button onclick="selectPreset('next4')" class="px-3.5 py-1.5 rounded-xl bg-[#faeed8] hover:bg-[#f6dfba] font-bold text-amber-950 transition cursor-pointer border border-amber-300 shadow-2xs">
-              ⚡ Următoarele 4 weekenduri
-            </button>
-            <button onclick="selectPreset('next8')" class="px-3.5 py-1.5 rounded-xl bg-[#faeed8] hover:bg-[#f6dfba] font-bold text-amber-950 transition cursor-pointer border border-amber-300 shadow-2xs">
-              ⚡ Următoarele 8 weekenduri
-            </button>
-            <button onclick="selectPreset('winter')" class="px-3.5 py-1.5 rounded-xl bg-[#faeed8] hover:bg-[#f6dfba] font-bold text-amber-950 transition cursor-pointer border border-amber-300 shadow-2xs">
-              ❄️ Toată Iarna (Dec '26 – Feb '27)
-            </button>
-            <button onclick="selectPreset('spring27')" class="px-3.5 py-1.5 rounded-xl bg-[#faeed8] hover:bg-[#f6dfba] font-bold text-amber-950 transition cursor-pointer border border-amber-300 shadow-2xs">
-              🌸 Primăvară 2027 (Mar – Mai)
-            </button>
-            <button onclick="selectPreset('summer27')" class="px-3.5 py-1.5 rounded-xl bg-[#faeed8] hover:bg-[#f6dfba] font-bold text-amber-950 transition cursor-pointer border border-amber-300 shadow-2xs">
-              ☀️ Vară 2027 (Iun – Aug)
-            </button>
-            <button onclick="selectPreset('clear')" class="px-3.5 py-1.5 rounded-xl bg-rose-100 hover:bg-rose-200 font-bold text-rose-800 transition cursor-pointer border border-rose-300 shadow-2xs">
-              ✕ Deselectează tot
-            </button>
-          </div>
-        </div>
-
-        <!-- Month Filter Tabs -->
-        <div class="pt-1">
-          <div class="flex items-center justify-between mb-2">
-            <span class="text-xs font-bold uppercase tracking-wider text-amber-900">Navighează pe luni (2026 – 2027):</span>
-            <div class="flex items-center gap-2 text-xs font-bold">
-              <button onclick="toggleAllVisibleMonth(true)" class="text-amber-800 hover:text-amber-950 hover:underline cursor-pointer">Bifează luna curentă</button>
-              <span class="text-amber-300">|</span>
-              <button onclick="toggleAllVisibleMonth(false)" class="text-slate-500 hover:text-slate-800 hover:underline cursor-pointer">Debifează luna</button>
-            </div>
-          </div>
-          <div id="month-tabs" class="flex gap-2 overflow-x-auto custom-scrollbar pb-2">
-            <!-- Rendered by JS -->
-          </div>
-        </div>
-
-        <!-- Weekend Interactive Chips Container -->
-        <div id="weekend-chips-grid" class="pt-1 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2.5">
-          <!-- Rendered by JS -->
-        </div>
-
-        <!-- Live Search Progress Bar -->
-        <div id="search-status" class="hidden bg-amber-100/90 border border-amber-300 rounded-2xl px-4 py-3 text-xs sm:text-sm text-amber-950 flex items-center justify-between shadow-xs">
-          <span id="search-status-text" class="font-bold loading-pulse font-fun">Se interoghează companiile aeriene în timp real...</span>
-          <span id="search-status-pct" class="font-mono font-bold text-amber-800">0%</span>
-        </div>
-      </section>
-
-      <!-- Controls Bar Above Table (Warm biscuit styling) -->
-      <div class="flex flex-wrap items-center justify-between gap-4">
-        <div class="flex flex-wrap items-center gap-3">
-          <!-- Switch 1pax / 2pax -->
-          <div class="inline-flex rounded-2xl bg-[#faeed8] border-2 border-amber-300 p-1 shadow-2xs font-fun">
-            <button id="btn-1pax" onclick="setMode(1)" class="px-4 py-2 text-xs sm:text-sm font-bold rounded-xl bg-amber-500 text-white transition cursor-pointer shadow-xs">
-              Per persoană
-            </button>
-            <button id="btn-2pax" onclick="setMode(2)" class="px-4 py-2 text-xs sm:text-sm font-bold rounded-xl text-amber-950 hover:bg-amber-200/60 transition cursor-pointer">
-              Total grup (<span id="lbl-group-count">2</span> pers.)
-            </button>
-          </div>
-
-          <!-- Link Mode Selector -->
-          <div class="inline-flex items-center gap-2 text-xs sm:text-sm text-slate-800 font-bold">
-            <span class="hidden sm:inline">La click pe preț:</span>
-            <select id="link-mode" onchange="setLinkMode(this.value)" class="rounded-2xl bg-[#fffcf3] border-2 border-amber-300 px-3 py-2 text-xs sm:text-sm font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500 shadow-2xs font-fun">
-              <option value="kiwi">Bilete directe (ambele zboruri deja selectate)</option>
-              <option value="airline">Site-ul companiei (Wizz Air / Ryanair)</option>
-              <option value="skyscanner">Skyscanner (comparație)</option>
-              <option value="google">Google Flights</option>
-            </select>
-          </div>
-        </div>
-        <span id="unit-label" class="text-xs sm:text-sm text-slate-800 font-bold">
-          Preț în € per persoană, tur–retur (click pe orice căsuță pentru cumpărare)
-        </span>
-      </div>
-
-      <!-- Matrix Table Card with Fluid Responsive Columns (Warm Sand Card) -->
-      <div class="vacation-card rounded-3xl p-4 sm:p-6 overflow-x-auto custom-scrollbar">
-        <table id="main-matrix-table" class="w-full border-separate" style="border-spacing: 6px 8px; min-width: 780px;">
-          <thead id="matrix-head">
-            <!-- Rendered dynamically -->
-          </thead>
-          <tbody id="matrix-body">
-            <!-- Rendered dynamically -->
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Selected Flight Quick-Buy Bar -->
-      <div id="quick-buy-bar" class="vacation-card rounded-3xl p-4 sm:p-5 flex flex-wrap items-center justify-between gap-4">
-        <div class="space-y-1">
-          <div id="qb-title" class="text-sm sm:text-base font-extrabold text-slate-900 font-fun">
-            💡 Fiecare căsuță de preț din tabel are link direct de cumpărare în spate!
-          </div>
-          <div id="qb-sub" class="text-xs sm:text-sm text-amber-950/80 font-medium">
-            Dă click pe orice preț pentru a deschide direct rezervarea de zbor la compania aeriană.
-          </div>
-        </div>
-        <div id="qb-actions" class="flex flex-wrap items-center gap-2"></div>
-      </div>
-
-      <!-- Color Legend -->
-      <div class="flex flex-wrap items-center gap-4 text-xs sm:text-sm text-slate-800 font-bold pt-1 font-fun">
-        <div class="flex items-center gap-2">
-          <span class="w-4 h-4 rounded-md tier-1 inline-block shadow-xs"></span>
-          <span id="leg-1">până la 75 €</span>
-        </div>
-        <div class="flex items-center gap-2">
-          <span class="w-4 h-4 rounded-md tier-2 inline-block shadow-xs"></span>
-          <span id="leg-2">76–100 €</span>
-        </div>
-        <div class="flex items-center gap-2">
-          <span class="w-4 h-4 rounded-md tier-3 inline-block shadow-xs"></span>
-          <span id="leg-3">101–125 €</span>
-        </div>
-        <div class="flex items-center gap-2">
-          <span class="w-4 h-4 rounded-md tier-4 inline-block shadow-xs"></span>
-          <span id="leg-4">126–150 €</span>
-        </div>
-        <div class="flex items-center gap-2">
-          <span class="w-4 h-4 rounded-md tier-empty inline-block shadow-xs"></span>
-          <span>nicio variantă în filtre</span>
-        </div>
-        <div class="flex items-center gap-2">
-          <span class="w-4 h-4 rounded-md border-2 border-amber-500 inline-block shadow-xs"></span>
-          <span>cel mai ieftin din weekend</span>
+        <!-- Link Mode Selector -->
+        <div class="inline-flex items-center gap-2 text-xs sm:text-sm text-[#0a0b0d] font-bold">
+          <span class="hidden sm:inline">La click pe preț:</span>
+          <select id="link-mode" onchange="setLinkMode(this.value)" class="rounded-xl bg-[#fbfbfd] border border-[#dce1e7] px-3 py-2 text-xs sm:text-sm font-bold text-[#0a0b0d] focus:outline-none focus:ring-2 focus:ring-[#dfa649] shadow-2xs font-display">
+            <option value="kiwi">Bilete directe (ambele zboruri deja selectate)</option>
+            <option value="airline">Site-ul companiei (Wizz Air / Ryanair)</option>
+            <option value="skyscanner">Skyscanner (comparație)</option>
+            <option value="google">Google Flights</option>
+          </select>
         </div>
       </div>
+      <span id="unit-label" class="text-xs sm:text-sm text-[#475569] font-bold">
+        Preț în € per persoană, tur–retur (click pe orice căsuță pentru cumpărare)
+      </span>
+    </div>
 
-      <!-- Flight Schedules Cards (Non-white soft cards) -->
-      <section class="pt-3">
-        <h2 class="text-base sm:text-lg font-bold text-slate-900 mb-3 font-fun">
-          Orele zborurilor și linkuri directe la companiile aeriene
-        </h2>
-        <div id="schedule-cards" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          <!-- Rendered dynamically by JS -->
+    <!-- Matrix Table Card with Fluid Responsive Columns -->
+    <div class="card-23ai rounded-3xl p-4 sm:p-6 overflow-x-auto custom-scrollbar border border-[#e4e7eb]">
+      <table id="main-matrix-table" class="w-full border-separate" style="border-spacing: 6px 8px; min-width: 780px;">
+        <thead id="matrix-head">
+          <!-- Rendered dynamically -->
+        </thead>
+        <tbody id="matrix-body">
+          <!-- Rendered dynamically -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Selected Flight Quick-Buy Bar -->
+    <div id="quick-buy-bar" class="card-23ai rounded-3xl p-4 sm:p-5 flex flex-wrap items-center justify-between gap-4 border border-[#e4e7eb]">
+      <div class="space-y-1">
+        <div id="qb-title" class="text-sm sm:text-base font-bold text-[#0a0b0d] font-display">
+          💡 Fiecare căsuță de preț din tabel are link direct de cumpărare în spate!
         </div>
-      </section>
-
-    </main>
-
-    <footer class="bg-[#fffbf2]/95 border-t-2 border-amber-200 mt-12 py-6 backdrop-blur-md">
-      <div class="max-w-[96rem] w-full mx-auto px-4 sm:px-6 lg:px-8 flex flex-wrap items-center justify-between gap-4 text-xs sm:text-sm text-amber-950/80 font-medium">
-        <div>CityBreak · Evadări spontane de weekend în Europa (2026 – 2027)</div>
-        <div>Prețuri verificate și actualizate prin Kiwi, Skyscanner, Wizz Air și Ryanair</div>
+        <div id="qb-sub" class="text-xs sm:text-sm text-[#475569] font-medium">
+          Dă click pe orice preț pentru a deschide direct rezervarea de zbor la compania aeriană.
+        </div>
       </div>
-    </footer>
+      <div id="qb-actions" class="flex flex-wrap items-center gap-2"></div>
+    </div>
 
-  </div>
+    <!-- Color Legend -->
+    <div class="flex flex-wrap items-center gap-4 text-xs sm:text-sm text-[#0a0b0d] font-bold pt-1 font-display">
+      <div class="flex items-center gap-2">
+        <span class="w-4 h-4 rounded-md tier-1 inline-block shadow-xs"></span>
+        <span id="leg-1">până la 75 €</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="w-4 h-4 rounded-md tier-2 inline-block shadow-xs"></span>
+        <span id="leg-2">76–100 €</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="w-4 h-4 rounded-md tier-3 inline-block shadow-xs"></span>
+        <span id="leg-3">101–125 €</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="w-4 h-4 rounded-md tier-4 inline-block shadow-xs"></span>
+        <span id="leg-4">126–150 €</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="w-4 h-4 rounded-md tier-empty inline-block shadow-xs"></span>
+        <span>nicio variantă în filtre</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="w-4 h-4 rounded-md border-2 border-[#0a0b0d] inline-block shadow-xs"></span>
+        <span>cel mai ieftin din weekend</span>
+      </div>
+    </div>
+
+    <!-- Flight Schedules Cards -->
+    <section class="pt-3">
+      <h2 class="text-base sm:text-lg font-bold text-[#0a0b0d] mb-3 font-display">
+        Orele zborurilor și linkuri directe la companiile aeriene
+      </h2>
+      <div id="schedule-cards" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <!-- Rendered dynamically by JS -->
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="bg-[#0a0b0d] text-[#8a95a6] border-t border-[#232730] mt-12 py-6">
+    <div class="max-w-[96rem] w-full mx-auto px-4 sm:px-6 lg:px-8 flex flex-wrap items-center justify-between gap-4 text-xs sm:text-sm font-medium">
+      <div>CityBreak · Powered by 23AI Design System (2026 – 2027)</div>
+      <div>Prețuri verificate și actualizate prin Kiwi, Skyscanner, Wizz Air și Ryanair</div>
+    </div>
+  </footer>
 
   <script>
-    // Vacation Wallpapers Definition
-    const WALLPAPERS = {
-      beach: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=2000&q=80",
-      amalfi: "https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&w=2000&q=80",
-      mountain: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=2000&q=80",
-      sunset: "https://images.unsplash.com/photo-1510414842594-a61c69b5ae57?auto=format&fit=crop&w=2000&q=80"
-    };
-
-    function setVacationTheme(theme) {
-      const url = WALLPAPERS[theme] || WALLPAPERS.beach;
-      document.body.style.backgroundImage = `url('${url}')`;
-      try { localStorage.setItem("citybreak_theme", theme); } catch(e) {}
-      
-      document.querySelectorAll(".theme-btn").forEach(btn => {
-        btn.classList.remove("bg-amber-300", "font-black");
-      });
-      const activeBtn = Array.from(document.querySelectorAll(".theme-btn")).find(b => b.getAttribute("onclick")?.includes(theme));
-      if (activeBtn) activeBtn.classList.add("bg-amber-300", "font-black");
-    }
-
-    // Initialize daily or saved theme
-    (function initTheme() {
-      const saved = (function() {
-        try { return localStorage.getItem("citybreak_theme"); } catch(e) { return null; }
-      })();
-      if (saved && WALLPAPERS[saved]) {
-        setVacationTheme(saved);
-      } else {
-        // Daily rotation
-        const day = new Date().getDay();
-        if (day === 5 || day === 6) setVacationTheme("beach");
-        else if (day === 0 || day === 1) setVacationTheme("amalfi");
-        else if (day === 2 || day === 3) setVacationTheme("mountain");
-        else setVacationTheme("sunset");
-      }
-    })();
-
     // 1. Generate All Weekends (2026 - end of 2027)
     function generateAllWeekends(startDateStr, numWeeks) {
       const monthsRo = ["ian", "feb", "mar", "apr", "mai", "iun", "iul", "aug", "sep", "oct", "noi", "dec"];
@@ -827,15 +780,15 @@
 
       const tabsEl = document.getElementById("month-tabs");
       let tabsHtml = `
-        <button onclick="setMonthFilter('all')" class="whitespace-nowrap px-3.5 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer border font-fun ${currentMonthFilter === 'all' ? 'bg-amber-500 text-white border-amber-600 shadow-xs' : 'bg-[#fdfaf2] text-amber-950 border-amber-300 hover:bg-[#faeed8]'}">
+        <button onclick="setMonthFilter('all')" class="whitespace-nowrap px-3.5 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer border font-display ${currentMonthFilter === 'all' ? 'bg-[#0a0b0d] text-[#dfa649] border-[#0a0b0d] shadow-xs' : 'bg-[#f4f5f8] text-[#0a0b0d] border-[#dce1e7] hover:bg-[#e4e7eb]'}">
           Toate lunile (${ALL_WEEKENDS.length})
         </button>
       `;
       for (const [key, m] of monthsMap.entries()) {
         const isActive = currentMonthFilter === key;
-        const selBadge = m.selectedCount > 0 ? `<span class="ml-1 px-1.5 py-0.2 rounded-full text-[10px] ${isActive ? 'bg-white text-amber-900' : 'bg-amber-500 text-white'}">${m.selectedCount}</span>` : "";
+        const selBadge = m.selectedCount > 0 ? `<span class="ml-1 px-1.5 py-0.2 rounded-full text-[10px] ${isActive ? 'bg-[#dfa649] text-[#0a0b0d]' : 'bg-[#0a0b0d] text-[#dfa649]'}">${m.selectedCount}</span>` : "";
         tabsHtml += `
-          <button onclick="setMonthFilter('${key}')" class="whitespace-nowrap px-3 py-1.5 rounded-xl text-xs font-semibold transition cursor-pointer border font-fun ${isActive ? 'bg-amber-500 text-white border-amber-600 shadow-xs font-bold' : 'bg-[#fdfaf2] text-amber-950 border-amber-300 hover:bg-[#faeed8]'}">
+          <button onclick="setMonthFilter('${key}')" class="whitespace-nowrap px-3 py-1.5 rounded-xl text-xs font-semibold transition cursor-pointer border font-display ${isActive ? 'bg-[#0a0b0d] text-[#dfa649] border-[#0a0b0d] shadow-xs font-bold' : 'bg-[#f4f5f8] text-[#0a0b0d] border-[#dce1e7] hover:bg-[#e4e7eb]'}">
             ${m.name} ${selBadge}
           </button>
         `;
@@ -849,13 +802,13 @@
       let chipsHtml = "";
       visibleWks.forEach(w => {
         const isSel = selectedWkIds.has(w.id);
-        const tagBadge = w.tag ? `<span class="text-[10px] px-1.5 py-0.5 rounded-md font-bold ${isSel ? 'bg-amber-900 text-yellow-300' : 'bg-amber-200 text-amber-950'} ml-1">${w.tag}</span>` : "";
+        const tagBadge = w.tag ? `<span class="text-[10px] px-1.5 py-0.5 rounded-md font-bold ${isSel ? 'bg-[#dfa649] text-[#0a0b0d]' : 'bg-[#fce8bd] text-[#5c3b06]'} ml-1">${w.tag}</span>` : "";
         chipsHtml += `
           <button onclick="toggleWeekend('${w.id}')"
-                  class="flex items-center justify-between p-2.5 rounded-2xl text-xs transition cursor-pointer border text-left font-fun shadow-2xs ${isSel ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white border-amber-600 font-bold shadow-xs' : 'bg-[#fdf9f0] text-slate-800 border-amber-200 hover:bg-[#faeed8]'}">
+                  class="flex items-center justify-between p-2.5 rounded-xl text-xs transition cursor-pointer border text-left font-display shadow-2xs ${isSel ? 'bg-[#0a0b0d] text-[#dfa649] border-[#0a0b0d] font-bold shadow-xs' : 'bg-[#f8f9fa] text-[#0a0b0d] border-[#dce1e7] hover:bg-[#fce8bd] hover:border-[#dfa649]'}">
             <div>
-              <div class="leading-tight">${w.dLabel} ${w.mLabel} ${tagBadge}</div>
-              <div class="text-[10px] opacity-80 mt-0.5 font-normal">${w.fri.slice(5)} → ${w.sun.slice(5)}</div>
+              <div class="leading-tight font-bold">${w.dLabel} ${w.mLabel} ${tagBadge}</div>
+              <div class="text-[10px] opacity-75 mt-0.5 font-normal">${w.fri.slice(5)} → ${w.sun.slice(5)}</div>
             </div>
             <span class="text-sm ml-1 font-bold">${isSel ? '✓' : '+'}</span>
           </button>
@@ -957,15 +910,15 @@
 
       qbActions.innerHTML = `
         <a href="${cell.bookingUrl}" target="_blank" rel="noopener noreferrer"
-           class="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white text-xs font-bold px-4 py-2 rounded-xl transition shadow-sm font-fun">
+           class="bg-[#dfa649] hover:bg-[#c98f33] active:bg-[#b57f2a] text-[#0a0b0d] text-xs font-black px-4 py-2 rounded-xl transition shadow-xs font-display">
           Rezervă direct (ambele zboruri) →
         </a>
         <a href="${cell.airlineUrl}" target="_blank" rel="noopener noreferrer"
-           class="bg-[#faeed8] hover:bg-[#f6dfba] text-amber-950 text-xs font-bold px-3 py-2 rounded-xl border border-amber-300 transition font-fun">
+           class="bg-[#f4f5f8] hover:bg-[#eaeef3] text-[#0a0b0d] text-xs font-bold px-3 py-2 rounded-xl border border-[#dce1e7] transition font-display">
           Companie aeriană
         </a>
         <a href="${cell.skyscannerUrl}" target="_blank" rel="noopener noreferrer"
-           class="bg-[#faeed8] hover:bg-[#f6dfba] text-amber-950 text-xs font-bold px-3 py-2 rounded-xl border border-amber-300 transition font-fun">
+           class="bg-[#f4f5f8] hover:bg-[#eaeef3] text-[#0a0b0d] text-xs font-bold px-3 py-2 rounded-xl border border-[#dce1e7] transition font-display">
           Skyscanner
         </a>
       `;
@@ -985,10 +938,10 @@
         thead.innerHTML = "";
         tbody.innerHTML = `
           <tr>
-            <td class="text-center py-12 px-4 text-amber-950 font-bold bg-[#fef8ed] rounded-3xl font-fun">
+            <td class="text-center py-12 px-4 text-[#0a0b0d] font-bold bg-[#fbf9f4] rounded-2xl font-display">
               <div class="text-3xl mb-2">📅</div>
               <div>Nu ai selectat niciun weekend.</div>
-              <div class="text-xs text-amber-800 mt-1">Alege cel puțin un weekend din selectorul de mai sus pentru a vizualiza zborurile.</div>
+              <div class="text-xs text-[#64748b] mt-1 font-body">Alege cel puțin un weekend din selectorul de mai sus pentru a vizualiza zborurile.</div>
             </td>
           </tr>
         `;
@@ -1014,13 +967,13 @@
         minPerWk[wk.id] = { minVal, minCode, minCell, minCity };
       });
 
-      // Render Table Header (Fluid & Responsive min-widths on soft biscuit header)
-      let headHtml = `<tr><th class="text-left py-3 px-3 min-w-[210px] sm:min-w-[250px] text-xs font-bold uppercase tracking-wider text-amber-950/80 font-fun">Destinație / Aeroport</th>`;
+      // Render Table Header
+      let headHtml = `<tr><th class="text-left py-3 px-3 min-w-[210px] sm:min-w-[250px] text-xs font-black uppercase tracking-wider text-[#0a0b0d] font-display">Destinație / Aeroport</th>`;
       activeWks.forEach(wk => {
         headHtml += `
-          <th class="text-center py-2.5 px-2 rounded-2xl text-xs sm:text-sm font-bold text-slate-800 min-w-[90px] sm:min-w-[110px] bg-[#fdf5e6] border border-amber-200/90 font-fun">
+          <th class="text-center py-2.5 px-2 rounded-xl text-xs sm:text-sm font-bold text-[#0a0b0d] min-w-[90px] sm:min-w-[110px] bg-[#f8f9fb] border border-[#e4e7eb] font-display">
             <div>${wk.dLabel}</div>
-            <div class="text-amber-800 font-normal text-[11px]">${wk.mLabel}</div>
+            <div class="text-[#64748b] font-normal text-[11px] font-body">${wk.mLabel}</div>
           </th>
         `;
       });
@@ -1059,10 +1012,10 @@
       if (rowsToRender.length === 0) {
         tbody.innerHTML = `
           <tr>
-            <td colspan="${activeWks.length + 1}" class="text-center py-10 px-4 text-amber-950 font-bold bg-[#fef8ed] rounded-3xl font-fun">
+            <td colspan="${activeWks.length + 1}" class="text-center py-10 px-4 text-[#0a0b0d] font-bold bg-[#fbf9f4] rounded-2xl font-display">
               <div class="text-3xl mb-2">🎯</div>
               <div class="text-sm sm:text-base">Nu s-au găsit zboruri pentru destinația selectată în criteriile actuale.</div>
-              <div class="text-xs text-amber-800 mt-1 font-normal">Încearcă să selectezi „Oricare (Toată Europa)” sau să crești bugetul maxim.</div>
+              <div class="text-xs text-[#64748b] mt-1 font-normal font-body">Încearcă să selectezi „Oricare (Toată Europa)” sau să crești bugetul maxim.</div>
             </td>
           </tr>
         `;
@@ -1076,8 +1029,8 @@
         const tdLabel = document.createElement("td");
         tdLabel.className = "py-2.5 px-3 align-middle min-w-[210px] sm:min-w-[250px]";
         tdLabel.innerHTML = `
-          <div class="font-bold text-sm sm:text-base text-slate-900 leading-snug font-fun">${r.city}</div>
-          <div class="text-xs text-amber-900 font-semibold mt-0.5 leading-tight">${r.sub}</div>
+          <div class="font-bold text-sm sm:text-base text-[#0a0b0d] leading-snug font-display">${r.city}</div>
+          <div class="text-xs text-[#64748b] font-semibold mt-0.5 leading-tight font-body">${r.sub}</div>
         `;
         tr.appendChild(tdLabel);
 
@@ -1088,7 +1041,7 @@
 
           if (!cell || cell.perPaxEur > maxBudget) {
             td.innerHTML = `
-              <div class="h-12 sm:h-14 rounded-2xl tier-empty flex items-center justify-center text-sm sm:text-base font-bold select-none font-fun">
+              <div class="h-12 sm:h-14 rounded-xl tier-empty flex items-center justify-center text-sm sm:text-base font-bold select-none font-display">
                 —
               </div>
             `;
@@ -1105,8 +1058,8 @@
             td.innerHTML = `
               <a href="${url}" target="_blank" rel="noopener noreferrer" title="${tooltip}"
                  onmouseenter="showQuickBuy(${origRowIdx}, '${wk.id}')"
-                 class="price-cell h-12 sm:h-14 rounded-2xl ${tierClass} ${outlineClass} flex items-center justify-center no-underline cursor-pointer px-2 shadow-2xs">
-                <span class="font-extrabold text-sm sm:text-base md:text-lg leading-none whitespace-nowrap">
+                 class="price-cell h-12 sm:h-14 rounded-xl ${tierClass} ${outlineClass} flex items-center justify-center no-underline cursor-pointer px-2 shadow-2xs">
+                <span class="font-black text-sm sm:text-base md:text-lg leading-none whitespace-nowrap">
                   ${displayPrice} <span class="text-xs font-semibold">€</span> <span class="text-xs font-normal opacity-75">↗</span>
                 </span>
               </a>
@@ -1202,29 +1155,29 @@
       ];
 
       container.innerHTML = sched.map(s => `
-        <div class="vacation-card rounded-2xl p-4 shadow-2xs hover:border-amber-400 transition flex flex-col justify-between">
+        <div class="card-23ai rounded-2xl p-4 shadow-2xs hover:border-[#dfa649] transition flex flex-col justify-between">
           <div>
-            <div class="flex items-center justify-between border-b border-amber-200/80 pb-2 mb-2.5">
+            <div class="flex items-center justify-between border-b border-[#eef0f3] pb-2 mb-2.5">
               <div>
-                <span class="font-extrabold text-sm text-slate-900 font-fun">${s.city}</span>
-                <span class="ml-1 text-xs font-bold text-amber-800 bg-amber-200/80 px-2 py-0.5 rounded-lg">${s.iata}</span>
+                <span class="font-bold text-sm text-[#0a0b0d] font-display">${s.city}</span>
+                <span class="ml-1 text-xs font-bold text-[#422904] bg-[#fce8bd] px-2 py-0.5 rounded-md">${s.iata}</span>
               </div>
-              <span class="text-[11px] font-bold text-slate-600">${s.airline}</span>
+              <span class="text-[11px] font-bold text-[#64748b]">${s.airline}</span>
             </div>
-            <div class="space-y-1 text-xs text-slate-700">
+            <div class="space-y-1 text-xs text-[#334155]">
               <div class="flex justify-between font-medium">
-                <span class="text-amber-900 font-bold">Tur vineri:</span>
-                <span class="font-mono font-bold text-slate-900">${s.out}</span>
+                <span class="text-[#0a0b0d] font-bold">Tur vineri:</span>
+                <span class="font-mono font-bold text-[#0a0b0d]">${s.out}</span>
               </div>
               <div class="flex justify-between font-medium">
-                <span class="text-amber-900 font-bold">Retur duminică:</span>
-                <span class="font-mono font-bold text-slate-900">${s.in}</span>
+                <span class="text-[#0a0b0d] font-bold">Retur duminică:</span>
+                <span class="font-mono font-bold text-[#0a0b0d]">${s.in}</span>
               </div>
             </div>
           </div>
-          <div class="pt-3 mt-2 border-t border-amber-200/70 flex justify-end">
+          <div class="pt-3 mt-2 border-t border-[#eef0f3] flex justify-end">
             <a href="${s.url}" target="_blank" rel="noopener noreferrer"
-               class="text-xs font-bold text-amber-700 hover:text-amber-950 font-fun flex items-center gap-1">
+               class="text-xs font-bold text-[#0a0b0d] hover:text-[#dfa649] font-display flex items-center gap-1">
               Deschide compania ↗
             </a>
           </div>
@@ -1237,11 +1190,11 @@
       const b1 = document.getElementById("btn-1pax");
       const b2 = document.getElementById("btn-2pax");
       if (m === 1) {
-        b1.className = "px-4 py-2 text-xs sm:text-sm font-bold rounded-xl bg-amber-500 text-white transition cursor-pointer shadow-xs";
-        b2.className = "px-4 py-2 text-xs sm:text-sm font-bold rounded-xl text-amber-950 hover:bg-amber-200/60 transition cursor-pointer";
+        b1.className = "px-4 py-2 text-xs sm:text-sm font-bold rounded-lg bg-[#0a0b0d] text-[#dfa649] transition cursor-pointer shadow-xs";
+        b2.className = "px-4 py-2 text-xs sm:text-sm font-bold rounded-lg text-[#475569] hover:text-[#0a0b0d] transition cursor-pointer";
       } else {
-        b2.className = "px-4 py-2 text-xs sm:text-sm font-bold rounded-xl bg-amber-500 text-white transition cursor-pointer shadow-xs";
-        b1.className = "px-4 py-2 text-xs sm:text-sm font-bold rounded-xl text-amber-950 hover:bg-amber-200/60 transition cursor-pointer";
+        b2.className = "px-4 py-2 text-xs sm:text-sm font-bold rounded-lg bg-[#0a0b0d] text-[#dfa649] transition cursor-pointer shadow-xs";
+        b1.className = "px-4 py-2 text-xs sm:text-sm font-bold rounded-lg text-[#475569] hover:text-[#0a0b0d] transition cursor-pointer";
       }
       renderMatrix();
     }
@@ -1314,8 +1267,8 @@
                   duration
                   sectorSegments {
                     segment {
-                      source { localTime station { code city { id name country { name code } } } }
-                      destination { localTime station { code city { id name country { name code } } } }
+                      source { localTime station { code city { id name country { code } } } }
+                      destination { localTime station { code city { id name country { code } } } }
                       code
                       carrier { name code }
                     }
@@ -1325,8 +1278,8 @@
                   duration
                   sectorSegments {
                     segment {
-                      source { localTime station { code city { id name country { name code } } } }
-                      destination { localTime station { code city { id name country { name code } } } }
+                      source { localTime station { code city { id name country { code } } } }
+                      destination { localTime station { code city { id name country { code } } } }
                       code
                       carrier { name code }
                     }
