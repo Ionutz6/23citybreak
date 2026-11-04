@@ -63,6 +63,7 @@
     .tier-2 { background-color: #fef3d8; color: #5c3b06; border: 1.5px solid #ebd096; }
     .tier-3 { background-color: #fff9ea; color: #714a08; border: 1.5px solid #fae7ba; }
     .tier-4 { background-color: #f5f6f8; color: #475569; border: 1.5px solid #e2e8f0; }
+    .tier-over { background-color: #fbf5eb; color: #8c5a0b; border: 1.5px solid #ecd8b0; }
     .tier-empty { background-color: #f8f9fa; color: #94a3b8; border: 1px dashed #cbd5e1; }
     
     .best-weekend-outline {
@@ -206,9 +207,11 @@
                     <span class="text-sm">🔍</span>
                     <input id="dest-search-input" type="text"
                            autocomplete="off"
-                           placeholder="Scrie direct: Tallinn, Manchester, Islanda, Nisa..."
+                           placeholder="Scrie direct: Liverpool, Tallinn, Manchester, Nisa..."
                            oninput="onDestSearchInput(this.value)"
-                           onfocus="this.select(); showDestDropdown(true)"
+                           onfocus="handleDestFocus(this)"
+                           onblur="handleDestBlur(this)"
+                           onkeydown="handleDestKeyDown(event, this)"
                            class="w-full bg-transparent text-xs sm:text-sm font-bold text-[#0a0b0d] outline-none font-body placeholder:text-[#94a3b8]" />
                     <button id="dest-clear-btn" type="button" onclick="clearDestSelection()"
                             title="Resetează la Toată Europa"
@@ -952,6 +955,12 @@
         transfer: "🚌 Autobuzul 500 / 86A sau tren direct către Lime Street (20-30 min, £2-4). Manchester Airport e la doar 45 min cu tren direct!",
         vibe: "Locul de naștere The Beatles (The Cavern Club, Penny Lane, Muzeul Beatles Story), Royal Albert Dock și atmosfera legendară de pe Anfield (LFC)."
       },
+      "lpl": {
+        city: "Liverpool (Regatul Unit)",
+        weather: "Primăvară: 14°C · Vară: 20°C · Toamnă: 13°C · Iarnă: 7°C (Temperat maritim)",
+        transfer: "🚌 Autobuzul 500 / 86A sau tren direct către Lime Street (20-30 min, £2-4). Manchester Airport e la doar 45 min cu tren direct!",
+        vibe: "Locul de naștere The Beatles (The Cavern Club, Penny Lane, Muzeul Beatles Story), Royal Albert Dock și atmosfera legendară de pe Anfield (LFC)."
+      },
       "tallinn": {
         city: "Tallinn (Estonia)",
         weather: "Iarnă: -2°C (Târg de Crăciun de poveste & zăpadă) · Vară: 22°C (Nopți albe magice)",
@@ -1165,14 +1174,98 @@
       return ALL_WEEKENDS.filter(w => selectedWkIds.has(w.id));
     }
 
+    function escapeHtml(s) {
+      if (!s) return "";
+      return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    }
+
+    function handleDestFocus(input) {
+      // Clear default "Oricare" placeholder text so user can immediately type their city
+      if (!input.value || input.value.includes("Oricare") || input.value.startsWith("🌟")) {
+        input.value = "";
+      } else {
+        input.select();
+      }
+      showDestDropdown(true);
+    }
+
+    function handleDestBlur(input) {
+      setTimeout(() => {
+        const raw = input.value.trim();
+        if (!raw) {
+          selectDestination("any");
+        } else {
+          resolveTypedDestination();
+        }
+      }, 250);
+    }
+
+    function handleDestKeyDown(event, input) {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        resolveTypedDestination();
+        const drop = document.getElementById("dest-autocomplete-dropdown");
+        if (drop) drop.classList.add("hidden");
+        runLiveSearch();
+      } else if (event.key === "Escape") {
+        const drop = document.getElementById("dest-autocomplete-dropdown");
+        if (drop) drop.classList.add("hidden");
+      }
+    }
+
     // --- Search As You Type Autocomplete Engine ---
     function normalizeDestQuery(val) {
       if (!val) return "";
-      const s = val.trim().toLowerCase();
-      if (s.startsWith("🌟") || s.includes("oricare") || s.includes("toată") || s.includes("toata")) {
-        return "";
-      }
+      let s = val.trim();
+      s = s.replace(/🌟/g, "")
+           .replace(/oricare\s*\(toat[ăa]\s*europa\)/gi, "")
+           .replace(/toat[ăa]\s*europa\s*\(oricare\)/gi, "")
+           .replace(/oricare/gi, "")
+           .replace(/toat[ăa]\s*europa/gi, "")
+           .replace(/[()·]/g, " ")
+           .replace(/\s+/g, " ")
+           .trim()
+           .toLowerCase();
       return s;
+    }
+
+    function resolveTypedDestination() {
+      const input = document.getElementById("dest-search-input");
+      if (!input) return;
+      const raw = input.value.trim();
+      const q = normalizeDestQuery(raw);
+
+      if (!q) {
+        selectDestination("any");
+        return;
+      }
+
+      const cleanQ = q.replace(/[^\p{L}\p{N}\s]/gu, '').trim().toLowerCase();
+      const tokens = cleanQ.split(/\s+/).filter(Boolean);
+
+      // 1. Exact match by name or IATA
+      let match = ALL_EUROPE_CITIES.find(c => !c.isAll && (c.name.toLowerCase() === cleanQ || c.iata.toLowerCase() === cleanQ));
+
+      // 2. Exact match on first token (e.g. "liverpool" in "liverpool uk")
+      if (!match && tokens.length > 0) {
+        match = ALL_EUROPE_CITIES.find(c => !c.isAll && (c.name.toLowerCase() === tokens[0] || c.iata.toLowerCase() === tokens[0]));
+      }
+
+      // 3. Name starts with cleanQ or first token
+      if (!match && tokens.length > 0) {
+        match = ALL_EUROPE_CITIES.find(c => !c.isAll && c.name.toLowerCase().startsWith(tokens[0]));
+      }
+
+      // 4. Any token match
+      if (!match && tokens.length > 0) {
+        match = ALL_EUROPE_CITIES.find(c => !c.isAll && tokens.every(tok =>
+          c.name.toLowerCase().includes(tok) || c.country.toLowerCase().includes(tok) || c.iata.toLowerCase().includes(tok)
+        ));
+      }
+
+      if (match) {
+        selectDestination(match.id);
+      }
     }
 
     let liveSearchTimeout = null;
@@ -1228,7 +1321,8 @@
 
       // If user typed an exact or close city name, preview its guide
       if (q) {
-        const match = ALL_EUROPE_CITIES.find(c => !c.isAll && (c.name.toLowerCase() === q || c.iata.toLowerCase() === q));
+        const cleanQ = q.replace(/[^\p{L}\p{N}\s]/gu, '').trim().toLowerCase();
+        const match = ALL_EUROPE_CITIES.find(c => !c.isAll && (c.name.toLowerCase() === cleanQ || c.iata.toLowerCase() === cleanQ));
         if (match) {
           renderCityGuide(match);
         }
@@ -1237,6 +1331,7 @@
 
     function showDestDropdown(show) {
       const drop = document.getElementById("dest-autocomplete-dropdown");
+      if (!drop) return;
       if (show) {
         const raw = document.getElementById("dest-search-input").value;
         renderDestDropdown(normalizeDestQuery(raw));
@@ -1248,36 +1343,76 @@
 
     function renderDestDropdown(q) {
       const drop = document.getElementById("dest-autocomplete-dropdown");
+      if (!drop) return;
+
       let matches = ALL_EUROPE_CITIES;
-      if (q) {
-        matches = ALL_EUROPE_CITIES.filter(c => {
-          return c.name.toLowerCase().includes(q) ||
-                 c.country.toLowerCase().includes(q) ||
-                 c.iata.toLowerCase().includes(q) ||
-                 (c.code && c.code.includes(q));
-        });
+      if (q && q.length > 0) {
+        const cleanQ = q.replace(/[^\p{L}\p{N}\s]/gu, '').trim().toLowerCase();
+        const tokens = cleanQ.split(/\s+/).filter(Boolean);
+
+        if (tokens.length > 0) {
+          matches = ALL_EUROPE_CITIES.filter(c => {
+            if (c.isAll) return false;
+            const name = (c.name || "").toLowerCase();
+            const country = (c.country || "").toLowerCase();
+            const iata = (c.iata || "").toLowerCase();
+            const code = (c.code || "").toLowerCase();
+            return tokens.every(tok =>
+              name.includes(tok) || country.includes(tok) || iata.includes(tok) || code.includes(tok)
+            );
+          });
+
+          matches.sort((a, b) => {
+            const aName = (a.name || "").toLowerCase();
+            const bName = (b.name || "").toLowerCase();
+            const aStarts = aName.startsWith(tokens[0]) ? 0 : 1;
+            const bStarts = bName.startsWith(tokens[0]) ? 0 : 1;
+            if (aStarts !== bStarts) return aStarts - bStarts;
+            return aName.localeCompare(bName);
+          });
+        }
       }
 
       if (matches.length === 0) {
         drop.innerHTML = `
           <div class="p-3 text-xs text-[#64748b] text-center font-body">
-            Se caută „${q}” pe Skyscanner și companii aeriene...<br>
-            <span class="text-[11px] text-[#dfa649] font-bold">Verifică conexiunile disponibile</span>
+            Se caută „${escapeHtml(q)}” pe Skyscanner și companii aeriene...<br>
+            <span class="text-[11px] text-[#dfa649] font-bold">Apasă Enter pentru a căuta</span>
           </div>
         `;
         return;
       }
 
       let html = "";
+      if (!q) {
+        const anyCity = ALL_EUROPE_CITIES.find(c => c.isAll);
+        if (anyCity) {
+          html += `
+            <button type="button" onclick="selectDestination('any')"
+                    class="w-full flex items-center justify-between px-3 py-2 text-xs font-bold text-left rounded-xl hover:bg-[#fce8bd] transition cursor-pointer text-[#0a0b0d] border border-transparent hover:border-[#dfa649] mb-1 bg-[#fff8eb]">
+              <div class="flex items-center gap-2">
+                <span class="text-base">🌟</span>
+                <div>
+                  <span class="font-display font-black">Oricare (Toată Europa)</span>
+                  <span class="text-[11px] text-[#64748b] font-normal ml-1 font-body">Cele mai bune oferte</span>
+                </div>
+              </div>
+              <span class="text-[10px] font-bold text-[#5c3b06] bg-[#fce8bd] px-1.5 py-0.5 rounded">Recomandat</span>
+            </button>
+          `;
+        }
+      }
+
       matches.slice(0, 35).forEach(c => {
+        if (!q && c.isAll) return;
         html += `
           <button type="button" onclick="selectDestination('${c.id}')"
                   class="w-full flex items-center justify-between px-3 py-2 text-xs font-bold text-left rounded-xl hover:bg-[#fce8bd] transition cursor-pointer text-[#0a0b0d] border border-transparent hover:border-[#dfa649]">
             <div class="flex items-center gap-2">
-              <span class="text-base">${c.flag}</span>
+              <span class="text-base">${c.flag || "✈️"}</span>
               <div>
-                <span class="font-display font-black">${c.name}</span>
-                <span class="text-[11px] text-[#64748b] font-normal ml-1 font-body">(${c.iata}) · ${c.country}</span>
+                <span class="font-display font-black">${escapeHtml(c.name)}</span>
+                <span class="text-[11px] text-[#64748b] font-normal ml-1 font-body">(${c.iata || "EUR"}) · ${escapeHtml(c.country || "Europa")}</span>
               </div>
             </div>
             ${c.isAll ? '<span class="text-[10px] font-bold text-[#5c3b06] bg-[#fce8bd] px-1.5 py-0.5 rounded">Default</span>' : '<span class="text-xs font-bold text-[#dfa649]">Alege →</span>'}
@@ -1298,6 +1433,8 @@
       const nativeSelect = document.getElementById("f-destination");
       const searchBtnText = document.getElementById("btn-search-text");
       const scanBtnText = document.getElementById("btn-scan-text");
+      const drop = document.getElementById("dest-autocomplete-dropdown");
+      if (drop) drop.classList.add("hidden");
 
       // Ensure native select has the option
       let opt = nativeSelect.querySelector(`option[value="${city.id}"]`);
@@ -1310,19 +1447,18 @@
       nativeSelect.value = city.id;
 
       if (city.isAll) {
-        // Fix: Explicitly display "🌟 Oricare (Toată Europa)" instead of leaving blank!
         input.value = "🌟 Oricare (Toată Europa)";
         input.placeholder = "🌟 Oricare (Toată Europa)";
         clearBtn.classList.add("hidden");
-        searchBtnText.textContent = "Caută zboruri";
-        scanBtnText.textContent = "Scanează tot anul (52 wk)";
+        if (searchBtnText) searchBtnText.textContent = "Caută zboruri";
+        if (scanBtnText) scanBtnText.textContent = "Scanează tot anul (52 wk)";
         document.getElementById("city-spotlight-banner")?.classList.add("hidden");
         document.getElementById("city-guide-card")?.classList.add("hidden");
       } else {
         input.value = `${city.flag} ${city.name} (${city.iata}) · ${city.country}`;
         clearBtn.classList.remove("hidden");
-        searchBtnText.textContent = `Caută în weekendurile alese`;
-        scanBtnText.textContent = `Scanează tot anul către ${city.name}`;
+        if (searchBtnText) searchBtnText.textContent = `Caută în weekendurile alese către ${city.name}`;
+        if (scanBtnText) scanBtnText.textContent = `Scanează tot anul către ${city.name}`;
 
         // Render City Break Insights & Guide IMMEDIATELY
         renderCityGuide(city);
@@ -1485,7 +1621,7 @@
       if (price1Pax <= maxBudget * 0.67) return "tier-2";
       if (price1Pax <= maxBudget * 0.84) return "tier-3";
       if (price1Pax <= maxBudget) return "tier-4";
-      return "tier-empty";
+      return "tier-over";
     }
 
     function getTargetUrl(cell) {
@@ -1535,7 +1671,7 @@
     function renderCrossEngineBar() {
       const container = document.getElementById("cross-engine-links");
       const originSelect = document.getElementById("f-origin");
-      const origIata = originSelect?.selectedOptions[0]?.dataset?.iata || "OTP";
+      const origIata = originSelect?.selectedOptions?.[0]?.dataset?.iata || "OTP";
       const targetIata = selectedCityObj?.iata || "BGY";
       const cityName = selectedCityObj?.name || "Milano";
       const activeWks = getSelectedWeekendsList();
@@ -1782,7 +1918,8 @@
           td.className = "p-0 align-middle min-w-[90px] sm:min-w-[110px]";
           const cell = r.cellsMap[wk.id];
 
-          if (!cell || cell.perPaxEur > maxBudget) {
+          const exceedsBudget = cell && cell.perPaxEur > maxBudget;
+          if (!cell || (destVal === "any" && exceedsBudget)) {
             td.innerHTML = `
               <div class="h-12 sm:h-14 rounded-xl tier-empty flex items-center justify-center text-sm sm:text-base font-bold select-none font-display">
                 —
@@ -2074,6 +2211,7 @@
 
     // --- FEATURE: SCAN ALL 52 WEEKENDS OF THE NEXT 12 MONTHS ---
     async function scanEntireYearForDestination() {
+      resolveTypedDestination();
       const destSelect = document.getElementById("f-destination");
       let destVal = destSelect.value;
 
@@ -2089,7 +2227,7 @@
       const cityName = selectedCityObj?.name || "destinație";
       const originSelect = document.getElementById("f-origin");
       const originCityId = originSelect.value;
-      const originIata = originSelect.selectedOptions[0]?.dataset?.iata || "OTP";
+      const originIata = originSelect?.selectedOptions?.[0]?.dataset?.iata || "OTP";
       const adults = parseInt(document.getElementById("f-adults").value, 10) || 2;
       const bagType = document.getElementById("f-bags").value;
       const handBags = Array(adults).fill(bagType === "cabin" ? 1 : 0);
@@ -2230,6 +2368,7 @@
 
     // Live Search on Selected Weekends
     async function runLiveSearch() {
+      resolveTypedDestination();
       const destSelect = document.getElementById("f-destination");
       const destVal = destSelect.value;
 
@@ -2244,7 +2383,7 @@
 
       const originSelect = document.getElementById("f-origin");
       const originCityId = originSelect.value;
-      const originIata = originSelect.selectedOptions[0]?.dataset?.iata || "OTP";
+      const originIata = originSelect?.selectedOptions?.[0]?.dataset?.iata || "OTP";
       const maxPrice1Pax = parseFloat(document.getElementById("f-max-price").value) || 350;
       const adults = parseInt(document.getElementById("f-adults").value, 10) || 2;
       const bagType = document.getElementById("f-bags").value;
@@ -2314,68 +2453,80 @@
           let targetAirline = "Companie aeriană";
           let totalFound = 0;
 
-          results.forEach(({ wk, itins }) => {
-            for (const it of itins) {
-              const outSegs = it.outbound?.sectorSegments || [];
-              const inSegs = it.inbound?.sectorSegments || [];
+          function processItineraries(allowStops, allowDurMin) {
+            results.forEach(({ wk, itins }) => {
+              for (const it of itins) {
+                const outSegs = it.outbound?.sectorSegments || [];
+                const inSegs = it.inbound?.sectorSegments || [];
 
-              if (maxStops === 0 && (outSegs.length > 1 || inSegs.length > 1)) continue;
-              if (it.outbound?.duration > maxDurMin * 60 || it.inbound?.duration > maxDurMin * 60) continue;
+                if (allowStops === 0 && (outSegs.length > 1 || inSegs.length > 1)) continue;
+                if (it.outbound?.duration > allowDurMin * 60 || it.inbound?.duration > allowDurMin * 60) continue;
 
-              const outFirst = outSegs[0]?.segment;
-              const outLast = outSegs[outSegs.length - 1]?.segment;
-              const inFirst = inSegs[0]?.segment;
-              const inLast = inSegs[inSegs.length - 1]?.segment;
-              if (!outFirst || !outLast || !inFirst || !inLast) continue;
+                const outFirst = outSegs[0]?.segment;
+                const outLast = outSegs[outSegs.length - 1]?.segment;
+                const inFirst = inSegs[0]?.segment;
+                const inLast = inSegs[inSegs.length - 1]?.segment;
+                if (!outFirst || !outLast || !inFirst || !inLast) continue;
 
-              const outOrig = outFirst.source.station.code;
-              const outDest = outLast.destination.station.code;
-              targetCode = outDest.toLowerCase();
-              targetCityTitle = outLast.destination.station.city?.name || cityName;
+                const outOrig = outFirst.source.station.code;
+                const outDest = outLast.destination.station.code;
+                targetCode = outDest.toLowerCase();
+                targetCityTitle = outLast.destination.station.city?.name || cityName;
 
-              const outArrTime = outLast.destination.localTime.slice(11, 16);
-              if (outArrLimit !== "03:00" && outArrTime > outArrLimit && outArrTime < "04:00") continue;
+                const outArrTime = outLast.destination.localTime.slice(11, 16);
+                if (outArrLimit !== "03:00" && outArrTime > outArrLimit && outArrTime < "04:00") continue;
 
-              const inArrTime = inLast.destination.localTime.slice(11, 16);
-              if (inArrLimit !== "03:00" && inArrTime > inArrLimit && inArrTime < "04:00") continue;
+                const inArrTime = inLast.destination.localTime.slice(11, 16);
+                if (inArrLimit !== "03:00" && inArrTime > inArrLimit && inArrTime < "04:00") continue;
 
-              const totalEur = parseFloat(it.priceEur?.amount) || 9999;
-              const perPaxEur = totalEur / adults;
+                const totalEur = parseFloat(it.priceEur?.amount) || 9999;
+                const perPaxEur = totalEur / adults;
 
-              const outCarrier = outFirst.carrier?.code || "FR";
-              const inCarrier = inFirst.carrier?.code || "FR";
-              const same = (outCarrier === inCarrier);
-              const airlineLabel = same ? carrierName(outCarrier) : `${carrierName(outCarrier)} + ${carrierName(inCarrier)}`;
-              targetAirline = airlineLabel;
+                const outCarrier = outFirst.carrier?.code || "FR";
+                const inCarrier = inFirst.carrier?.code || "FR";
+                const same = (outCarrier === inCarrier);
+                const airlineLabel = same ? carrierName(outCarrier) : `${carrierName(outCarrier)} + ${carrierName(inCarrier)}`;
+                targetAirline = airlineLabel;
 
-              const links = buildFlightLinks(outOrig, outDest, wk.fri, wk.sun, adults, outCarrier);
+                const links = buildFlightLinks(outOrig, outDest, wk.fri, wk.sun, adults, outCarrier);
+                const stopsCount = Math.max(outSegs.length - 1, inSegs.length - 1);
+                const stopsLabel = stopsCount > 0 ? ` (${stopsCount} esc.)` : "";
 
-              const cellObj = {
-                totalEur: totalEur,
-                perPaxEur: perPaxEur,
-                outRoute: `${outOrig} → ${outDest}`,
-                outTime: `${outFirst.source.localTime.slice(11, 16)} → ${outArrTime}`,
-                inRoute: `${inFirst.source.station.code} → ${inLast.destination.station.code}`,
-                inTime: `${inFirst.source.localTime.slice(11, 16)} → ${inArrTime}`,
-                airlineLabel: airlineLabel,
-                bookingUrl: links.googleFlightsUrl,
-                googleFlightsUrl: links.googleFlightsUrl,
-                skyscannerUrl: links.skyscannerUrl,
-                kayakUrl: links.kayakUrl,
-                kiwiSearchUrl: links.kiwiSearchUrl,
-                airlineUrl: links.airlineDirectUrl
-              };
+                const cellObj = {
+                  totalEur: totalEur,
+                  perPaxEur: perPaxEur,
+                  outRoute: `${outOrig} → ${outDest}`,
+                  outTime: `${outFirst.source.localTime.slice(11, 16)} → ${outArrTime}${stopsLabel}`,
+                  inRoute: `${inFirst.source.station.code} → ${inLast.destination.station.code}`,
+                  inTime: `${inFirst.source.localTime.slice(11, 16)} → ${inArrTime}`,
+                  airlineLabel: airlineLabel + stopsLabel,
+                  bookingUrl: links.googleFlightsUrl,
+                  googleFlightsUrl: links.googleFlightsUrl,
+                  skyscannerUrl: links.skyscannerUrl,
+                  kayakUrl: links.kayakUrl,
+                  kiwiSearchUrl: links.kiwiSearchUrl,
+                  airlineUrl: links.airlineDirectUrl
+                };
 
-              if (!targetCellsMap[wk.id] || cellObj.perPaxEur < targetCellsMap[wk.id].perPaxEur) {
-                targetCellsMap[wk.id] = cellObj;
-                totalFound++;
+                if (!targetCellsMap[wk.id] || cellObj.perPaxEur < targetCellsMap[wk.id].perPaxEur) {
+                  targetCellsMap[wk.id] = cellObj;
+                  totalFound++;
+                }
               }
-            }
-          });
+            });
+          }
+
+          processItineraries(maxStops, maxDurMin);
+
+          let fallbackUsed = false;
+          if (totalFound === 0 && maxStops === 0) {
+            processItineraries(1, 480);
+            if (totalFound > 0) fallbackUsed = true;
+          }
 
           const newRow = {
             city: targetCityTitle,
-            sub: `${targetCode.toUpperCase()} · ${targetAirline}`,
+            sub: `${targetCode.toUpperCase()} · ${targetAirline}${fallbackUsed ? " (1 escală)" : ""}`,
             code: targetCode,
             iata: targetCode.toUpperCase(),
             cityId: destVal,
@@ -2386,7 +2537,9 @@
           currentRows = currentRows.filter(r => r.cityId !== destVal && r.code !== targetCode);
           currentRows.unshift(newRow);
 
-          if (totalFound > 0) {
+          if (fallbackUsed) {
+            updateSearchStatus(`✅ Am găsit zboruri pentru ${targetCityTitle} (cu 1 escală, neavând zbor direct din București). Sfat: Verifică și Manchester (direct la 45 min de Liverpool)!`, 100, "success");
+          } else if (totalFound > 0) {
             updateSearchStatus(`✅ Căutare finalizată! S-au găsit zboruri în ${Object.keys(targetCellsMap).length} weekenduri pentru ${cityName}.`, 100, "success");
           } else {
             updateSearchStatus(`⚠️ Nu s-au găsit zboruri pentru ${cityName} cu filtrele actuale (ore/directe). Apasă pe [🔓 Resetează filtre (Mod permisiv)] pentru a permite escale sau ore flexibile.`, 100, "empty");
