@@ -648,41 +648,66 @@
     let currentMode = 1; // 1 = per pax, 2 = total grup
     let currentLinkMode = "kiwi";
 
-    // Enrich static cells with direct deep links
-    function enrichStaticRow(rowLinks, originIata, destIata) {
-      const res = {};
-      ALL_WEEKENDS.forEach(w => {
-        const link = rowLinks && rowLinks[w.id];
-        if (link && link.priceEur) {
-          const adults = parseInt(document.getElementById("f-adults")?.value || "2", 10);
-          const perPax = link.priceEur;
-          const total = perPax * adults;
+        function carrierName(code) {
+      const map = { W4: "Wizz Air", W6: "Wizz Air", FR: "Ryanair", RO: "Tarom", H4: "HiSky", LH: "Lufthansa", TK: "Turkish Airlines", OS: "Austrian", LO: "LOT" };
+      return map[code] || code;
+    }
 
-          const outDateIso = w.fri;
-          const inDateIso = w.sun;
-          const outDateSky = outDateIso.replace(/-/g, "").slice(2);
-          const inDateSky = inDateIso.replace(/-/g, "").slice(2);
-
-          const defaultCheckoutUrl = link.bookingUrl || link.kiwiDeepLink ||
-            `https://www.kiwi.com/ro/booking?token=${encodeURIComponent(link.bookingToken || '')}&passengers=${adults}`;
-
-          res[w.id] = {
-            perPaxEur: perPax,
-            totalEur: total,
-            outRoute: link.outRoute || `${originIata} → ${destIata}`,
-            outTime: link.outTime || "19:00 → 21:00",
-            inRoute: link.inRoute || `${destIata} → ${originIata}`,
-            inTime: link.inTime || "21:00 → 01:00",
-            airlineLabel: link.airlineLabel || "Companie aeriană",
-            bookingUrl: defaultCheckoutUrl,
-            kiwiCheckoutUrl: defaultCheckoutUrl,
-            airlineUrl: link.airlineUrl || "https://wizzair.com/ro-ro#/booking/select-flight",
-            skyscannerUrl: `https://www.skyscanner.ro/transport/dflights/${originIata.toLowerCase()}/${destIata.toLowerCase()}/${outDateSky}/${inDateSky}/?adultsv2=${adults}&cabinclass=economy&childrenv2=&inboundaltsenabled=false&outboundaltsenabled=false&preferdirects=true&ref=home`,
-            googleFlightsUrl: `https://www.google.com/travel/flights?hl=ro&curr=EUR&q=Flights%20from%20${originIata}%20to%20${destIata}%20on%20${outDateIso}%20through%20${inDateIso}%20for%20${adults}%20adults`
-          };
+    function buildAirlineUrl(carrier, fromCode, toCode, dateOut, dateIn, adults = 2, isOneWay = false) {
+      if (carrier === "W4" || carrier === "W6") {
+        const retPart = isOneWay ? "null" : dateIn;
+        return `https://wizzair.com/ro-ro#/booking/select-flight/${fromCode}/${toCode}/${dateOut}/${retPart}/${adults}/0/0/null`;
+      }
+      if (carrier === "FR") {
+        if (isOneWay) {
+          return `https://www.ryanair.com/ro/ro/trip/flights/select?adults=${adults}&teens=0&children=0&infants=0&dateOut=${dateOut}&isConnectedFlight=false&discount=0&isReturn=false&originIata=${fromCode}&destinationIata=${toCode}`;
         }
+        return `https://www.ryanair.com/ro/ro/trip/flights/select?adults=${adults}&teens=0&children=0&infants=0&dateOut=${dateOut}&dateIn=${dateIn}&isConnectedFlight=false&discount=0&isReturn=true&originIata=${fromCode}&destinationIata=${toCode}`;
+      }
+      if (carrier === "RO") return "https://www.tarom.ro/";
+      if (carrier === "H4") return "https://hisky.aero/";
+      return `https://www.google.com/travel/flights?hl=ro&curr=EUR&q=Flights%20from%20${fromCode}%20to%20${toCode}%20on%20${dateOut}%20through%20${dateIn}`;
+    }
+
+    // Enrich static cells with direct deep links
+    function enrichStaticRow(arr, skyFrom, skyTo) {
+      const map = {};
+      if (!arr || !Array.isArray(arr)) return map;
+      const baseWkIds = ["2026-11-13", "2026-11-20", "2026-11-27", "2026-12-04", "2026-12-11", "2026-12-18"];
+      arr.forEach((item, idx) => {
+        if (!item) return;
+        const wkId = baseWkIds[idx];
+        const wk = ALL_WEEKENDS.find(w => w.id === wkId);
+        if (!wk) return;
+        const [outOrig, outDest] = item.outRoute.split("->");
+        const [inOrig, inDest] = item.inRoute.split("->");
+        const same = (item.outCarrier === item.inCarrier) && (outDest === inOrig);
+        const airlineDirectUrl = buildAirlineUrl(item.outCarrier, outOrig, outDest, wk.fri, wk.sun, 2, !same);
+        const airlineLabel = same ? carrierName(item.outCarrier) : `${carrierName(item.outCarrier)} + ${carrierName(item.inCarrier)}`;
+        const skyOut = wk.fri.replace(/-/g, "").slice(2);
+        const skyIn = wk.sun.replace(/-/g, "").slice(2);
+        const skyscannerUrl = `https://www.skyscanner.ro/transport/zboruri/${skyFrom.toLowerCase()}/${skyTo.toLowerCase()}/${skyOut}/${skyIn}/?adults=2&direct=true`;
+        const googleFlightsUrl = `https://www.google.com/travel/flights?hl=ro&curr=EUR&q=Flights%20from%20${outOrig}%20to%20${outDest}%20on%20${wk.fri}%20through%20${wk.sun}%20for%202%20adults%20nonstop`;
+
+        map[wkId] = {
+          totalEur: item.totalEur,
+          perPaxEur: item.totalEur / 2,
+          outRoute: item.outRoute ? item.outRoute.replace("->", " → ") : `${outOrig} → ${outDest}`,
+          inRoute: item.inRoute ? item.inRoute.replace("->", " → ") : `${inOrig} → ${inDest}`,
+          outTime: item.outTime ? item.outTime.replace("->", " → ") : "",
+          inTime: item.inTime ? item.inTime.replace("->", " → ") : "",
+          outCarrier: item.outCarrier,
+          inCarrier: item.inCarrier,
+          airlineLabel,
+          kiwiBookingUrl: item.bookingUrl,
+          bookingUrl: item.bookingUrl,
+          airlineDirectUrl,
+          airlineUrl: airlineDirectUrl,
+          skyscannerUrl,
+          googleFlightsUrl
+        };
       });
-      return res;
+      return map;
     }
 
     let currentRows = [];
@@ -691,10 +716,17 @@
       currentRows = [
         {
           city: "Milano Bergamo",
-          sub: "BGY · Wizz Air / Ryanair",
+          sub: "BGY · Wizz Air (19:30 → 21:00)",
           code: "BGY",
-          skyTo: "milan",
-          cellsMap: enrichStaticRow(INITIAL_CELL_LINKS.bergamo, "otp", "bgy")
+          skyTo: "bgy",
+          cellsMap: enrichStaticRow(INITIAL_CELL_LINKS.bgy_wizz, "otp", "bgy")
+        },
+        {
+          city: "Milano (Toate aeroporturile)",
+          sub: "BGY / MXP · Ryanair + Wizz Air",
+          code: "MIL",
+          skyTo: "mila",
+          cellsMap: enrichStaticRow(INITIAL_CELL_LINKS.milan_all, "otp", "mila")
         },
         {
           city: "Bologna",
@@ -704,58 +736,30 @@
           cellsMap: enrichStaticRow(INITIAL_CELL_LINKS.bologna, "otp", "blq")
         },
         {
+          city: "Chișinău",
+          sub: "RMO · Wizz Air",
+          code: "RMO",
+          skyTo: "rmo",
+          cellsMap: enrichStaticRow(INITIAL_CELL_LINKS.chisinau, "otp", "rmo")
+        },
+        {
           city: "Varșovia",
-          sub: "WAW · Wizz Air",
+          sub: "WAW · Wizz Air (Băneasa BBU)",
           code: "WAW",
           skyTo: "waw",
-          cellsMap: enrichStaticRow(INITIAL_CELL_LINKS.warsaw, "otp", "waw")
+          cellsMap: enrichStaticRow(INITIAL_CELL_LINKS.warsaw, "bbu", "waw")
         },
         {
-          city: "Istanbul",
-          sub: "IST · Turkish Airlines / Tarom",
-          code: "IST",
-          skyTo: "ist",
-          cellsMap: enrichStaticRow(INITIAL_CELL_LINKS.istanbul, "otp", "ist")
+          city: "Copenhaga",
+          sub: "CPH · Wizz Air",
+          code: "CPH",
+          skyTo: "cph",
+          cellsMap: enrichStaticRow(INITIAL_CELL_LINKS.copenhagen, "otp", "cph")
         },
         {
-          city: "München",
-          sub: "MUC · Lufthansa City / Tarom",
-          code: "MUC",
-          skyTo: "muc",
-          cellsMap: enrichStaticRow(INITIAL_CELL_LINKS.munich, "otp", "muc")
-        },
-        {
-          city: "Roma Fiumicino",
-          sub: "FCO · Wizz Air / Ryanair",
-          code: "FCO",
-          skyTo: "rome",
-          cellsMap: enrichStaticRow(INITIAL_CELL_LINKS.rome, "otp", "fco")
-        },
-        {
-          city: "Veneția Treviso",
-          sub: "TSF · Wizz Air / Ryanair",
-          code: "TSF",
-          skyTo: "tsf",
-          cellsMap: enrichStaticRow(INITIAL_CELL_LINKS.venice, "otp", "tsf")
-        },
-        {
-          city: "Paris Beauvais",
-          sub: "BVA · Wizz Air / Ryanair",
-          code: "BVA",
-          skyTo: "pari",
-          cellsMap: enrichStaticRow(INITIAL_CELL_LINKS.paris, "otp", "bva")
-        },
-        {
-          city: "Londra Luton",
-          sub: "LTN · Wizz Air / Ryanair",
-          code: "LTN",
-          skyTo: "lond",
-          cellsMap: enrichStaticRow(INITIAL_CELL_LINKS.london, "otp", "ltn")
-        },
-        {
-          city: "Bruxelles Charleroi",
-          sub: "CRL · Wizz Air / Ryanair",
-          code: "CRL",
+          city: "Bruxelles",
+          sub: "CRL / BRU · Ryanair + Tarom",
+          code: "BRU",
           skyTo: "brus",
           cellsMap: enrichStaticRow(INITIAL_CELL_LINKS.brussels, "otp", "brus")
         }
