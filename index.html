@@ -109,7 +109,35 @@
     .custom-scrollbar::-webkit-scrollbar-thumb:hover {
       background: #c98f33;
     }
-  </style>
+  
+    /* Redesign Option 4 Enhancements */
+    .city-card-bg {
+      background-size: cover;
+      background-position: center;
+      transition: transform 0.28s ease, box-shadow 0.28s ease;
+    }
+    .city-card-bg:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 28px -4px rgba(10, 11, 13, 0.22);
+    }
+    .glass-dark {
+      background: rgba(10, 11, 13, 0.78);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+    .glass-gold {
+      background: rgba(223, 166, 73, 0.15);
+      border: 1px solid rgba(223, 166, 73, 0.4);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+    }
+    .vibe-pill-active {
+      background-color: #0a0b0d !important;
+      color: #dfa649 !important;
+      border-color: #dfa649 !important;
+      box-shadow: 0 2px 8px rgba(10, 11, 13, 0.15);
+    }
+</style>
 </head>
 <body class="antialiased min-h-screen flex flex-col bg-white text-[#0a0b0d]">
 
@@ -145,293 +173,381 @@
 
   <main class="flex-1 max-w-[96rem] w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
 
-    <!-- 1. Interactive Filter Configurator (23AI Yellow & Black on Non-White Warm Surface) -->
-    <section id="configurator" class="card-23ai rounded-3xl p-5 sm:p-7 space-y-6 border border-[#e4e7eb]">
+    <!-- 1. Hero Search Console (Airy & Clean Primary Bar + Collapsible Advanced Drawer) -->
+    <section id="configurator" class="card-23ai rounded-3xl p-5 sm:p-7 space-y-5 border border-[#e4e7eb] shadow-sm">
       
-      <!-- Section Header -->
+      <!-- Top Title & Quick Presets Summary -->
       <div class="flex flex-wrap items-center justify-between gap-4 border-b border-[#eef0f3] pb-4">
         <div>
           <div class="flex items-center gap-2.5">
             <span class="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-[#0a0b0d] text-[#dfa649] text-base font-black shadow-xs">
               ⚡
             </span>
-            <h1 class="font-display text-xl sm:text-2xl font-bold tracking-tight text-[#0a0b0d]">
-              Filtre & Criterii de Căutare
+            <h1 class="font-display text-lg sm:text-xl font-black text-[#0a0b0d] tracking-tight">
+              Căutare Inteligentă City Break de Weekend
             </h1>
           </div>
           <p id="subtitle-summary" class="text-xs sm:text-sm text-[#475569] font-medium mt-1">
-            Personalizează criteriile de zbor grupate pe traseu, buget și orare, apoi alege weekendurile dorite.
+            Găsește zboruri directe fără concediu pierdut: plecare vineri seară după birou, retur duminică noaptea.
           </p>
         </div>
         <div class="flex flex-wrap items-center gap-2">
+          <button id="btn-toggle-advanced" onclick="toggleAdvancedFilters()"
+                  class="inline-flex items-center gap-2 text-xs font-bold text-[#0a0b0d] bg-[#f4f5f8] hover:bg-[#e4e7eb] px-3.5 py-2 rounded-xl border border-[#dce1e7] transition cursor-pointer font-display shadow-2xs">
+            <span>⚙️</span>
+            <span id="btn-toggle-advanced-text">Filtre avansate (Orare & Bagaj) ▼</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Compact Primary Search Console -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3.5 items-end">
+        
+        <!-- 1. Plecare -->
+        <div class="lg:col-span-3 bg-[#fdfaf3] p-3 rounded-2xl border border-[#ecd8b0] shadow-2xs hover:border-[#dfa649] transition">
+          <label class="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#0a0b0d] mb-1.5 font-display">
+            <span>📍</span> Oraș plecare
+          </label>
+          <select id="f-origin" class="w-full rounded-xl border border-[#e4d3b5] bg-[#fffdf8] px-3 py-2 text-xs sm:text-sm font-bold text-[#0a0b0d] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#dfa649] transition font-body">
+            <option value="City:bucharest_ro" data-sky="otp" data-iata="OTP" selected>București (OTP / BBU)</option>
+            <option value="City:cluj-napoca_ro" data-sky="clj" data-iata="CLJ">Cluj-Napoca (CLJ)</option>
+            <option value="City:iasi_ro" data-sky="ias" data-iata="IAS">Iași (IAS)</option>
+            <option value="City:timisoara_ro" data-sky="tsr" data-iata="TSR">Timișoara (TSR)</option>
+          </select>
+        </div>
+
+        <!-- 2. Destinație -->
+        <div class="lg:col-span-4 bg-[#fdfaf3] p-3 rounded-2xl border border-[#ecd8b0] shadow-2xs hover:border-[#dfa649] transition relative">
+          <div class="flex items-center justify-between mb-1.5">
+            <label class="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#0a0b0d] font-display">
+              <span>🎯</span> Destinație în Europa
+            </label>
+            <span id="dest-type-badge" class="text-[10px] font-bold text-[#5c3b06] bg-[#fce8bd] px-2 py-0.5 rounded-md border border-[#dfa649]/60 font-display">
+              Scrie orașul
+            </span>
+          </div>
+
+          <div class="relative">
+            <div class="flex items-center gap-2 rounded-xl border border-[#e4d3b5] bg-[#fffdf8] px-3 py-2 focus-within:bg-white focus-within:ring-2 focus-within:ring-[#dfa649] transition">
+              <span class="text-sm">🔍</span>
+              <input id="dest-search-input" type="text"
+                     autocomplete="off"
+                     placeholder="Ex: Bologna, Milano, Roma, Paris, Londra..."
+                     oninput="onDestSearchInput(this.value)"
+                     onfocus="handleDestFocus(this)"
+                     onblur="handleDestBlur(this)"
+                     onkeydown="handleDestKeyDown(event, this)"
+                     class="w-full bg-transparent text-xs sm:text-sm font-bold text-[#0a0b0d] outline-none font-body placeholder:text-[#94a3b8]" />
+              <button id="dest-clear-btn" type="button" onclick="clearDestSelection()"
+                      title="Resetează la Toată Europa"
+                      class="hidden text-xs font-black text-[#64748b] hover:text-[#0a0b0d] bg-[#f1f2f4] hover:bg-[#e2e5e9] w-5 h-5 rounded-full flex items-center justify-center transition cursor-pointer">
+                ✕
+              </button>
+            </div>
+
+            <!-- Floating Autocomplete Dropdown -->
+            <div id="dest-autocomplete-dropdown"
+                 class="hidden absolute top-full left-0 right-0 mt-1 max-h-72 overflow-y-auto bg-[#ffffff] border-2 border-[#dfa649] rounded-2xl shadow-2xl z-50 p-2 custom-scrollbar font-display">
+            </div>
+          </div>
+
+          <select id="f-destination" class="hidden">
+            <option value="any" selected>🌟 Oricare (Toată Europa)</option>
+          </select>
+        </div>
+
+        <!-- 3. Număr călători -->
+        <div class="lg:col-span-2 bg-[#fdfaf3] p-3 rounded-2xl border border-[#ecd8b0] shadow-2xs hover:border-[#dfa649] transition">
+          <label class="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#0a0b0d] mb-1.5 font-display">
+            <span>👥</span> Călători
+          </label>
+          <select id="f-adults" class="w-full rounded-xl border border-[#e4d3b5] bg-[#fffdf8] px-2.5 py-2 text-xs sm:text-sm font-bold text-[#0a0b0d] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#dfa649] transition font-body">
+            <option value="1">1 Adult</option>
+            <option value="2" selected>2 Adulți (cuplu)</option>
+            <option value="3">3 Adulți</option>
+            <option value="4">4 Adulți</option>
+          </select>
+        </div>
+
+        <!-- 4. Buget maxim -->
+        <div class="lg:col-span-3 bg-[#fdfaf3] p-3 rounded-2xl border border-[#ecd8b0] shadow-2xs hover:border-[#dfa649] transition">
+          <label class="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#0a0b0d] mb-1.5 font-display">
+            <span>💶</span> Buget max / pers
+          </label>
+          <select id="f-max-price" class="w-full rounded-xl border border-[#e4d3b5] bg-[#fffdf8] px-2.5 py-2 text-xs sm:text-sm font-bold text-[#0a0b0d] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#dfa649] transition font-body">
+            <option value="75">Până la 75 €</option>
+            <option value="100">Până la 100 €</option>
+            <option value="125">Până la 125 €</option>
+            <option value="150">Până la 150 €</option>
+            <option value="200">Până la 200 €</option>
+            <option value="350" selected>Până la 350 €</option>
+            <option value="999">Oricât (Fără limită)</option>
+          </select>
+        </div>
+
+      </div>
+
+      <!-- Primary Action Buttons Row -->
+      <div class="flex flex-wrap items-center justify-between gap-3 pt-1">
+        <div class="flex flex-wrap items-center gap-2">
+          <button id="btn-search" onclick="runLiveSearch()"
+                  class="bg-[#dfa649] hover:bg-[#c98f33] active:bg-[#b57f2a] text-[#0a0b0d] text-xs sm:text-sm font-black px-5 py-2.5 rounded-xl shadow-xs transition flex items-center gap-2 cursor-pointer font-display">
+            <span id="btn-search-icon">🔍</span>
+            <span id="btn-search-text">Caută zboruri live</span>
+          </button>
+          <button id="btn-scan-year" onclick="scanEntireYearForDestination()"
+                  title="Scanează toate cele 52 de weekenduri din an pentru a găsi cel mai mic preț"
+                  class="bg-[#0a0b0d] hover:bg-[#1a1e27] active:bg-[#282d3a] text-[#dfa649] text-xs sm:text-sm font-black px-4 py-2.5 rounded-xl shadow-xs transition flex items-center gap-2 cursor-pointer font-display">
+            <span>📅</span>
+            <span id="btn-scan-text">Scanează tot anul (52 wk)</span>
+          </button>
+        </div>
+
+        <div class="flex items-center gap-2 text-xs text-[#5c3b06] font-bold">
+          <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span>Actualizare prețuri live: Google Flights, Skyscanner, Wizz Air & Kiwi</span>
+        </div>
+      </div>
+
+      <!-- Collapsible Advanced Drawer (Hidden by default for an airy UI) -->
+      <div id="advanced-filters-panel" class="hidden border-t border-[#ecd8b0] pt-5 space-y-4">
+        
+        <!-- Presets Row Inside Drawer -->
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="text-xs font-bold uppercase tracking-wider text-[#64748b] font-display">Preseturi rapide:</span>
           <button onclick="resetToPermissive()" title="Setează filtre permisive pentru a găsi garantat zboruri către orice destinație aleasă"
-                  class="inline-flex items-center gap-1.5 text-xs font-black text-[#0a0b0d] bg-[#dfa649] hover:bg-[#c98f33] active:bg-[#b57f2a] px-3.5 py-2 rounded-xl shadow-2xs transition cursor-pointer font-display">
-            🔓 Resetează filtre (Mod permisiv · găsește garantat)
+                  class="inline-flex items-center gap-1.5 text-xs font-black text-[#0a0b0d] bg-[#dfa649] hover:bg-[#c98f33] px-3 py-1.5 rounded-xl transition cursor-pointer font-display">
+            🔓 Permisiv (Găsește garantat)
           </button>
           <button onclick="resetToStrict()" title="Revino la selecția strictă de weekend: vineri seară după 18:00, zbor direct"
-                  class="inline-flex items-center gap-1.5 text-xs font-bold text-[#475569] hover:text-[#0a0b0d] bg-[#f4f5f8] hover:bg-[#eaeef3] px-3 py-2 rounded-xl border border-[#dce1e7] transition cursor-pointer font-display">
-            ⚡ Preset Weekend Clasic (2 nopți)
+                  class="inline-flex items-center gap-1.5 text-xs font-bold text-[#475569] hover:text-[#0a0b0d] bg-[#f4f5f8] hover:bg-[#eaeef3] px-3 py-1.5 rounded-xl border border-[#dce1e7] transition cursor-pointer font-display">
+            ⚡ Weekend Clasic (2 nopți)
           </button>
-          <button onclick="presetExtendedWeekend()" title="Preset Weekend Prelungit: 3-4 nopți (Sf. Andrei, 1 Dec, Paște, Rusalii)"
-                  class="inline-flex items-center gap-1.5 text-xs font-bold text-[#5c3b06] hover:text-[#0a0b0d] bg-[#fce8bd] hover:bg-[#f6dc9c] px-3 py-2 rounded-xl border border-[#dfa649] transition cursor-pointer font-display">
-            🏖️ Preset Weekend Prelungit (3–4 nopți)
+          <button onclick="presetExtendedWeekend()" title="Preset Weekend Prelungit: 3-4 nopți"
+                  class="inline-flex items-center gap-1.5 text-xs font-bold text-[#5c3b06] hover:text-[#0a0b0d] bg-[#fce8bd] hover:bg-[#f6dc9c] px-3 py-1.5 rounded-xl border border-[#dfa649] transition cursor-pointer font-display">
+            🏖️ Weekend Prelungit (3–4 nopți)
           </button>
-          <button onclick="presetSchoolHolidays()" title="Preset Vacanțe Copii: sejur de 1 săptămână în vacanțele școlare oficiale (Iarnă, Schi, Paște, Vară)"
-                  class="inline-flex items-center gap-1.5 text-xs font-bold text-[#0369a1] hover:text-[#0c4a6e] bg-[#e0f2fe] hover:bg-[#bae6fd] px-3 py-2 rounded-xl border border-[#7dd3fc] transition cursor-pointer font-display">
-            🎒 Preset Vacanțe Copii (1 săpt.)
+          <button onclick="presetSchoolHolidays()" title="Preset Vacanțe Copii"
+                  class="inline-flex items-center gap-1.5 text-xs font-bold text-[#0369a1] hover:text-[#0c4a6e] bg-[#e0f2fe] hover:bg-[#bae6fd] px-3 py-1.5 rounded-xl border border-[#7dd3fc] transition cursor-pointer font-display">
+            🎒 Vacanțe Copii (1 săpt.)
           </button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          
+          <!-- Stopovers & Duration -->
+          <div class="bg-[#fdfaf3] p-4 rounded-2xl border border-[#ecd8b0] space-y-3">
+            <div class="font-display text-xs font-bold uppercase tracking-wider text-[#0a0b0d] flex items-center gap-2">
+              <span>✈️</span> Escale & Durată
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold text-[#5c3b06] mb-1 font-display">Escale</label>
+              <select id="f-stops" class="w-full rounded-lg border border-[#e4d3b5] bg-[#fffdf8] px-2.5 py-1.5 text-xs font-bold text-[#0a0b0d] focus:outline-none focus:ring-2 focus:ring-[#dfa649]">
+                <option value="0" selected>Doar zboruri directe (fără escală)</option>
+                <option value="1">Permite și 1 escală scurtă</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold text-[#5c3b06] mb-1 font-display">Durată maximă pe sens</label>
+              <select id="f-max-dur" class="w-full rounded-lg border border-[#e4d3b5] bg-[#fffdf8] px-2.5 py-1.5 text-xs font-bold text-[#0a0b0d] focus:outline-none focus:ring-2 focus:ring-[#dfa649]">
+                <option value="120">Maximum 2 ore / sens</option>
+                <option value="180" selected>Maximum 3 ore / sens</option>
+                <option value="240">Maximum 4 ore / sens</option>
+                <option value="360">Maximum 6 ore / sens</option>
+              </select>
+            </div>
+            <div>
+              <label class="inline-flex items-center gap-2 text-xs font-bold text-[#0a0b0d] cursor-pointer pt-1">
+                <input type="checkbox" id="f-domestic" class="accent-[#dfa649] rounded w-4 h-4 cursor-pointer" onchange="runLiveSearch()" />
+                <span>Include zboruri interne în RO</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Bags & Pax Options -->
+          <div class="bg-[#fdfaf3] p-4 rounded-2xl border border-[#ecd8b0] space-y-3">
+            <div class="font-display text-xs font-bold uppercase tracking-wider text-[#0a0b0d] flex items-center gap-2">
+              <span>🧳</span> Bagaje Incluse
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold text-[#5c3b06] mb-1 font-display">Tip bagaj calculat</label>
+              <select id="f-bags" class="w-full rounded-lg border border-[#e4d3b5] bg-[#fffdf8] px-2.5 py-1.5 text-xs font-bold text-[#0a0b0d] focus:outline-none focus:ring-2 focus:ring-[#dfa649]">
+                <option value="small" selected>Rucsac mic sub scaun (inclus)</option>
+                <option value="cabin">Troller de cabină (10 kg)</option>
+                <option value="hold">Bagaj mare de cală (20 kg)</option>
+              </select>
+            </div>
+            <div class="text-xs text-[#5c3b06] font-medium leading-relaxed pt-2">
+              💡 Prețurile sunt afișate transparent per bilet de avion conform criteriilor selectate.
+            </div>
+          </div>
+
+          <!-- Weekend Flight Hours -->
+          <div class="bg-[#fdfaf3] p-4 rounded-2xl border border-[#ecd8b0] space-y-3">
+            <div class="font-display text-xs font-bold uppercase tracking-wider text-[#0a0b0d] flex items-center gap-2">
+              <span>⏰</span> Orare Vineri / Duminică
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="block text-[11px] font-bold text-[#5c3b06] mb-1 font-display">Vineri plecare</label>
+                <select id="f-fri-dep" class="w-full rounded-lg border border-[#e4d3b5] bg-[#fffdf8] px-2 py-1.5 text-xs font-bold text-[#0a0b0d]">
+                  <option value="06:00">De la 06:00</option>
+                  <option value="12:00">După 12:00</option>
+                  <option value="15:00">După 15:00</option>
+                  <option value="18:00" selected>După 18:00 (seară)</option>
+                  <option value="20:00">După 20:00</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-[#5c3b06] mb-1 font-display">Vineri sosire</label>
+                <select id="f-out-arr" class="w-full rounded-lg border border-[#e4d3b5] bg-[#fffdf8] px-2 py-1.5 text-xs font-bold text-[#0a0b0d]">
+                  <option value="23:00">Până la 23:00</option>
+                  <option value="23:59">Până la 24:00</option>
+                  <option value="01:00" selected>Până la 01:00</option>
+                  <option value="03:00">Fără limită</option>
+                </select>
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="block text-[11px] font-bold text-[#5c3b06] mb-1 font-display">Duminică plecare</label>
+                <select id="f-sun-dep" class="w-full rounded-lg border border-[#e4d3b5] bg-[#fffdf8] px-2 py-1.5 text-xs font-bold text-[#0a0b0d]">
+                  <option value="12:00">După 12:00</option>
+                  <option value="15:00">După 15:00</option>
+                  <option value="17:00">După 17:00</option>
+                  <option value="18:00" selected>După 18:00 (seară)</option>
+                  <option value="20:00">După 20:00</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-[#5c3b06] mb-1 font-display">Duminică retur</label>
+                <select id="f-in-arr" class="w-full rounded-lg border border-[#e4d3b5] bg-[#fffdf8] px-2 py-1.5 text-xs font-bold text-[#0a0b0d]">
+                  <option value="23:00">Până la 23:00</option>
+                  <option value="23:59">Până la 24:00</option>
+                  <option value="01:00" selected>Până la 01:00</option>
+                  <option value="03:00">Până la 03:00</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
 
-      <!-- 3 Themed Cards: All light non-white backgrounds, 23ai yellow & dark borders -->
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
-
-        <!-- CARD 1: Traseu & Destinație (23AI Warm Sand Tint) -->
-        <div class="lg:col-span-4 bg-[#fbf9f4] border-2 border-[#ecd8b0] rounded-2xl p-4 sm:p-5 shadow-2xs flex flex-col justify-between space-y-4">
-          <div>
-            <div class="flex items-center justify-between mb-3.5">
-              <div class="flex items-center gap-2">
-                <span class="w-7 h-7 rounded-lg bg-[#0a0b0d] text-[#dfa649] flex items-center justify-center text-xs font-black shadow-xs">01</span>
-                <h2 class="font-display text-sm font-bold uppercase tracking-wider text-[#0a0b0d]">Traseu & Destinație</h2>
-              </div>
-              <span class="text-[11px] font-bold text-[#5c3b06] bg-[#fce8bd] px-2.5 py-0.5 rounded-md border border-[#dfa649]/60 font-display">Zbor</span>
-            </div>
-
-            <div class="space-y-3">
-              <!-- Oraș plecare -->
-              <div class="bg-[#fdfaf3] p-3 rounded-xl border border-[#ecd8b0] shadow-2xs hover:border-[#dfa649] transition">
-                <label class="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#0a0b0d] mb-1.5 font-display">
-                  <span>📍</span> Oraș de plecare
-                </label>
-                <select id="f-origin" class="w-full rounded-lg border border-[#e4d3b5] bg-[#fffdf8] px-3 py-2 text-xs sm:text-sm font-bold text-[#0a0b0d] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#dfa649] focus:border-transparent transition font-body">
-                  <option value="City:bucharest_ro" data-sky="otp" data-iata="OTP" selected>București (OTP / BBU)</option>
-                  <option value="City:cluj-napoca_ro" data-sky="clj" data-iata="CLJ">Cluj-Napoca (CLJ)</option>
-                  <option value="City:iasi_ro" data-sky="ias" data-iata="IAS">Iași (IAS)</option>
-                  <option value="City:timisoara_ro" data-sky="tsr" data-iata="TSR">Timișoara (TSR)</option>
-                </select>
-              </div>
-
-              <!-- Destinație dorită (Search As You Type + Selector Europa) -->
-              <div class="bg-[#fdfaf3] p-3 rounded-xl border border-[#ecd8b0] shadow-2xs hover:border-[#dfa649] transition relative">
-                <div class="flex items-center justify-between mb-1.5">
-                  <label class="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#0a0b0d] font-display">
-                    <span>🎯</span> Destinație în Europa
-                  </label>
-                  <span id="dest-type-badge" class="text-[10px] font-bold text-[#5c3b06] bg-[#fce8bd] px-2 py-0.5 rounded-md border border-[#dfa649]/60 font-display">
-                    Scrie direct orașul
-                  </span>
-                </div>
-
-                <!-- Search Input with Floating Autocomplete -->
-                <div class="relative">
-                  <div class="flex items-center gap-2 rounded-lg border border-[#e4d3b5] bg-[#fffdf8] px-3 py-2 focus-within:bg-white focus-within:ring-2 focus-within:ring-[#dfa649] focus-within:border-transparent transition">
-                    <span class="text-sm">🔍</span>
-                    <input id="dest-search-input" type="text"
-                           autocomplete="off"
-                           placeholder="Scrie direct: Liverpool, Tallinn, Manchester, Nisa..."
-                           oninput="onDestSearchInput(this.value)"
-                           onfocus="handleDestFocus(this)"
-                           onblur="handleDestBlur(this)"
-                           onkeydown="handleDestKeyDown(event, this)"
-                           class="w-full bg-transparent text-xs sm:text-sm font-bold text-[#0a0b0d] outline-none font-body placeholder:text-[#94a3b8]" />
-                    <button id="dest-clear-btn" type="button" onclick="clearDestSelection()"
-                            title="Resetează la Toată Europa"
-                            class="hidden text-xs font-black text-[#64748b] hover:text-[#0a0b0d] bg-[#f1f2f4] hover:bg-[#e2e5e9] w-5 h-5 rounded-full flex items-center justify-center transition cursor-pointer">
-                      ✕
-                    </button>
-                  </div>
-
-                  <!-- Dropdown List of European Cities & Countries -->
-                  <div id="dest-autocomplete-dropdown"
-                       class="hidden absolute top-full left-0 right-0 mt-1 max-h-72 overflow-y-auto bg-[#ffffff] border-2 border-[#dfa649] rounded-2xl shadow-2xl z-50 p-2 custom-scrollbar font-display">
-                    <!-- Populated dynamically by JS -->
-                  </div>
-                </div>
-
-                <!-- Hidden native select for state synchronization -->
-                <select id="f-destination" class="hidden">
-                  <option value="any" selected>🌟 Oricare (Toată Europa)</option>
-                </select>
-              </div>
-
-              <!-- Tip zbor & Escale -->
-              <div class="bg-[#fdfaf3] p-3 rounded-xl border border-[#ecd8b0] shadow-2xs hover:border-[#dfa649] transition">
-                <label class="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#0a0b0d] mb-1.5 font-display">
-                  <span>✈️</span> Tip zbor & escale
-                </label>
-                <select id="f-stops" class="w-full rounded-lg border border-[#e4d3b5] bg-[#fffdf8] px-3 py-2 text-xs sm:text-sm font-bold text-[#0a0b0d] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#dfa649] focus:border-transparent transition font-body">
-                  <option value="0" selected>Doar zboruri directe (fără escală)</option>
-                  <option value="1">Permite și 1 escală scurtă</option>
-                </select>
-              </div>
-
-              <!-- Durată maximă zbor -->
-              <div class="bg-[#fdfaf3] p-3 rounded-xl border border-[#ecd8b0] shadow-2xs hover:border-[#dfa649] transition">
-                <label class="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#0a0b0d] mb-1.5 font-display">
-                  <span>⏱️</span> Durată maximă pe sens
-                </label>
-                <select id="f-max-dur" class="w-full rounded-lg border border-[#e4d3b5] bg-[#fffdf8] px-3 py-2 text-xs sm:text-sm font-bold text-[#0a0b0d] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#dfa649] focus:border-transparent transition font-body">
-                  <option value="120">Maximum 2 ore / sens</option>
-                  <option value="180" selected>Maximum 3 ore / sens</option>
-                  <option value="240">Maximum 4 ore / sens</option>
-                  <option value="360">Maximum 6 ore / sens</option>
-                </select>
-              </div>
-            </div>
-          </div>
-
-          <!-- Domestic flight toggle inside Card 1 -->
-          <div class="pt-2 border-t border-[#ecd8b0]">
-            <label class="inline-flex items-center gap-2 text-xs font-bold text-[#0a0b0d] cursor-pointer bg-[#fdfaf3] hover:bg-[#faeed8] px-3 py-2 rounded-xl border border-[#ecd8b0] transition w-full font-body">
-              <input type="checkbox" id="f-domestic" class="accent-[#dfa649] rounded w-4 h-4 cursor-pointer" onchange="runLiveSearch()" />
-              <span>Include zboruri interne în RO (Cluj, Iași etc.)</span>
-            </label>
-          </div>
-        </div>
-
-        <!-- CARD 2: Buget & Călători (23AI Warm Cream Tint) -->
-        <div class="lg:col-span-4 bg-[#fbf9f4] border-2 border-[#ecd8b0] rounded-2xl p-4 sm:p-5 shadow-2xs flex flex-col justify-between space-y-4">
-          <div>
-            <div class="flex items-center justify-between mb-3.5">
-              <div class="flex items-center gap-2">
-                <span class="w-7 h-7 rounded-lg bg-[#0a0b0d] text-[#dfa649] flex items-center justify-center text-xs font-black shadow-xs">02</span>
-                <h2 class="font-display text-sm font-bold uppercase tracking-wider text-[#0a0b0d]">Buget & Călători</h2>
-              </div>
-              <span class="text-[11px] font-bold text-[#5c3b06] bg-[#fce8bd] px-2.5 py-0.5 rounded-md border border-[#dfa649]/60 font-display">Preț & Bagaj</span>
-            </div>
-
-            <div class="space-y-3">
-              <!-- Buget maxim -->
-              <div class="bg-[#fdfaf3] p-3 rounded-xl border border-[#ecd8b0] shadow-2xs hover:border-[#dfa649] transition space-y-2">
-                <div class="flex justify-between items-center">
-                  <label class="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#0a0b0d] font-display">
-                    <span>💰</span> Buget max / persoană
-                  </label>
-                  <span id="lbl-max-price" class="font-display text-xs font-black text-[#0a0b0d] bg-[#dfa649] px-2.5 py-0.5 rounded-lg border border-[#c98f33]">150 €</span>
-                </div>
-                <input id="f-max-price" type="range" min="50" max="350" step="10" value="150"
-                       oninput="document.getElementById('lbl-max-price').textContent = this.value + ' €'"
-                       class="w-full accent-[#dfa649] cursor-pointer h-2 bg-[#ecd8b0] rounded-lg" />
-                <div class="flex justify-between text-[11px] text-[#5c3b06] font-bold px-0.5 font-display">
-                  <span>50 €</span>
-                  <span class="text-[#0a0b0d] font-black">150 €</span>
-                  <span>250 €</span>
-                  <span>350 €</span>
-                </div>
-              </div>
-
-              <!-- Număr pasageri -->
-              <div class="bg-[#fdfaf3] p-3 rounded-xl border border-[#ecd8b0] shadow-2xs hover:border-[#dfa649] transition">
-                <label class="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#0a0b0d] mb-1.5 font-display">
-                  <span>👥</span> Număr călători
-                </label>
-                <select id="f-adults" class="w-full rounded-lg border border-[#e4d3b5] bg-[#fffdf8] px-3 py-2 text-xs sm:text-sm font-bold text-[#0a0b0d] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#dfa649] focus:border-transparent transition font-body">
-                  <option value="1">1 Adult (individual)</option>
-                  <option value="2" selected>2 Adulți (cuplu / pereche)</option>
-                  <option value="3">3 Adulți (grup mic)</option>
-                  <option value="4">4 Adulți (grup prieteni)</option>
-                </select>
-              </div>
-
-              <!-- Bagaje incluse -->
-              <div class="bg-[#fdfaf3] p-3 rounded-xl border border-[#ecd8b0] shadow-2xs hover:border-[#dfa649] transition">
-                <label class="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#0a0b0d] mb-1.5 font-display">
-                  <span>🧳</span> Bagaje incluse
-                </label>
-                <select id="f-bags" class="w-full rounded-lg border border-[#e4d3b5] bg-[#fffdf8] px-3 py-2 text-xs sm:text-sm font-bold text-[#0a0b0d] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#dfa649] focus:border-transparent transition font-body">
-                  <option value="small" selected>Rucsac mic sub scaun (inclus)</option>
-                  <option value="cabin">Troller de cabină (10 kg)</option>
-                  <option value="hold">Bagaj mare de cală (20 kg)</option>
-                </select>
-              </div>
-            </div>
-          </div>
-
-          <div class="pt-2 border-t border-[#ecd8b0] text-xs text-[#5c3b06] font-bold px-1 flex items-center gap-1.5 font-body">
-            <span>✨</span> <span>Prețurile din tabel sunt calculate pentru bagajul ales</span>
-          </div>
-        </div>
-
-        <!-- CARD 3: Orare Weekend (23AI Warm Honey Tint) -->
-        <div class="lg:col-span-4 bg-[#fbf9f4] border-2 border-[#ecd8b0] rounded-2xl p-4 sm:p-5 shadow-2xs flex flex-col justify-between space-y-4">
-          <div>
-            <div class="flex items-center justify-between mb-3.5">
-              <div class="flex items-center gap-2">
-                <span class="w-7 h-7 rounded-lg bg-[#0a0b0d] text-[#dfa649] flex items-center justify-center text-xs font-black shadow-xs">03</span>
-                <h2 class="font-display text-sm font-bold uppercase tracking-wider text-[#0a0b0d]">Orare de Weekend</h2>
-              </div>
-              <span class="text-[11px] font-bold text-[#5c3b06] bg-[#fce8bd] px-2.5 py-0.5 rounded-md border border-[#dfa649]/60 font-display">Timp optim</span>
-            </div>
-
-            <div class="space-y-3">
-              <!-- Sub-bloc Tur Vineri -->
-              <div class="bg-[#fdfaf3] p-3 rounded-xl border border-[#ecd8b0] shadow-2xs hover:border-[#dfa649] transition space-y-2">
-                <div class="flex items-center gap-1.5 text-xs font-black text-[#0a0b0d] border-b border-[#ecd8b0] pb-1 font-display">
-                  <span>🛫</span> <span>TUR (Vineri)</span>
-                </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 font-body">
-                  <div>
-                    <label class="block text-[11px] font-bold uppercase tracking-wider text-[#5c3b06] mb-1 font-display">Plecare min.</label>
-                    <select id="f-fri-dep" class="w-full rounded-lg border border-[#e4d3b5] bg-[#fffdf8] px-2 py-1.5 text-xs font-bold text-[#0a0b0d] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#dfa649] transition">
-                      <option value="06:00">De la 06:00</option>
-                      <option value="12:00">După 12:00</option>
-                      <option value="15:00">După 15:00</option>
-                      <option value="18:00" selected>După 18:00 (seară)</option>
-                      <option value="20:00">După 20:00</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label class="block text-[11px] font-bold uppercase tracking-wider text-[#5c3b06] mb-1 font-display">Aterizare max.</label>
-                    <select id="f-out-arr" class="w-full rounded-lg border border-[#e4d3b5] bg-[#fffdf8] px-2 py-1.5 text-xs font-bold text-[#0a0b0d] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#dfa649] transition">
-                      <option value="23:00">Până la 23:00</option>
-                      <option value="23:59">Până la 24:00</option>
-                      <option value="01:00" selected>Până la 01:00 (sâm)</option>
-                      <option value="03:00">Fără limită</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Sub-bloc Retur Duminica -->
-              <div class="bg-[#fdfaf3] p-3 rounded-xl border border-[#ecd8b0] shadow-2xs hover:border-[#dfa649] transition space-y-2">
-                <div class="flex items-center gap-1.5 text-xs font-black text-[#0a0b0d] border-b border-[#ecd8b0] pb-1 font-display">
-                  <span>🛬</span> <span>RETUR (Duminică)</span>
-                </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 font-body">
-                  <div>
-                    <label class="block text-[11px] font-bold uppercase tracking-wider text-[#5c3b06] mb-1 font-display">Plecare min.</label>
-                    <select id="f-sun-dep" class="w-full rounded-lg border border-[#e4d3b5] bg-[#fffdf8] px-2 py-1.5 text-xs font-bold text-[#0a0b0d] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#dfa649] transition">
-                      <option value="12:00">După 12:00</option>
-                      <option value="15:00">După 15:00</option>
-                      <option value="17:00">După 17:00</option>
-                      <option value="18:00" selected>După 18:00 (seară)</option>
-                      <option value="20:00">După 20:00</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label class="block text-[11px] font-bold uppercase tracking-wider text-[#5c3b06] mb-1 font-display">Acasă până la</label>
-                    <select id="f-in-arr" class="w-full rounded-lg border border-[#e4d3b5] bg-[#fffdf8] px-2 py-1.5 text-xs font-bold text-[#0a0b0d] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#dfa649] transition">
-                      <option value="23:00">Până la 23:00</option>
-                      <option value="23:59">Până la 24:00</option>
-                      <option value="01:00" selected>Până la 01:00 (luni)</option>
-                      <option value="03:00">Până la 03:00 (luni)</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-
-            </div>
-          </div>
-
-          <div class="pt-2 border-t border-[#ecd8b0] text-xs text-[#5c3b06] font-bold px-1 flex items-center gap-1.5 font-body">
-            <span>💡</span> <span>Pleci vineri după birou și te întorci duminică noaptea</span>
-          </div>
-        </div>
-
-      </div>
     </section>
 
-    <!-- 2. Multi-Weekend Selector (2026 - 2027) -->
+    <!-- 2. Vibe Quick Filters Bar (Tematice) -->
+    <div id="vibe-filters-container" class="card-23ai rounded-2xl px-4 py-3 border border-[#e4e7eb] flex items-center justify-between gap-3 overflow-x-auto custom-scrollbar">
+      <div class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#64748b] font-display whitespace-nowrap">
+        <span>🧭</span> Vibe & Tematică:
+      </div>
+      <div class="flex items-center gap-2 font-display text-xs whitespace-nowrap">
+        <button onclick="setVibeFilter('all')" id="vibe-btn-all" class="vibe-pill-active px-3 py-1.5 rounded-xl border border-[#dce1e7] font-bold transition cursor-pointer">
+          ✨ Toate
+        </button>
+        <button onclick="setVibeFilter('food')" id="vibe-btn-food" class="bg-[#f5f6f8] text-[#475569] hover:bg-[#fce8bd] hover:border-[#dfa649] px-3 py-1.5 rounded-xl border border-[#dce1e7] font-bold transition cursor-pointer">
+          🍕 Foodie & Dolce Vita
+        </button>
+        <button onclick="setVibeFilter('shopping')" id="vibe-btn-shopping" class="bg-[#f5f6f8] text-[#475569] hover:bg-[#fce8bd] hover:border-[#dfa649] px-3 py-1.5 rounded-xl border border-[#dce1e7] font-bold transition cursor-pointer">
+          🛍️ Shopping & Style
+        </button>
+        <button onclick="setVibeFilter('culture')" id="vibe-btn-culture" class="bg-[#f5f6f8] text-[#475569] hover:bg-[#fce8bd] hover:border-[#dfa649] px-3 py-1.5 rounded-xl border border-[#dce1e7] font-bold transition cursor-pointer">
+          🏛️ Artă & Istorie
+        </button>
+        <button onclick="setVibeFilter('sea')" id="vibe-btn-sea" class="bg-[#f5f6f8] text-[#475569] hover:bg-[#fce8bd] hover:border-[#dfa649] px-3 py-1.5 rounded-xl border border-[#dce1e7] font-bold transition cursor-pointer">
+          ☀️ Soare & Relax
+        </button>
+        <button onclick="setVibeFilter('budget')" id="vibe-btn-budget" class="bg-[#f5f6f8] text-[#475569] hover:bg-[#fce8bd] hover:border-[#dfa649] px-3 py-1.5 rounded-xl border border-[#dce1e7] font-bold transition cursor-pointer">
+          💸 Sub 100 €
+        </button>
+        <button onclick="setVibeFilter('family')" id="vibe-btn-family" class="bg-[#f5f6f8] text-[#475569] hover:bg-[#fce8bd] hover:border-[#dfa649] px-3 py-1.5 rounded-xl border border-[#dce1e7] font-bold transition cursor-pointer">
+          🎒 Cu Copiii
+        </button>
+      </div>
+    </div>
+
+    <!-- 3. Destination Spotlight Banner (with High-Res Photo Background & Dark Gradient) -->
+    <div id="city-spotlight-banner" class="hidden rounded-3xl overflow-hidden shadow-lg transition duration-300">
+      <div id="spotlight-card-inner" class="relative p-6 sm:p-8 text-white">
+        <div class="relative z-10 flex flex-wrap items-center justify-between gap-6">
+          <div class="space-y-2 max-w-3xl">
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="text-xs uppercase font-black text-[#dfa649] tracking-wider font-display">🏆 Cel mai ieftin weekend găsit:</span>
+              <span id="spotlight-badge" class="glass-gold text-[#dfa649] text-xs font-bold px-2.5 py-0.5 rounded-md font-display">
+                Cea mai bună ofertă
+              </span>
+              <span id="spotlight-concediu-badge" class="bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-xs font-bold px-2.5 py-0.5 rounded-md font-display flex items-center gap-1">
+                <span>✨</span> 0 zile concediu
+              </span>
+            </div>
+            
+            <div id="spotlight-title" class="text-2xl sm:text-3xl font-black text-white font-display drop-shadow-md">
+              <!-- Rendered by JS -->
+            </div>
+            
+            <div id="spotlight-details" class="text-xs sm:text-sm text-[#e2e8f0] font-medium font-body leading-relaxed">
+              <!-- Rendered by JS -->
+            </div>
+
+            <!-- Runner-ups for full year scan -->
+            <div id="spotlight-runners" class="hidden text-xs text-[#dfa649] font-bold pt-1 font-display">
+              <!-- Rendered by JS -->
+            </div>
+          </div>
+
+          <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+            <div id="spotlight-action" class="flex flex-wrap items-center gap-2">
+              <!-- Rendered by JS -->
+            </div>
+            <div id="spotlight-share-container">
+              <!-- Rendered by JS -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. Destination 48h Guide & Weather (Independent Card with Photo Ambient & Glassmorphism) -->
+    <div id="city-guide-card" class="hidden card-23ai rounded-3xl p-6 text-xs sm:text-sm text-[#0a0b0d] shadow-sm transition space-y-4 border border-[#ecd8b0]">
+      <div class="flex flex-wrap items-center justify-between gap-2 border-b border-[#ecd8b0] pb-3">
+        <div class="flex items-center gap-2.5">
+          <span class="w-8 h-8 rounded-xl bg-[#0a0b0d] text-[#dfa649] flex items-center justify-center text-xs font-black shadow-xs">48h</span>
+          <h3 id="guide-city-title" class="font-display text-base sm:text-lg font-black text-[#0a0b0d]">Ghid de Weekend 23AI</h3>
+        </div>
+        <span class="text-[11px] font-bold text-[#5c3b06] bg-[#fce8bd] px-2.5 py-0.5 rounded-md border border-[#dfa649]/60 font-display">Info esențial de călătorie</span>
+      </div>
+      
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <div class="space-y-1.5 border-b md:border-b-0 md:border-r border-[#ecd8b0] pb-3 md:pb-0 md:pr-4">
+          <div class="font-bold uppercase tracking-wider text-[#5c3b06] text-xs font-display flex items-center gap-1.5">
+            <span>☀️</span> <span>Vreme & Sezon optim</span>
+          </div>
+          <div id="guide-weather" class="font-medium text-[#334155] leading-relaxed font-body">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+        
+        <div class="space-y-1.5 border-b md:border-b-0 md:border-r border-[#ecd8b0] pb-3 md:pb-0 md:pr-4">
+          <div class="font-bold uppercase tracking-wider text-[#5c3b06] text-xs font-display flex items-center gap-1.5">
+            <span>🚆</span> <span>Transfer Aeroport → Centru</span>
+          </div>
+          <div id="guide-transfer" class="font-medium text-[#334155] leading-relaxed font-body">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+        
+        <div class="space-y-1.5">
+          <div class="font-bold uppercase tracking-wider text-[#5c3b06] text-xs font-display flex items-center gap-1.5">
+            <span>🎒</span> <span>Vibe & Ce faci în 48 de ore</span>
+          </div>
+          <div id="guide-vibe" class="font-medium text-[#334155] leading-relaxed font-body">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. Multi-Weekend Selector (2026 - 2027) -->
     <section class="card-23ai rounded-3xl p-5 sm:p-7 space-y-4 border border-[#e4e7eb]">
       <div class="flex flex-wrap items-center justify-between gap-3 border-b border-[#eef0f3] pb-3">
         <div class="flex items-center gap-2.5">
@@ -449,21 +565,10 @@
           <span id="selected-wk-badge" class="bg-[#fce8bd] text-[#422904] font-bold text-xs sm:text-sm px-3.5 py-1.5 rounded-xl border border-[#dfa649] font-display shadow-2xs">
             6 weekenduri selectate
           </span>
-          <button id="btn-scan-year" onclick="scanEntireYearForDestination()"
-                  title="Scanează toate cele 52 de weekenduri din următorul an pentru a găsi cel mai ieftin weekend"
-                  class="bg-[#0a0b0d] hover:bg-[#1a1e27] active:bg-[#282d3a] text-[#dfa649] text-xs sm:text-sm font-black px-4 py-2.5 rounded-xl shadow-xs transition flex items-center gap-1.5 cursor-pointer font-display">
-            <span>📅</span>
-            <span id="btn-scan-text">Scanează tot anul (52 wk)</span>
-          </button>
-          <button id="btn-search" onclick="runLiveSearch()"
-                  class="bg-[#dfa649] hover:bg-[#c98f33] active:bg-[#b57f2a] text-[#0a0b0d] text-xs sm:text-sm font-black px-5 py-2.5 rounded-xl shadow-sm transition flex items-center gap-2 cursor-pointer font-display">
-            <span id="btn-search-icon">🔍</span>
-            <span id="btn-search-text">Caută zboruri</span>
-          </button>
         </div>
       </div>
 
-      <!-- Quick Preset Buttons (Non-white soft surface) -->
+      <!-- Quick Preset Buttons -->
       <div class="space-y-2">
         <div class="text-xs font-bold uppercase tracking-wider text-[#475569] font-display">Scurtături rapide:</div>
         <div class="flex flex-wrap items-center gap-2 text-xs font-display">
@@ -488,156 +593,91 @@
           <button onclick="selectPreset('spring27')" class="px-3.5 py-1.5 rounded-xl bg-[#f5f6f8] hover:bg-[#fce8bd] hover:border-[#dfa649] font-bold text-[#0a0b0d] transition cursor-pointer border border-[#dce1e7]">
             🌸 Primăvară 2027 (Mar – Mai)
           </button>
-          <button onclick="selectPreset('summer27')" class="px-3.5 py-1.5 rounded-xl bg-[#f5f6f8] hover:bg-[#fce8bd] hover:border-[#dfa649] font-bold text-[#0a0b0d] transition cursor-pointer border border-[#dce1e7]">
-            ☀️ Vară 2027 (Iun – Aug)
-          </button>
-          <button onclick="selectPreset('clear')" class="px-3.5 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 font-bold text-rose-800 transition cursor-pointer border border-rose-200">
-            ✕ Deselectează tot
-          </button>
         </div>
       </div>
 
-      <!-- Month Filter Tabs -->
-      <div class="pt-1">
-        <div class="flex items-center justify-between mb-2">
-          <span class="text-xs font-bold uppercase tracking-wider text-[#475569] font-display">Navighează pe luni (2026 – 2027):</span>
-          <div class="flex items-center gap-2 text-xs font-bold">
-            <button onclick="toggleAllVisibleMonth(true)" class="text-[#0a0b0d] hover:text-[#dfa649] hover:underline cursor-pointer">Bifează luna curentă</button>
-            <span class="text-[#cbd5e1]">|</span>
-            <button onclick="toggleAllVisibleMonth(false)" class="text-[#64748b] hover:text-[#0a0b0d] hover:underline cursor-pointer">Debifează luna</button>
-          </div>
+      <!-- Month Tabs -->
+      <div class="space-y-2 pt-2 border-t border-[#eef0f3]">
+        <div class="flex items-center justify-between text-xs font-bold text-[#475569]">
+          <span class="font-display uppercase tracking-wider">Navighează pe luni calendaristice:</span>
+          <button onclick="toggleAllVisibleMonth()" class="text-[#0a0b0d] hover:text-[#dfa649] underline cursor-pointer font-display">
+            Selectează / Deselectează toate din lună
+          </button>
         </div>
-        <div id="month-tabs" class="flex gap-2 overflow-x-auto custom-scrollbar pb-2">
-          <!-- Rendered by JS -->
+        <div id="month-tabs" class="flex items-center gap-1.5 overflow-x-auto pb-2 custom-scrollbar">
+          <!-- Populated by JS -->
         </div>
       </div>
 
-      <!-- Weekend Interactive Chips Container -->
-      <div id="weekend-chips-grid" class="pt-1 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2.5">
+      <!-- Weekend Chips Grid -->
+      <div id="weekend-chips-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 pt-2">
         <!-- Rendered by JS -->
-      </div>
-
-      <!-- Live Search Progress & Completion Notice -->
-      <div id="search-status" class="hidden rounded-2xl px-4 py-3 text-xs sm:text-sm flex flex-wrap items-center justify-between gap-2 shadow-xs transition border">
-        <div class="flex items-center gap-2">
-          <span id="search-status-spinner" class="text-base loading-pulse">⚡</span>
-          <span id="search-status-text" class="font-bold font-display">Se interoghează companiile aeriene în timp real...</span>
-        </div>
-        <div class="flex items-center gap-2">
-          <span id="search-status-pct" class="font-mono font-bold">0%</span>
-          <button id="search-status-dismiss" onclick="document.getElementById('search-status').classList.add('hidden')" class="hidden text-xs font-black px-2 py-0.5 rounded-lg bg-[#0a0b0d] text-[#dfa649] cursor-pointer">✕ Închide</button>
-        </div>
       </div>
     </section>
 
-    <!-- Dedicated Best Weekend Spotlight for Selected City (23AI Theme) -->
-    <div id="city-spotlight-banner" class="hidden space-y-4">
-      <div class="card-23ai bg-[#fce8bd] border-2 border-[#dfa649] rounded-3xl p-5 shadow-sm transition">
-        <div class="flex flex-wrap items-center justify-between gap-4">
-          <div class="space-y-1">
-            <div class="flex items-center gap-2">
-              <span class="text-xs uppercase font-black text-[#5c3b06] tracking-wider font-display">🏆 Cel mai ieftin weekend găsit:</span>
-              <span id="spotlight-badge" class="bg-[#0a0b0d] text-[#dfa649] text-[11px] font-bold px-2 py-0.5 rounded-md font-display">Cea mai bună ofertă</span>
-            </div>
-            <div id="spotlight-title" class="text-lg sm:text-xl font-black text-[#0a0b0d] font-display">
-              <!-- Rendered by JS -->
-            </div>
-            <div id="spotlight-details" class="text-xs sm:text-sm text-[#422904] font-medium font-body">
-              <!-- Rendered by JS -->
-            </div>
-            <!-- Runner-ups for full year scan -->
-            <div id="spotlight-runners" class="hidden text-xs text-[#5c3b06] font-bold pt-1 font-display">
-              <!-- Rendered by JS -->
-            </div>
-          </div>
-          <div id="spotlight-action" class="flex flex-wrap items-center gap-2">
-            <!-- Rendered by JS -->
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Independent City Break Guide & Weather (Visible immediately when any city is selected) -->
-    <div id="city-guide-card" class="hidden card-23ai bg-[#fdfaf3] border-2 border-[#ecd8b0] rounded-3xl p-5 text-xs sm:text-sm text-[#0a0b0d] shadow-sm transition space-y-3">
-      <div class="flex flex-wrap items-center justify-between gap-2 border-b border-[#ecd8b0] pb-3">
-        <div class="flex items-center gap-2">
-          <span class="w-7 h-7 rounded-lg bg-[#0a0b0d] text-[#dfa649] flex items-center justify-center text-xs font-black">48h</span>
-          <h3 id="guide-city-title" class="font-display text-base font-black text-[#0a0b0d]">Ghid de Weekend 23AI</h3>
-        </div>
-        <span class="text-[11px] font-bold text-[#5c3b06] bg-[#fce8bd] px-2.5 py-0.5 rounded-md border border-[#dfa649]/60 font-display">Info esențial de călătorie</span>
-      </div>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div class="space-y-1 border-b md:border-b-0 md:border-r border-[#ecd8b0] pb-3 md:pb-0 md:pr-4">
-          <div class="font-bold uppercase tracking-wider text-[#5c3b06] text-[11px] font-display flex items-center gap-1.5">
-            <span>☀️</span> <span>Vreme & Sezon optim</span>
-          </div>
-          <div id="guide-weather" class="font-medium text-[#334155] leading-relaxed font-body">
-            <!-- Rendered by JS -->
-          </div>
-        </div>
-        <div class="space-y-1 border-b md:border-b-0 md:border-r border-[#ecd8b0] pb-3 md:pb-0 md:pr-4">
-          <div class="font-bold uppercase tracking-wider text-[#5c3b06] text-[11px] font-display flex items-center gap-1.5">
-            <span>🚆</span> <span>Transfer Aeroport → Centru</span>
-          </div>
-          <div id="guide-transfer" class="font-medium text-[#334155] leading-relaxed font-body">
-            <!-- Rendered by JS -->
-          </div>
-        </div>
-        <div class="space-y-1">
-          <div class="font-bold uppercase tracking-wider text-[#5c3b06] text-[11px] font-display flex items-center gap-1.5">
-            <span>🎒</span> <span>Vibe & Ce faci în 48 de ore</span>
-          </div>
-          <div id="guide-vibe" class="font-medium text-[#334155] leading-relaxed font-body">
-            <!-- Rendered by JS -->
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Controls Bar Above Table -->
-    <div class="flex flex-wrap items-center justify-between gap-4">
+    <!-- 6. Dual View Mode & Booking Controls Bar -->
+    <div class="flex flex-wrap items-center justify-between gap-4 pt-2">
       <div class="flex flex-wrap items-center gap-3">
+        
         <!-- Switch 1pax / 2pax -->
         <div class="inline-flex rounded-xl bg-[#f4f5f8] border border-[#dce1e7] p-1 shadow-2xs font-display">
-          <button id="btn-1pax" onclick="setMode(1)" class="px-4 py-2 text-xs sm:text-sm font-bold rounded-lg bg-[#0a0b0d] text-[#dfa649] transition cursor-pointer shadow-xs">
+          <button id="btn-1pax" onclick="setMode(1)" class="px-3.5 py-1.5 text-xs sm:text-sm font-bold rounded-lg bg-[#0a0b0d] text-[#dfa649] transition cursor-pointer shadow-xs">
             Per persoană
           </button>
-          <button id="btn-2pax" onclick="setMode(2)" class="px-4 py-2 text-xs sm:text-sm font-bold rounded-lg text-[#475569] hover:text-[#0a0b0d] transition cursor-pointer">
+          <button id="btn-2pax" onclick="setMode(2)" class="px-3.5 py-1.5 text-xs sm:text-sm font-bold rounded-lg text-[#475569] hover:text-[#0a0b0d] transition cursor-pointer">
             Total grup (<span id="lbl-group-count">2</span> pers.)
           </button>
         </div>
 
         <!-- Link Mode Selector -->
         <div class="inline-flex items-center gap-2 text-xs sm:text-sm text-[#0a0b0d] font-bold">
-          <span class="hidden sm:inline">La click pe preț:</span>
-          <select id="link-mode" onchange="setLinkMode(this.value)" class="rounded-xl bg-[#fffdf8] border border-[#dce1e7] px-3 py-2 text-xs sm:text-sm font-bold text-[#0a0b0d] focus:outline-none focus:ring-2 focus:ring-[#dfa649] shadow-2xs font-display">
-            <option value="google" selected>Google Flights (Recomandat · Direct la companie)</option>
-            <option value="skyscanner">Skyscanner (Comparație completă)</option>
-            <option value="airline">Site-ul companiei (Wizz / Ryanair)</option>
-            <option value="kiwi">Kiwi.com (Căutare live)</option>
+          <span class="hidden sm:inline">La click:</span>
+          <select id="link-mode" onchange="setLinkMode(this.value)" class="rounded-xl bg-[#fffdf8] border border-[#dce1e7] px-3 py-1.5 text-xs sm:text-sm font-bold text-[#0a0b0d] focus:outline-none focus:ring-2 focus:ring-[#dfa649] shadow-2xs font-display">
+            <option value="google" selected>Google Flights (Direct)</option>
+            <option value="skyscanner">Skyscanner (Comparație)</option>
+            <option value="airline">Companie (Wizz / Ryanair)</option>
+            <option value="kiwi">Kiwi.com</option>
           </select>
         </div>
       </div>
-      <span id="unit-label" class="text-xs sm:text-sm text-[#475569] font-bold">
-        Preț în € per persoană, tur–retur (click pe orice căsuță pentru cumpărare)
-      </span>
+
+      <!-- Dual View Mode Switcher [ ⊞ Carduri Destinații ] vs [ ☷ Matrice Tabel ] -->
+      <div class="inline-flex rounded-xl bg-[#f4f5f8] border border-[#dce1e7] p-1 shadow-2xs font-display">
+        <button id="btn-view-cards" onclick="setViewMode('cards')" class="px-4 py-1.5 text-xs sm:text-sm font-black rounded-lg bg-[#0a0b0d] text-[#dfa649] transition cursor-pointer shadow-xs flex items-center gap-1.5">
+          <span>⊞</span>
+          <span>Carduri Destinații</span>
+        </button>
+        <button id="btn-view-table" onclick="setViewMode('table')" class="px-4 py-1.5 text-xs sm:text-sm font-bold rounded-lg text-[#475569] hover:text-[#0a0b0d] transition cursor-pointer flex items-center gap-1.5">
+          <span>☷</span>
+          <span>Matrice Tabel (52 wk)</span>
+        </button>
+      </div>
     </div>
 
-    
-    <!-- Cross-Search Engine Multi-Provider Comparison Bar -->
+    <!-- 7. Cross-Search Engine Multi-Provider Comparison Bar -->
     <div id="cross-engine-bar" class="card-23ai bg-[#f8f9fb] border border-[#e4e7eb] rounded-2xl px-4 py-3 flex flex-wrap items-center justify-between gap-3 text-xs">
       <div class="flex items-center gap-2 font-display text-[#0a0b0d]">
         <span class="font-black text-sm text-[#dfa649]">⚡</span>
-        <span class="font-bold">Verificare completă pe toate motoarele:</span>
-        <span class="text-[#64748b] hidden sm:inline">Niciun zbor pierdut · Verifică live pe Google Flights & Skyscanner:</span>
+        <span class="font-bold">Verificare completă zboruri:</span>
+        <span class="text-[#64748b] hidden sm:inline">Deschide instant pe motoarele partenere:</span>
       </div>
       <div id="cross-engine-links" class="flex flex-wrap items-center gap-2 font-display font-bold">
         <!-- Rendered by JS -->
       </div>
     </div>
 
-    <!-- Matrix Table Card with Fluid Responsive Columns -->
-    <div class="card-23ai rounded-3xl p-4 sm:p-6 overflow-x-auto custom-scrollbar border border-[#e4e7eb]">
+    <!-- 8. VIEW 1: Destination Cards Gallery (Visual cards with real city background photos) -->
+    <div id="results-cards-container" class="space-y-4">
+      <div id="cards-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+        <!-- Populated dynamically by JS -->
+      </div>
+    </div>
+
+    <!-- 9. VIEW 2: Matrix Table Card (Hidden in cards mode, visible in table mode) -->
+    <div id="main-matrix-table-container" class="hidden card-23ai rounded-3xl p-4 sm:p-6 overflow-x-auto custom-scrollbar border border-[#e4e7eb]">
+      <div class="flex items-center justify-between mb-3 text-xs text-[#64748b] font-bold">
+        <span id="unit-label">Preț în € per persoană, tur–retur (click pe orice căsuță pentru cumpărare)</span>
+      </div>
       <table id="main-matrix-table" class="w-full border-separate" style="border-spacing: 6px 8px; min-width: 780px;">
         <thead id="matrix-head">
           <!-- Rendered dynamically -->
@@ -689,7 +729,7 @@
       </div>
     </div>
 
-    <!-- Flight Schedules Cards -->
+    <!-- 10. Flight Schedules & Details Section -->
     <section id="section-schedules" class="pt-3">
       <h2 id="schedule-section-title" class="text-base sm:text-lg font-bold text-[#0a0b0d] mb-3 font-display">
         Orele zborurilor și linkuri directe la companiile aeriene
@@ -1099,6 +1139,203 @@
     let currentRows = [];
     let hasEverSearched = false;
     let selectedCityObj = null;
+
+    // View Mode & Vibe State (Option 4 Redesign)
+    let currentViewMode = "cards"; // "cards" | "table"
+    let currentVibeFilter = "all";
+    let isAdvancedFiltersOpen = false;
+
+    // Curated high-res Unsplash photo CDN map for European destinations
+    const CITY_PHOTOS = {
+      "milan": "https://images.unsplash.com/photo-1513581166391-887a96ddeafd?auto=format&fit=crop&w=1200&q=80",
+      "bgy": "https://images.unsplash.com/photo-1513581166391-887a96ddeafd?auto=format&fit=crop&w=1200&q=80",
+      "mil": "https://images.unsplash.com/photo-1513581166391-887a96ddeafd?auto=format&fit=crop&w=1200&q=80",
+      "bologna": "https://images.unsplash.com/photo-1596701062351-8c2c14d1fdd0?auto=format&fit=crop&w=1200&q=80",
+      "blq": "https://images.unsplash.com/photo-1596701062351-8c2c14d1fdd0?auto=format&fit=crop&w=1200&q=80",
+      "rome": "https://images.unsplash.com/photo-1552832230-c0197dd311b5?auto=format&fit=crop&w=1200&q=80",
+      "rom": "https://images.unsplash.com/photo-1552832230-c0197dd311b5?auto=format&fit=crop&w=1200&q=80",
+      "fco": "https://images.unsplash.com/photo-1552832230-c0197dd311b5?auto=format&fit=crop&w=1200&q=80",
+      "cia": "https://images.unsplash.com/photo-1552832230-c0197dd311b5?auto=format&fit=crop&w=1200&q=80",
+      "paris": "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=1200&q=80",
+      "par": "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=1200&q=80",
+      "bva": "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=1200&q=80",
+      "london": "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=1200&q=80",
+      "lon": "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=1200&q=80",
+      "stn": "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=1200&q=80",
+      "ltn": "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=1200&q=80",
+      "barcelona": "https://images.unsplash.com/photo-1539037116277-4db20889f2d4?auto=format&fit=crop&w=1200&q=80",
+      "bcn": "https://images.unsplash.com/photo-1539037116277-4db20889f2d4?auto=format&fit=crop&w=1200&q=80",
+      "venice": "https://images.unsplash.com/photo-1514890547357-a9ee288728e0?auto=format&fit=crop&w=1200&q=80",
+      "vce": "https://images.unsplash.com/photo-1514890547357-a9ee288728e0?auto=format&fit=crop&w=1200&q=80",
+      "tsf": "https://images.unsplash.com/photo-1514890547357-a9ee288728e0?auto=format&fit=crop&w=1200&q=80",
+      "vienna": "https://images.unsplash.com/photo-1516550893923-42d28e5677af?auto=format&fit=crop&w=1200&q=80",
+      "vie": "https://images.unsplash.com/photo-1516550893923-42d28e5677af?auto=format&fit=crop&w=1200&q=80",
+      "warsaw": "https://images.unsplash.com/photo-1519197924294-4ba991a11128?auto=format&fit=crop&w=1200&q=80",
+      "waw": "https://images.unsplash.com/photo-1519197924294-4ba991a11128?auto=format&fit=crop&w=1200&q=80",
+      "chisinau": "https://images.unsplash.com/photo-1549877452-9c387954fbc2?auto=format&fit=crop&w=1200&q=80",
+      "rmo": "https://images.unsplash.com/photo-1549877452-9c387954fbc2?auto=format&fit=crop&w=1200&q=80",
+      "kiv": "https://images.unsplash.com/photo-1549877452-9c387954fbc2?auto=format&fit=crop&w=1200&q=80",
+      "tallinn": "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80",
+      "tll": "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80",
+      "manchester": "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=1200&q=80",
+      "man": "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=1200&q=80",
+      "liverpool": "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=1200&q=80",
+      "lpl": "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=1200&q=80",
+      "nice": "https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&w=1200&q=80",
+      "nce": "https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&w=1200&q=80",
+      "brussels": "https://images.unsplash.com/photo-1577717903315-1691ae25ab3f?auto=format&fit=crop&w=1200&q=80",
+      "bru": "https://images.unsplash.com/photo-1577717903315-1691ae25ab3f?auto=format&fit=crop&w=1200&q=80",
+      "crl": "https://images.unsplash.com/photo-1577717903315-1691ae25ab3f?auto=format&fit=crop&w=1200&q=80",
+      "athens": "https://images.unsplash.com/photo-1555993539-1732b0258235?auto=format&fit=crop&w=1200&q=80",
+      "ath": "https://images.unsplash.com/photo-1555993539-1732b0258235?auto=format&fit=crop&w=1200&q=80",
+      "lisbon": "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=1200&q=80",
+      "lis": "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=1200&q=80",
+      "budapest": "https://images.unsplash.com/photo-1549877452-9c387954fbc2?auto=format&fit=crop&w=1200&q=80",
+      "bud": "https://images.unsplash.com/photo-1549877452-9c387954fbc2?auto=format&fit=crop&w=1200&q=80",
+      "prague": "https://images.unsplash.com/photo-1519671482749-fd09be7ccebf?auto=format&fit=crop&w=1200&q=80",
+      "prg": "https://images.unsplash.com/photo-1519671482749-fd09be7ccebf?auto=format&fit=crop&w=1200&q=80",
+      "berlin": "https://images.unsplash.com/photo-1560969184-10fe8719e047?auto=format&fit=crop&w=1200&q=80",
+      "ber": "https://images.unsplash.com/photo-1560969184-10fe8719e047?auto=format&fit=crop&w=1200&q=80",
+      "naples": "https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=1200&q=80",
+      "nap": "https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=1200&q=80",
+      "madrid": "https://images.unsplash.com/photo-1539037116277-4db20889f2d4?auto=format&fit=crop&w=1200&q=80",
+      "mad": "https://images.unsplash.com/photo-1539037116277-4db20889f2d4?auto=format&fit=crop&w=1200&q=80",
+      "default": "https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=1200&q=80"
+    };
+
+    function getCityPhoto(key) {
+      if (!key) return CITY_PHOTOS["default"];
+      const clean = String(key).toLowerCase().replace(/[^a-z0-9]/g, '');
+      for (const k in CITY_PHOTOS) {
+        if (clean.includes(k) || k.includes(clean)) {
+          return CITY_PHOTOS[k];
+        }
+      }
+      return CITY_PHOTOS["default"];
+    }
+
+    const CITY_VIBES = {
+      "bologna": ["food", "culture"],
+      "blq": ["food", "culture"],
+      "milan": ["shopping", "food"],
+      "bgy": ["shopping", "food"],
+      "mil": ["shopping", "food"],
+      "rome": ["culture", "food"],
+      "rom": ["culture", "food"],
+      "fco": ["culture", "food"],
+      "paris": ["culture", "shopping", "family"],
+      "par": ["culture", "shopping", "family"],
+      "bva": ["culture", "shopping", "family"],
+      "london": ["shopping", "culture", "family"],
+      "lon": ["shopping", "culture", "family"],
+      "barcelona": ["sea", "food", "culture"],
+      "bcn": ["sea", "food", "culture"],
+      "nice": ["sea", "food"],
+      "nce": ["sea", "food"],
+      "venice": ["culture"],
+      "vce": ["culture"],
+      "vienna": ["culture", "shopping", "family"],
+      "vie": ["culture", "shopping", "family"],
+      "warsaw": ["culture", "budget"],
+      "waw": ["culture", "budget"],
+      "chisinau": ["budget", "food"],
+      "rmo": ["budget", "food"],
+      "tallinn": ["culture"],
+      "tll": ["culture"],
+      "brussels": ["culture", "family"],
+      "bru": ["culture", "family"],
+      "crl": ["culture", "family"],
+      "naples": ["food", "sea", "culture"],
+      "nap": ["food", "sea", "culture"],
+      "athens": ["culture", "sea"],
+      "ath": ["culture", "sea"],
+      "lisbon": ["sea", "culture", "food"],
+      "lis": ["sea", "culture", "food"],
+      "budapest": ["culture", "budget"],
+      "bud": ["culture", "budget"],
+      "madrid": ["culture", "shopping", "food"],
+      "mad": ["culture", "shopping", "food"]
+    };
+
+    function getCityVibes(key) {
+      if (!key) return ["culture"];
+      const clean = String(key).toLowerCase().replace(/[^a-z0-9]/g, '');
+      for (const k in CITY_VIBES) {
+        if (clean.includes(k) || k.includes(clean)) {
+          return CITY_VIBES[k];
+        }
+      }
+      return ["culture"];
+    }
+
+    function isZeroConcediu(cell) {
+      if (!cell) return false;
+      if (cell.outTime) {
+        const depOut = cell.outTime.split("→")[0]?.trim();
+        if (depOut) {
+          const h = parseInt(depOut.split(":")[0], 10);
+          if (h < 17) return false;
+        }
+      }
+      return true;
+    }
+
+    function shareTripWhatsApp(cityName, dates, price, flightInfo, bookUrl) {
+      const text = `✈️ City Break în ${cityName}!\n📅 Weekend: ${dates}\n💰 De la ${price} € / pers tur–retur\n🛫 Zbor: ${flightInfo}\n🔗 Rezervă direct: ${bookUrl || 'https://23citybreak.ro/'}`;
+      const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+      window.open(url, '_blank');
+    }
+
+    function toggleAdvancedFilters() {
+      const panel = document.getElementById("advanced-filters-panel");
+      const btnText = document.getElementById("btn-toggle-advanced-text");
+      if (!panel) return;
+      isAdvancedFiltersOpen = !isAdvancedFiltersOpen;
+      if (isAdvancedFiltersOpen) {
+        panel.classList.remove("hidden");
+        if (btnText) btnText.textContent = "Filtre avansate (Orare & Bagaj) ▲";
+      } else {
+        panel.classList.add("hidden");
+        if (btnText) btnText.textContent = "Filtre avansate (Orare & Bagaj) ▼";
+      }
+    }
+
+    function setViewMode(mode) {
+      currentViewMode = mode;
+      const btnCards = document.getElementById("btn-view-cards");
+      const btnTable = document.getElementById("btn-view-table");
+      const cardsContainer = document.getElementById("results-cards-container");
+      const tableContainer = document.getElementById("main-matrix-table-container");
+
+      if (mode === "cards") {
+        if (btnCards) btnCards.className = "px-4 py-1.5 text-xs sm:text-sm font-black rounded-lg bg-[#0a0b0d] text-[#dfa649] transition cursor-pointer shadow-xs flex items-center gap-1.5";
+        if (btnTable) btnTable.className = "px-4 py-1.5 text-xs sm:text-sm font-bold rounded-lg text-[#475569] hover:text-[#0a0b0d] transition cursor-pointer flex items-center gap-1.5";
+        if (cardsContainer) cardsContainer.classList.remove("hidden");
+        if (tableContainer) tableContainer.classList.add("hidden");
+      } else {
+        if (btnTable) btnTable.className = "px-4 py-1.5 text-xs sm:text-sm font-black rounded-lg bg-[#0a0b0d] text-[#dfa649] transition cursor-pointer shadow-xs flex items-center gap-1.5";
+        if (btnCards) btnCards.className = "px-4 py-1.5 text-xs sm:text-sm font-bold rounded-lg text-[#475569] hover:text-[#0a0b0d] transition cursor-pointer flex items-center gap-1.5";
+        if (cardsContainer) cardsContainer.classList.add("hidden");
+        if (tableContainer) tableContainer.classList.remove("hidden");
+      }
+      renderMatrix();
+    }
+
+    function setVibeFilter(vibe) {
+      currentVibeFilter = vibe;
+      const vibes = ["all", "food", "shopping", "culture", "sea", "budget", "family"];
+      vibes.forEach(v => {
+        const el = document.getElementById(`vibe-btn-${v}`);
+        if (el) {
+          if (v === vibe) {
+            el.className = "vibe-pill-active px-3 py-1.5 rounded-xl border border-[#dfa649] font-bold transition cursor-pointer";
+          } else {
+            el.className = "bg-[#f5f6f8] text-[#475569] hover:bg-[#fce8bd] hover:border-[#dfa649] px-3 py-1.5 rounded-xl border border-[#dce1e7] font-bold transition cursor-pointer";
+          }
+        }
+      });
+      renderMatrix();
+    }
 
     function getTripDates(wk) {
       if (!wk) return { dateOut: "2026-11-13", dateIn: "2026-11-15" };
@@ -1667,6 +1904,11 @@
         vibe: `Explorare la pas în centrul istoric, gastronomie tradițională la terase locale și muzee de top în 48 de ore.`
       };
 
+      const photoUrl = getCityPhoto(key);
+      guideCard.style.backgroundImage = `linear-gradient(rgba(253, 250, 243, 0.94), rgba(253, 250, 243, 0.88)), url('${photoUrl}')`;
+      guideCard.style.backgroundSize = "cover";
+      guideCard.style.backgroundPosition = "center";
+
       document.getElementById("guide-city-title").textContent = `Ghid de Weekend 23AI · ${city.flag} ${city.name} (${city.iata})`;
       document.getElementById("guide-weather").textContent = insight.weather;
       document.getElementById("guide-transfer").textContent = insight.transfer;
@@ -1937,7 +2179,148 @@
       }
     }
 
-    // Render Matrix Table
+    // Render Destination Cards Grid (View 1)
+    function renderCardsView(filteredRows, activeWks, maxBudget) {
+      const cardsGrid = document.getElementById("cards-grid");
+      if (!cardsGrid) return;
+
+      if (!filteredRows || filteredRows.length === 0) {
+        cardsGrid.innerHTML = `
+          <div class="col-span-full text-center py-12 px-4 bg-[#fbf9f4] rounded-3xl border border-[#ecd8b0]">
+            <div class="text-3xl mb-2">🔍</div>
+            <div class="font-display font-black text-base text-[#0a0b0d]">Nu s-au găsit zboruri conform filtrelor alese.</div>
+            <div class="text-xs text-[#64748b] mt-1 font-body">Încearcă să selectezi o altă tematică de vibe sau să activezi modul permisiv (1 escală).</div>
+          </div>
+        `;
+        return;
+      }
+
+      let cardsHtml = "";
+      filteredRows.forEach(r => {
+        // Find best price cell for this city across active weekends
+        let bestCell = null;
+        let bestWk = null;
+        activeWks.forEach(wk => {
+          const c = r.cellsMap[wk.id];
+          if (c && c.perPaxEur <= maxBudget) {
+            if (!bestCell || c.perPaxEur < bestCell.perPaxEur) {
+              bestCell = c;
+              bestWk = wk;
+            }
+          }
+        });
+
+        if (!bestCell && activeWks.length > 0) {
+          // If no cell within budget, show lowest anyway with note
+          activeWks.forEach(wk => {
+            const c = r.cellsMap[wk.id];
+            if (c) {
+              if (!bestCell || c.perPaxEur < bestCell.perPaxEur) {
+                bestCell = c;
+                bestWk = wk;
+              }
+            }
+          });
+        }
+
+        const cityKey = (r.code || r.iata || r.city).toLowerCase();
+        const photoUrl = getCityPhoto(cityKey);
+        const vibes = getCityVibes(cityKey);
+        const p1 = bestCell ? Math.round(bestCell.perPaxEur) : "—";
+        const pTot = bestCell ? Math.round(bestCell.totalEur) : "—";
+        const priceDisplay = (currentMode === 1) ? `${p1} €` : `${pTot} €`;
+        const priceSub = (currentMode === 1) ? "per persoană" : "total grup";
+
+        const zeroConcediu = bestCell ? isZeroConcediu(bestCell) : false;
+        const zeroBadge = zeroConcediu ? `
+          <span class="inline-flex items-center gap-1 bg-emerald-500/90 text-white text-[10px] font-bold px-2 py-0.5 rounded-md shadow-xs">
+            <span>✨</span> 0 zile concediu
+          </span>
+        ` : '';
+
+        const vibeBadge = vibes[0] ? `
+          <span class="inline-flex items-center bg-black/60 text-[#dfa649] border border-[#dfa649]/40 text-[10px] font-bold px-2 py-0.5 rounded-md backdrop-blur-sm">
+            ${vibes[0] === 'food' ? '🍕 Foodie' : vibes[0] === 'shopping' ? '🛍️ Shopping' : vibes[0] === 'sea' ? '☀️ Plajă' : '🏛️ Cultură'}
+          </span>
+        ` : '';
+
+        const datesLabel = bestWk ? `${bestWk.label} (${getTripDates(bestWk).dateOut.slice(5)} → ${getTripDates(bestWk).dateIn.slice(5)})` : 'Selectează weekend';
+        const flightTimeOut = bestCell ? bestCell.outTime : "—";
+        const flightTimeIn = bestCell ? bestCell.inTime : "—";
+        const airline = bestCell ? bestCell.airlineLabel : (r.sub || "Zbor direct");
+        const bookUrl = bestCell ? getTargetUrl(bestCell) : "#";
+
+        cardsHtml += `
+          <div class="card-23ai city-card-bg rounded-3xl overflow-hidden flex flex-col justify-between border border-[#e4e7eb] shadow-sm relative group"
+               style="background-image: linear-gradient(180deg, rgba(10, 11, 13, 0.45) 0%, rgba(10, 11, 13, 0.88) 60%, rgba(10, 11, 13, 0.98) 100%), url('${photoUrl}'); min-height: 340px;">
+            
+            <!-- Top Card Header: Badges & IATA -->
+            <div class="p-4 flex items-start justify-between gap-2 z-10">
+              <div class="flex flex-wrap items-center gap-1.5">
+                ${zeroBadge}
+                ${vibeBadge}
+              </div>
+              <span class="glass-dark text-white font-mono text-xs font-black px-2 py-1 rounded-lg border border-white/20">
+                ${r.iata || r.code?.toUpperCase()}
+              </span>
+            </div>
+
+            <!-- Bottom Card Content: Price, Route, Schedule & Booking -->
+            <div class="p-5 z-10 space-y-3">
+              <div>
+                <h3 class="font-display text-xl sm:text-2xl font-black text-white tracking-tight flex items-center gap-1.5 drop-shadow-md">
+                  <span>${r.city}</span>
+                </h3>
+                <div class="text-xs text-[#cbd5e1] font-medium font-body flex items-center gap-1.5 mt-0.5">
+                  <span>📅</span> <span>${datesLabel}</span>
+                </div>
+              </div>
+
+              <!-- Flight schedule & airline -->
+              <div class="bg-black/50 border border-white/10 rounded-xl p-2.5 text-xs text-slate-200 space-y-1 backdrop-blur-sm font-body">
+                <div class="flex items-center justify-between">
+                  <span class="text-[#dfa649] font-bold">🛫 Tur:</span>
+                  <span>${flightTimeOut}</span>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span class="text-[#dfa649] font-bold">🛬 Retur:</span>
+                  <span>${flightTimeIn}</span>
+                </div>
+                <div class="text-[11px] text-slate-300 border-t border-white/10 pt-1 flex items-center justify-between">
+                  <span>${airline}</span>
+                  <span class="text-emerald-400 font-bold">Direct</span>
+                </div>
+              </div>
+
+              <!-- Price & CTA Buttons -->
+              <div class="pt-1 flex items-center justify-between gap-3">
+                <div>
+                  <div class="font-num text-2xl font-black text-[#dfa649] leading-none">${priceDisplay}</div>
+                  <div class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">${priceSub}</div>
+                </div>
+                <div class="flex items-center gap-1.5">
+                  <button onclick="shareTripWhatsApp('${r.city}', '${datesLabel}', '${p1}', '${flightTimeOut} / ${flightTimeIn}', '${bookUrl}')"
+                          title="Trimite pe WhatsApp"
+                          class="bg-emerald-600 hover:bg-emerald-500 text-white p-2.5 rounded-xl transition cursor-pointer shadow-xs font-display flex items-center justify-center">
+                    💬
+                  </button>
+                  <a href="${bookUrl}" target="_blank" rel="noopener noreferrer"
+                     class="bg-[#dfa649] hover:bg-[#c98f33] active:bg-[#b57f2a] text-[#0a0b0d] font-black text-xs px-3.5 py-2.5 rounded-xl transition shadow-xs font-display flex items-center gap-1">
+                    <span>Rezervă</span>
+                    <span>→</span>
+                  </a>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        `;
+      });
+
+      cardsGrid.innerHTML = cardsHtml;
+    }
+
+    // Render Matrix Table & Cards View
     function renderMatrix() {
       const thead = document.getElementById("matrix-head");
       const tbody = document.getElementById("matrix-body");
@@ -1979,6 +2362,21 @@
         });
       }
 
+      // Apply Vibe Filtering if active
+      if (currentVibeFilter !== "all") {
+        if (currentVibeFilter === "budget") {
+          filteredRows = filteredRows.filter(r => {
+            return Object.values(r.cellsMap).some(c => c && c.perPaxEur <= 100);
+          });
+        } else {
+          filteredRows = filteredRows.filter(r => {
+            const key = (r.code || r.iata || r.city).toLowerCase();
+            const vibes = getCityVibes(key);
+            return vibes.includes(currentVibeFilter);
+          });
+        }
+      }
+
       // Calculate cheapest flight across selected weekends for spotlight banner
       const spotlightBanner = document.getElementById("city-spotlight-banner");
       let globalBestCell = null;
@@ -2006,8 +2404,20 @@
           const sTitle = document.getElementById("spotlight-title");
           const sDetails = document.getElementById("spotlight-details");
           const sAction = document.getElementById("spotlight-action");
+          const sShare = document.getElementById("spotlight-share-container");
+          const sInner = document.getElementById("spotlight-card-inner");
+
+          const photoUrl = getCityPhoto(globalBestRow.code || globalBestRow.iata || globalBestRow.city);
+          if (sInner) {
+            sInner.style.backgroundImage = `linear-gradient(135deg, rgba(10, 11, 13, 0.94) 0%, rgba(10, 11, 13, 0.8) 55%, rgba(10, 11, 13, 0.65) 100%), url('${photoUrl}')`;
+            sInner.style.backgroundSize = "cover";
+            sInner.style.backgroundPosition = "center";
+          }
+
           if (sTitle) sTitle.textContent = `${globalBestRow.city} · ${currentMode === 1 ? p1 + ' € / pers.' : pTot + ' € total grup'} în weekendul ${globalBestWk.label}`;
           if (sDetails) sDetails.textContent = `Tur: ${globalBestCell.outRoute} (${globalBestCell.outTime}) | Retur: ${globalBestCell.inRoute} (${globalBestCell.inTime}) · ${globalBestCell.airlineLabel}`;
+          
+          const targetBookUrl = getTargetUrl(globalBestCell);
           if (sAction) {
             sAction.innerHTML = `
               <a href="${globalBestCell.googleFlightsUrl}" target="_blank" rel="noopener noreferrer"
@@ -2020,10 +2430,21 @@
               </a>
             `;
           }
+          if (sShare) {
+            sShare.innerHTML = `
+              <button onclick="shareTripWhatsApp('${globalBestRow.city}', '${globalBestWk.label}', '${p1}', '${globalBestCell.outTime} / ${globalBestCell.inTime}', '${targetBookUrl}')"
+                      class="bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs sm:text-sm px-4 py-2.5 rounded-xl transition shadow-xs font-display flex items-center gap-1.5 cursor-pointer">
+                <span>💬</span> Trimite pe WhatsApp
+              </button>
+            `;
+          }
         } else {
           spotlightBanner.classList.add("hidden");
         }
       }
+
+      // Keep Cards View updated synchronously
+      renderCardsView(filteredRows, activeWks, maxBudget);
 
       // Find per-weekend cheapest
       const minPerWk = {};
@@ -3075,11 +3496,11 @@
     }
 
     // Initialize Page
-    currentRows = [];
+    loadDefaultRows();
     hasEverSearched = false;
     renderWeekendSelectorUI();
     renderCrossEngineBar();
-    renderMatrix();
+    setViewMode("cards"); // Default to Cards View for clean, modern look
     // Default destination input text
     document.getElementById("dest-search-input").value = "🌟 Oricare (Toată Europa)";
 
