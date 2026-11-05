@@ -1214,20 +1214,20 @@
       const googleFlightsUrl = buildGoogleFlightsUrl(orig, dest, dateOut, dateIn, adults);
 
       // Skyscanner - Direct live price comparison
-      const skyscannerUrl = `https://www.skyscanner.ro/transport/dflights/${orig.toLowerCase()}/${dest.toLowerCase()}/${skyOut}/${skyIn}/?adultsv2=${adults}&cabinclass=economy&childrenv2=&inboundaltsenabled=false&outboundaltsenabled=false&preferdirects=true&ref=home`;
+      const skyscannerUrl = `https://www.skyscanner.ro/transport/flights/${orig.toLowerCase()}/${dest.toLowerCase()}/${skyOut}/${skyIn}/?adultsv2=${adults}&cabinclass=economy&childrenv2=&inboundaltsenabled=false&outboundaltsenabled=false&preferdirects=true&ref=home`;
 
       // Kayak
       const kayakUrl = `https://www.kayak.com/flights/${orig}-${dest}/${dateOut}/${dateIn}/${adults}adults`;
 
       // Kiwi live fresh search (never expires unlike token)
-      const kiwiSearchUrl = `https://www.kiwi.com/ro/search/results/${orig.toLowerCase()}/${dest.toLowerCase()}/${dateOut}/${dateIn}?passengers=${adults}`;
+      const kiwiSearchUrl = `https://www.kiwi.com/ro/search/results/${orig.toLowerCase()}/${dest.toLowerCase()}/${dateOut}/${dateIn}/?passengers=${adults}`;
 
       // Airline direct
       let airlineDirectUrl = googleFlightsUrl;
       if (carrier === "FR") {
         airlineDirectUrl = `https://www.ryanair.com/ro/ro/trip/flights/select?adults=${adults}&teens=0&children=0&infants=0&dateOut=${dateOut}&dateIn=${dateIn}&isConnectedFlight=false&discount=0&isReturn=true&originIata=${orig}&destinationIata=${dest}`;
       } else if (carrier === "W4" || carrier === "W6") {
-        airlineDirectUrl = `https://wizzair.com/ro-ro/zboruri/${orig.toLowerCase()}/${dest.toLowerCase()}`;
+        airlineDirectUrl = `https://wizzair.com/ro-ro#/booking/select-flight/${orig}/${dest}/${dateOut}/${dateIn}/${adults}/0/0/null`;
       } else if (carrier === "RO") {
         airlineDirectUrl = "https://www.tarom.ro/";
       } else if (carrier === "TK") {
@@ -1832,7 +1832,7 @@
       if (!cell) return "#";
       if (currentLinkMode === "skyscanner") return cell.skyscannerUrl || cell.googleFlightsUrl;
       if (currentLinkMode === "airline") return cell.airlineUrl || cell.googleFlightsUrl;
-      if (currentLinkMode === "kiwi") return cell.kiwiSearchUrl || cell.bookingUrl;
+      if (currentLinkMode === "kiwi") return cell.kiwiCheckoutUrl || cell.kiwiSearchUrl || cell.bookingUrl;
       return cell.googleFlightsUrl || cell.skyscannerUrl || cell.bookingUrl;
     }
 
@@ -1851,6 +1851,8 @@
       qbTitle.textContent = `✈️ ${row.city} · Weekend ${wk ? wk.label : ''} · ${Math.round(currentMode === 1 ? cell.perPaxEur : cell.totalEur)} €`;
       qbSub.textContent = `Tur: ${cell.outRoute} ${cell.outTime} | Retur: ${cell.inRoute} ${cell.inTime} · ${cell.airlineLabel}`;
 
+      const kiwiUrl = cell.kiwiCheckoutUrl || cell.kiwiSearchUrl || cell.bookingUrl;
+
       qbActions.innerHTML = `
         <a href="${cell.googleFlightsUrl}" target="_blank" rel="noopener noreferrer"
            class="bg-[#dfa649] hover:bg-[#c98f33] text-[#0a0b0d] text-xs font-black px-3.5 py-2 rounded-xl transition shadow-xs font-display flex items-center gap-1">
@@ -1864,7 +1866,7 @@
            class="bg-[#f4f5f8] hover:bg-[#eaeef3] text-[#0a0b0d] text-xs font-bold px-3 py-2 rounded-xl border border-[#dce1e7] transition font-display">
           Companie aeriană
         </a>
-        <a href="${cell.kiwiSearchUrl}" target="_blank" rel="noopener noreferrer"
+        <a href="${kiwiUrl}" target="_blank" rel="noopener noreferrer"
            class="bg-[#f4f5f8] hover:bg-[#eaeef3] text-[#0a0b0d] text-xs font-bold px-3 py-2 rounded-xl border border-[#dce1e7] transition font-display">
           Kiwi Live
         </a>
