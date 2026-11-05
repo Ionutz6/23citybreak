@@ -152,7 +152,9 @@
         </a>
         <div>
           <div class="flex items-center gap-2">
-            <a href="https://23citybreak.ro/" class="font-display text-2xl font-black tracking-tight text-white hover:text-[#dfa649] transition">23<span class="text-[#dfa649]">citybreak</span><span class="text-xs text-[#8a95a6] font-normal">.ro</span></a>
+            <a href="https://23citybreak.ro/" class="font-display text-2xl font-black tracking-tight transition group flex items-baseline hover:opacity-95" title="23citybreak.ro Acasă">
+              <span class="text-white">23</span><span class="text-[#dfa649] transition group-hover:brightness-110">city</span><span class="text-white">break</span><span class="text-xs text-[#dfa649]/80 font-bold ml-0.5">.ro</span>
+            </a>
             <span class="text-[11px] bg-[#1e222b] text-[#dfa649] font-bold px-2.5 py-0.5 rounded-md border border-[#373d4c] font-display">
               23AI Edition
             </span>
@@ -744,7 +746,7 @@
   <footer class="bg-[#0a0b0d] text-[#8a95a6] border-t border-[#232730] mt-12 py-6">
     <div class="max-w-[96rem] w-full mx-auto px-4 sm:px-6 lg:px-8 flex flex-wrap items-center justify-between gap-4 text-xs sm:text-sm font-medium">
       <div class="flex items-center gap-2">
-        <span class="font-bold text-white">23citybreak<span class="text-[#dfa649]">.ro</span></span>
+        <span class="font-bold text-white font-display text-sm sm:text-base"><span class="text-white">23</span><span class="text-[#dfa649]">city</span><span class="text-white">break</span><span class="text-[#dfa649]">.ro</span></span>
         <span>·</span>
         <span>Powered by <a href="https://23ai.ro" target="_blank" rel="noopener" class="text-[#dfa649] hover:underline font-semibold">23AI</a> Design System (2026 – 2027)</span>
       </div>
@@ -1365,6 +1367,122 @@
       return `${dd1}.${m1Short} → ${dd2}.${m2Short}`;
     }
 
+    const RO_CITY_NAMES = {
+      "rome": "Roma",
+      "roma": "Roma",
+      "milan": "Milano",
+      "milano": "Milano",
+      "brussels": "Bruxelles",
+      "bruxelles": "Bruxelles",
+      "warsaw": "Varșovia",
+      "venice": "Veneția",
+      "vienna": "Viena",
+      "prague": "Praga",
+      "copenhagen": "Copenhaga",
+      "london": "Londra",
+      "athens": "Atena",
+      "lisbon": "Lisabona",
+      "florence": "Florența",
+      "munich": "München",
+      "cologne": "Köln",
+      "seville": "Sevilla",
+      "thessaloniki": "Salonic",
+      "geneva": "Geneva",
+      "zurich": "Zürich",
+      "naples": "Napoli",
+      "turin": "Torino"
+    };
+
+    const AIRPORT_INFO = {
+      CIA: { cityRo: "Roma", airport: "Ciampino", group: "Roma" },
+      FCO: { cityRo: "Roma", airport: "Fiumicino", group: "Roma" },
+      BGY: { cityRo: "Milano", airport: "Bergamo", group: "Milano" },
+      MXP: { cityRo: "Milano", airport: "Malpensa", group: "Milano" },
+      LIN: { cityRo: "Milano", airport: "Linate", group: "Milano" },
+      CRL: { cityRo: "Bruxelles", airport: "Charleroi", group: "Bruxelles" },
+      BRU: { cityRo: "Bruxelles", airport: "Zaventem", group: "Bruxelles" },
+      BVA: { cityRo: "Paris", airport: "Beauvais", group: "Paris" },
+      CDG: { cityRo: "Paris", airport: "Charles de Gaulle", group: "Paris" },
+      ORY: { cityRo: "Paris", airport: "Orly", group: "Paris" },
+      LTN: { cityRo: "Londra", airport: "Luton", group: "Londra" },
+      STN: { cityRo: "Londra", airport: "Stansted", group: "Londra" },
+      LGW: { cityRo: "Londra", airport: "Gatwick", group: "Londra" },
+      LHR: { cityRo: "Londra", airport: "Heathrow", group: "Londra" },
+      WAW: { cityRo: "Varșovia", airport: "Chopin", group: "Varșovia" },
+      WMI: { cityRo: "Varșovia", airport: "Modlin", group: "Varșovia" },
+      TSF: { cityRo: "Veneția", airport: "Treviso", group: "Veneția" },
+      VCE: { cityRo: "Veneția", airport: "Marco Polo", group: "Veneția" },
+      BER: { cityRo: "Berlin", airport: "Brandenburg", group: "Berlin" },
+      BLQ: { cityRo: "Bologna", airport: "Guglielmo Marconi", group: "Bologna" },
+      RMO: { cityRo: "Chișinău", airport: "Internațional", group: "Chișinău" }
+    };
+
+    function resolveDestinationDisplay(iata, rawCityName) {
+      const code = (iata || "").toUpperCase();
+      const info = AIRPORT_INFO[code];
+      if (info) {
+        return {
+          city: info.cityRo,
+          airport: info.airport,
+          group: info.group,
+          fullTitle: `${info.cityRo} (${info.airport})`
+        };
+      }
+      const cleanRaw = (rawCityName || "").trim();
+      const roName = RO_CITY_NAMES[cleanRaw.toLowerCase()] || cleanRaw || code;
+      return {
+        city: roName,
+        airport: code,
+        group: roName,
+        fullTitle: roName
+      };
+    }
+
+    function sortRowsByCityGroup(rows) {
+      if (!rows || rows.length === 0) return [];
+
+      // 1. Calculate min price and assign cityGroup/airportName for each row
+      rows.forEach(r => {
+        const validCells = Object.values(r.cellsMap || {}).filter(Boolean);
+        r._minPrice = validCells.length > 0 ? Math.min(...validCells.map(c => c.perPaxEur)) : 9999;
+        
+        const iata = (r.iata || r.code || "").toUpperCase();
+        const disp = resolveDestinationDisplay(iata, r.city);
+        if (!r.cityGroup) r.cityGroup = disp.group;
+        if (!r.airportName && disp.airport !== iata) r.airportName = disp.airport;
+        if (!r.city || r.city.toLowerCase() === "rome" || r.city.toLowerCase() === "brussels") r.city = disp.city;
+      });
+
+      // 2. Compute minimum price for each cityGroup
+      const groupMinPrices = new Map();
+      rows.forEach(r => {
+        const grp = r.cityGroup || r.city;
+        const current = groupMinPrices.get(grp) || 9999;
+        if (r._minPrice < current) {
+          groupMinPrices.set(grp, r._minPrice);
+        }
+      });
+
+      // 3. Sort:
+      // Primary: City group's overall lowest price (best destination first)
+      // Secondary: Group name
+      // Tertiary: Airport's lowest price within the same city group (e.g. CIA 49€ before FCO 57€)
+      return [...rows].sort((a, b) => {
+        const grpA = a.cityGroup || a.city;
+        const grpB = b.cityGroup || b.city;
+        const groupMinA = groupMinPrices.get(grpA) || 9999;
+        const groupMinB = groupMinPrices.get(grpB) || 9999;
+
+        if (groupMinA !== groupMinB) {
+          return groupMinA - groupMinB;
+        }
+        if (grpA !== grpB) {
+          return grpA.localeCompare(grpB, 'ro');
+        }
+        return a._minPrice - b._minPrice;
+      });
+    }
+
     function getTripDates(wk) {
       if (!wk) return { dateOut: "2026-11-13", dateIn: "2026-11-15" };
       if (currentTripMode === "extended") {
@@ -1549,7 +1667,9 @@
     function loadDefaultRows() {
       currentRows = [
         {
-          city: "Milano Bergamo",
+          city: "Milano",
+          airportName: "Bergamo",
+          cityGroup: "Milano",
           sub: "BGY · Wizz Air",
           code: "bgy",
           iata: "BGY",
@@ -1558,7 +1678,9 @@
           cellsMap: enrichStaticRow(INITIAL_CELL_LINKS.bgy_wizz, "otp", "bgy", "City:milan_it")
         },
         {
-          city: "Milano (Toate aeroporturile)",
+          city: "Milano",
+          airportName: "Toate (BGY+MXP)",
+          cityGroup: "Milano",
           sub: "MIL (BGY + MXP) · Wizz & Ryanair",
           code: "mil",
           iata: "MIL",
@@ -1568,6 +1690,8 @@
         },
         {
           city: "Bologna",
+          airportName: "G. Marconi",
+          cityGroup: "Bologna",
           sub: "BLQ · Wizz Air",
           code: "blq",
           iata: "BLQ",
@@ -1577,6 +1701,8 @@
         },
         {
           city: "Chișinău",
+          airportName: "Internațional",
+          cityGroup: "Chișinău",
           sub: "RMO · Wizz Air",
           code: "rmo",
           iata: "RMO",
@@ -1586,6 +1712,8 @@
         },
         {
           city: "Varșovia",
+          airportName: "Chopin / Băneasa",
+          cityGroup: "Varșovia",
           sub: "WAW / BBU · Wizz Air",
           code: "waw",
           iata: "WAW",
@@ -1595,6 +1723,8 @@
         },
         {
           city: "Copenhaga",
+          airportName: "",
+          cityGroup: "Copenhaga",
           sub: "CPH · Wizz Air",
           code: "cph",
           iata: "CPH",
@@ -1604,6 +1734,8 @@
         },
         {
           city: "Bruxelles",
+          airportName: "Charleroi & BRU",
+          cityGroup: "Bruxelles",
           sub: "CRL / BRU · Ryanair & Tarom",
           code: "crl",
           iata: "BRU",
@@ -2297,8 +2429,9 @@
             <!-- Bottom Card Content: Price, Route, Schedule & Booking -->
             <div class="p-5 z-10 space-y-3">
               <div>
-                <h3 class="font-display text-xl sm:text-2xl font-black text-white tracking-tight flex items-center gap-1.5 drop-shadow-md">
+                <h3 class="font-display text-xl sm:text-2xl font-black text-white tracking-tight flex items-center gap-2 flex-wrap drop-shadow-md">
                   <span>${r.city}</span>
+                  ${r.airportName ? `<span class="text-xs font-bold text-[#dfa649] bg-black/60 px-2 py-0.5 rounded-md border border-[#dfa649]/40 backdrop-blur-sm">${r.airportName}</span>` : ''}
                 </h3>
                 <div class="text-xs text-[#cbd5e1] font-medium font-body flex items-center gap-1.5 mt-0.5">
                   <span>📅</span> <span>${datesLabel}</span>
@@ -2376,18 +2509,19 @@
       const destSelect = document.getElementById("f-destination");
       const destVal = destSelect?.value || "any";
 
-      let filteredRows = currentRows;
+      let filteredRows = sortRowsByCityGroup(currentRows);
       if (destVal !== "any" && selectedCityObj) {
-        filteredRows = currentRows.filter(r => {
+        filteredRows = filteredRows.filter(r => {
           const rCode = (r.code || "").toLowerCase();
           const rIata = (r.iata || "").toLowerCase();
           const rCity = (r.city || "").toLowerCase();
+          const rGroup = (r.cityGroup || "").toLowerCase();
           const targetIata = (selectedCityObj.iata || "").toLowerCase();
           const targetName = (selectedCityObj.name || "").toLowerCase();
 
           return (r.cityId === destVal) ||
                  (targetIata && (rCode === targetIata || rIata === targetIata)) ||
-                 (targetName && rCity.includes(targetName));
+                 (targetName && (rCity.includes(targetName) || rGroup.includes(targetName)));
         });
       }
 
@@ -2567,8 +2701,12 @@
 
         const tdLabel = document.createElement("td");
         tdLabel.className = "py-2.5 px-3 align-middle min-w-[210px] sm:min-w-[250px]";
+        const airportBadge = r.airportName ? `<span class="text-[10px] font-bold text-[#8a5d14] bg-[#fdf3dc] border border-[#dfa649]/40 px-1.5 py-0.5 rounded-md">${r.airportName} (${r.iata})</span>` : '';
         tdLabel.innerHTML = `
-          <div class="font-bold text-sm sm:text-base text-[#0a0b0d] leading-snug font-display">${r.city}</div>
+          <div class="font-bold text-sm sm:text-base text-[#0a0b0d] leading-snug font-display flex items-center gap-1.5 flex-wrap">
+            <span>${r.city}</span>
+            ${airportBadge}
+          </div>
           <div class="text-xs text-[#64748b] font-semibold mt-0.5 leading-tight font-body">${r.sub}</div>
         `;
         tr.appendChild(tdLabel);
@@ -2625,6 +2763,59 @@
       renderSchedules();
     }
 
+    function renderScheduleCardHtml(r, wk, c) {
+      const tripDates = getTripDates(wk);
+      const datesLabel = formatTripSpan(tripDates.dateOut, tripDates.dateIn);
+      const airportBadge = r.airportName ? `<span class="text-[10px] font-bold text-[#8a5d14] bg-[#fdf3dc] border border-[#dfa649]/40 px-1.5 py-0.5 rounded">${r.airportName} (${r.iata})</span>` : `<span class="text-[10px] font-bold text-[#422904] bg-[#fce8bd] px-1.5 py-0.5 rounded font-mono">${r.iata}</span>`;
+      const p1 = Math.round(c.perPaxEur);
+      const bookUrl = c.googleFlightsUrl || c.skyscannerUrl || c.bookingUrl;
+
+      return `
+        <div class="card-23ai rounded-2xl p-4 shadow-2xs hover:border-[#dfa649] transition flex flex-col justify-between border border-[#e4e7eb] bg-white">
+          <div>
+            <div class="flex items-center justify-between border-b border-[#eef0f3] pb-2 mb-2.5">
+              <div class="flex items-center gap-1.5 flex-wrap">
+                <span class="font-bold text-sm text-[#0a0b0d] font-display">${r.city}</span>
+                ${airportBadge}
+              </div>
+              <span class="text-[11px] font-bold text-[#475569] bg-[#f1f4f8] px-2 py-0.5 rounded-md">${c.airlineLabel}</span>
+            </div>
+            
+            <div class="text-[11px] font-semibold text-[#8a5d14] mb-2 flex items-center justify-between">
+              <span class="flex items-center gap-1"><span>📅</span> ${datesLabel}</span>
+              <span class="text-[10px] font-bold bg-[#fce8bd] text-[#5c3b06] px-1.5 py-0.2 rounded">${wk.label}</span>
+            </div>
+
+            <div class="space-y-1.5 text-xs text-[#334155] bg-[#fafbfc] p-2.5 rounded-xl border border-[#edf0f3]">
+              <div class="flex justify-between font-medium">
+                <span class="text-[#0a0b0d] font-bold">🛫 Tur:</span>
+                <span class="font-mono font-bold text-[#0a0b0d]">${c.outRoute} (${c.outTime})</span>
+              </div>
+              <div class="flex justify-between font-medium">
+                <span class="text-[#0a0b0d] font-bold">🛬 Retur:</span>
+                <span class="font-mono font-bold text-[#0a0b0d]">${c.inRoute} (${c.inTime})</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="pt-3 mt-3 border-t border-[#eef0f3] flex items-center justify-between">
+            <span class="text-sm font-black text-[#0a0b0d]">${p1} € <span class="font-normal text-[11px] text-[#64748b]">/ pers.</span></span>
+            <div class="flex items-center gap-2">
+              <a href="${bookUrl}" target="_blank" rel="noopener noreferrer"
+                 class="text-xs font-bold text-[#0a0b0d] hover:text-[#dfa649] font-display flex items-center gap-1 bg-[#fff8eb] border border-[#dfa649]/60 px-2.5 py-1 rounded-lg transition hover:bg-[#dfa649] hover:text-black shadow-2xs">
+                Google Flights ↗
+              </a>
+              ${c.skyscannerUrl ? `
+              <a href="${c.skyscannerUrl}" target="_blank" rel="noopener noreferrer" title="Verifică pe Skyscanner"
+                 class="text-xs font-bold text-[#475569] hover:text-[#0a0b0d] font-display px-2 py-1 rounded-lg bg-[#f1f4f8] hover:bg-[#e2e8f0] transition">
+                Sky ↗
+              </a>` : ''}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
     function renderSchedules() {
       const section = document.getElementById("section-schedules");
       const container = document.getElementById("schedule-cards");
@@ -2633,172 +2824,82 @@
 
       const destSelect = document.getElementById("f-destination");
       const destVal = destSelect?.value || "any";
+      const activeWks = getSelectedWeekendsList();
 
-      // If specific destination is selected (e.g. Liverpool): DO NOT show Milano / Bergamo / Warsaw!
-      if (destVal !== "any" && selectedCityObj && !selectedCityObj.isAll) {
-        const cityName = selectedCityObj.name;
-        const iata = selectedCityObj.iata || "";
-
-        const cityRow = currentRows.find(r => r.cityId === destVal || (iata && (r.iata === iata || r.code === iata.toLowerCase())));
-
-        if (cityRow && cityRow.cellsMap) {
-          const cells = Object.values(cityRow.cellsMap).filter(Boolean);
-          if (cells.length > 0) {
-            if (title) title.textContent = `Orele zborurilor și opțiuni de zbor către ${cityName} (${iata})`;
-            const uniqueFlights = [];
-            const seen = new Set();
-            cells.forEach(c => {
-              const sig = `${c.outRoute}_${c.outTime}_${c.inTime}_${c.airlineLabel}`;
-              if (!seen.has(sig)) {
-                seen.add(sig);
-                uniqueFlights.push(c);
-              }
-            });
-
-            container.innerHTML = uniqueFlights.slice(0, 4).map(c => `
-              <div class="card-23ai rounded-2xl p-4 shadow-2xs hover:border-[#dfa649] transition flex flex-col justify-between">
-                <div>
-                  <div class="flex items-center justify-between border-b border-[#eef0f3] pb-2 mb-2.5">
-                    <div>
-                      <span class="font-bold text-sm text-[#0a0b0d] font-display">${cityName}</span>
-                      <span class="ml-1 text-xs font-bold text-[#422904] bg-[#fce8bd] px-2 py-0.5 rounded-md font-mono">${iata}</span>
-                    </div>
-                    <span class="text-[11px] font-bold text-[#64748b]">${c.airlineLabel}</span>
-                  </div>
-                  <div class="space-y-1.5 text-xs text-[#334155]">
-                    <div class="flex justify-between font-medium">
-                      <span class="text-[#0a0b0d] font-bold">Tur:</span>
-                      <span class="font-mono font-bold text-[#0a0b0d]">${c.outRoute} (${c.outTime})</span>
-                    </div>
-                    <div class="flex justify-between font-medium">
-                      <span class="text-[#0a0b0d] font-bold">Retur:</span>
-                      <span class="font-mono font-bold text-[#0a0b0d]">${c.inRoute} (${c.inTime})</span>
-                    </div>
-                  </div>
-                </div>
-                <div class="pt-3 mt-2 border-t border-[#eef0f3] flex items-center justify-between">
-                  <span class="text-xs font-black text-[#0a0b0d]">${Math.round(c.perPaxEur)} € <span class="font-normal text-[11px] text-[#64748b]">/ pers.</span></span>
-                  <a href="${c.googleFlightsUrl}" target="_blank" rel="noopener noreferrer"
-                     class="text-xs font-bold text-[#0a0b0d] hover:text-[#dfa649] font-display flex items-center gap-1">
-                    Google Flights ↗
-                  </a>
-                </div>
-              </div>
-            `).join("");
-            if (section) section.classList.remove("hidden");
-            return;
-          }
-        }
-
-        // When Liverpool or any city is selected but no specific search flights are present yet, hide this section completely
+      if (!currentRows || currentRows.length === 0) {
         if (section) section.classList.add("hidden");
         return;
       }
 
-      // Default: "Toată Europa" (any) selected
       if (section) section.classList.remove("hidden");
-      if (title) title.textContent = "Orele zborurilor și linkuri directe la companiile aeriene";
 
-      const originSelect = document.getElementById("f-origin");
-      const origIata = originSelect?.selectedOptions?.[0]?.dataset?.iata || "OTP";
-      const sampleWk = ALL_WEEKENDS[0];
+      // 1. If a specific destination is selected (e.g. Rome, Bologna, Liverpool)
+      if (destVal !== "any" && selectedCityObj && !selectedCityObj.isAll) {
+        const cityName = selectedCityObj.name;
+        const iata = (selectedCityObj.iata || "").toLowerCase();
+        const cityRows = currentRows.filter(r => 
+          r.cityId === destVal || 
+          (iata && (r.iata?.toLowerCase() === iata || r.code?.toLowerCase() === iata)) || 
+          (r.city && r.city.toLowerCase().includes(cityName.toLowerCase())) ||
+          (r.cityGroup && r.cityGroup.toLowerCase().includes(cityName.toLowerCase()))
+        );
 
-      const sched = [
-        {
-          city: "Milano Bergamo",
-          iata: "BGY",
-          airline: "Wizz Air & Ryanair",
-          out: "19:30 → 21:00 (sau 23:35 → 00:55)",
-          in: "21:45 → 01:00 luni",
-          url: buildGoogleFlightsUrl(origIata, "BGY", sampleWk.fri, sampleWk.sun, 2)
-        },
-        {
-          city: "Bologna",
-          iata: "BLQ",
-          airline: "Wizz Air",
-          out: "18:55 → 20:15",
-          in: "20:50 → 23:55",
-          url: buildGoogleFlightsUrl(origIata, "BLQ", sampleWk.fri, sampleWk.sun, 2)
-        },
-        {
-          city: "Varșovia",
-          iata: "WAW",
-          airline: "Wizz Air",
-          out: "21:50 → 22:40",
-          in: "18:20 → 21:15",
-          url: buildGoogleFlightsUrl(origIata, "WAW", sampleWk.fri, sampleWk.sun, 2)
-        },
-        {
-          city: "Manchester",
-          iata: "MAN",
-          airline: "Ryanair",
-          out: "Vineri direct / conexiune",
-          in: "Duminică seară",
-          url: buildGoogleFlightsUrl(origIata, "MAN", sampleWk.fri, sampleWk.sun, 2)
-        },
-        {
-          city: "Tallinn",
-          iata: "TLL",
-          airline: "Wizz Air & Ryanair",
-          out: "Vineri cu escală scurtă",
-          in: "Duminică noapte",
-          url: buildGoogleFlightsUrl(origIata, "TLL", sampleWk.fri, sampleWk.sun, 2)
-        },
-        {
-          city: "Roma Fiumicino",
-          iata: "FCO",
-          airline: "Wizz Air / Ryanair",
-          out: "19:00 → 20:15",
-          in: "21:30 → 00:45 luni",
-          url: buildGoogleFlightsUrl(origIata, "FCO", sampleWk.fri, sampleWk.sun, 2)
-        },
-        {
-          city: "Veneția Treviso",
-          iata: "TSF",
-          airline: "Wizz Air",
-          out: "19:10 → 20:20",
-          in: "20:55 → 23:50",
-          url: buildGoogleFlightsUrl(origIata, "TSF", sampleWk.fri, sampleWk.sun, 2)
-        },
-        {
-          city: "Paris Beauvais",
-          iata: "BVA",
-          airline: "Wizz Air / Ryanair",
-          out: "18:45 → 20:55",
-          in: "21:30 → 01:15 luni",
-          url: buildGoogleFlightsUrl(origIata, "BVA", sampleWk.fri, sampleWk.sun, 2)
+        const scheduleCards = [];
+        cityRows.forEach(row => {
+          activeWks.forEach(wk => {
+            const c = row.cellsMap[wk.id];
+            if (c) {
+              scheduleCards.push({
+                row: row,
+                wk: wk,
+                cell: c
+              });
+            }
+          });
+        });
+
+        if (scheduleCards.length > 0) {
+          if (title) title.textContent = `Orele zborurilor și opțiuni de zbor către ${cityName}`;
+          scheduleCards.sort((a, b) => a.cell.perPaxEur - b.cell.perPaxEur);
+          container.innerHTML = scheduleCards.slice(0, 8).map(item => renderScheduleCardHtml(item.row, item.wk, item.cell)).join("");
+          return;
         }
-      ];
 
-      container.innerHTML = sched.map(s => `
-        <div class="card-23ai rounded-2xl p-4 shadow-2xs hover:border-[#dfa649] transition flex flex-col justify-between">
-          <div>
-            <div class="flex items-center justify-between border-b border-[#eef0f3] pb-2 mb-2.5">
-              <div>
-                <span class="font-bold text-sm text-[#0a0b0d] font-display">${s.city}</span>
-                <span class="ml-1 text-xs font-bold text-[#422904] bg-[#fce8bd] px-2 py-0.5 rounded-md font-mono">${s.iata}</span>
-              </div>
-              <span class="text-[11px] font-bold text-[#64748b]">${s.airline}</span>
-            </div>
-            <div class="space-y-1 text-xs text-[#334155]">
-              <div class="flex justify-between font-medium">
-                <span class="text-[#0a0b0d] font-bold">Tur vineri:</span>
-                <span class="font-mono font-bold text-[#0a0b0d]">${s.out}</span>
-              </div>
-              <div class="flex justify-between font-medium">
-                <span class="text-[#0a0b0d] font-bold">Retur duminică:</span>
-                <span class="font-mono font-bold text-[#0a0b0d]">${s.in}</span>
-              </div>
-            </div>
-          </div>
-          <div class="pt-3 mt-2 border-t border-[#eef0f3] flex justify-end">
-            <a href="${s.url}" target="_blank" rel="noopener noreferrer"
-               class="text-xs font-bold text-[#0a0b0d] hover:text-[#dfa649] font-display flex items-center gap-1">
-              Google Flights ↗
-            </a>
-          </div>
-        </div>
-      `).join("");
+        if (section) section.classList.add("hidden");
+        return;
+      }
+
+      // 2. Default: "Toată Europa" (any) - Render real flights from search results / currentRows
+      if (title) title.textContent = "Orele zborurilor și linkuri directe pentru cele mai bune oferte găsite";
+
+      const rowsToShow = sortRowsByCityGroup(currentRows).slice(0, 8);
+      let cardsHtml = "";
+
+      rowsToShow.forEach(r => {
+        let bestCell = null;
+        let bestWk = null;
+
+        activeWks.forEach(wk => {
+          const c = r.cellsMap[wk.id];
+          if (c) {
+            if (!bestCell || c.perPaxEur < bestCell.perPaxEur) {
+              bestCell = c;
+              bestWk = wk;
+            }
+          }
+        });
+
+        if (bestCell && bestWk) {
+          cardsHtml += renderScheduleCardHtml(r, bestWk, bestCell);
+        }
+      });
+
+      if (!cardsHtml) {
+        if (section) section.classList.add("hidden");
+        return;
+      }
+
+      container.innerHTML = cardsHtml;
     }
 
     function setMode(m) {
@@ -3121,8 +3222,11 @@
         });
 
         const targetIata = selectedCityObj?.iata || allFound[0].outRoute.split("→")[1].trim();
+        const disp = resolveDestinationDisplay(targetIata, cityName);
         const newRow = {
-          city: cityName,
+          city: disp.city,
+          airportName: disp.airport,
+          cityGroup: disp.group,
           sub: `${targetIata} · ${allFound[0].airlineLabel}`,
           code: targetIata.toLowerCase(),
           iata: targetIata,
@@ -3313,8 +3417,11 @@
             if (totalFound > 0) fallbackUsed = true;
           }
 
+          const disp = resolveDestinationDisplay(targetCode, targetCityTitle);
           const newRow = {
-            city: targetCityTitle,
+            city: disp.city,
+            airportName: disp.airport,
+            cityGroup: disp.group,
             sub: `${targetCode.toUpperCase()} · ${targetAirline}${fallbackUsed ? " (1 escală)" : ""}`,
             code: targetCode,
             iata: targetCode.toUpperCase(),
@@ -3484,8 +3591,11 @@
 
               const key = outDest.toLowerCase();
               if (!cityRowsMap.has(key)) {
+                const disp = resolveDestinationDisplay(outDest, destCity?.name);
                 cityRowsMap.set(key, {
-                  city: destCity?.name || outDest,
+                  city: disp.city,
+                  airportName: disp.airport,
+                  cityGroup: disp.group,
                   sub: `${outDest} · ${airlineLabel}`,
                   code: key,
                   iata: outDest,
@@ -3505,11 +3615,7 @@
           }
         }
 
-        currentRows = [...cityRowsMap.values()].sort((a, b) => {
-          const minA = Math.min(...Object.values(a.cellsMap).map(c => c.perPaxEur));
-          const minB = Math.min(...Object.values(b.cellsMap).map(c => c.perPaxEur));
-          return minA - minB;
-        });
+        currentRows = sortRowsByCityGroup([...cityRowsMap.values()]);
 
         if (totalFound > 0) {
           updateSearchStatus(`✅ Căutare finalizată! S-au găsit zboruri în ${currentRows.length} orașe din Europa.`, 100, "success");
