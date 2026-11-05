@@ -1337,6 +1337,34 @@
       renderMatrix();
     }
 
+    function formatTripSpan(dateOut, dateIn, mode = "short") {
+      if (!dateOut || !dateIn) return "";
+      const parts1 = dateOut.split("-");
+      const parts2 = dateIn.split("-");
+      const d1 = parseInt(parts1[2], 10);
+      const m1 = parseInt(parts1[1], 10);
+      const d2 = parseInt(parts2[2], 10);
+      const m2 = parseInt(parts2[1], 10);
+      
+      const monthsShort = ["ian", "feb", "mar", "apr", "mai", "iun", "iul", "aug", "sep", "oct", "noi", "dec"];
+      const monthsFull = ["Ianuarie", "Februarie", "Martie", "Aprilie", "Mai", "Iunie", "Iulie", "August", "Septembrie", "Octombrie", "Noiembrie", "Decembrie"];
+
+      const dd1 = String(d1).padStart(2, '0');
+      const dd2 = String(d2).padStart(2, '0');
+      const m1Short = monthsShort[m1 - 1];
+      const m2Short = monthsShort[m2 - 1];
+
+      if (mode === "card") {
+        if (m1 === m2) {
+          return `${d1}–${d2} ${monthsFull[m1 - 1]}`;
+        }
+        return `${d1} ${m1Short} → ${d2} ${m2Short}`;
+      }
+
+      // Format dd.MMM (e.g. 13.noi → 15.noi)
+      return `${dd1}.${m1Short} → ${dd2}.${m2Short}`;
+    }
+
     function getTripDates(wk) {
       if (!wk) return { dateOut: "2026-11-13", dateIn: "2026-11-15" };
       if (currentTripMode === "extended") {
@@ -1975,7 +2003,7 @@
                   class="flex items-center justify-between p-2.5 rounded-xl text-xs transition cursor-pointer border text-left font-display shadow-2xs ${isSel ? 'bg-[#0a0b0d] text-[#dfa649] border-[#0a0b0d] font-bold shadow-xs' : 'bg-[#f8f9fa] text-[#0a0b0d] border-[#dce1e7] hover:bg-[#fce8bd] hover:border-[#dfa649]'}">
             <div>
               <div class="leading-tight font-bold">${w.dLabel} ${w.mLabel} ${tagBadge}</div>
-              <div class="text-[10px] opacity-75 mt-0.5 font-normal">${tripDates.dateOut.slice(5)} → ${tripDates.dateIn.slice(5)}</div>
+              <div class="text-[10px] opacity-75 mt-0.5 font-normal whitespace-nowrap">${formatTripSpan(tripDates.dateOut, tripDates.dateIn)}</div>
             </div>
             <span class="text-sm ml-1 font-bold">${isSel ? '✓' : '+'}</span>
           </button>
@@ -2244,7 +2272,8 @@
           </span>
         ` : '';
 
-        const datesLabel = bestWk ? `${bestWk.label} (${getTripDates(bestWk).dateOut.slice(5)} → ${getTripDates(bestWk).dateIn.slice(5)})` : 'Selectează weekend';
+        const tripD = bestWk ? getTripDates(bestWk) : null;
+        const datesLabel = tripD ? formatTripSpan(tripD.dateOut, tripD.dateIn, "card") : 'Selectează weekend';
         const flightTimeOut = bestCell ? bestCell.outTime : "—";
         const flightTimeIn = bestCell ? bestCell.inTime : "—";
         const airline = bestCell ? bestCell.airlineLabel : (r.sub || "Zbor direct");
@@ -2473,7 +2502,7 @@
         headHtml += `
           <th class="text-center py-2.5 px-2 rounded-xl text-xs sm:text-sm font-bold text-[#0a0b0d] min-w-[95px] sm:min-w-[115px] bg-[#f8f9fb] border border-[#e4e7eb] font-display">
             <div>${wk.dLabel}</div>
-            <div class="text-[#64748b] font-normal text-[10px] font-body">${tripDates.dateOut.slice(5)} → ${tripDates.dateIn.slice(5)}</div>
+            <div class="text-[#64748b] font-medium text-[10px] sm:text-[11px] font-body mt-0.5 whitespace-nowrap">${formatTripSpan(tripDates.dateOut, tripDates.dateIn)}</div>
             ${tagBadge}
           </th>
         `;

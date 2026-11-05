@@ -787,6 +787,24 @@
       return ALL_WEEKENDS.filter(w => selectedWkIds.has(w.id));
     }
 
+    function formatTripSpan(dateOut, dateIn) {
+      if (!dateOut || !dateIn) return "";
+      const parts1 = dateOut.split("-");
+      const parts2 = dateIn.split("-");
+      const d1 = parseInt(parts1[2], 10);
+      const m1 = parseInt(parts1[1], 10);
+      const d2 = parseInt(parts2[2], 10);
+      const m2 = parseInt(parts2[1], 10);
+      
+      const monthsShort = ["ian", "feb", "mar", "apr", "mai", "iun", "iul", "aug", "sep", "oct", "noi", "dec"];
+      const dd1 = String(d1).padStart(2, '0');
+      const dd2 = String(d2).padStart(2, '0');
+      const m1Short = monthsShort[m1 - 1];
+      const m2Short = monthsShort[m2 - 1];
+
+      return `${dd1}.${m1Short} → ${dd2}.${m2Short}`;
+    }
+
     function renderWeekendSelectorUI() {
       // 1. Render Month Tabs
       const monthsMap = new Map();
@@ -829,7 +847,7 @@
                   class="flex items-center justify-between p-2.5 rounded-xl text-xs transition cursor-pointer border text-left font-display shadow-2xs ${isSel ? 'bg-[#0a0b0d] text-[#dfa649] border-[#0a0b0d] font-bold shadow-xs' : 'bg-[#f8f9fa] text-[#0a0b0d] border-[#dce1e7] hover:bg-[#fce8bd] hover:border-[#dfa649]'}">
             <div>
               <div class="leading-tight font-bold">${w.dLabel} ${w.mLabel} ${tagBadge}</div>
-              <div class="text-[10px] opacity-75 mt-0.5 font-normal">${w.fri.slice(5)} → ${w.sun.slice(5)}</div>
+              <div class="text-[10px] opacity-75 mt-0.5 font-normal whitespace-nowrap">${formatTripSpan(w.fri, w.sun)}</div>
             </div>
             <span class="text-sm ml-1 font-bold">${isSel ? '✓' : '+'}</span>
           </button>
