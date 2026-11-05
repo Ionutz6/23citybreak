@@ -677,10 +677,24 @@
 
     <!-- 9. VIEW 2: Matrix Table Card (Hidden in cards mode, visible in table mode) -->
     <div id="main-matrix-table-container" class="hidden card-23ai rounded-3xl p-4 sm:p-6 overflow-x-auto custom-scrollbar border border-[#e4e7eb]">
+      
+      <!-- Quick-Buy Helper Bar (integrated exclusively in Matrix view above table) -->
+      <div id="quick-buy-bar" class="mb-4 p-4 rounded-2xl bg-[#fbf9f4] border border-[#ecd8b0] flex flex-wrap items-center justify-between gap-3 shadow-2xs">
+        <div class="space-y-0.5">
+          <div id="qb-title" class="text-xs sm:text-sm font-black text-[#0a0b0d] font-display flex items-center gap-1.5">
+            <span>💡</span> <span>Apasă pe o căsuță din tabel pentru a cumpăra biletele direct!</span>
+          </div>
+          <div id="qb-sub" class="text-[11px] sm:text-xs text-[#64748b] font-medium font-body">
+            Fiecare căsuță de preț din tabel are link direct de cumpărare în spate. Mută cursorul pe un preț pentru orar și opțiuni de rezervare.
+          </div>
+        </div>
+        <div id="qb-actions" class="flex flex-wrap items-center gap-2"></div>
+      </div>
+
       <div class="flex items-center justify-between mb-3 text-xs text-[#64748b] font-bold">
         <span id="unit-label">Preț în € per persoană, tur–retur (click pe orice căsuță pentru cumpărare)</span>
       </div>
-      <table id="main-matrix-table" class="w-full border-separate" style="border-spacing: 6px 8px; min-width: 780px;">
+      <table id="main-matrix-table" class="w-full border-separate" style="border-spacing: 6px 8px; min-width: 780px;" onmouseleave="resetQuickBuyBar()">
         <thead id="matrix-head">
           <!-- Rendered dynamically -->
         </thead>
@@ -688,19 +702,6 @@
           <!-- Rendered dynamically -->
         </tbody>
       </table>
-    </div>
-
-    <!-- Selected Flight Quick-Buy Bar -->
-    <div id="quick-buy-bar" class="card-23ai rounded-3xl p-4 sm:p-5 flex flex-wrap items-center justify-between gap-4 border border-[#e4e7eb]">
-      <div class="space-y-1">
-        <div id="qb-title" class="text-sm sm:text-base font-bold text-[#0a0b0d] font-display">
-          💡 Fiecare căsuță de preț din tabel are link direct de cumpărare în spate!
-        </div>
-        <div id="qb-sub" class="text-xs sm:text-sm text-[#475569] font-medium">
-          Dă click pe orice preț pentru a deschide direct rezervarea de zbor la compania aeriană.
-        </div>
-      </div>
-      <div id="qb-actions" class="flex flex-wrap items-center gap-2"></div>
     </div>
 
     <!-- Color Legend -->
@@ -740,6 +741,77 @@
         <!-- Rendered dynamically by JS -->
       </div>
     </section>
+
+    <!-- 11. Interactive Destination & Weather Modal (Accessible from cards or matrix table) -->
+    <div id="city-guide-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-3 sm:p-6 bg-black/75 backdrop-blur-sm" onclick="if(event.target === this) closeCityGuideModal()">
+      <div class="relative w-full max-w-2xl bg-white rounded-3xl overflow-hidden shadow-2xl border border-[#ecd8b0] flex flex-col max-h-[92vh] animate-fade-in font-display">
+        
+        <!-- Modal Header Banner with City Photo -->
+        <div id="modal-guide-banner" class="relative h-44 sm:h-52 bg-cover bg-center p-5 flex flex-col justify-between text-white" style="background-image: linear-gradient(180deg, rgba(10,11,13,0.35) 0%, rgba(10,11,13,0.85) 100%);">
+          <div class="flex items-center justify-between">
+            <span class="text-[11px] font-bold text-[#dfa649] bg-black/70 px-2.5 py-1 rounded-md border border-[#dfa649]/40 backdrop-blur-sm">
+              Ghid de Weekend 23Citybreak · 48h
+            </span>
+            <button onclick="closeCityGuideModal()" class="w-8 h-8 rounded-full bg-black/70 hover:bg-black text-white flex items-center justify-center text-sm font-black border border-white/20 transition cursor-pointer" title="Închide">
+              ✕
+            </button>
+          </div>
+          <div>
+            <h2 id="modal-guide-title" class="text-2xl sm:text-3xl font-black text-white tracking-tight drop-shadow-md">
+              Milano
+            </h2>
+            <div id="modal-guide-country" class="text-xs text-[#cbd5e1] font-medium font-body mt-0.5">
+              Italia
+            </div>
+          </div>
+        </div>
+
+        <!-- Modal Body Content -->
+        <div class="p-5 sm:p-6 space-y-4 overflow-y-auto custom-scrollbar font-body text-xs sm:text-sm text-[#0a0b0d]">
+          
+          <!-- Weather & Best Season -->
+          <div class="p-4 rounded-2xl bg-[#fbf9f4] border border-[#ecd8b0] space-y-1.5">
+            <div class="font-bold text-[#5c3b06] text-xs font-display flex items-center gap-1.5 uppercase tracking-wider">
+              <span>☀️</span> <span>Vreme & Sezon optim de călătorie</span>
+            </div>
+            <div id="modal-guide-weather" class="text-[#334155] leading-relaxed">
+              <!-- Populated dynamically -->
+            </div>
+          </div>
+
+          <!-- Airport Transfer -->
+          <div class="p-4 rounded-2xl bg-[#f4f7fb] border border-[#d6e2f0] space-y-1.5">
+            <div class="font-bold text-[#1e3a5f] text-xs font-display flex items-center gap-1.5 uppercase tracking-wider">
+              <span>🚆</span> <span>Transfer Aeroport → Centru (Opțiuni & Preț)</span>
+            </div>
+            <div id="modal-guide-transfer" class="text-[#334155] leading-relaxed">
+              <!-- Populated dynamically -->
+            </div>
+          </div>
+
+          <!-- Vibe & 48h Plan -->
+          <div class="p-4 rounded-2xl bg-[#faf6fe] border border-[#e8dcf7] space-y-1.5">
+            <div class="font-bold text-[#4a2373] text-xs font-display flex items-center gap-1.5 uppercase tracking-wider">
+              <span>🍕</span> <span>Vibe & Ce să faci în 48 de ore</span>
+            </div>
+            <div id="modal-guide-vibe" class="text-[#334155] leading-relaxed">
+              <!-- Populated dynamically -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="p-4 sm:p-5 bg-[#fbf9f4] border-t border-[#ecd8b0] flex flex-wrap items-center justify-between gap-3 font-display">
+          <button id="modal-guide-filter-btn" class="px-4 py-2 rounded-xl bg-[#0a0b0d] hover:bg-[#1a1e27] text-[#dfa649] text-xs sm:text-sm font-black transition shadow-xs flex items-center gap-1.5 cursor-pointer">
+            <span>🔍</span> <span>Filtrează zborurile spre acest oraș</span>
+          </button>
+          <button onclick="closeCityGuideModal()" class="px-4 py-2 rounded-xl bg-white hover:bg-[#f1f3f6] text-[#475569] text-xs sm:text-sm font-bold border border-[#dce1e7] transition cursor-pointer">
+            Închide
+          </button>
+        </div>
+
+      </div>
+    </div>
 
   </main>
 
@@ -1668,20 +1740,9 @@
       currentRows = [
         {
           city: "Milano",
-          airportName: "Bergamo",
+          airportName: "Bergamo & Malpensa",
           cityGroup: "Milano",
-          sub: "BGY · Wizz Air",
-          code: "bgy",
-          iata: "BGY",
-          cityId: "City:milan_it",
-          skyTo: "bgy",
-          cellsMap: enrichStaticRow(INITIAL_CELL_LINKS.bgy_wizz, "otp", "bgy", "City:milan_it")
-        },
-        {
-          city: "Milano",
-          airportName: "Toate (BGY+MXP)",
-          cityGroup: "Milano",
-          sub: "MIL (BGY + MXP) · Wizz & Ryanair",
+          sub: "BGY / MXP · Wizz Air & Ryanair",
           code: "mil",
           iata: "MIL",
           cityId: "City:milan_it",
@@ -1712,9 +1773,9 @@
         },
         {
           city: "Varșovia",
-          airportName: "Chopin / Băneasa",
+          airportName: "Chopin",
           cityGroup: "Varșovia",
-          sub: "WAW / BBU · Wizz Air",
+          sub: "WAW · Wizz Air (plecare BBU)",
           code: "waw",
           iata: "WAW",
           cityId: "City:warsaw_pl",
@@ -2239,8 +2300,8 @@
     }
 
     // Modal / Instant Quick-Buy Selection
-    function showQuickBuy(rowIdx, wkId) {
-      const row = currentRows[rowIdx];
+    function showQuickBuy(rowOrIdx, wkId) {
+      const row = (typeof rowOrIdx === "object" && rowOrIdx !== null) ? rowOrIdx : currentRows[rowOrIdx];
       if (!row) return;
       const cell = row.cellsMap[wkId];
       if (!cell) return;
@@ -2249,9 +2310,13 @@
       const qbTitle = document.getElementById("qb-title");
       const qbSub = document.getElementById("qb-sub");
       const qbActions = document.getElementById("qb-actions");
+      if (!qbTitle || !qbSub || !qbActions) return;
 
-      qbTitle.textContent = `✈️ ${row.city} · Weekend ${wk ? wk.label : ''} · ${Math.round(currentMode === 1 ? cell.perPaxEur : cell.totalEur)} €`;
-      qbSub.textContent = `Tur: ${cell.outRoute} ${cell.outTime} | Retur: ${cell.inRoute} ${cell.inTime} · ${cell.airlineLabel}`;
+      const pVal = Math.round(currentMode === 1 ? cell.perPaxEur : cell.totalEur);
+      const pUnit = currentMode === 1 ? "€ / pers." : "€ total grup";
+
+      qbTitle.innerHTML = `<span>✈️</span> <span>${row.city} · Weekend ${wk ? wk.label : ''} · <span class="text-[#8a5d14] font-black">${pVal} ${pUnit}</span></span>`;
+      qbSub.textContent = `Tur: ${cell.outRoute} (${cell.outTime}) | Retur: ${cell.inRoute} (${cell.inTime}) · ${cell.airlineLabel}`;
 
       const kiwiUrl = cell.kiwiCheckoutUrl || cell.kiwiSearchUrl || cell.bookingUrl;
 
@@ -2274,6 +2339,88 @@
         </a>
       `;
     }
+
+    function resetQuickBuyBar() {
+      const qbTitle = document.getElementById("qb-title");
+      const qbSub = document.getElementById("qb-sub");
+      const qbActions = document.getElementById("qb-actions");
+      if (!qbTitle || !qbSub || !qbActions) return;
+
+      qbTitle.innerHTML = `<span>💡</span> <span>Apasă pe o căsuță din tabel pentru a cumpăra biletele direct!</span>`;
+      qbSub.textContent = "Fiecare căsuță de preț din tabel are link direct de cumpărare în spate. Mută cursorul pe un preț pentru orar și opțiuni de rezervare.";
+      qbActions.innerHTML = "";
+    }
+
+    // Modal & Guide Helpers for Destination Weather & 48h Itinerary
+    function getCityInsight(key, cityName, iata) {
+      const cleanKey = (key || "").toLowerCase().replace(/[^a-z0-9]/g, '');
+      const cleanCity = (cityName || "").toLowerCase().replace(/[^a-z0-9]/g, '');
+      const cleanIata = (iata || "").toLowerCase().replace(/[^a-z0-9]/g, '');
+
+      for (const k in CITY_INSIGHTS) {
+        if (k === cleanKey || k === cleanCity || k === cleanIata || cleanCity.includes(k) || k.includes(cleanCity)) {
+          return CITY_INSIGHTS[k];
+        }
+      }
+
+      return {
+        city: `${cityName || 'Destinație'} (${iata || ''})`,
+        weather: `Climă temperată europeană. Primăvara (16–22°C) și toamna sunt ideale pentru plimbare la pas, iar iarna aduce piețe de sezon și vizite relaxate la muzee.`,
+        transfer: `Conexiuni regulate de transfer din aeroportul ${iata || ''} către centru via tren expres sau autobuz dedicat (cca. 20–45 min, 3–12 €).`,
+        vibe: `Explorare la pas în centrul vechi, bistro-uri locale cu gastronomie tradițională și obiective cheie în 48 de ore.`
+      };
+    }
+
+    function openCityGuideModal(cityKey, cityName, iata) {
+      const modal = document.getElementById("city-guide-modal");
+      if (!modal) return;
+
+      const insight = getCityInsight(cityKey, cityName, iata);
+      const photoUrl = getCityPhoto(cityKey || iata || cityName);
+
+      const banner = document.getElementById("modal-guide-banner");
+      const title = document.getElementById("modal-guide-title");
+      const countryEl = document.getElementById("modal-guide-country");
+      const weatherEl = document.getElementById("modal-guide-weather");
+      const transferEl = document.getElementById("modal-guide-transfer");
+      const vibeEl = document.getElementById("modal-guide-vibe");
+      const filterBtn = document.getElementById("modal-guide-filter-btn");
+
+      if (banner) {
+        banner.style.backgroundImage = `linear-gradient(180deg, rgba(10,11,13,0.35) 0%, rgba(10,11,13,0.85) 100%), url('${photoUrl}')`;
+      }
+      if (title) title.textContent = `${cityName || insight.city} (${iata || ''})`;
+      if (countryEl) countryEl.textContent = insight.city;
+      if (weatherEl) weatherEl.textContent = insight.weather;
+      if (transferEl) transferEl.textContent = insight.transfer;
+      if (vibeEl) vibeEl.textContent = insight.vibe;
+
+      if (filterBtn) {
+        filterBtn.onclick = () => {
+          closeCityGuideModal();
+          const target = (cityName || cityKey || "").toLowerCase();
+          const cityMatch = CITIES_DB.find(c =>
+            (c.iata && iata && c.iata.toLowerCase() === iata.toLowerCase()) ||
+            (c.code && cityKey && c.code.toLowerCase() === cityKey.toLowerCase()) ||
+            (c.name && target && c.name.toLowerCase().includes(target))
+          );
+          if (cityMatch) {
+            selectDestination(cityMatch.id);
+          }
+        };
+      }
+
+      modal.classList.remove("hidden");
+    }
+
+    function closeCityGuideModal() {
+      const modal = document.getElementById("city-guide-modal");
+      if (modal) modal.classList.add("hidden");
+    }
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") closeCityGuideModal();
+    });
 
     // Render Cross-Engine Search Bar
     function renderCrossEngineBar() {
@@ -2421,9 +2568,16 @@
                 ${zeroBadge}
                 ${vibeBadge}
               </div>
-              <span class="glass-dark text-white font-mono text-xs font-black px-2 py-1 rounded-lg border border-white/20">
-                ${r.iata || r.code?.toUpperCase()}
-              </span>
+              <div class="flex items-center gap-1.5">
+                <button onclick="openCityGuideModal('${cityKey}', '${r.city}', '${r.iata || r.code}')"
+                        title="Vezi Vremea & Ghidul de 48h"
+                        class="bg-black/60 hover:bg-black text-[#dfa649] hover:text-white border border-[#dfa649]/40 text-[10px] font-bold px-2.5 py-1 rounded-lg backdrop-blur-sm transition cursor-pointer flex items-center gap-1 shadow-2xs font-display">
+                  <span>☀️</span> <span class="hidden sm:inline">Vreme & Ghid</span>
+                </button>
+                <span class="glass-dark text-white font-mono text-xs font-black px-2 py-1 rounded-lg border border-white/20">
+                  ${r.iata || r.code?.toUpperCase()}
+                </span>
+              </div>
             </div>
 
             <!-- Bottom Card Content: Price, Route, Schedule & Booking -->
@@ -2489,6 +2643,7 @@
       const maxBudget = parseFloat(document.getElementById("f-max-price").value) || 350;
       const adults = parseInt(document.getElementById("f-adults").value, 10) || 2;
       document.getElementById("lbl-group-count").textContent = adults;
+      resetQuickBuyBar();
 
       const activeWks = getSelectedWeekendsList();
 
@@ -2696,16 +2851,21 @@
       }
 
       filteredRows.forEach((r) => {
-        const origRowIdx = currentRows.indexOf(r);
         const tr = document.createElement("tr");
 
         const tdLabel = document.createElement("td");
         tdLabel.className = "py-2.5 px-3 align-middle min-w-[210px] sm:min-w-[250px]";
         const airportBadge = r.airportName ? `<span class="text-[10px] font-bold text-[#8a5d14] bg-[#fdf3dc] border border-[#dfa649]/40 px-1.5 py-0.5 rounded-md">${r.airportName} (${r.iata})</span>` : '';
+        const cityKey = (r.code || r.iata || r.city).toLowerCase();
         tdLabel.innerHTML = `
           <div class="font-bold text-sm sm:text-base text-[#0a0b0d] leading-snug font-display flex items-center gap-1.5 flex-wrap">
             <span>${r.city}</span>
             ${airportBadge}
+            <button onclick="openCityGuideModal('${cityKey}', '${r.city}', '${r.iata || r.code}')"
+                    title="Vezi Vremea & Ghidul de 48h"
+                    class="text-xs hover:scale-125 transition cursor-pointer opacity-70 hover:opacity-100" style="border:none;background:none;">
+              ☀️
+            </button>
           </div>
           <div class="text-xs text-[#64748b] font-semibold mt-0.5 leading-tight font-body">${r.sub}</div>
         `;
@@ -2733,15 +2893,19 @@
             const url = getTargetUrl(cell);
             const tooltip = `Click pentru cumpărare (${cell.airlineLabel}) · Tur: ${cell.outRoute} ${cell.outTime} | Retur: ${cell.inRoute} ${cell.inTime}`;
 
-            td.innerHTML = `
-              <a href="${url}" target="_blank" rel="noopener noreferrer" title="${tooltip}"
-                 onmouseenter="showQuickBuy(${origRowIdx}, '${wk.id}')"
-                 class="price-cell h-12 sm:h-14 rounded-xl ${tierClass} ${outlineClass} flex items-center justify-center no-underline cursor-pointer px-2 shadow-2xs">
-                <span class="font-black text-sm sm:text-base md:text-lg leading-none whitespace-nowrap">
-                  ${displayPrice} <span class="text-xs font-semibold">€</span> <span class="text-xs font-normal opacity-75">↗</span>
-                </span>
-              </a>
+            const a = document.createElement("a");
+            a.href = url;
+            a.target = "_blank";
+            a.rel = "noopener noreferrer";
+            a.title = tooltip;
+            a.className = `price-cell h-12 sm:h-14 rounded-xl ${tierClass} ${outlineClass} flex items-center justify-center no-underline cursor-pointer px-2 shadow-2xs`;
+            a.innerHTML = `
+              <span class="font-black text-sm sm:text-base md:text-lg leading-none whitespace-nowrap">
+                ${displayPrice} <span class="text-xs font-semibold">€</span> <span class="text-xs font-normal opacity-75">↗</span>
+              </span>
             `;
+            a.addEventListener("mouseenter", () => showQuickBuy(r, wk.id));
+            td.appendChild(a);
           }
           tr.appendChild(td);
         });
