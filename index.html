@@ -166,6 +166,14 @@
     .calendar-range-choice:hover { border-color:#dfa649; background:#fff8ea; color:#5c3b06; }
     .calendar-nav-button { width:36px; height:36px; border:1px solid #e4d3b5; border-radius:10px; background:#fffdf8; color:#0a0b0d; font-size:18px; font-weight:800; cursor:pointer; }
     .calendar-nav-button:disabled { opacity:.35; cursor:not-allowed; }
+    /* Step 1 contains route, basic criteria and advanced filters; Step 2 follows it. */
+    #configurator.search-panel { display:flex; flex-direction:column; }
+    #configurator.search-panel > .search-heading { order:1; }
+    #configurator.search-panel > .grid { order:2; }
+    #configurator.search-panel > #search-status { order:3; }
+    #configurator.search-panel > #advanced-filters-panel { order:4; }
+    #configurator.search-panel > .period-section { order:5; }
+    #configurator.search-panel > .search-actions { order:6; }
   </style>
 </head>
 <body class="antialiased min-h-screen flex flex-col bg-white text-[#0a0b0d]">
