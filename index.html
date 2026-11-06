@@ -2494,7 +2494,11 @@
         spinner.className = "text-base";
         statusPct.classList.add("hidden");
         dismissBtn.classList.remove("hidden");
-        statusText.textContent = text;
+        if (text.includes('[[RESET_PERMISSIVE]]')) {
+          statusText.innerHTML = `${text.replace('[[RESET_PERMISSIVE]]', '')} <button type="button" class="ml-1 underline font-black text-[#8a5d14] hover:text-[#0a0b0d]" onclick="resetToPermissive(); runLiveSearch();">🔓 Resetează filtre și caută din nou</button>`;
+        } else {
+          statusText.textContent = text;
+        }
       }
     }
 
@@ -3677,7 +3681,7 @@
           } else if (totalFound > 0) {
             updateSearchStatus(`✅ Căutare finalizată! S-au găsit zboruri în ${Object.keys(targetCellsMap).length} weekenduri pentru ${cityName}.`, 100, "success");
           } else {
-            updateSearchStatus(`⚠️ Nu s-au găsit zboruri pentru ${cityName} cu filtrele actuale (ore/directe). Apasă pe [🔓 Resetează filtre (Mod permisiv)] pentru a permite escale sau ore flexibile.`, 100, "empty");
+            updateSearchStatus(`⚠️ Nu s-au găsit zboruri pentru ${cityName} cu filtrele actuale (ore/directe). [[RESET_PERMISSIVE]]`, 100, "empty");
           }
 
           renderMatrix();
