@@ -162,7 +162,11 @@
     @media(max-width:600px) { .header-inner {padding:18px 5%}.header-right span {display:none}.header-right {gap:0}.header-right a {font-size:11px}.site-main {padding:0 5% 55px}.hero {margin:0 -5.56%;display:flex;flex-direction:column;min-height:0}.hero-copy {padding:50px 6% 35px}.hero h1 {font-size:39px}.hero-copy p {font-size:15px}.hero-image {height:190px;background-image:linear-gradient(0deg,rgba(0,0,0,.4),transparent 70%),url('assets/weekend-hero.webp');}.hero-image-label {bottom:25px}.hero-index {display:none}.search-panel {padding:25px 18px;border-radius:0 0 14px 14px}.search-heading {align-items:flex-start;flex-direction:column}.search-heading h2 {font-size:26px}.search-panel > .grid {gap:8px}.search-panel > .grid > div:nth-child(2),.search-panel > .grid > div:nth-child(3) {grid-column:span 12}.period-options {display:grid;grid-template-columns:1fr 1fr}.period-choice {min-width:0;padding:11px}.search-actions-buttons,.search-actions button {width:100%;justify-content:center}.results-heading {margin-top:45px}.results-heading p {display:none} }
     @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
 
-</style>
+    .calendar-range-choice { border:1px solid #e4e5df; border-radius:8px; background:#fff; padding:8px 10px; color:#475569; font-size:11px; font-weight:800; cursor:pointer; transition:all .18s; }
+    .calendar-range-choice:hover { border-color:#dfa649; background:#fff8ea; color:#5c3b06; }
+    .calendar-nav-button { width:36px; height:36px; border:1px solid #e4d3b5; border-radius:10px; background:#fffdf8; color:#0a0b0d; font-size:18px; font-weight:800; cursor:pointer; }
+    .calendar-nav-button:disabled { opacity:.35; cursor:not-allowed; }
+  </style>
 </head>
 <body class="antialiased min-h-screen flex flex-col bg-white text-[#0a0b0d]">
 
@@ -268,11 +272,12 @@
         <span id="search-status-spinner"></span><span id="search-status-text" class="flex-1"></span>
         <span id="search-status-pct"></span><button id="search-status-dismiss" type="button" aria-label="Închide mesajul" onclick="document.getElementById('search-status').classList.add('hidden')">✕</button>
       </div>
-    <!-- 1. PASUL 1: Selectare Perioadă (Weekenduri clasice & extinse) -->
+    <!-- 2. PASUL 2: Tip de weekend și calendar -->
     <section class="period-section">
-      <div class="period-heading"><div><span class="field-kicker">02 / CÂND PLECI</span><h3>Alege weekendurile</h3></div><span id="selected-wk-badge" class="period-count"></span></div>
-      <div class="period-options"><button type="button" id="classic-mode" class="period-choice active" onclick="setSimpleTripMode('classic')"><strong>Weekend clasic</strong><small>Vineri – duminică</small></button><button type="button" id="extended-mode" class="period-choice" onclick="setSimpleTripMode('extended')"><strong>Weekend prelungit</strong><small>În jurul sărbătorilor</small></button></div>
-      <details class="calendar-details"><summary>Alege alte weekenduri <span>+</span></summary>
+      <div class="period-heading"><div><span class="field-kicker">02 / CÂND PLECI</span><h3>Ce fel de weekend cauți?</h3><p class="text-xs text-[#64748b] mt-1">Alege tipul, apoi bifează una sau mai multe perioade din calendar.</p></div><span id="selected-wk-badge" class="period-count"></span></div>
+      <div class="period-options"><button type="button" id="classic-mode" class="period-choice active" onclick="setSimpleTripMode('classic')"><strong>Weekend clasic</strong><small>Vineri – duminică · 2 nopți</small></button><button type="button" id="extended-mode" class="period-choice" onclick="setSimpleTripMode('extended')"><strong>Weekend prelungit</strong><small>Include joi sau luni când există sărbătoare legală</small></button></div>
+      <div class="mt-4 rounded-xl border border-[#eee5d4] bg-[#fffdf8] p-3"><div class="text-[11px] font-black uppercase tracking-wider text-[#8a5d14] mb-2">Alege perioada</div><div class="flex flex-wrap gap-2"><button class="calendar-range-choice" onclick="selectCalendarRange('next-month')">Luna următoare</button><button class="calendar-range-choice" onclick="selectCalendarRange('next-2-months')">Următoarele 2 luni</button><button id="range-winter" class="calendar-range-choice" onclick="selectCalendarRange('winter')">Iarna <span data-range-year></span></button><button id="range-spring" class="calendar-range-choice" onclick="selectCalendarRange('spring')">Primăvara <span data-range-year></span></button><button id="range-summer" class="calendar-range-choice" onclick="selectCalendarRange('summer')">Vara <span data-range-year></span></button><button id="range-autumn" class="calendar-range-choice" onclick="selectCalendarRange('autumn')">Toamna <span data-range-year></span></button><button class="calendar-range-choice" onclick="selectCalendarRange('year')">Tot anul <span data-range-year></span></button></div></div>
+      <div class="calendar-details calendar-details-open">
       <!-- Quick Preset Buttons (Clasice, Extinse, Iarnă, Primăvară) - FĂRĂ vacanțe copii -->
       <div class="hidden">
         <div class="text-xs font-bold uppercase tracking-wider text-[#475569] font-display">Scurtături rapide:</div>
@@ -298,24 +303,17 @@
         </div>
       </div>
 
-      <!-- Month Tabs & Eliminare Selecție -->
-      <div class="space-y-2 pt-2 border-t border-[#eef0f3]">
-        <div class="flex items-center justify-between text-xs font-bold text-[#475569]">
-          <span class="font-display uppercase tracking-wider">Navighează pe luni calendaristice:</span>
-          <button onclick="selectPreset('clear')" class="text-rose-600 hover:text-rose-700 font-bold hover:underline cursor-pointer font-display flex items-center gap-1.5 bg-rose-50 px-2.5 py-1 rounded-lg border border-rose-200 transition">
-            <span>✕</span> <span>Eliminare selecție</span>
-          </button>
-        </div>
-        <div id="month-tabs" class="flex items-center gap-1.5 overflow-x-auto pb-2 custom-scrollbar">
-          <!-- Populated by JS -->
-        </div>
+      <div class="flex items-center justify-between gap-3 pt-3 border-t border-[#eef0f3]">
+        <button id="calendar-prev-year" type="button" onclick="shiftCalendarYear(-1)" class="calendar-nav-button" aria-label="Anul anterior">←</button>
+        <div class="text-center"><div id="calendar-year-label" class="font-display text-lg font-black text-[#0a0b0d]"></div><div class="text-[11px] text-[#64748b]">următoarele 12 luni · poți selecta mai multe weekenduri</div></div>
+        <button id="calendar-next-year" type="button" onclick="shiftCalendarYear(1)" class="calendar-nav-button" aria-label="Anul următor">→</button>
       </div>
+      <div class="flex flex-wrap items-center justify-between gap-2 pt-3 text-xs font-bold text-[#475569]"><span id="calendar-selection-help">Selectează perioadele care ți se potrivesc.</span><button onclick="selectPreset('clear')" class="text-rose-600 hover:text-rose-700 font-bold hover:underline cursor-pointer font-display flex items-center gap-1.5 bg-rose-50 px-2.5 py-1 rounded-lg border border-rose-200 transition"><span>✕</span> Golește selecția</button></div>
 
       <!-- Weekend Chips Grid -->
       <div id="weekend-chips-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 pt-2">
         <!-- Rendered by JS -->
       </div>
-      </details>
     </section>
 
 
@@ -334,7 +332,7 @@
           </button>
         </div>
 
-        <p>Tarifele și disponibilitatea se verifică la furnizor.</p>
+        <p>La furnizor, reconfirmă traseul, datele, călătorii, bagajele și prețul.</p>
       </div>
 
       <!-- Collapsible Advanced Drawer (Hidden by default) -->
@@ -351,7 +349,7 @@
                   class="inline-flex items-center gap-1.5 text-xs font-bold text-[#5c3b06] hover:text-[#0a0b0d] bg-[#fce8bd] hover:bg-[#f6dc9c] px-3 py-1.5 rounded-xl border border-[#dfa649] transition cursor-pointer font-display">
             🏖️ Weekend Prelungit (3–4 nopți)
           </button>
-          <button onclick="resetToPermissive()" title="Setează filtre permisive pentru a găsi garantat zboruri"
+          <button onclick="resetToPermissive()" title="Setează ore flexibile și permite o escală"
                   class="inline-flex items-center gap-1.5 text-xs font-bold text-[#475569] hover:text-[#0a0b0d] bg-[#f4f5f8] hover:bg-[#eaeef3] px-3 py-1.5 rounded-xl border border-[#dce1e7] transition cursor-pointer font-display">
             🔓 Permisiv (flexibil orare)
           </button>
@@ -382,7 +380,7 @@
             </div>
             <div>
               <label class="inline-flex items-center gap-2 text-xs font-bold text-[#0a0b0d] cursor-pointer pt-1">
-                <input type="checkbox" id="f-domestic" class="accent-[#dfa649] rounded w-4 h-4 cursor-pointer" onchange="runLiveSearch()" />
+                <input type="checkbox" id="f-domestic" class="accent-[#dfa649] rounded w-4 h-4 cursor-pointer" />
                 <span>Include zboruri interne în RO</span>
               </label>
             </div>
@@ -561,7 +559,7 @@
         <div class="inline-flex items-center gap-2 text-xs sm:text-sm text-[#0a0b0d] font-bold">
           <span class="hidden sm:inline">La click:</span>
           <select id="link-mode" onchange="setLinkMode(this.value)" class="rounded-xl bg-[#fffdf8] border border-[#dce1e7] px-3 py-1.5 text-xs sm:text-sm font-bold text-[#0a0b0d] focus:outline-none focus:ring-2 focus:ring-[#dfa649] shadow-2xs font-display">
-            <option value="google" selected>Google Flights (Direct)</option>
+            <option value="google" selected>Google Flights</option>
             <option value="skyscanner">Skyscanner (Comparație)</option>
             <option value="airline">Companie (Wizz / Ryanair)</option>
             <option value="kiwi">Kiwi.com</option>
@@ -726,6 +724,7 @@
           </div>
         </div>
 
+        <p class="px-5 pb-4 text-xs text-[#64748b]">Informațiile și costurile de transfer sunt orientative. Verifică ruta și prețul la operator.</p>
         <!-- Modal Footer -->
         <div class="p-4 sm:p-5 bg-[#fbf9f4] border-t border-[#ecd8b0] flex flex-wrap items-center justify-between gap-3 font-display">
           <button id="modal-guide-filter-btn" class="px-4 py-2 rounded-xl bg-[#0a0b0d] hover:bg-[#1a1e27] text-[#dfa649] text-xs sm:text-sm font-black transition shadow-xs flex items-center gap-1.5 cursor-pointer">
@@ -753,13 +752,31 @@
   </footer>
 
   <script>
-    // 1. Generate All Weekends & Romanian Vacations (2026 - end of 2027: 58 weekends)
+    // Romanian public holidays (Labour Code, art. 139). Movable dates use Orthodox Easter.
+    function romanianPublicHolidays(year) {
+      const fixed = { '01-01': 'Anul Nou', '01-02': 'Anul Nou', '01-06': 'Bobotează', '01-07': 'Sf. Ioan', '01-24': 'Unirea Principatelor', '05-01': 'Ziua Muncii', '06-01': 'Ziua Copilului', '08-15': 'Adormirea Maicii Domnului', '11-30': 'Sf. Andrei', '12-01': 'Ziua Națională', '12-25': 'Crăciun', '12-26': 'Crăciun' };
+      const holidays = new Map(Object.entries(fixed).map(([day, name]) => [`${year}-${day}`, name]));
+      const a = year % 4, b = year % 7, c = year % 19;
+      const d = (19 * c + 15) % 30;
+      const e = (2 * a + 4 * b - d + 34) % 7;
+      // Julian Easter converted to Gregorian; the offset also works across centuries.
+      const easter = new Date(Date.UTC(year, Math.floor((d + e + 114) / 31) - 1, (d + e + 114) % 31 + 1));
+      easter.setUTCDate(easter.getUTCDate() + Math.floor(year / 100) - Math.floor(year / 400) - 2);
+      for (const [offset, name] of [[-2, 'Vinerea Mare'], [0, 'Paște'], [1, 'A doua zi de Paște'], [49, 'Rusalii'], [50, 'A doua zi de Rusalii']]) {
+        const date = new Date(easter);
+        date.setUTCDate(date.getUTCDate() + offset);
+        holidays.set(date.toISOString().slice(0, 10), name);
+      }
+      return holidays;
+    }
+
+    // Generate weekends in local calendar time, avoiding UTC shifts in western timezones.
     function generateAllWeekends(startDateStr, numWeeks) {
       const monthsRo = ["ian", "feb", "mar", "apr", "mai", "iun", "iul", "aug", "sep", "oct", "noi", "dec"];
       const monthsRoFull = ["Ianuarie", "Februarie", "Martie", "Aprilie", "Mai", "Iunie", "Iulie", "August", "Septembrie", "Octombrie", "Noiembrie", "Decembrie"];
       
       const weekends = [];
-      let d = new Date(startDateStr);
+      let d = new Date(`${startDateStr}T12:00:00`);
       while (d.getDay() !== 5) {
         d.setDate(d.getDate() + 1);
       }
@@ -837,6 +854,14 @@
           holidayType = "school";
         }
 
+        const fridayHoliday = romanianPublicHolidays(fri.getFullYear()).get(friStr);
+        const mondayHoliday = romanianPublicHolidays(mon.getFullYear()).get(monStr);
+        if (fridayHoliday || mondayHoliday) {
+          tag = [...new Set([fridayHoliday, mondayHoliday].filter(Boolean))].join(' · ');
+          isHoliday = true;
+          holidayType = 'extended';
+        }
+
         weekends.push({
           id: friStr,
           idx: i,
@@ -852,7 +877,9 @@
           monthName: `${monthsRoFull[mFri]} ${yFri}`,
           tag: tag,
           isHoliday: isHoliday,
-          holidayType: holidayType
+          holidayType: holidayType,
+          fridayHoliday: Boolean(fridayHoliday),
+          mondayHoliday: Boolean(mondayHoliday)
         });
 
         d.setDate(d.getDate() + 7);
@@ -862,7 +889,7 @@
 
     const today = new Date();
     const todayStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
-    const ALL_WEEKENDS = generateAllWeekends(todayStr, 58);
+    const ALL_WEEKENDS = generateAllWeekends(todayStr, 156);
     const INITIAL_CELL_LINKS = {"bgy_wizz":[{"cityId":"City:milan_it","outRoute":"OTP->BGY","inRoute":"BGY->OTP","outTime":"19:30->21:00","inTime":"21:45->01:00","outCarrier":"W4","inCarrier":"W4","totalEur":259,"bookingUrl":"https://www.kiwi.com/ro/booking/?direct=true&locale=ro&currency=eur&passengers=2-0-0&token=HdjqQOcvHuhWTKCsH2vShPKO5VzKqScKx3Ibpc4oNIhGVcC-KEha9BXyNDrlLbL9t_Nd5bbk9zR7iYLvsefD0_76Ad3R40b5i0NgAp_HNBG-kQ3VNuLehLj4dAu1zevzPt5Egv45xL6iBQ108TzXBjBdTSu36EiztFlLKCQnoJKhMFy6J6V6XPjpfVrYahG_0NZyrpYIkplS_xxY6ajApfvTMYDKYRBLFdwrsKVZeNpAZabu0f-IlKNe5Dj7ZCpYJK0iaHcCtmrkXEsVJwFV7UNDqELPHXaQXj7xOp9zSRsXl_1o4DBBObDXRQ2XRnBtltpOuMHhz9slhq7qB3lJYYLtZhImrcbEatZ8Nm6ErIk-k9GYV1FMrP00aSvH3wBiqhYTvsMqM904DTGZtdqo-Z53s_9DDey4naKhRewX5VA_rJZMx7eeugaBFtVma7C7QOCVLzERUNufj_JLyoRcmOeRpfeXrCM7tEoF7COvuQu5tPd8VFLSYPvp3Ml48MpqDr90oJIGDKhSU1gFPr47MIfeePFtbVXUHBC0wPErTcr9HZfbXQHpA8yPxe5mWuqFKBQACkdzgvKD8MTvlMIHiJ4rMNMIi3fkxMKsPZ76H7F6wFuhoFZ6prW0Uh8uRhcKOa0GhsIndk1zWKoRhOIKTF5_4gpF5bVqPGH-m3652UZ68ToAN4Qktooqt254BwzsflB4OO0O6E7ktSa_sM6rvOvDF0YJO-LVrnbj4vnp9No_pF_azTnnR101Mm3tRvbiulPg2d83Pmv9es6LE1fsyz_Mv31P5iLWak1z9GxgCF4yOC0CrTyZZNpv0fGBwiJLPTdI7ip10DmR8i-4K7Z7K7jOOZDph1Z_rfxL_NtAkst9DdsA3gNssNb4484HT2xjdTp-MKNSD9E2AS6WXr6aOViDAvkV3snjNZIpRwMaHnvpvCerlLmVJRRRpFD_Ga5YEc63RDsJyJK3xz2tMUE5otOel45-ntYYRluD0wW8r_7jzj6DFh_C0SWWn5JM7IGI4DXyQbYnEMDxQ3TLlctZDXUaYf66uDfxoJhP__YqvGQ50V-HvX6dwt1fAPCFgcYHvRx4M161A_ZndHR2y33QfSQj3uRd9dzmr3a7_7kkCdiJzMGQKokJCxLBaQeVf93C83XnyPP_OnhzqeJRtZCriOvTB6IpK1K40KYX9Kx20r7o5tNS4FB0V7jhDZ5qDmWdO&searchType=return&searchBags=0.0_0.0"},{"cityId":"City:milan_it","outRoute":"OTP->BGY","inRoute":"BGY->OTP","outTime":"19:30->21:00","inTime":"21:45->01:00","outCarrier":"W4","inCarrier":"W4","totalEur":210,"bookingUrl":"https://www.kiwi.com/ro/booking/?direct=true&locale=ro&currency=eur&passengers=2-0-0&token=HFwF1QZ8B7PK1x-WtaBTYcomspAwJdznN2Xd0Ueqz0jPPzp2tQzxhQJswz9Z9BNAnvXTn-oOKcxmPRZHZ1mvp7aJ7Grnlkl6bEbBYQmw1ihMCWkepHUhVfVL_1Q1YUNFBCH0p9RjsszUi-vihFWBCapMzPHf2jYeodepnrPaGSn0BqDhuXM0xgiEWJ8AZuy79KvW-AJAWswy-UmNtf2rP2aNl8UyKXe-zOomoRan9yTZWyhTIXYU7kcf6FoVNcbrzmvoVbgarAm08VmZGLmujvQAsXEK_WfWwNFM6cqrXiDJyBu4c63C9ZaNW12lK7ZgPzVHDDN52vlJMIGKakylR9xqwKyWFTpyHMe7GPd1DHZ9QLJ7icTAgWcR-95_lGWjvP7qNhMxTEsKxI8sMggVGASYCqfas0eO-cLTc2vnmtmXqSYvJBSF60vbMQ0m3U1QhwuGnzxRz2WKHgE6-NGzJ6Y3EMByLgYdJksL-_CRBzLZcYEW4qNkfUE_GUS9k_-xVziZm2ErBurqL1xVSiGBPYdqmM5IQ_7HaksDrSc6K4Iag_dNt6A-d5wzDiwJne8L6uzCh2Zb6FbSW7IvmFJbzazWsoKfW25M6nAKo4tMc7xQ1wjRYuxxjOF_KJu0D_Mf_9qom4pgRqBSnP3nbfUTOCoK9MLQfK_38Xx-XR_xeNup5prssHCzgEJgBeJ-BV-_eoW2xJ_2M0BJ8OOjBF2NIv563EcdIi_4ld0Gn451KLTiuBrHimjzUpV8fDr5UnMBkyB3_smNAgG6rZ988Up90VS10GztTi7B1UpWPelAVAcUDbS1TmFTlnsJTcX2uQSB3jShFFKkk-lFDHu81Z577ADpkhBG4k87-hpON3vp1EVWUhUr0V12gq5T4Qvo1UmUKkSXOMQ17Z9NgskYLnNZd1b1SuIlaI99YaJPBGahKQSp7uWQqIxUT_4oSoQGgnF_P9qVnRFxw2mNM7DxHZYwLGfYnRiaDLTEFKNZv2o8t6nAWyr9y21rReh3y80ks_0cY-Ys14jmZVrxd-t5qnUtwq9LfQILi2grpA3L14O6UMNR7nk8LuzWotLb8OcX5ne3DAfQHmCIlvL19lC71TVs5VS9m29rHqzjnrgSczCvq5Y-12QvLJfzBd2TsCP1euUr-LRtWpC5a81_O19c20yvxk-WrFBSTUkF1S0yVnRL32Ze047znDyxqRhtJuDUsY5Ix&searchType=return&searchBags=0.0_0.0"},null,{"cityId":"City:milan_it","outRoute":"OTP->BGY","inRoute":"BGY->OTP","outTime":"19:30->21:00","inTime":"21:45->01:00","outCarrier":"W4","inCarrier":"W4","totalEur":237,"bookingUrl":"https://www.kiwi.com/ro/booking/?direct=true&locale=ro&currency=eur&passengers=2-0-0&token=HT9v7Ae49WXfPgDx7K92GpRC-wo7NrffWVtplw1s_4RlNyj8WzMyQAp14mPAzlmpleZ-CAsMN9snGsGKmIn_3lI92mfu5Ql3wotMlkztdwW6zz2CexS0wO7eXjqVs6mKC2OHv6olapKF98LXT0baEHB3zXov2ROvPD6ycV4Ken8fxueEnK29TI6nMHJ0b43sT5uMdduIronWdJNeJTGFXJZfouV5tPhUFtUbqM9tb3PV43mktrwDbqt3CIv3WKwAwUUw5H0Oro2W567GbqapB4GSqnMVEi2qMY5VV1pgfpnfUSfkUGRFXYx9SxiMzmRPZ0r5gJCKDjLoKKZ2ewoXgBQD2rSSINEwbnVaoVI_YhMUvWyKH6xX7e1WlREhZ2j6CBhwmN46bOHmLjpYtLbE_l-B01RLDJibGCXgtmrWuSVI9v3W_XQ4YG3Wba4wE0taHyH8X9GWCyanLARBLDPAtagdvlhnEkX2sm7qz7-jfLUKAIkNH0C0mtdj5y17i8h3y3wCyZwiKWCEjVzClBu02SjzFl1Cyj3totZ5N-rvaBZTVfwjfGYEjKUY7KObaBqZCi9y2ynKUn_sqKPHFAReNBlNiRmaR5A3g3UbP9Ey6e0ulvydkVhsu0Bunh67PJQbAOFgFO40-EmsuwcG1D1H0WxFbnFHnCZ4xkEYzKbGyKFb1c5Y49fJ_4q2Q-sHuvBJuvT9dTLDMuoemnlUwlaUD-LvWGCNxzqJ9Gu72vHE38F2X2uCk0hQ2uyziOzODFw4KJF-vexFUGB_jih-1zwLK69zc3FGKILlOYc-yHf1gYvbgxg5TbPJ2-0bZNPrYn6EJP781pQ84yClBHl9z6A1AnonnI2h-wVPjbMii9hqUmYWYpq5Ff3reOVyHvMUnNiSMoLsEADJQzFdOO_H9dUc7JdCNJCTo2_LnZoEUsI0qSRjWjeEuDf6RnYigc0OVJnH2PbUp4THYQDVV_848T7l6NhhJJuMEj8kylVSqSCJv1rxA-i6hOS0HqIGK8vQQBmcr4vWP2y7oMVlrwNlRJBRGBbPlBeyv6d5U87374lbeceSwR8olBfOF9eEosrbs5nomSesqZN9KOfoemqhfl8B_IP4RQG4xCM9dWpADj7z2QubXaMa8_ppei14tUdIqozahk32pp9lcQ3d-N19anJV4yUz1O6NjKal4Gd4rgu5_aJ4%3D&searchType=return&searchBags=0.0_0.0"},{"cityId":"City:milan_it","outRoute":"OTP->BGY","inRoute":"BGY->OTP","outTime":"19:30->21:00","inTime":"21:45->01:00","outCarrier":"W4","inCarrier":"W4","totalEur":125,"bookingUrl":"https://www.kiwi.com/ro/booking/?direct=true&locale=ro&currency=eur&passengers=2-0-0&token=HooEKNkpMBhLQyhbFaplMHK0PreUt8csWhg0suVsobCOrzYrbUOgHIQ6420E9q_FiW040DTlpv8hcVjsfJOkWgfnNVMIng23yUHRgPm5dY1rUKu2dl4Xi9A1JNS5eyWJk09Y-jZ3YYFjbTK6KW_fBBGO3Qx4fdiw4_8ubJRI500PYaRfzxj1LDHBxISSyrrjZjVdNx2f8iMpDos92t0gydD1gQQg9cmasgcPoZfPjKSGVrJ7qqBtSV5S00EPs7jIiviotPsJPZ_3ZYKlXeKToNDiFlZR7ro0LAU24qCVfKLuJeUQzRoUd2QU62Moh3N8yYla670WKx7EhEGEcGAeUuLRuC_678LVdOAROp5Ilq0NxMrB8qjAnaKCDcPUe03i5PDNIz0xqpGVqTAdZq39qlFuqEISQziC338cQO8BmuboZyn4iI3JM9odS6Goo71VePgETK4ku54MqQnV0DkLn4CUt_DJvBI6OTfd2rqLWPCPlq0CDAojXijb4d21PvuR9lKUECHGjhiUTMmSJMJKjyhxADnqj5M5eK3vCcAWDUR0j0HsDwwB13xPLut9Y3H_fxsh0uz5vruIh9DR3Y-Scobs-NQX_lRhAGvEc5-T3hSN9R9-yS1AqmCKveqSv0bdDAzgt_N-8EhEs-R2DTtTF0RNV-ieKGv9fKWwQzN-R0ue4OYOCc0kALwtbe44W-4zrlGu_OYJzOEzBHJBkp7XnC9FjnSODch8gM1kGEGnuWihRmMhgKwraqHPqGsi96naZ3KCdTMurQGUptBX-RmdcDkxeYFx59zRzFk0XusUPTqPwAVDu2hl2efnYWfRC2uPKzUSkRrkqDvhns-GspBFxw0YRVTa1aXhchcgZbqTwA-g8W57SwlSKiTW5gF5AdfFEZS4uw3ujBqC2SD15hoYV3gXbnL_Q04h3qUz-UICLpTLHTS8zEqBS4gPL0UoiW8AMn28sRPBzzaINg-DJMQTPyrr6H7Xt-oP7DM6m6gLsLh6d4G8-6_iANsWeufehWQzOzDB86nCf5lGNl-VEVxE6KpFZ5m6md7YzMd8Z2Plr4NinEgl1Z8DQs_SmGYKsAA4EbRCCfRhdFkYfKGd9Aeq1b03P-mZGfX-Xf_fDQ0XAWcIe7NiYQga3-4b6kStBv60brNH0Vfc5jngpeo8bBEhJD4CthYjrfkdx_QkQUo3404WLtRSbfqZaLLLcEvEMVKAt&searchType=return&searchBags=0.0_0.0"},{"cityId":"City:milan_it","outRoute":"OTP->BGY","inRoute":"BGY->OTP","outTime":"19:30->21:00","inTime":"21:45->01:00","outCarrier":"W4","inCarrier":"W4","totalEur":213,"bookingUrl":"https://www.kiwi.com/ro/booking/?direct=true&locale=ro&currency=eur&passengers=2-0-0&token=Hs-WQriNJ_xv1UMX0t0sFpHQMFP3x4dyXhagyMjlM7VRo7wjItcdVhy-tZYEM59nNIghTOfewvsNB3V5J2byqmUP5H4UDS7IROZGKmLoE3niigf3_jppGPkumxAM5DPD0E8irv_q8ItH_-wrdRNtoxEJZ3wGzIB6YeWccSfZrr6yJyVZ-iBGf57sH_18n3FOn27nggZpJ2ccm3yMDTo76hlA5qAou6gPcuszQjXN3fqH3sU4AT72EePdHJfDn8L9z_iRUyL-dirzK_pTSmLvYgs26pyNeKlgVVkBHlQNBFUQGgEv5cJLBL8SWCkFoYp8kpw0inoGSzyZmeejm5yg8hX2xxtDznbxgg3EzG6H2IFt_dYQyiwfW9MIuAB0lNxHjEgnnfAcWRKUBYyDxAZoWl2EGopVD1dY5WFNu-aSeVDvtRAGeOyTOLJ75wZXmExLBaHl-O8Dg7uL_CKzWLKg-1VZvgbhquIO7WAFWEhvgWeWFNhd7WVNr27AOQSMoxfDt7-Wse2-vswzaRpYSZWQGQqDPOJYtK5R2v1hTdxDktY6X_HrdvC6CPIuYGau1bIUQgRF974ZanaVVPi7i7QLbxU5eRVc4q1nM378MApay_4fsTPyGIUnZ6_ylvbouv7plqOugMQAl3Ny4NWC42-JVLxpH9zSHo5JXi111CldtKZo-Onp0K9_FxICOicDTmtF-AHMBJ442WjA7n8GyNGs6thf5x53yaKL8WbtxZTrq7RdCEX_9FP9FgB9j6xSpwZOuLZKoOFJhFKuwAHByW9ZMYkZ8Ez3es_X_DogLrTxvpUvCOnxSDkU54JZ50WNzHlSUUX3-H6x3l0viTyHZtc8WPq61GJBliX6-oCODi9hDr_MaBmuvtRoBk4UzTVuTqfap8seozWoFvJJItS0u1vz16gG3xiR8Rk-lwVQe-OEQeKShpZg25i6epXjnR4d8vIG_cl2kvVh55HQ3Vi4zk0nQQU0-Lo7u_edTX1zRD3mndletFRrHaB2WrOeZTjzm2o8-zxC7osxrv_R1IRFOseloTzLF6DINm59Yk-d_FwjQHlhyjvzAenJQ8mfQmpDd-SQ9YgU7ZmONnL1qYV5dGxZMTQ5NG_RqfKSX14-MrkW_PnFu2dFhAIMtYwTF4e8cXvSJkQIQoiczat7SstnecCoF3jxsxJHvW9d6ocPd9UTzTnA%3D&searchType=return&searchBags=0.0_0.0"}],"milan_all":[{"cityId":"City:milan_it","outRoute":"OTP->BGY","inRoute":"BGY->OTP","outTime":"23:35->00:55","inTime":"21:45->01:00","outCarrier":"FR","inCarrier":"W4","totalEur":222,"bookingUrl":"https://www.kiwi.com/ro/booking/?direct=true&locale=ro&currency=eur&passengers=2-0-0&token=HrFmv9MXbGs_de1AkJHOCy_0v8XziyoMyqbxpunJfCDxafVBlw0cLx2L2-cgdcAuDF8PW3YI44fReTHAfiTT4xKbkeqiJ42__BhOqlmBWFSekhRR8mJ-rO_b6tyRhwcNMNnj2AMck7A9NhRHD0fRI6XYh3-0JnvbbVdn5E0ixGehVWayq77ezq35aJwlOFqAhA7aA9TazH_m68zH6EWP6A34NHeCYm8Ma4Cf2iOEwY8z7Yh4NnbH26oH5sPTYDKRBbTX68atmPqELIp2XjKg0jNAu2kjgeDKXA7Rm2HsVY2uhVAc_NsNoT_Ia2SWB7BYAStHdhTO3aRSxLcBath-sAxcFHeE-OlrNZtmm6-rZ4x7myHaPvWR9kFknKFx5KL2rwyZ8vDuQrauqKF3NIBkod24VMatc9koKsyI7M2w4-NVAG_Gg8Rz-PVfSnD8BIRZzGcHZRHIwGsdFtLNDuzK3VRkHodHTk8bQACh-5VNTRESo7MoYk6qa1ENwjbwxcplizoCVm3hNeEhuG3uHeU_qH7BCCnHon4uGn7NkWuZfV7WK7gaYbDLjjTxGVq122fUOPmXxy2bwDsYiZh2bHV93eQHlYvfDQfDAFq0AwkILF9DeXmHXdJP1MH024sEubIYrL_xljg7lG6OEi1qY_XponIkAwcWV-VIquA4sIoJAsazjJ585gnNj1EOqFQ6NEqOnctjYJJ0hFXHXvVTXhah91mBqEeM7HGKXLP4t_cQxjUSn8heYCT3HaV1sJAxMAjOCigIYPs-_7IqDuJiDLvDz1-kuSSRFHj-cO-s5CLgho4fhOpdvaQ1lfb1kDFAB7MZT5dp39HcwrAar5eydARZ6s-d4dWbVpkczpNXFiEdt36mMr3iAZzTJreKFrMPkz_pAlNIJKHQ4lONdf4plvECK1YDikYtIkcI6s2W12NRmuKrm5GREEIb3vxsSYwjGZI5vUWNbpOPTO2a2genJeZXOl2JExhwn43CQ2r5GZoNswM_ehoSNEOc98qkiHpdvlkaZkvS1qojPAVYjRQx3VDSGeSv2EW-IoCyF7g57pivrnulG_17rEFe7zYAuFgc0rdyLhMjnd6bY550syGyLCUZTP5JEEVJbPZRq96dTWkrGomhK4ggUjUKLP3Cm0C6YDonCvjz0yZdcF63lSfW9fFPLcw%3D%3D&searchType=return&searchBags=0.0_0.0"},{"cityId":"City:milan_it","outRoute":"OTP->BGY","inRoute":"MXP->OTP","outTime":"23:35->00:55","inTime":"19:15->22:30","outCarrier":"FR","inCarrier":"FR","totalEur":193,"bookingUrl":"https://www.kiwi.com/ro/booking/?direct=true&locale=ro&currency=eur&passengers=2-0-0&token=HmlzV3-euKJ1tnaP5H6PH2vb5M0HYwf19UCSXSmF-5pmFETLEmduWVEd1059IaYG3xCS5T3Xt0P6a67cYl8NlCT8RwiWz0GfZgHTYlXQheXwa_WSUaRfsZMBqC8BQuOxiO682esWKXID-ejTSO8JaEJSsvhds3GsikljoFvb5uXvE8PYXemya9ZtfJ2L4NE-YIs27Y7d6LRPpV3PMmdgI99Jwq9m1RqlB8J4UCa5n0NE2JSyui5P1vDDOh6rC14ZJYtuEYjmJGT3gh_WFrT0GKEU5uQbdog9893aLppDZoRM5dYX6SAKgsK3eCVGXYgvM3quY7_5-DNdQoV8mqI2esX3Xn5yH7EBBCHIzHcQgyFyvGyoksPF0Sb2O6eG_kZtGYXYA0Cywi-mtM4pqk7Lw0TKdKa19yjWprrdFPZ15xIXawgu3z1IXyvix_k1oUG0W1L1kXW_4Nr-4qr2UZ3cxzZUHqAuS5b5WfKTOXPO26v-Fftb90mPoDjQNaCj59a_wOCS9TcO34CWlepYVgNMBlq9SZxW_9QXQ2PjDrmkG-87yxr8r-f-yd0ESNCbynpy3hgGZ7xSkhyA25cWK9wPsSfpeozUm9hfF2PGvhHKaKH2fv96wvvJlecKmpR4OzZlRWphgl2pRGFWUcpTM14qqF8htt3eO79oDH44CGIe9OawauhJ4QTA60MYpggjR0MANcYnXoPuqB895nll81hMR_Mm2sMRkZGytOMFrqkXJWLzI2CErpwz3SpS7b_GpEBjhijyt8qL72VGWQuVT67fu2cb5NCyzBQSg9fdRYM2lEZ7wBaAAy10-uvBcZ9JoCTbOaD39d6vA-yu5yKj8yJrFmui8ZOMZ4OeU04yswn8YZYIyrupnN46GCuVqDAfgV69BuFHreZBZxsDn553FYgXmL06nh2m3cWhOdXe-2Fn-zwAcaG_JC-Ab3tcLooPIFtv8Z6NP_OxHWX3ZAYvMbZszmOr_pJwm2gznDJEAUhaVAZQc8aULQIfl4uxGlhBieie1tZYtbSDH-aPmRTow8K9IodCfsjx7g9bnkaBXRO0Okh2NtHzLNeQIr9Ev0hECPrjmfUrZp2tucgT7P1VimoQuo9F5lAWYRWNiISHK55LJzKoTmFhyMgMDPCwAYprda-hl&searchType=return&searchBags=0.0_0.0"},{"cityId":"City:milan_it","outRoute":"OTP->BGY","inRoute":"MXP->OTP","outTime":"23:35->00:55","inTime":"19:15->22:30","outCarrier":"FR","inCarrier":"FR","totalEur":197,"bookingUrl":"https://www.kiwi.com/ro/booking/?direct=true&locale=ro&currency=eur&passengers=2-0-0&token=HtAmoNdjtQsx6m-ZSc2LIkj9iqbuO1iI1oqjtASPTf2nUwBWmbVk-ExJ1X42NeSC9SJ_71uqZ7p8aN23RZZ9gSP6UaV1x0xRqM8g6G_suf_VHLvS0Y218dsOhhSOCP5CXG3v1gJtfscZVaPGZxJmznXGQUXXSHFVjoeRprmR2Z7RU1U02ObhddSv-CbQpLTjKT6Ztd-gWSzn-K0ugZDinS-2DEvaMBx_vjBKglyf_xoKV5TEcboWvomi8LrMkFjKo4VGn4iAfVNMh1kjwv9T7MQ8kgXN23FGS6-EZarScbSsFk73C3IPXLV4wEoQmkVrp_BDnb_mUpTAhBxzln8xFEHgdV0Ua8wqnR-Z2n0QAv2dFlgsUnJ2MxfsAzn5maplYjKcurTFKJrqoOnsE55ZjkBbe1-10IWYIgGnuPxBJJCI21U2-l9U7B7NB0sNcm8zLwpbpW4j5ffwPaER_MZh5A76MTNVP_4wAzMd1bEq9bKeyXOFoW5CLVdBSXazl5XvMHL8tKLz3cs8G3PBGcyu2r68eFFEdz9PsmMUUQWOvg8SDK1zV2ni49mTwyxL20FwD8KD1F6qyXMLH7B9EbiXSesYlAk2vjllfatDqMEfz4Bzw8Jk0iAqfBbUCoNivCW2d5rOqr4x-9c96c6qhmxB3rU8-lTHgu38AaQoNzEOFKPa6Cf8pvZMtmqb2VP0Efb6OgjBENO7NmA2Koq_ADZziO7gLo4xXggkwX9ogyRnvt2uYS2PFphi3sCr_dcshZ0waFtss5sWzy0c9cpDP9qN03J70JByMicxu_Eu4eLp91Auys2DNjHyt2KpanL3Vh6vqV-qT0iQD-J6FS0Kn-YDy2WzjXvvoyTMCVVQxzJNdHzy9-f3JoLpu2fqnkCgagAyWXHbu_jb2md7gCD9XJE-rS9WCuPZVRyya26o87TQZLXbHllRh0DI0HATuNC7f3VlulvzOXQldJxu6rajss6e0Xn3IkNiBwtPSlVW1dlmAjFpoc5tyrdyLkQhNjZt1pLr4jF7Y7HkhVwAzyDaaC_2nVqBGruirXfC5hgNiTcxvDLn0Q3ELCwxgSp1w2KDJU9z4ho9YD0Sj9C9ovGsLu91Fz_rMyl3crYlmuwbavUazcRAyp57h7ZK-B9X2X03uMwkk&searchType=return&searchBags=0.0_0.0"},{"cityId":"City:milan_it","outRoute":"OTP->BGY","inRoute":"MXP->OTP","outTime":"23:35->00:55","inTime":"19:15->22:30","outCarrier":"FR","inCarrier":"FR","totalEur":148,"bookingUrl":"https://www.kiwi.com/ro/booking/?direct=true&locale=ro&currency=eur&passengers=2-0-0&token=HT4UIrNJDCKk3kPxKjI7W2tM69QGC8Yjgk1AC3uPtUabUEXkT3t3pDSiSfjc8sHS2xdzWkPY_AaoeofTlgYJUYOlQWopdYjCMyN67ur7ISUqo-3WdfWPF6xskhyPU-jRldkI5mefM28iLIhdyGh9Npyr-IodwRySaf1kmU5SgB_TWDkCFGaANdHbBbbIjBH7CXDjdM1cvjdwfIRiS7C5-OHUTE5sBlx4TMuqxakqCa4-_24UFSRu19hsnlpfuhWM88rsnfglIW4ooaCcBdWbDDgArTdPMZtY5wgM-c1oZJjFQJCoyWmc-VeElDon6OdTR-WvpZAzGPkTw23_rJ3OPxCIWukJuPXhY3HyKMB19J5ybE0-hI6pNEU84fFBJ0B4IKOVVUs0-jdAA0_Tga7e_LvlIen-75p1CTIb9wCtVp4fFg9og2Z1s1Tre8DyQo5ZgLQhqZWZZtJVOp56EMW29oXiCxg1vSU_KIhUcXAwxvrQHP09X87QS4CPwiaZRStNoqKNf3Vkw0O6O1Sg5GTBjXC02tQZU4BBXOMzesivyiKUOZGL2lNkhTxDUbcLRVA9stkZuULZlQFGuiA8OCFMZPe1a3r61YB9ErHaKyk22dF3CR36pRYrzT1Lk95LunnFDynkNWnWz0x2q1dsH_PLHiZ9tQQXmirplM5oDrLjgWh6721jMOxx--q0s4fg-srG7vhx8vYuu28xvMtZ_2Z-cfea_nfHq0XP-Bk9_yr0Ms4UstRARUStp_9SVppdJGGWV2ojmzgOiLx3Dncqyt6eP2HpH8uR9Dks7k9shGZuqEpoTZaRM5ANudQrFhj1wpmHoSlpncUxjeZjFEFaE7A5KDqlE-MSive2qIWRspliMBOnOHPWQuitNz4vPWGBLffcwQGYY2ym14wW-qy5tP2Xpce7vDI6ZIz-4ubqHruYh3cyZ-9kODxDLExc8oKKLOZszDku9vsjbDTZAHb5ag9pjMrjU5VqI8F9dlEsOwVrA7qVv9XMJ5fgZVYB4G_DAc9G2zDjlRzlx9rhilmdwZn-RWGnPw_4MepreiNZAeGiJPaatIe9UhLikJXbjNvc3STbgHVR-N-nRksKdHH2vinnmhZS8mNBvTtVY5WM9QOlWmlis66UKeEhy5Oqs9ien2mO1&searchType=return&searchBags=0.0_0.0"},{"cityId":"City:milan_it","outRoute":"OTP->BGY","inRoute":"BGY->OTP","outTime":"23:35->00:55","inTime":"21:45->01:00","outCarrier":"FR","inCarrier":"W4","totalEur":102,"bookingUrl":"https://www.kiwi.com/ro/booking/?direct=true&locale=ro&currency=eur&passengers=2-0-0&token=HAmThpe8RELy5VEDxoCvQUMgM3LUWBqAgK8a4tiT70BCvkSaXj3E564oJOfVbS81w5WlYIvbecTRuBPEdUTcVJIwSiyC19fax6sfe3xQf3xVJ7WL9BvBCfYcK19GljlbCcKheXQGraNHR3DBMVr2lO-BWLirwOuaeEigH04ARvGBqhuesnLja3Zv9M6PP9C-RUf9meKmcuYpXn2LLAfOuZu_PXMOXds8WAF6Y1tM27Hy-j6Q4V_K2NKMK5uUeFZDiLTpszke5JcjTxSl_PivFJhobfUfBzUyfyad7ZQKWw4fvDakka7JgD7tTymAEchIbpox8fYXUtUnZS3YIBVXKl_WBKeS8SacFkNlNsTHilfuz5CFWnYawKCP_pFL3X868_9MDMvNhu1ZDEM-rvfiZ2J3UA_5QdiW-MkRWEplr9TtuFDpIZRK8RWfJ9B6n-ZR-c23pK6wkAUdqF3lKuSO9-ibzWQUK1IR4_CI0RISxqmbOpQDghWSjfyLpoAnHSgqbHSdIEslo4XzMJstEcdhe0BAYXfB5aB-sEmtCoxupiSghxoub_lZ6cZSiIhaQD0nUlDovKhMxUHWLpSugHnxaL5qsp2H3KZ103afAcGG_nr0zeqyReQ_T0-xKESbR7mXx4S35Gv5cGZB3wL-jsmpqetStZMKzEmX_diIC-d4cRC7jW58_rbxK-tLFnt6G8L77ieFHayOPIbHGDbQwcbo3VYp3E6TsX59iKL23OYYBSuHW9JTuSSjZphYf_jo4OKD1v83e1mvP1CA_4PiT5Pulmv4Pdx-4p4T-gpZx5mVYekMXG2wohg00m3N8PAFAvEZ1pWuDOkMVf6F9cz6BtJMlS_MotHesxGrG0SpoRARUbh7uXrkmJ7OOByPTQAcikSKLIF2UkjmF3VgvOXpSabEdkLIjhcwBlbCNj2dw1pBCHAeIKVAp1ua99nCdsl7gT20GM2QgItI2h767TKmxc9HyEvAdFXmTpuUJkxV-wTXk9ADLkCc0BFr36pU5bkvO5sbFoPrGrv3kjtIX5n_SUM9uYTnSxdYA1ZQCYsDlZKVzFxlnnlDy3fL-0qB37zkZXmXI46zhPxt-3HxZYZVHd8mGmkyh9NXV8Z533icgMCrvPSzNAJoyzSQ3yXSN7EtqWQW7u6p0ljJe7-fUqiqiENGkKuv7w99847Kp73XZ0v5paSo%3D&searchType=return&searchBags=0.0_0.0"},{"cityId":"City:milan_it","outRoute":"OTP->BGY","inRoute":"BGY->OTP","outTime":"18:10->19:30","inTime":"21:45->01:00","outCarrier":"FR","inCarrier":"W4","totalEur":204,"bookingUrl":"https://www.kiwi.com/ro/booking/?direct=true&locale=ro&currency=eur&passengers=2-0-0&token=HRyqi64zCrJ7iyym3aIWBUbc7O3N0hYXZtKYeMoQk125E56qwRFjrFmvGlBue0w_kefIAc-nfiauXwd47YlAlwYYuUYsUh3mlty0CYjW0YT8iMCSZhi8Eu_H-7GqjvacK9bB0QfyZoGl7DdJiwEmf8ho81YECDRUTaGpL6uE__2uC_UY18O8rFn722nro8OiFPmbDJUCt3yrq1PqaJrf00u7YMF3r0wR_VsL9LkhHXfTswpPRLdcS75_BgejxmN7y0ABsTKWVsQe9yVzD36WSGB61yv2CR8P7QhTU2_QgJ815ZlAgrvCJFTS0VEopYm0_Z17sgbB-tY-Zq0xMtwK--JcFuGZNKiBOsSIFWmynTMX7qk6Jovm-8zkdOQiDFlg-iSRm8BaCCW_jtJ0TLPw6VGkWHVljxfEbpRy4z5hChSJ0u7n8Ckz8utFjFYrCXf28t7BpthiJ80RGUf0E62W7OfgNMglwsG8sMQ9urEaEwhAjyyyx09NZhqoKKJAeq2s8HTDonePXVH_Oqtp33MiSEi01Gwviq88p6BfPopAFEul5kCDkfX3ddNwyAGGmaa0r4fJd_GVlA0B_Hn91Tg7MXVM_jAhFdrraURd5Bca26_LBrNDM8YnTIbnik5g9Sg8pmR_avB2cSRjtIDAqBYe1CeKBe50U-yYvagN1QYZPvEbuTditPuQytwaImo39eSD8_zf5jfMfAJC00m26_l1yn59UEbbjhCGy_mWwCpynfGxRkwxqafr8nqYwy-c1oD8dQZteOAqIrbzqTfczAH6sDZSam8hpAOVUEUDsdWSz6vzxvW-H7CFW0qifS4EPsgfLqnK9lorSX3sdi1RuVGvbhlU7CgjddZ-aI6mth8MwW694CoMmE089GybTiW7F8kK85kzlSfGhQMyBJkjpASquPQPrdMZB0hIcIsBUZrEGvqEe1ElVt1fFxbc5kS4jLAJLN3vWtACjovwNA511TmUIl3FF4SW0NC1DLLK_MCBmarJfeXXVdEDoGZRH8PEbIb6RLXsrxZplbkaUf8FQQnMPeJlkzfTHBAiqYm07_4_qgugMpG6msrjnV7X87xkTCrjDJ8dIC0DzvflcVn5kpsy3JWJipf7KpwxcrlMSDizADuvGGt1Lcio0eTWtsuDiGQ48vm_2us6NE3n3iSaR0YLoLQ%3D%3D&searchType=return&searchBags=0.0_0.0"}],"bologna":[{"cityId":"City:bologna_it","outRoute":"OTP->BLQ","inRoute":"BLQ->OTP","outTime":"18:55->20:15","inTime":"20:50->23:55","outCarrier":"W4","inCarrier":"W4","totalEur":271,"bookingUrl":"https://www.kiwi.com/ro/booking/?direct=true&locale=ro&currency=eur&passengers=2-0-0&token=HMmowKsa4cEgREfO_GsH599oymUpAyw_vO9s8KJ2v6Sq7k67jfCRclj67axjfj_WQfenuHjEJoMox7YEIKJhQ3qQB-F5WWL-G9EVQW2OYqehmcsH3fiY8uRL34GEru7r0SfLKG5-ml6QbiDQwx3aMyiwX46vxZTUHF35iOYxRg_A27-J5Hg2Sm6GdijNqsbVkRnWt5ybbUyqJSznbzw-a5-m61axR2w-f7gsdnxcqV-bvPct6XTNtF-OU-EUEGNF3TLjENA-anJgWoercwscafXreAXMXF7uvbdA_aWpoX-gOAaSrHeuCsGbL71ic2PF9NZWy4brcJJZSwKR2Copp1qxFi5DJ3a2memg7plfRzxABB8tiX8u8I-T-BcxG9U79mN6QCTs2XkikEsK9Yg0A0tYPiEyX268I8DnMpyyT6yRO9tMuMWbZpP45J1-d69dondgA6njflHh0vDTvIBpWwYHbbUNOrepHSx2Blp_4JWnMUI0Cxtvd28jxYfhINh_luCHn6cN1K6R12xo3lOU3EIdWR4yv27FlXl36sOxueXy_dFxKXnz4aqtN2PsEtNRNWXXh9vQryyv5Aka4NG9-4hxKjwrcstipPTH8eF70vmt5XdfCxLrCxrwev_B3o-E57jXvof2zW9gS8VF8yP3MwY14v_A52j9paQh63bTqHWDSNPB4gJchpGaUUwwsHDHxMUzrIF4mjWbMcbCO-VYLJVmZIj968ZHLxQFsttiRWjJ7SpFZKzSaYG8LBIseaJlSlLsvZBtlVttNvpdfDlrg0LgsXu_rC8DxUH-N24b0Nh1g-h6G0Eg25JiYI4Csl-CL-I5r0fr1xZAgBsklhdCUgrcUrKpYmBOerctTHX18N13sO_g2I1K3Fow5-44P134G0y-bNqq2ybQQfKjFO-BZoCYJMxFkAUGjIfj3KTSdU7d1a-HsOtEYekLER6GU_6IyWS8ddrRMi8D2BTwvQMCu-Zn_9KaTxX84eTTB5xByEurp39TODPjblgSIRhK_iEHc7xEtBSh8wj_mgNYknztT0GySPzx4vAEjZ7IzKGeWSX4FaYxnmI3DS0ra-nsjb5UR-pySLSPhy6J3q_yGXPEzlR4p4fcPhwXow-o413a59K-1TiKt13Q-MypuYAiUoceErLwRodA1qoZsm1cHraW3Nvr2lvDqEP-fFq3mT7dqk8w%3D&searchType=return&searchBags=0.0_0.0"},{"cityId":"City:bologna_it","outRoute":"OTP->BLQ","inRoute":"BLQ->OTP","outTime":"18:55->20:15","inTime":"20:50->23:55","outCarrier":"W4","inCarrier":"W4","totalEur":208,"bookingUrl":"https://www.kiwi.com/ro/booking/?direct=true&locale=ro&currency=eur&passengers=2-0-0&token=H0kmlwn3tvcKeCsvaBmP_M6bya6nnpCNZthR-EjNq-XVaY2tLws2Z3J8ZXcu1jdXEce1vfHKG4GuxBvFpUoW8dqYBjOnfv8chAe80uLaUgpqtWgBohCFrCSZjgg4Cpw9Jv8i7hJXOPH9V6zgOm1IQGU_fZjCEoagFNyqYgqM5uBZO557TPm1MXanQg9UjADejmGI4xuFyd92VG2EXJTgZKnJ-vBm32aTqzXw2OucNVefk23SAotk4RXtOsprU3RqLgKEewb2jA9COZSpzZlFGKN_CtftVRXiFCjfn7pdNFvOooA3S_3MH3IUj9U3k9PeoGQ7IhPGQXGOfwB9KYdQAwOFG6kf9lhDFDz7AlSkgPs5nZbADYe8TNwWlpPz9mXKTJngIHmcqKLnTbvuX7rOcEa0Pn3hY0kNWd53uA9aV79-phJglGeHIg-tKA5vIc8ggu-xVWyHBl7u4f1tphMCbCkEdYqQX0fbbhWbCBFnT_Ex3NOPSBd1DqsRlWuC_s-6bzMAYCUSPdOTcvQzl-BTu4E_S7pxgIB_XUdMWr4C3xswW1ew5w6PmArsf9zyewWY5Hzh8y5SpEDvnIG0DNLaBUvcwBN_Wa-I3Za-FNXpVHF4AVykdvDj8psMRmem6GdBGnaZIwtQ-Ab-MnFmwsac4vJS-uchbnoLWvumD-sluIHtWXMt_vVb7ViBeAKO6pP7VxUv5_pVCNFZxpXkWh6MeRVNPbbR81yvoJ5M9z3MB-zLYJTBX16dUSEZgZiMLRgP-D7uPBSKsKHabwSAVsbfqOC1kyqXKO0STzl3bkyatLn_kKnGKxaXfblqVuJ2TePCahUUyBhnFjVQQydFuZ9-V-1X-KO25irGZ-WNhU0U2HASdhf8ZNM-p-qEeHQ1k_hODVO4NwFB9gvmopETlbkEYr9_kaDYjDJHUEJcSEkMM48V64JFqKV_RE8uHDA4OlgVKnAG7VjyPdPf45CiSSgWQQtWajTGbpckVNAGMG2U1i_zo7q-lZQRnm2tKG2UiWQPTjEolTpYKxY9UdJSeYisi8TyVikqgnBMV1ygCrlartZxZT9DKtpeS6ld0Hv33mFwKw_Leqwmmu2rqAmk5kf8bdXVQeB4frMTzdixPGyFWSvph67DkV6dELo-zF3OTHjY5oAUtK4qHIHszlI7a3DcA8q48AmY8J6i6ksRgYw1rXA8%3D&searchType=return&searchBags=0.0_0.0"},{"cityId":"City:bologna_it","outRoute":"OTP->BLQ","inRoute":"BLQ->OTP","outTime":"18:55->20:15","inTime":"19:10->22:15","outCarrier":"W4","inCarrier":"FR","totalEur":229,"bookingUrl":"https://www.kiwi.com/ro/booking/?direct=true&locale=ro&currency=eur&passengers=2-0-0&token=H5ek7U74BsNPYqCeyxrdz9MEORzVrPZvytmlBFiU89DLjT4NSADD6iTqSUGrTKYQuwpP0PrnW-FHLdSC-NzRVHCmTAwOVLLcwjDNk_lPp4uP0SP10mC3vWTnj-Q9eHliTyS90hAxcWO6oC5AoVsC65jnhpj7aVWbi8hrAz4snH9Y0yTT96El4AkhYGvSKd0Ubh0XP7FoARZVfWlQRctEuC5t-R-8DNtkDrU89F0HNA_CxFMqC68GRloNtaVkPdRFUiNWxy-P3M0rL3-8AlPvNV9KzVQ4OSvJUREh76Az2SLF78Is-0bSHkblLc6yuLKmtlY5Ui_G0xyZZXbGMy2ie5B5OKNRENcmec74nObN-0JPEGO-CwXump32vd062OAIWvtt3_udVuTmFY8A8xz4j8PciJZqnlTR4m4fCNXFgs8rNDzINRrSszGYrc0SjyHKck34Or_vdU30wMl5zU3SaoMDiyGzzvN2mvfDUNHm7gmUiyuUmMaL5MYQieJBR-G2YIGeiEyv-uQGFph3boEP2QsmMREXbl1uaOqofhc5C7HpjfKVgtxVGgseKaucUM_lx-p5QkPIgC9V_XjfPfAlAqDivn3xrLSTLOhgU64pp7sgbtR4tG23dSWim3T5EswDYAAL2WicTZL3geeL7IySjE-rHqLWJaXagzZ9g7sZxM6wACymB-52T1ddPhqHOuUF-zNSdUoJRY1ApNiLioQiMyr9WLi64mur5nZmVPRmM76jhBv4a8kfEDgUzJm_ybf2OtBZ4o5CCCCyuP7OfmrEXkdwp64Xx-kUOy0gV24__xe8IEXDt2E7lvEdxvDFrNz2HNKWL4raxi_raR_yMuuYQ7YPbmhJdpPKUovclJpefREWNwSS0HgxQgos4TdSDu22ySHC5Zo-p_TueYjORcVh833pNxa0yDmZT-9VQy5xcdKyZ0AtPhP7YCO2KMznfijZwatoFwFcXBg2S09Zt5VJf4msuZaVwtdcT4RvKpVzf92W-okz8WgODGvzzYQF26CkYot6RmYAxLERwmowpLz0vcBWI6Sornb0498lLERJvVBDuCUOK_7DyJg17jCZNFCLDSv5iBI6o0voTFVZx-ssmb3BYX_rgUD_tiKehZjiUXnhq55bIBnjgfhQIrhIs_fAeeafc4uj5XdQ8j_qove435Q%3D%3D&searchType=return&searchBags=0.0_0.0"},{"cityId":"City:bologna_it","outRoute":"OTP->BLQ","inRoute":"BLQ->OTP","outTime":"18:55->20:15","inTime":"20:50->23:55","outCarrier":"W4","inCarrier":"W4","totalEur":141,"bookingUrl":"https://www.kiwi.com/ro/booking/?direct=true&locale=ro&currency=eur&passengers=2-0-0&token=HzYIkCNZfuMhmHfBtDKHx7Q47kTo979gCZJQXBAC1zbg6aNOojfXzDtgCu71bsScRKE3q2BHSFZ99K8fhoq1Hs-YXhhWgcLpjTYBr4Y33FO8xf4TnsMFxSr2FOr51ffCLkcIabg_xYTaHIqKWY9SdQrtMWLxeBaetvQ3WsH-9MfGkKiP16i1bbfnTatBgr_IsEZq9j9s0gawkhi8em-TCF3P3uwdzQ2AOqmp4Ae3PQ3bPYAxjrPaLH5piBwVCXKnTKqQxZSlqS5XO1J8YYqZopMu_f2LM_B94eMu6tGsjZswFDyBBYmz3iUbV1vn_bD9lHv3ygiR-Pnv4nPY56oThGI1y5q1aP11BvXTYVMgtjSJ_3iJw7JsimA9RG1Q22u2fM1vNEeUxUZD0KfOQTWIt9arXbIN6mbRra7HFD0j2bTz-GH1uCXyac3JK4jNI6u8vb8fGCKUTn9ayAHML1zuP_1MtPDkkG2Cxh9ilkqR2GZrJGf6wK_5BhEYuUdLY5SVJv1dpUXMfSWDzNbqWaAHBqf0Ch1mvj-qC4k35x3hfyEToDiZmyufrTJxi4AH2VteFdsi-6WYWYmXxUWf_gcX-VRW0GAMPVE1fKkZI26_BalwMN_EPJ5l1JwaDJ7EV9ViNOmc_1MEU7kNhM1RL5r-x6bsJjdN_u_xvY-pIdWLaA6nz8BS_Ue8ejK8h5enG_5DobKcZ2VxVzISmc3OUdYgTRCJUDz1uztU2tRkpqh5PwfLckyJaZwR8KaUifDyWOrWa_M2mj3W-pFUP24TDciCHdS5SoXY7oWcmuPTVAMPBhMc87pZGe2NfaSBkw6DtssFgIH7wYW6tvSVg3NdOwwqKggaWLuqnrb8tGkk1kB2RYY4n52tsUjN_R9ZDozALzWczCeRkICUrGptd0Ds4z39edUmz0PsxtM8OWdi3PHyw4gXSIlmmMxxJUySLB1zzTcA9N3AIcrav3NlC_qjDrfsBgABDCACOpm3w6gPfkVX3nLA7SMFPpBBrEF8xrx4xV7tsNtl0RNRKIpd5x9sdSmcVXe6KNgzDbwsMunCDDSR5lBsNF5TuAQ_i7TphrjHh-BvgiLnCmq9Mol9ZJA0TSbrY4YllzayKEyphUFtYDuu3jCEdATScc-rv8Dl7268w2l8HNqhGG7-SOQLgaHxVjCH4Z4v1OU0HprgP50-2IbI5Zv0%3D&searchType=return&searchBags=0.0_0.0"},{"cityId":"City:bologna_it","outRoute":"OTP->BLQ","inRoute":"BLQ->OTP","outTime":"18:55->20:15","inTime":"20:50->23:55","outCarrier":"W4","inCarrier":"W4","totalEur":141,"bookingUrl":"https://www.kiwi.com/ro/booking/?direct=true&locale=ro&currency=eur&passengers=2-0-0&token=HcHXDPZaXRvJK57tp2VKse4vaWo96IH3iOtmpUCO4rLDtj4rR-PwRAMX3T2d_SXYJCpqNniRY4tK8t7DqBCxYwKvcqXT8Z_pvsE4dpZYvR-ITtW6d5066ym5vRyJGeF8VjHaOJ_1siDSdX7p9t9-jerZgKS9-aYDJixVyXLlWgtfdVC-FnRLs8IRkpMPUOazxFhq6xKtb05gFmP2zXfivl_mzrNN7bCmowG_r4Kcce_6CEXjEnuVr8t4UHkZIJsygwio3_rRAgxRCDTBMajgtlW026xA37bmKiwWWETbPzO9a9zg32j-IKzOsJjco7ixvtf7J7DpiJfOyK1xf0MDSbTbubDdyAsHYTjNzR8N7Ry7ZryVxGhQvaZmAsJuz0-dvaUdpC71FsNMawBnsi-vrSq8bLFTzeWIroEEbUpMJ6qgjm11RMYZ9hPRC6QbKlwziuvkSEr3SQK0vHdTciMa_3DX6yQEcEM4HhFQHahth5rPfoNaL-hdhKIke-T7dchU2yZsqPNs_5SaO8ou_-LE6nFrnsHD9mmxdDq3xDe7xGLPql-rOn2W6xGauseo8lzD70KWKldo9lJKulXHLVYSWDAyY17hyDNcG8seX6WXBBfUqPYFQZcM8V5ARb1M6reZAR8MFBqjX6CpwsWSX-jrwH__f5i2bRnXg-QvZdf3s-hQhdtJm7lbFZbJWmdB9Sx9XbaRPEj1k6OiKEY1TcCu8HCA8iIlwOdwbJXEx6UcXNGNhKcyTC9d0Zbgblx8voDo4IUxDZvZ_lqeBYKb1yNZgNZ-R7E2Nmv3yERaR5oRlDAmreTwc5w5tK5_GZgJ1prC6212M7DPfurpKkPAD2sgyKcKS59pwZTNpD4R8xOpy23F0gzhexgeqPH2wI8qLeWV5lORCZMoXUgUPea3XWMnRGZwH2Tqpxs1-dKTcVg6XsAErEbIOLAYWgO5QHuReYmtIXWToPC8HdWT5JY-I687qPOFvw2PYJhZFikpBgtL6TM3-Uu39z6IPIcIEsL35m6tmGeiLsZBQehNVFMrjqIyHc-LcJ4emvekr0vSPQr5VNCREomckYyACo9or1YF7svB5FJmLEWTxlZcwVk3gAuYaIIatZVbs2t-HX6TE5G5KXWsYtcVJKG2Sn1p3oibVmUEdFrBbcoYTiWxf5kzt1I5J-MmDtgFaYK4tmMFfxUTdGV6OEyURiJ8L31ibuPQNXRx4&searchType=return&searchBags=0.0_0.0"},{"cityId":"City:bologna_it","outRoute":"OTP->BLQ","inRoute":"BLQ->OTP","outTime":"18:55->20:15","inTime":"20:50->23:55","outCarrier":"W4","inCarrier":"W4","totalEur":186,"bookingUrl":"https://www.kiwi.com/ro/booking/?direct=true&locale=ro&currency=eur&passengers=2-0-0&token=HaFAhdLTFuUP_uyhnAJQ1ponAWcVuhyyu_E6dKW7oLQ1629T2F5PPmLwnhiON1KeCGkaYLa7VF0Ift5cXAL7i52VNpBhpphBLMI5Q_e1vmNRzQvIc8TMdSorhCKU0ctimV1oARqPsLFpsuNE5SdoiHmUgVD1vaUiqFB77Wu8fpdS_PN5fk0HOBSf4gpG9dt-CDh-Cwk7yXQLSHxTViuOPyeM4J8fLVzY4Tf1CErpGfsykAMY2AvRGy6RXu1C3gZJyX7QVhGQMVXctY9CS9b_XmjN1EYTpwE-85AdwRtKV992LUAvK3TDcfOTIz2w607FHvuSP3R8HXPh2fPKghRZxEcgM6L6fKTpg0sbZdS_7-UMOoDnk0juLk2XPE42e7cwvyEW8FhUxt3TyAY1qRK9ztreqPKDlNxcbDK-iAGhgSlsxA_DhadLPhXiOBeSAQMRxdpsbF1Fq3l1u0LdQmYaukoTdKR79ZQLINWUSibtF9CiDKnTMIrvYlexxGAaJW9ZpxI9I8NRssvclRLMv-oWaRjRX_TB7MQ_EzqsJIA-vjrdgteBRn-2Jr2SLGU4i2_9zpN-cbiyAGOyiKKs_eoLl2oLmhpDkLGcrI_a8SbRugIiTl1vfo4SmBmtsKTHHxgI2pI7NMlc99Amorusks6uPS7sHN-SiAQOPeHKRs-gD3FMO6Wzs7wA1VKp1fB9_H1O4C7fp9g7Lc0EQKGeEdoZNa1hEIhetY9WZw7fmiTvPdGzsv_I4ZL7Mb1wo4qSoGqivDrLHHVOfxC37Q4npun1YeOoLDAtcXRepSkgK1XPKXxJQqEuU_pNkGEl0yK-YyLyyAQURyy0QQHRBK2J6WToMJoN-dak03Eg6841hBv_ggnqEFFqvpLT5P6GvulvTPdCAUom6JdM1aDEVmp-MMf83BQHsco49dK0Ny5goQbeSvL6_lyJHke-VHiE9awTon-MAIK15uI6e5Si-B4DHgrtDk2SWhMFn5Ew_mpAAAZhiht8qPQbDNlZ8PI3jMaaUe59TmYhV_EEUzUZB6Jp48AnNbxD93Su5wxnYBYcKq_fdh_57tNGo83JZWr7AWE4ewCT5PXGiJ0LzVG0faRTG1i2os8MI9iLN4p4GYwuluS3twhU4c4hpd-Ykg-O3-_pYXD35v4KrnN4PzRWeFw5NLF3c7JPJmWAyIG4X0nKxUit2Cq4%3D&searchType=return&searchBags=0.0_0.0"}],"chisinau":[{"cityId":"City:chisinau_md","outRoute":"OTP->RMO","inRoute":"RMO->OTP","outTime":"22:30->23:30","inTime":"20:45->21:55","outCarrier":"W4","inCarrier":"W4","totalEur":151,"bookingUrl":"https://www.kiwi.com/ro/booking/?direct=true&locale=ro&currency=eur&passengers=2-0-0&token=HLkCNiGfnDcReJECaCDi9KDWZbkJrUcYIvCwDNOsuT3zHwB5k2ahx9aIgQqc33I0S3OG0F4UpA5vcxICLlis6zx2JQZPoxTPzavu2WGJsgkQDtMG01Bs3OtorjpYQKFKyNZp1AS_nZ8vscHeaiOoCDPmNJH6ZwC5jd-1MP0pbTLdC7ALE6KawKHVzYmH0AOUdSDGA7sSZFkvuBGcjtAYKEMnhWToeZHlqc-A6Bq-au6tWMWW4ySxAz_KuGSDqqa6atXuCovIuf3PD5rj61vc37VlXjxXeXH1tXv9904z0NrwmdJhLrRmRdqolEAy898ch7qudzDU2b-0Mekjm-8x5tCzEEpLSAwwx59x_jACxcZRMrUGB0GbAMcdbh9xIyKGkYBS9zw_DfuLcjU5WhrRIujALxcm8iTsKczg0fbHkK-xYiFnblSPx3Xcsr_dGcQXfMpHzdzaHcVWuyRArm7DPAn6yopOxzNBrNmJyIWzwJCePaBCRKeCNKHIOFoKkZBPdolzZOf1iYPV744V7huO3vYfleR9jWYLZSkQbi_C8EDxno9mIkUwrRAPELUaKQLjt5O_ZpitfluJu_BXIXzCLNaEcy0H38Bp2iNjUqC3SlXsljgoY7suAi_jKFliinQ201aLeD-7prGw51F2yF1TtxoFmz8TTgGR3XhNPL9m7jIkoxmLNWRAlqd-Ss7VO657tnaHrs8rtCuAMbdQ8bpPuJqpjY8yzgYPbLXsXpUYNXbgiMSNvIY0zs6-EIaPNaVBrBgEjnI1DTRhpmO_87Vkj_lvo65C35ic0dGZuV-HOzmBwlKfIOnVtTWwvlKtgvkysiQmNOYKB134VoDW-VGzbD5HqEiLwbQ5BUrpj5L04dkSrkADlTqrxY-1MxC1D7Sg8iBdPT1hucvFLcb7W1aabVi5eODs3ozC2zw1KkxHHS6r74qfA4VBXHJCMPqKzEcgxTWbR7VdgyJen_jb6R3Vpz9yVIXMgsIEmw-mrv5FYvYOzrETYg8rWI-Am6rMEUrUG8LPG-q8gneEJQ7hBo9KWUq00Mruxxf6LWZE0ou8uaV2VdRThaMQof3Vt0mrYPu3aISBQgVByKM8xyv4REdxD3BTrdSUoOH_PlOT04-ahQwqN9-bvKdQqP_3BSJgyVMiOg6Ft6b-PcsIWNfJC8LviAWsW0Amrs3VIKwbhUxtGBSg%3D&searchType=return&searchBags=0.0_0.0"},{"cityId":"City:chisinau_md","outRoute":"OTP->RMO","inRoute":"RMO->OTP","outTime":"22:30->23:30","inTime":"20:45->21:55","outCarrier":"W4","inCarrier":"W4","totalEur":130,"bookingUrl":"https://www.kiwi.com/ro/booking/?direct=true&locale=ro&currency=eur&passengers=2-0-0&token=H8-01DmMsZDdBJ6OfRGHtit2va78FsgYLWwSTP4whtdfGoOVzk5_LccXZ_PH9_nM8u4aT0lM23g9uI9XC0b1tZeIKgIHhgf1e-KGSCDqrSUrnvDjYRR9rtn7IsPDGda67OPWOyjA1Q2VA44nJkN9HKUq66Wnm4zgOFU46udDwdUdpLpC9fURsbeW9OVne8C7nQ9e9g8q8xWs7esoFGdhgdTZ9rzW0izBX-3E3svVdKZuc01UdXxE0MI3hF5ZAW9jW64_ifgjFeYaKxz2dcjovUObJajIQP6YRZbX4hAxf7tAnGM-NRuRYuviHENLthaOVURUl93r0LX40Gltj9gXx2TCQ6ZPl-XMw3-2TAJCQ7-zsBJg3wnCp9HhaFcXns-4AjP6pt8xqdOq1-6fgDofoqwn7zsRUvAyyrH5NFUX8gD1YHUZQ06ppqGWEzGUrmkTN1syKjuUgBaRnbgl0nLZ9UiheY1LnBljripZdNLpRMrKu3ZaVLM5gW1Hz-LXM1dpbiyjVcWTsbtl5UvOac_bOQYxqh9-bw_nz3Zwy65vDwjMkXSamUAxdrNdODj3GDAvV92AsM9g16L7qPSZMHWw7bhghc5ylbv0wbiBRpldeueS7qamXgsWadTyb2f5ryRE6vCV-iP0hWzzbiIxDxK8OZ0aRfQ6LAokjwMO0IcsCNrO7qGcyItI_zFkKYiuYbMKrdrhL4WZEFOsiLL905m_mUa7I6qlOTRSWZqv5MHv2JXAfPZ9OG1Ou1B6avEUJUWR0aFDwhVRjMqVQKU7Tq2aCEc08NsQ_CcCCY5VZ-u5kUgxQYaNKuOJiw6LZOYGFnhcc35LfOVc8nw4YCtbdn68BE2XEEL1rwe88GAcRSuj-kG9_DyTlHeQEJRwCNZxGIHQcCvsD03YdL7bZPoppkUW0tjyk-EPTHPhcrJ62zmieqZW4npPb9ORipPr-peAdVlC0rniZ9uufxxyh1aq4nUU1s4a-2T_eFlvKtpRraIcgBs6fHpdpsEMQSbcKcwuJ7y6xCUScnhpxJEXam7mBHFn4ozNn4h4D1Ek_0lWeHg9k_tAlbsKdiiSAdquMrulZB2VE7W0nL28JIvGKcsfpdTIRTQMfSFntBPqjmrUUhEHCE9Y-WRKlepawkTEUpHW7CiKRJh7Y3H-AD5N0xo1_ZOtnXhOz0acEwLxXnUkuR3Zfjiu6EkGsy2_wSkEv8LCx6ZmC&searchType=return&searchBags=0.0_0.0"},{"cityId":"City:chisinau_md","outRoute":"OTP->RMO","inRoute":"RMO->OTP","outTime":"22:30->23:30","inTime":"20:45->21:55","outCarrier":"W4","inCarrier":"W4","totalEur":168,"bookingUrl":"https://www.kiwi.com/ro/booking/?direct=true&locale=ro&currency=eur&passengers=2-0-0&token=HoRfKjMXbxHvtbcrntPgk8l3SejizBM3Z1FSio4mAu8mKV-IaEBO0eM8QnUAEHhjSJTjSKZqqlKZqZIUTMk32lH2DyvzIWHTbZfMKOGMa1bks0IWXpqGfLGHOgpdXwycPqjSl0qUVRhbjDVoIbKRfINKjJHjcEMHcRG8KH8sjtCyxSbSH5RLmQQXrkyw-VmAMyhyXywGPom6Rsxve9mQu7gyParH4ZiA952p3jOxpXWu7xg2L4sVO3vSxnpoCgKvyIW7DFXcoKzE-2C7DUJ7YRBuEtH6-9FqerLpx2WK-wa7ww5lOUufEOBoTtHIp4xPiRD-lYBGtVei3oDhdEZutm_ld1KLouuZF7oGAz01a11RzzEdnOvbs-zdvb5SghtvpFeYFk46AavgRKVRU5O3iACd-FuAVtcKFtsXlHo9a7PewlX7TR4WWMH28WQuR1R6SCNrC_0wWix7-g40BcSOWC2FEDpIV2-p4CovzyU6Vb24FyfeqxwhSPyO-dhQTDK8hFVHxlcpUtQimQZNJw2Ga0AhtM6uKzqcsWCv7HbhjHz-kvfciR6j6raf9BHjDcIQ9XyDGZ6YkHp47X4FZw7XHUm37X42iHUj4sNccnZC_5cVGL5pMeMEwZzErsDae8nVuqiYmh1bU-xH6mAZZUlO3PFEmdXR0DA0CwXLIthQtegJ91VaOAeeisll51OW8nSYPeZw0kCg-fGFdpgA_02dEJb1Ak7WpsBKDFzI62uUjUzrwKU28UKjeyaIB9jLbYhSksp526V8srnO3-sHqFGTIYL89eyvxxR0z82pBoFE2MVxA9TS5soQQAOG3IjLhvliCdIcPQuO5DztxXcPmhlcWYRd5Uk9smKzGDe7yILBQGC-qB_PxTkC_DXDaOVGu5MmTmyKFlDhidyMt2_rDv9BGlVeQZ7nnZ_wzYs7jPZJMgJz9ZDx0grlUL3GOMT6Ok2455zwJVXCeLpE7pfuL3Aw_aYmFJIAdP8MBiDGzDqwN5OYqPFp-uzQu4NnT-B7bRwzCY-S8A2g71xKknF86zZCL8ZQprnJxDs4t2pmn3exonZr2TgnNEh7dfycJV-TDNRzyBN1g4fMvzua9NOyullsYApF-99MqaONPykQOGI9XI-LmVh4ImaD0pZoMV7K-ws89Cfo3XU_RkwNdT1Sl0kUxB1JVZsixoSlIJGcX95ERsqQ%3D&searchType=return&searchBags=0.0_0.0"},{"cityId":"City:chisinau_md","outRoute":"OTP->RMO","inRoute":"RMO->OTP","outTime":"22:30->23:30","inTime":"20:45->21:55","outCarrier":"W4","inCarrier":"W4","totalEur":118,"bookingUrl":"https://www.kiwi.com/ro/booking/?direct=true&locale=ro&currency=eur&passengers=2-0-0&token=HkvTw2eQv7wpgZJmzhDwhGuvCWoJ51QGhgB18-CfFiZPeT_Z0HvfAus9l9CDRj5p4ozn5rb723OHasrF4YIcI8WnJliftpV60c_CizQ3NVCf0mBE5DHNDSicfdX7aerNtSYIhRgMgQBfwAlti15dj_GLhvNaCj7sdmpHqc2DT95evnLJgTWr3M5Vem4gDPlvq1J0IC7rdvq6qp1ZFgVa88YbMumU8HPhctTfU0IIsRMXn2c_wC9CG7ClDAWSUcFs3WHl8Xwk-WspDt0I2EMwt08RpDgndY9FkUwMnk4s7KGdax7x5Ngz1pm5c-4Y8Vx1kifXovnwcnNOqpV12xHFcQfMEYMx4P3_QOUdQuBvZi9O8BZCSEewG6Pfadp57Y4QmxWxHcKQMEXQMrznVWYJ1jj4VfWwI_zwH_02D9JhcstIXLOwonCjMvBhujaC8GpeeKgAC8M7VYcJhnrxkPetP2LB_88MQF5KcVs7XU1Pl2nIlgOuM53PpsQrbP4tTcSOMu_cX8cr5ImTyukApr3BlYuPkrZ_IKhRmeqSmORHhYJnrfVvwmy5UlJyJF5vHTU0hhwI_ko1-tNUuTCA9x9JeqptnyEqmQgPZxq39GiMaGfQbX-so1jk8aVXbvMFtSEmD4R9HIgcK6eBy-CvJn7jlwGrgkPoqu_rV7bT0vC1ikdcoAI378GIJI0WwXeXhm_RY9Wnvu5PanuZN2sIDOXHc2ZZPrT7eeSMzurttW3fFwEjxq78mnj4QkQaafyBX53x7OagneB-9uuo-JWLL_Fh3duRPG1IleHjQzrpVohn-NtZZF2nPH0_Vb5hw5gGjZuJZcZKeLACF5JG1F_-opG3bTyH5vhpW-iMeJdlqKha0cRTHGDGphYm9hSOWvZ_xwmwaJb6MXjSU2VQBfgXJYQTuomeF8raPVbGVp3fHvitrqxy-pTDHMcm0sOZN7T1O_LHPNg_I8FpKY5QKIc376peQqtccGNSa3GTN5DfhkxFo1ZqiP_mG2VhCk-4e-RAfFtaOsTnlN2rh9_yAuLXiJewyBYAUyei4t6XMXw_97WCpTd26KhykiBckP28IK5hrIE9a_HLXO8-RB1vAoZl4Hc0Pt3IvLX39gwegLZEBFMjzSxCjAfE2k_uC7ehqKC7b1v0Yy75yR_MHAdI35Xl5fYvDL5S749c2O84kXIsC_ETYwEvbJIvricd01McoKVLymn0E&searchType=return&searchBags=0.0_0.0"},{"cityId":"City:chisinau_md","outRoute":"OTP->RMO","inRoute":"RMO->OTP","outTime":"22:30->23:30","inTime":"20:45->21:55","outCarrier":"W4","inCarrier":"W4","totalEur":118,"bookingUrl":"https://www.kiwi.com/ro/booking/?direct=true&locale=ro&currency=eur&passengers=2-0-0&token=HM8qqk7s-AAFktz5IlPWAzOx2IOYFvagVDAqbV9i4TjlifH8vKSo5f2nTjn9_0QlkRAg04LiX8DwwiKCmaCC7yEskpY1BPav49ay7_p36HGd3xswmGdUPz7pQGj_ZxQwI4RBB7LzzbN75EPktvb01bbBeD_syeMDiIgYC_zDg5jOEZwWR_SCNn1wflPKqCmfDRTp5TEjQLipKSCKefWhiUh48VbgZHuyQGBDTTzZCHl2L1jq1IICnjdbzPAcoxPGIjoy5Xsn8jqMr8DWPIqDI9w2YUrWJwgY9BzLXNU-1ZKw_kfKzeU1RofuII9ssFESnJOC040kvno5vQDp-5wdOsNtDMgFwK2f3nekIFbOJOYbvX_HJqJpY9QiYws2G4ZwrfyIfke9sXWBMl8o2atbs5UfeBdxmn4D2WnLnLgb6PHPgwhKpSMIwpRUoXkt4uCP9pDQ-k-8Fl8Cku_D9xK1L_YaGQqhKzaMeb6LMKX3_ul3JXTcWqMn4D0KRXQkocSvqMx71ACOPTozHsElK5DfUTpH-54MWVusj9lXAW4NUp3afiOwCLNqH2ZUh8QiGIp7ZyzYWs6JroTqh5uCTeNozS21iSpa8u6FiYNY8ZxLiDxrYMZ5RRhRG_O9f7N3Hhsw2v1ZrePDW42UqA9s1YRVNUaFxccAAANQHc-fAyoMaxuGRxNCOkFlYhjIxjpOpwo2bquCl_8F7-Gyg9GOm9B8lXo1nD5l-A-O7B6O59TRO0JuTwb_0DGQ0HYvzan55o4x3iwtVMvekt9WlDcRkTObuBH6n3WlJMK8qAzUJl1QBwdn-bxWLlNhBCPSxOHHhW1oPRmzuK55hRwDCZ8MXZi633cGt-sRxa3tpOglwDphdQ3ciL3xfxDh9_gneW1TEKu6mC6S_m5wTL3esRJ5ATtaeKjQrlu1jrzhm9VOAI28ZOH4Hyn6K3U4T6tMHKRw2TegWyfmH-aFcUbL-kIlqL1zIScd-WN-LXccg48PhnYsvmqw7E9aIRPutAy0BpzIpGpC9rItbi1UWkyuBbG9WHUUf9PZVtu-2dqhavsyybqAlWbiG7YNgIRfdElyBJQCBKmitNX2EQcEQwKSkeyst2qFBVImjhvJ1oTeYZ0I2Jss_fIg0sH97omCH8yVXrwMLVVvBRCgCuI0kffZMYeg4I1hvzHVC5CfP7aNfZklBSN_Bs5Griyxntb5VX_-3XRYyqDBq&searchType=return&searchBags=0.0_0.0"},{"cityId":"City:chisinau_md","outRoute":"OTP->RMO","inRoute":"RMO->OTP","outTime":"22:30->23:30","inTime":"20:45->21:55","outCarrier":"W4","inCarrier":"W4","totalEur":118,"bookingUrl":"https://www.kiwi.com/ro/booking/?direct=true&locale=ro&currency=eur&passengers=2-0-0&token=HIIOMuulBJ27D9sg4Drs0yeZXNX0ATsd0H6UEXiaxsGx0P3oGUKPTbzK9GQss6G86i6Z_hvuLUqnvrmjYO-tbbmNesFaFZ1woi1ZrWN-wu8OGTt10OY5NJT8MDZ3A87MtWX8Wcz6kdpC3RLNO_8ChC5GoKY6vSdRwdL7laF7r-wtl58gNqZdVijPVgIlEskjHA-2PPJQq8cy-Hs-tk7jkOsPbZ_FFxBoACVmBYwg5IRtx0OJA407T5JNzAiBsoxLST9swfoDSy-XisOXkbwkeyQW-gFhY9Tw0NvX4ZWGZOnmlW3GHAKD4rFJiQjHC-czJE4lBGgnKavXXStS5xBESex7TMBsHg52zOy5nt49wQQ_cK2bxK3ohPZaz0T2ssQR_hVCIIjwHHc5qSf5LvkyRMtWl7FOWuReiQvx1gjmsja_jTqVrHWJ33voPHsR2d8pBb2qDlOhD-s9FMLLHSIZ-wPIl0Y6qxTV0VTdgkBZYxbO1LjFezkWsC57jLI4IaA3YY9q7TiVMIG9xkXwmX4guT-PdlFfPSUMexgFLfC3UjVZg_MLhDz7B5bwM-li81bakHKk2v0DA0wgEhAli-K6li8xEPZ-is4dv7OlUsmpfFMoZ-35il8YffaesOVcvgtJefgSJnZKnf1EWmir29OD70oHAMsp5ctqiUqkTwrC0ZnpfD7fmULLKed0hTS4uEkUCYkfoV-peS9Tr4eZeFPrTrJkhAbB0Ba1O3kOibsj6gQRuTsxtSKqld8kk3rS0ls2IjPMVFtcdq938Zx8WNuKEvONe6P4vc_tJEDvyRsqjVXsw0iv71Vs55voHYg9x_h5RJ6PnZagleXHBdeBUkt8Uzniav7880Z1QH5Gq0g9RWMvMZFvM0gfE1zKepJz-rzWcL4SjbP51ti7rCp89wG0lu-N_k-1kv1bmmJ1OeI3mUP5GvWZ1oa0J74kUMhCUeGmZH9wpZP7Ky9bi5UGWk4sCsHlWTdBGcgPFfYnmWQ6RGwrXD27ripC9eK2ZiXGA_30nrwcliAv2WzjvXVrYPKKno8_XhJ3fMR0zY8P2-jx4CQ3e40wRBnqXMUZkHAlDDpE8aYY3kdO2LdGfMLKmIoS5ZwX25os-ExH9VynehMiRBEWqjyL93d_EId0AQcw2urvWBS9eyH-8F0B8bzyTA73_ceuuPv1-4KSaf2mgd6pW5Xsj1ZKbIqirwXWMZ8lK1-eZ&searchType=return&searchBags=0.0_0.0"}],"warsaw":[null,null,null,null,{"cityId":"City:warsaw_pl","outRoute":"BBU->WAW","inRoute":"WAW->BBU","outTime":"21:50->22:40","inTime":"18:20->21:15","outCarrier":"W6","inCarrier":"W6","totalEur":226,"bookingUrl":"https://www.kiwi.com/ro/booking/?direct=true&locale=ro&currency=eur&passengers=2-0-0&token=HAmYZ_tjM2V_aZhyjjgVkkWOG6vImPMERAx_FuLAdhVlccDIKL0sqHMGWVGFiz6VXe9lEgNP7oJsCTcYlXcxZz8-L7KQLIU9gwMZhA8nW3JaJhgSg-BtkzkaetrnvNDhfM3Cd3yak-o4PNKr-7OgG9PcuTvQpCKATt8SGfJ7aPilv5OO8mGuwNInoa5d5xtLThXzImdDjirI7Ar_VGzhoHluCy5hFedF8R8JNmFg7wXFBn7_33c8eu02xHZP6MSEegchonHhH-ri-T-PxnX2qnz4ghX-W7WiqgNVrb_oM5890d7NclkCihWyCU5eQwPYZtKLrbVzGY3tnj0ijLULEkdoyLBwS2Rth00VnJGUidLTYVo-1BU1kcJ8cQ-k4dya8Ol_qT9kzGo5nNXL4DVy1cT72DlN7AsWrFx1vcmkuThQfJ7betEdemFrqS5a23LEPdt62EAQvTglsUNp2EjlMv4pr_n0SNSS_kZt6mRqJ57iHATK1OV-dMDHrQDYVzcuJfVU1DFLvUkiyetG3O477BbXXTvUzXKCcv1RBn940d5BpR6i7RyscTxNdFUEo1DOzTv2FMo_gUtNCGjY-Z762JwkLQBKO54Ipm_ehXf1FDD7ukB22g8WjBf-QvGeqsb2lXksb0kRSHznnBmf2_S1T8jxXNi9-hm2g2aFoDcTS-p-k1F_nZ8K9O46maCQeYg9mUpfKE92ARGaGtVFiTuveFircRbvqG_a47tD8iRoqapNXz885fYET9LcDO5gqxrmNBPkQC3I-ubngiZ_cfLq6-y4LwIx47IAZ7ibC2_q3mKjYEQbpra_QhoYpCy5LeKl4CEyWnLtu-GzzhEiRRMBjXtYOL4yZrQKqfkThctouRNR6Ued4DIuBr-sYXPjPdQwXffEZY9_mNF7ZgYaEsQ7YipUg2XjFkt93PRy1jyijKYVvEXwDoJMpnE7-kmTOltgeHf3jG-bTuwJtlZgxV9EjUeoi5iijtlIjGy3i7F7BM-CiCrAsoxeGk12BRnkc_OayTC3iu9AmcsmCZmIkOLgyVRBUHq0kkjIHBj2kyEu6HY2bKE_Tc6_O7QK1B_ZlS_T66MBb3i86QH8-lpUITtjdoln8frQUI35nM_u6kOlQU2uUL615eTfNayGxNziiDzR1h4UiqdiHGj_aV6lmVE2FNcKAkATpchI9dHvX_cx-eAABrXTtGj4DjngotMK03dX6&searchType=return&searchBags=0.0_0.0"},{"cityId":"City:warsaw_pl","outRoute":"BBU->WAW","inRoute":"WAW->BBU","outTime":"21:50->22:40","inTime":"18:20->21:15","outCarrier":"W6","inCarrier":"W6","totalEur":194,"bookingUrl":"https://www.kiwi.com/ro/booking/?direct=true&locale=ro&currency=eur&passengers=2-0-0&token=H6jzULbJlQ7HE0M1058DkIyT2-n21bujg_DdxlRfIRsjDxx6hQ_lwOz_HOyp83g6gXlKqFHNu2mbYeFxulqktvIbBNwbu9vr57KzA0AwvCwxglk5hDVqeIuJRKyYkW0xe8f9gH70TCQY2UWtQHLpw2LPLBvEye5hQDc3ck0Z1ME4YrmNXbzVuunz7BtpcNxifeXm9oICPvky5Nu5cEaYPhV_YsuY_IxbhCj3kWfa_usEmdY4DLh4chGF6RrszPUJDEZK65K_3XzNurHScwDqrJnjRp8bUVSytS-i_UCsttAXvSEjI5iX4BzltpqQGDie7qI0HWLK9kgirsHOKi8NYgKkwP4ieE885HHdSsmbmvsOZ6tYXuoQH6JatfroscRCbdEFQQo04oRVLG0x20QnVfz4Ssz9vkbot7-_Srh_mqjcA_pkzBG32Jd9Nzpn2x4mC8WDxOLetdv_LmFtk47SnSDo-1WH2lCLd-OaiyS1oc7XFEG0EjS3_nl10NEB2ymGGBEnahczwr27lx_GikEbBIw5g9G5U1BFYisSWHbP08v3RZ6pvRcvoldFip5h_kMZ3dj42DSPr3fUTE9yqJONTmVqnQxtsMyvfBo2EuZn-HO6ReGykg_zGXHDb_81fWvz1ge5fLoiSzwbhx--Sk-K39rluJbWrIUPiz9SI0vKM60WrPeU1tM_EvmSP_GdRy8LmolZKNS-v9bbtSixwhSJuQWzmnd_g1AKdsm2850fxyziFIOX0vHTNkQL8g1r0ubz_1ypggnvfLvA10pTNSZHDKotA8jbKWisVJ7Pf6ffRNayD9QdtO_Dqsal4sKqAMZvylUWTYR9oHFVQXlWD0H-XmgYbc5goxAABqJhk-VcrjChFub7Fl0uLOEywEKhUpY5ekMlf77r7H-0Tj1a9EkxC_i4JkkOfSiPxqFDJ4piS-TbYlW8MO9tzw7bWRShHvJDEq1AZ3WOwll1Zrk6ZE9aCAH9N_p8WZYCQ04Do4r9TN8uZN-i5-Vka5uMyYsW0dXPue634NzMxo8gtJ5dZgKYGdrXRlmg_pO_xHCMR3QU9X03MPw7w_NYPmH99_EkX-WyFBNsTyWCtOR4RaSkilAb0Y2VvEAzFb5SSaYNXYYk0zHSQmS6iPddE5RKAN4U3TwFy9jkRxzo4g1uxeHIEFOlcYCmeOhEPCTTfOWaiRmqMJ5Y%3D&searchType=return&searchBags=0.0_0.0"}],"copenhagen":[null,null,null,{"cityId":"City:copenhagen_dk","outRoute":"OTP->CPH","inRoute":"CPH->OTP","outTime":"18:45->20:30","inTime":"21:00->00:35","outCarrier":"W4","inCarrier":"W4","totalEur":257,"bookingUrl":"https://www.kiwi.com/ro/booking/?direct=true&locale=ro&currency=eur&passengers=2-0-0&token=H3A3XgNfsIZ3bpzEJZ3UF0V8RhQRD_XlCc-8WU5zIhtxKKK8Y1TnW2vgk-i1H54w9E7YH8vkyJHZz4jPrE-DEmJx0nIKCieViIHjI06uyJpoR9nsgzgCzucVCiPaNP2yXJdaIcv2Smcb5cRwWg7OSpH_J4oMwjFeLpA0KLB9gA7fGd8yXg2UgONm3n7DKEOnDJJ0i7-6L3rbkFO5CU_6GKy8yGUj4cVLG-5VehHD3divX5RriVNScec7W7DNnr51rHt--123m1EE3_CE1wB4-rry23P_fu-zG4K4zi9-rlGCrK8RXwAjA6iVtbPX9f-XaPC6E8zI6UXFFB2pYTyzlTo7dMV1Y5aI1YW75Jenn9LPC3UApdVhUTUz7X-mS0q26aWfrmPyNWg1Kmbw-R1lqWSFnTnvlkrspLgSmyQWwjyBPHOhsmvsv0RwkLwEksbq9m316W8lU4Lac8_kGlZ-y-X0aGJD7j3cI0hJzVweSyXLdzZTn7Oua-uC25Pz6b1Efc0FN2fwPle8lmwUjcdpj_6QqovQWKh5ZweeNRy-V9f_iQl9MldiHftPGOvh00Aq0pki3tK6gGMqNIGi7L7cjTRFokD2KYD2_xUix68Wu-8aVJJIMLE31Cd0UI3TXxBXgQ0YwGyRWSW_PFYLGHAgqZA0NQSsa1KD-SsR5HsvZUpOQc46kGoWl4Xh_ANgfrryu84WOwGUBRoHA2hDBMrDKbwwpWL3hrEHrh6MOLUpV5IAKi0M0PcY2Jx5B7zX-WaWNJPwKI17pFCtaE49NRshsDGK3YLxRZXKJkG91pMSm6kLK__tlrk-GNayIHW2X8wU1D92CAn4XIsZ0_eorFIs0T7WxYEbWdz-q49GWxxnssPKVplGK1bLH2xDpmSS4sVn31sV5RrpUdUO0AXKPBxRdJudLmGsw-VdgUL4kRWqR7PiDbDM8hwhgXuCHy5NNA5b5wG8qUdvFB24V8XGqYo5WMwbPynkzCDDHQFW9iMKUqOHoWEMGZeipGmuv0t119D62XM3z97nfqo76InE4PaqjCyzmyAcMoy0dmr3h-RfuIcyvyTAEdWD9aU6bELlJBFQwZlb11tRHuvz8DDNupkiAVIN1VnPSWyAUmrGdioehMCkOi6NcblJJykrfh146FT-TJpWWoaBd1QK1UClJodDc38-UKi2NV9Klk11QV0QvwzrmnCIYq6mIGsbp-3Qyc2Fg&searchType=return&searchBags=0.0_0.0"},null,null],"brussels":[null,null,null,{"cityId":"City:brussels_be","outRoute":"OTP->CRL","inRoute":"BRU->OTP","outTime":"20:35->22:25","inTime":"19:20->23:00","outCarrier":"FR","inCarrier":"RO","totalEur":288,"bookingUrl":"https://www.kiwi.com/ro/booking/?direct=true&locale=ro&currency=eur&passengers=2-0-0&token=H3bsyU9PEwAbQrMuJqU3D3LT8xuuTwG8FohU-CKX8ybXttqjU9qddhHP0w6zMfffCCWSA30wXvHTxgPCXjy10dr4HIQICYTIqyrTMQvgRDTLPVTqIVvU7bX5oPL0MY930ZwrYmHNMEoNiHzxP52V0oHvEAiYWjksDIGNEZLTHYne8IAnE6meGczPmeBUY_c94kyBxRHvFP9LoBX0tRH-oHnIhdaKAx2QQQsWwVw-p2TqYBJn_NyRb0dH3AIyJ_Q3b7G-rqUnsgmo6bAzdTO6VoWt8xWIXqc16t5pDhg19Sc37w2YVrmvTrPRVNMsIc5ZyB4-yTnlTu7_r-TG3oPgyFuHEKIHEb2UwfuEq45uGTVfx-c7MnFCGmcgLlcQfApidxOgEpYYX3hb-CfkrFQXZFJUCPIiKqW1V4JQyuc7bzbb2j1KdTVEks_WhAJKBXpWPQ4jVPEJzPoq1ErAJvkx93XnQRDVl9gAdkPhPgeTyhPW4Km2Jc3HZcTB7GBdnhbRsx8Nei2Kn6EixT6wOYwOI0exbq65YfnsM7dKAMdAZoKjmEnEuOR54kChcz-c8NcqTw6QoA9vzK8R1Q6UMygONydwG-OPvpbEJ00OYGrkbxB1TVI2QDhq6quQgtHj_aDI3-lFiTFE_c4abV_k15fYRaU-GzBaxoEXZV99Mg5F0HeWo99gGwUEMSIpTMVIxGymx15-5tbgnWQy4Kk_gBwVJuCqlICHPtLm02ub0eHkJc1j_pYcwE4VIiRjRyy1kFAa0EO43-OClIPv6GjkRBUzutHacvbhZ-ZSqE7apmzmQthUz24IR-SNXW7Q-IiiTmyuSZC3iXfciz1BtKzUWRXFO5UTg5iSBssWDEwexKtjTnFrjdflAy4p72dkocFAYxjAvygzKLTKf3QZ8qxZ3I8bHMgHn2FBzEw7pAkqSRl2_wZDDkcupctnlJZwda060UXynJ5eqcpycGg4wepUJoY7jJmJFLdy3K_w96TsS2Sjk2OFBYxwGvAY6PbGjbHyYo3UR3CNvtkYaH3twDDxkoyjweNyst5bwHuhNGLy_82Ns9x0iICtFikVC6gh13LUp9DxYLbg7OhlEK3tJpXG34IKRzen6pTPEL0CnI9Ed2xZWNspPdmdtGB5grNJ5Awkb_dvCOkUAC8cKD5SOqcHqJarNqK0lU2IiRhyWZksmV198DmNV9Ar8d5JsZosTqFZUnFHUSqvnBYwQyJzg2cuIaFzgMA%3D%3D&searchType=return&searchBags=0.0_0.0"},null,null]};
 
     // Full European Destinations Database with flags and IATA codes (150+ Skyscanner cities)
@@ -1133,12 +1160,14 @@
     };
 
     // Selection State
-    let selectedWkIds = new Set(ALL_WEEKENDS.slice(0, 4).map(w => w.id));
+    let selectedWkIds = new Set();
     let currentMonthFilter = "all";
+    let calendarYear = ALL_WEEKENDS[0]?.fri ? Number(ALL_WEEKENDS[0].fri.slice(0, 4)) : today.getFullYear();
     let currentTripMode = "classic"; // "classic" (2 nopți) | "extended" (3-4 nopți) | "school_week" (7-9 nopți)
     let currentMode = 1; // 1 = per pax, 2 = total grup
-    let currentLinkMode = "google"; // Default to Google Flights for 100% reliable live booking
+    let currentLinkMode = "google"; // Default external search provider
     let currentRows = [];
+    let searchState = "idle";
     let hasEverSearched = false;
     let selectedCityObj = null;
 
@@ -1486,10 +1515,7 @@
     function getTripDates(wk) {
       if (!wk) return { dateOut: "2026-11-13", dateIn: "2026-11-15" };
       if (currentTripMode === "extended") {
-        if (wk.id === "2026-11-27") {
-          return { dateOut: wk.fri, dateIn: wk.mon }; // Sf. Andrei, luni
-        }
-        return { dateOut: wk.fri, dateIn: wk.mon || wk.sun };
+        return { dateOut: wk.fridayHoliday ? wk.thu : wk.fri, dateIn: wk.mondayHoliday ? wk.mon : wk.sun };
       } else if (currentTripMode === "school_week") {
         return { dateOut: wk.fri, dateIn: wk.nextSun || wk.sun };
       }
@@ -1501,7 +1527,7 @@
       return map[code] || code;
     }
 
-    // Pure Browser JavaScript Protobuf TFS Encoder for Google Flights (Guaranteed 100% Destination & Date Prefill)
+    // Browser-side Protobuf TFS encoder for Google Flights search links.
     function encodeVarint(val) {
       const bytes = [];
       while (val > 127) {
@@ -1586,14 +1612,14 @@
       }
     }
 
-    // 100% Guaranteed Booking & Search URLs across Google Flights, Skyscanner, Airlines, Kiwi
-    function buildFlightLinks(outOrig, outDest, dateOut, dateIn, adults = 2, carrier = "FR") {
+    // External search links. Availability and supported filters depend on each provider.
+    function buildFlightLinks(outOrig, outDest, dateOut, dateIn, adults = 2, carrier = "", originSlug = "", destinationSlug = "") {
       const orig = outOrig.toUpperCase();
       const dest = outDest.toUpperCase();
       const skyOut = dateOut.replace(/-/g, "").slice(2);
       const skyIn = dateIn.replace(/-/g, "").slice(2);
 
-      // Google Flights - TFS Protobuf encoding guarantees 100% reliable destination and dates prefill in any language
+      // Google Flights search payload: route, dates and passenger count.
       const googleFlightsUrl = buildGoogleFlightsUrl(orig, dest, dateOut, dateIn, adults);
 
       // Skyscanner - Direct live price comparison
@@ -1603,7 +1629,12 @@
       const kayakUrl = `https://www.kayak.com/flights/${orig}-${dest}/${dateOut}/${dateIn}/${adults}adults`;
 
       // Kiwi live fresh search (never expires unlike token)
-      const kiwiSearchUrl = `https://www.kiwi.com/ro/search/results/${orig.toLowerCase()}/${dest.toLowerCase()}/${dateOut}/${dateIn}/?passengers=${adults}`;
+      const knownSlugs = { OTP: 'henri-coanda-international-bucharest-romania', BGY: 'orio-al-serio-international-milan-italy' };
+      const kiwiOrig = originSlug || knownSlugs[orig];
+      const kiwiDest = destinationSlug || knownSlugs[dest];
+      const kiwiSearchUrl = kiwiOrig && kiwiDest
+        ? `https://www.kiwi.com/en/search/results/${encodeURIComponent(kiwiOrig)}/${encodeURIComponent(kiwiDest)}/${dateOut}/${dateIn}/?adults=${adults}&children=0&infants=0&currency=eur`
+        : 'https://www.kiwi.com/en/';
 
       // Airline direct
       let airlineDirectUrl = googleFlightsUrl;
@@ -1611,12 +1642,6 @@
         airlineDirectUrl = `https://www.ryanair.com/ro/ro/trip/flights/select?adults=${adults}&teens=0&children=0&infants=0&dateOut=${dateOut}&dateIn=${dateIn}&isConnectedFlight=false&discount=0&isReturn=true&originIata=${orig}&destinationIata=${dest}`;
       } else if (carrier === "W4" || carrier === "W6") {
         airlineDirectUrl = `https://wizzair.com/ro-ro#/booking/select-flight/${orig}/${dest}/${dateOut}/${dateIn}/${adults}/0/0/null`;
-      } else if (carrier === "RO") {
-        airlineDirectUrl = "https://www.tarom.ro/";
-      } else if (carrier === "TK") {
-        airlineDirectUrl = "https://www.turkishairlines.com";
-      } else if (carrier === "LH") {
-        airlineDirectUrl = "https://www.lufthansa.com";
       }
 
       return {
@@ -1658,7 +1683,8 @@
           skyscannerUrl: links.skyscannerUrl,
           kayakUrl: links.kayakUrl,
           kiwiSearchUrl: links.kiwiSearchUrl,
-          airlineUrl: links.airlineDirectUrl
+          airlineUrl: links.airlineDirectUrl,
+                stops: Math.max(outSegs.length - 1, inSegs.length - 1)
         };
       });
       return map;
@@ -1791,7 +1817,7 @@
            .replace(/\s+/g, " ")
            .trim()
            .toLowerCase();
-      return s;
+      return s.normalize("NFD").replace(/\p{M}/gu, "");
     }
 
     function resolveTypedDestination() {
@@ -1808,28 +1834,28 @@
       const cleanQ = q.replace(/[^\p{L}\p{N}\s]/gu, '').trim().toLowerCase();
       const tokens = cleanQ.split(/\s+/).filter(Boolean);
 
-      const countryOnly = ALL_EUROPE_CITIES.some(c => !c.isAll && c.country.toLowerCase() === cleanQ);
+      const countryOnly = ALL_EUROPE_CITIES.some(c => !c.isAll && normalizeDestQuery(c.country) === cleanQ);
       if (countryOnly) {
         updateSearchStatus("Căutarea pe țară nu este disponibilă încă. Alege un oraș din listă.", 100, "empty");
         return false;
       }
       // 1. Exact match by name or IATA
-      let match = ALL_EUROPE_CITIES.find(c => !c.isAll && (c.name.toLowerCase() === cleanQ || c.iata.toLowerCase() === cleanQ));
+      let match = ALL_EUROPE_CITIES.find(c => !c.isAll && (normalizeDestQuery(c.name) === cleanQ || normalizeDestQuery(c.iata) === cleanQ));
 
       // 2. Exact match on first token (e.g. "liverpool" in "liverpool uk")
       if (!match && tokens.length > 0) {
-        match = ALL_EUROPE_CITIES.find(c => !c.isAll && (c.name.toLowerCase() === tokens[0] || c.iata.toLowerCase() === tokens[0]));
+        match = ALL_EUROPE_CITIES.find(c => !c.isAll && (normalizeDestQuery(c.name) === tokens[0] || normalizeDestQuery(c.iata) === tokens[0]));
       }
 
       // 3. Name starts with cleanQ or first token
       if (!match && tokens.length > 0) {
-        match = ALL_EUROPE_CITIES.find(c => !c.isAll && c.name.toLowerCase().startsWith(tokens[0]));
+        match = ALL_EUROPE_CITIES.find(c => !c.isAll && normalizeDestQuery(c.name).startsWith(tokens[0]));
       }
 
       // 4. Any token match
       if (!match && tokens.length > 0) {
         match = ALL_EUROPE_CITIES.find(c => !c.isAll && tokens.every(tok =>
-          c.name.toLowerCase().includes(tok) || c.country.toLowerCase().includes(tok) || c.iata.toLowerCase().includes(tok)
+          normalizeDestQuery(c.name).includes(tok) || normalizeDestQuery(c.country).includes(tok) || normalizeDestQuery(c.iata).includes(tok)
         ));
       }
 
@@ -1852,28 +1878,50 @@
       renderDestDropdown(q);
       showDestDropdown(true);
 
-      // Live search Skyscanner / Kiwi locations API for ANY city in Europe or the world!
+      // Resolve additional European cities through the current provider GraphQL API.
+      clearTimeout(liveSearchTimeout);
       if (q && q.length >= 2) {
         clearTimeout(liveSearchTimeout);
         liveSearchTimeout = setTimeout(async () => {
           try {
-            const res = await fetch(`https://api.skypicker.com/locations?term=${encodeURIComponent(q)}&location_types=city,airport&active_only=true&limit=10`);
+            const res = await fetch('https://api.skypicker.com/umbrella/v2/graphql', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              signal: AbortSignal.timeout(15000),
+              body: JSON.stringify({
+                query: `query Places($search: PlacesSearchInput) {
+                  places(search: $search, first: 10) {
+                    ... on PlaceConnection { edges { node {
+                      __typename
+                      ... on City { id name code country { code name } }
+                      ... on Station { id name code city { id name code country { code name } } }
+                    } } }
+                  }
+                }`,
+                variables: { search: { term: q } }
+              })
+            });
+            if (!res.ok) throw new Error(`Destinații: HTTP ${res.status}`);
             const data = await res.json();
-            const locs = data?.locations || [];
+            if (data.errors || !Array.isArray(data.data?.places?.edges)) throw new Error('Răspuns invalid pentru destinații');
+            if (normalizeDestQuery(document.getElementById('dest-search-input').value) !== q) return;
+            const locs = data.data.places.edges.map(edge => edge.node).filter(l => ['City', 'Station'].includes(l.__typename));
             let added = false;
             locs.forEach(l => {
-              const cityId = l.type === "city" ? `City:${l.id}` : (l.city?.id ? `City:${l.city.id}` : `Station:${l.id}`);
+              const city = l.__typename === "Station" ? l.city : l;
+              if (!city || !EUROPE_COUNTRIES.has(city.country?.code)) return;
+              const cityId = city.id;
               const code = (l.code || l.city?.code || "EUR").toLowerCase();
               const iata = (l.code || l.city?.code || "EUR").toUpperCase();
-              const countryName = l.country?.name || "Europa";
-              const countryCode = l.country?.id || "EU";
+              const countryName = city.country?.name || "Europa";
+              const countryCode = city.country?.code || "EU";
               const flag = getCountryFlag(countryCode);
 
-              const existing = ALL_EUROPE_CITIES.find(c => c.id === cityId || (c.iata && c.iata.toLowerCase() === code));
+              const existing = ALL_EUROPE_CITIES.find(c => c.id === cityId || (c.iata && normalizeDestQuery(c.iata) === code));
               if (!existing) {
                 ALL_EUROPE_CITIES.push({
                   id: cityId,
-                  name: l.name,
+                  name: city.name,
                   country: countryName,
                   flag: flag,
                   iata: iata,
@@ -1895,7 +1943,7 @@
       // If user typed an exact or close city name, preview its guide
       if (q) {
         const cleanQ = q.replace(/[^\p{L}\p{N}\s]/gu, '').trim().toLowerCase();
-        const match = ALL_EUROPE_CITIES.find(c => !c.isAll && (c.name.toLowerCase() === cleanQ || c.iata.toLowerCase() === cleanQ));
+        const match = ALL_EUROPE_CITIES.find(c => !c.isAll && (normalizeDestQuery(c.name) === cleanQ || normalizeDestQuery(c.iata) === cleanQ));
         if (match) {
           renderCityGuide(match);
         } else {
@@ -1930,18 +1978,18 @@
         if (tokens.length > 0) {
           matches = ALL_EUROPE_CITIES.filter(c => {
             if (c.isAll) return false;
-            const name = (c.name || "").toLowerCase();
-            const country = (c.country || "").toLowerCase();
-            const iata = (c.iata || "").toLowerCase();
-            const code = (c.code || "").toLowerCase();
+            const name = normalizeDestQuery(c.name);
+            const country = normalizeDestQuery(c.country);
+            const iata = normalizeDestQuery(c.iata);
+            const code = normalizeDestQuery(c.code);
             return tokens.every(tok =>
               name.includes(tok) || country.includes(tok) || iata.includes(tok) || code.includes(tok)
             );
           });
 
           matches.sort((a, b) => {
-            const aName = (a.name || "").toLowerCase();
-            const bName = (b.name || "").toLowerCase();
+            const aName = normalizeDestQuery(a.name);
+            const bName = normalizeDestQuery(b.name);
             const aStarts = aName.startsWith(tokens[0]) ? 0 : 1;
             const bStarts = bName.startsWith(tokens[0]) ? 0 : 1;
             if (aStarts !== bStarts) return aStarts - bStarts;
@@ -1953,8 +2001,8 @@
       if (matches.length === 0) {
         drop.innerHTML = `
           <div class="p-3 text-xs text-[#64748b] text-center font-body">
-            Se caută „${escapeHtml(q)}” pe Skyscanner și companii aeriene...<br>
-            <span class="text-[11px] text-[#dfa649] font-bold">Apasă Enter pentru a căuta</span>
+            Nu există potriviri pentru „${escapeHtml(q)}” în lista de orașe.<br>
+            <span class="text-[11px] text-[#dfa649] font-bold">Încearcă numele complet sau codul aeroportului</span>
           </div>
         `;
         return;
@@ -2042,6 +2090,7 @@
         renderCityGuide(city);
       }
 
+      invalidateSearchResults();
       showDestDropdown(false);
       renderCrossEngineBar();
       renderMatrix();
@@ -2085,43 +2134,24 @@
 
     // Month Tabs & Chips
     function renderWeekendSelectorUI() {
-      const tabsEl = document.getElementById("month-tabs");
-      const monthMap = new Map();
-      ALL_WEEKENDS.forEach(w => {
-        if (!monthMap.has(w.monthKey)) {
-          monthMap.set(w.monthKey, { key: w.monthKey, name: w.monthName, count: 0 });
-        }
-        monthMap.get(w.monthKey).count++;
-      });
-
-      let tabsHtml = `
-        <button onclick="setMonthFilter('all')"
-                class="px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition cursor-pointer font-display ${currentMonthFilter === 'all' ? 'bg-[#0a0b0d] text-[#dfa649] shadow-xs' : 'bg-[#f4f5f8] text-[#475569] hover:bg-[#e2e8f0]'}">
-          Toate (${ALL_WEEKENDS.length})
-        </button>
-        <button onclick="setMonthFilter('holidays')"
-                class="px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition cursor-pointer font-display ${currentMonthFilter === 'holidays' ? 'bg-[#0a0b0d] text-[#dfa649] shadow-xs' : 'bg-[#fce8bd] text-[#5c3b06] hover:bg-[#f6dc9c] border border-[#dfa649]/60'}">
-          🏖️ Weekenduri Extinse & Sărbători (${ALL_WEEKENDS.filter(w => w.holidayType === 'extended').length})
-        </button>
-      `;
-
-      for (const m of monthMap.values()) {
-        const isAct = currentMonthFilter === m.key;
-        tabsHtml += `
-          <button onclick="setMonthFilter('${m.key}')"
-                  class="px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition cursor-pointer font-display ${isAct ? 'bg-[#0a0b0d] text-[#dfa649] shadow-xs' : 'bg-[#f4f5f8] text-[#475569] hover:bg-[#e2e8f0]'}">
-            ${m.name}
-          </button>
-        `;
-      }
-      tabsEl.innerHTML = tabsHtml;
-
       const gridEl = document.getElementById("weekend-chips-grid");
-      const visibleWks = currentMonthFilter === 'all'
-        ? ALL_WEEKENDS
-        : currentMonthFilter === 'holidays'
-          ? ALL_WEEKENDS.filter(w => w.holidayType === 'extended')
-          : ALL_WEEKENDS.filter(w => w.monthKey === currentMonthFilter);
+      const visibleWks = ALL_WEEKENDS.filter(w => Number(w.fri.slice(0, 4)) === calendarYear);
+      const yearLabel = document.getElementById('calendar-year-label');
+      if (yearLabel) yearLabel.textContent = `Calendar ${calendarYear}`;
+      document.querySelectorAll('[data-range-year]').forEach(el => { el.textContent = calendarYear; });
+      const seasonRanges = {
+        winter: [new Date(`${calendarYear}-12-01T12:00:00`), new Date(`${calendarYear + 1}-02-28T12:00:00`)],
+        spring: [new Date(`${calendarYear}-03-01T12:00:00`), new Date(`${calendarYear}-05-31T12:00:00`)],
+        summer: [new Date(`${calendarYear}-06-01T12:00:00`), new Date(`${calendarYear}-08-31T12:00:00`)],
+        autumn: [new Date(`${calendarYear}-09-01T12:00:00`), new Date(`${calendarYear}-11-30T12:00:00`)]
+      };
+      Object.entries(seasonRanges).forEach(([season, [from, to]]) => {
+        const button = document.getElementById(`range-${season}`);
+        if (!button) return;
+        button.hidden = !ALL_WEEKENDS.some(w => { const d = new Date(`${w.fri}T12:00:00`); return d >= from && d <= to; });
+      });
+      document.getElementById('calendar-prev-year').disabled = calendarYear <= Number(ALL_WEEKENDS[0].fri.slice(0, 4));
+      document.getElementById('calendar-next-year').disabled = calendarYear >= Number(ALL_WEEKENDS.at(-1).fri.slice(0, 4));
       
       let chipsHtml = "";
       visibleWks.forEach(w => {
@@ -2141,7 +2171,48 @@
       });
       gridEl.innerHTML = chipsHtml;
 
-      document.getElementById("selected-wk-badge").textContent = `${selectedWkIds.size} weekend${selectedWkIds.size === 1 ? '' : 'uri'} selectate`;
+      document.getElementById("selected-wk-badge").textContent = selectedWkIds.size ? `${selectedWkIds.size} weekend${selectedWkIds.size === 1 ? '' : 'uri'} selectate` : 'Nicio perioadă selectată';
+      document.getElementById('calendar-selection-help').textContent = selectedWkIds.size ? 'Poți adăuga sau elimina oricând perioade.' : 'Selectează cel puțin un weekend pentru a căuta.';
+    }
+
+    function shiftCalendarYear(offset) {
+      const next = calendarYear + offset;
+      const min = Number(ALL_WEEKENDS[0].fri.slice(0, 4));
+      const max = Number(ALL_WEEKENDS.at(-1).fri.slice(0, 4));
+      if (next < min || next > max) return;
+      calendarYear = next;
+      renderWeekendSelectorUI();
+    }
+
+    function selectCalendarRange(range) {
+      const first = ALL_WEEKENDS[0];
+      const start = new Date(`${first.fri}T12:00:00`);
+      const end = new Date(start);
+      const year = calendarYear;
+      if (range === 'next-month') {
+        end.setMonth(end.getMonth() + 1);
+      } else if (range === 'next-2-months') {
+        end.setMonth(end.getMonth() + 2);
+      } else if (range === 'winter') {
+        start.setFullYear(year, 11, 1); end.setFullYear(year + 1, 1, 28);
+      } else if (range === 'spring') {
+        start.setFullYear(year, 2, 1); end.setFullYear(year, 4, 31);
+      } else if (range === 'summer') {
+        start.setFullYear(year, 5, 1); end.setFullYear(year, 7, 31);
+      } else if (range === 'autumn') {
+        start.setFullYear(year, 8, 1); end.setFullYear(year, 10, 30);
+      } else if (range === 'year') {
+        start.setFullYear(year, 0, 1); end.setFullYear(year, 11, 31);
+      }
+      selectedWkIds = new Set(ALL_WEEKENDS.filter(w => {
+        const date = new Date(`${w.fri}T12:00:00`);
+        const eligibleType = currentTripMode === 'extended' ? w.holidayType === 'extended' : true;
+        return eligibleType && date >= start && date <= end;
+      }).map(w => w.id));
+      calendarYear = Number((selectedWkIds.values().next().value || first.fri).slice(0, 4));
+      renderWeekendSelectorUI();
+      renderCrossEngineBar();
+      renderMatrix();
     }
 
     function toggleWeekend(id) {
@@ -2214,6 +2285,9 @@
         }).map(w => w.id));
         currentMonthFilter = "all";
       }
+      document.getElementById('classic-mode').classList.toggle('active', currentTripMode === 'classic');
+      document.getElementById('extended-mode').classList.toggle('active', currentTripMode === 'extended');
+      invalidateSearchResults();
       renderWeekendSelectorUI();
       renderCrossEngineBar();
       renderMatrix();
@@ -2259,7 +2333,7 @@
       qbActions.innerHTML = `
         <a href="${cell.googleFlightsUrl}" target="_blank" rel="noopener noreferrer"
            class="bg-[#dfa649] hover:bg-[#c98f33] text-[#0a0b0d] text-xs font-black px-3.5 py-2 rounded-xl transition shadow-xs font-display flex items-center gap-1">
-          Google Flights (Direct) →
+          Google Flights →
         </a>
         <a href="${cell.skyscannerUrl}" target="_blank" rel="noopener noreferrer"
            class="bg-[#0a0b0d] hover:bg-[#1e232e] text-[#dfa649] text-xs font-bold px-3 py-2 rounded-xl border border-[#0a0b0d] transition font-display flex items-center gap-1">
@@ -2369,7 +2443,7 @@
       const firstWk = activeWks[0] || ALL_WEEKENDS[0];
       const tripDates = getTripDates(firstWk);
 
-      const links = buildFlightLinks(origIata, targetIata, tripDates.dateOut, tripDates.dateIn, 2);
+      const links = buildFlightLinks(origIata, targetIata, tripDates.dateOut, tripDates.dateIn, Number(document.getElementById("f-adults").value));
 
       container.innerHTML = `
         <a href="${links.googleFlightsUrl}" target="_blank" rel="noopener noreferrer"
@@ -2389,6 +2463,8 @@
 
     // Visual Search Status Notifier
     function updateSearchStatus(text, pct, state = "loading") {
+      searchState = state;
+      if (state === 'loading' || state === 'error') renderMatrix();
       const statusBox = document.getElementById("search-status");
       const statusText = document.getElementById("search-status-text");
       const statusPct = document.getElementById("search-status-pct");
@@ -2412,7 +2488,7 @@
         statusPct.classList.add("hidden");
         dismissBtn.classList.remove("hidden");
         statusText.textContent = text;
-      } else if (state === "empty") {
+      } else if (state === "empty" || state === "error") {
         statusBox.classList.add("bg-[#fffbeb]", "border-amber-500", "text-amber-950");
         spinner.textContent = "⚠️";
         spinner.className = "text-base";
@@ -2540,7 +2616,7 @@
                 </div>
                 <div class="text-[11px] text-slate-300 border-t border-white/10 pt-1 flex items-center justify-between">
                   <span>${airline}</span>
-                  <span class="text-emerald-400 font-bold">Direct</span>
+                  <span class="text-emerald-400 font-bold">${bestCell ? (bestCell.stops > 0 ? `${bestCell.stops} esc.` : "Direct") : "—"}</span>
                 </div>
               </div>
 
@@ -2558,7 +2634,7 @@
                   </button>
                   <a href="${bookUrl}" target="_blank" rel="noopener noreferrer"
                      class="bg-[#dfa649] hover:bg-[#c98f33] active:bg-[#b57f2a] text-[#0a0b0d] font-black text-xs px-3.5 py-2.5 rounded-xl transition shadow-xs font-display flex items-center gap-1">
-                    <span>Rezervă</span>
+                    <span>Verifică oferta</span>
                     <span>→</span>
                   </a>
                 </div>
@@ -2585,6 +2661,8 @@
       const activeWks = getSelectedWeekendsList();
 
       if (activeWks.length === 0) {
+        document.getElementById('cards-grid').innerHTML = '<div class="col-span-full p-6 text-center">Alege cel puțin un weekend sau scanează cele 52 de weekenduri pentru orașul ales.</div>';
+        document.getElementById('city-spotlight-banner')?.classList.add('hidden');
         thead.innerHTML = "";
         tbody.innerHTML = `
           <tr>
@@ -2677,7 +2755,7 @@
             sAction.innerHTML = `
               <a href="${globalBestCell.googleFlightsUrl}" target="_blank" rel="noopener noreferrer"
                  class="bg-[#0a0b0d] hover:bg-[#1a1e27] text-[#dfa649] font-black text-xs sm:text-sm px-4 py-2.5 rounded-xl transition shadow-xs font-display flex items-center gap-1.5">
-                Rezervă pe Google Flights (${p1} €) →
+                Verifică pe Google Flights (de la ${p1} €/pers.) →
               </a>
               <a href="${globalBestCell.skyscannerUrl}" target="_blank" rel="noopener noreferrer"
                  class="bg-[#dfa649] hover:bg-[#c98f33] text-[#0a0b0d] font-black text-xs sm:text-sm px-4 py-2.5 rounded-xl transition shadow-xs font-display flex items-center gap-1.5">
@@ -2735,6 +2813,14 @@
       });
       headHtml += `</tr>`;
       thead.innerHTML = headHtml;
+
+      // A failed request is not evidence that no flights exist.
+      if (filteredRows.length === 0 && ['loading', 'error'].includes(searchState)) {
+        const message = searchState === 'loading' ? 'Căutăm zboruri la furnizor…' : 'Căutarea nu a putut fi finalizată. Disponibilitatea zborurilor nu este confirmată. Încearcă din nou.';
+        tbody.innerHTML = `<tr><td colspan="${activeWks.length + 1}" class="p-6 text-center">${message}</td></tr>`;
+        document.getElementById('cards-grid').innerHTML = `<div class="col-span-full p-6 text-center">${message}</div>`;
+        return;
+      }
 
       // Render Body
       tbody.innerHTML = "";
@@ -3039,7 +3125,7 @@
       document.getElementById("f-domestic").checked = true;
 
       document.getElementById("subtitle-summary").textContent =
-        "🔓 Mod permisiv activat: buget max. 350 €, permite 1 escală, plecare vineri oricând, retur duminică oricând. Găsește garantat variante pentru orice oraș din Europa!";
+        "🔓 Mod permisiv activat: buget max. 350 €, permite 1 escală, plecare vineri oricând, retur duminică oricând. Disponibilitatea depinde de furnizor și de criteriile alese.";
 
       currentRows = [];
       hasEverSearched = false;
@@ -3090,17 +3176,17 @@
       document.getElementById("f-bags").value = "cabin";
       document.getElementById("f-max-dur").value = "360";
       document.getElementById("f-stops").value = "1";
-      document.getElementById("f-fri-dep").value = "06:00";
+      document.getElementById("f-fri-dep").value = "18:00";
       document.getElementById("f-out-arr").value = "03:00";
       document.getElementById("f-sun-dep").value = "12:00";
       document.getElementById("f-in-arr").value = "03:00";
       document.getElementById("f-domestic").checked = true;
 
       document.getElementById("subtitle-summary").textContent =
-        "🏖️ Preset Weekend Prelungit (3–4 nopți): zboruri optimizate pentru zile libere legale & minivacanțe (Sf. Andrei & 1 Dec, Paște, 1 Mai, Rusalii). Buget max. 250 €.";
+        "🏖️ Preset Weekend Prelungit (3–4 nopți): plecare joi seara dacă vineri este sărbătoare legală; retur luni doar dacă luni este sărbătoare legală. Buget max. 250 €.";
 
       selectPreset('extended');
-      updateSearchStatus("Preset Weekend Prelungit configurat (4 minivacanțe selectate). Apasă pe «Caută zboruri»!", 100, "success");
+      updateSearchStatus(`Preset Weekend Prelungit configurat (${selectedWkIds.size} weekenduri selectate). Apasă pe «Caută zboruri»!`, 100, "success");
       renderMatrix();
     }
 
@@ -3139,8 +3225,8 @@
                   duration
                   sectorSegments {
                     segment {
-                      source { localTime station { code city { id name country { code } } } }
-                      destination { localTime station { code city { id name country { code } } } }
+                      source { localTime station { code slugEn city { id name country { code } } } }
+                      destination { localTime station { code slugEn city { id name country { code } } } }
                       carrier { name code }
                     }
                   }
@@ -3172,8 +3258,8 @@
                   duration
                   sectorSegments {
                     segment {
-                      source { localTime station { code city { id name country { code } } } }
-                      destination { localTime station { code city { id name country { code } } } }
+                      source { localTime station { code slugEn city { id name country { code } } } }
+                      destination { localTime station { code slugEn city { id name country { code } } } }
                       code
                       carrier { name code }
                     }
@@ -3183,8 +3269,8 @@
                   duration
                   sectorSegments {
                     segment {
-                      source { localTime station { code city { id name country { code } } } }
-                      destination { localTime station { code city { id name country { code } } } }
+                      source { localTime station { code slugEn city { id name country { code } } } }
+                      destination { localTime station { code slugEn city { id name country { code } } } }
                       code
                       carrier { name code }
                     }
@@ -3209,6 +3295,8 @@
       if (!response.ok) throw new Error(`Serviciul de zboruri a răspuns cu HTTP ${response.status}`);
       const data = await response.json();
       if (data.errors || !data.data) throw new Error("Răspuns invalid de la serviciul de zboruri");
+      const result = data.data.returnItineraries ?? data.data.onewayItineraries;
+      if (!result || !Array.isArray(result.itineraries)) throw new Error("Furnizorul nu a returnat o listă validă de itinerarii");
       return data;
     }
 
@@ -3263,6 +3351,7 @@
             try {
               const res = await fetch("https://api.skypicker.com/umbrella/v2/graphql", {
                 method: "POST",
+                signal: AbortSignal.timeout(45000),
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                   query: QUERY_RETURN,
@@ -3277,7 +3366,7 @@
                         inboundDepartureDate: { start: `${tripDates.dateIn}T${sunDep}:00`, end: `${tripDates.dateIn}T23:59:59` }
                       }
                     },
-                    filter: { transportTypes: ["FLIGHT"] },
+                    filter: { allowChangeInboundSource: false, allowChangeInboundDestination: false, transportTypes: ["FLIGHT"] },
                     options: { partner: "skypicker", sortBy: "PRICE" }
                   }
                 })
@@ -3312,7 +3401,7 @@
               const outOrig = outFirst.source.station.code;
               const outDest = outLast.destination.station.code;
 
-              const links = buildFlightLinks(outOrig, outDest, tripDates.dateOut, tripDates.dateIn, adults, outCarrier);
+              const links = buildFlightLinks(outOrig, outDest, tripDates.dateOut, tripDates.dateIn, adults, same && outSegs.length === 1 && inSegs.length === 1 ? outCarrier : "", outFirst.source.station.slugEn, outLast.destination.station.slugEn);
 
               return {
                 wk,
@@ -3328,7 +3417,8 @@
                 skyscannerUrl: links.skyscannerUrl,
                 kayakUrl: links.kayakUrl,
                 kiwiSearchUrl: links.kiwiSearchUrl,
-                airlineUrl: links.airlineDirectUrl
+                airlineUrl: links.airlineDirectUrl,
+                stops: Math.max(outSegs.length - 1, inSegs.length - 1)
               };
             } catch (e) {
               failedRequests++;
@@ -3341,7 +3431,7 @@
         }
 
         if (failedRequests) {
-          updateSearchStatus(`Căutarea nu a putut fi finalizată (${failedRequests} cereri eșuate). Încearcă din nou.`, 100, "empty");
+          updateSearchStatus(`Căutarea nu a putut fi finalizată (${failedRequests} cereri eșuate). Încearcă din nou.`, 100, "error");
           return;
         }
         if (allFound.length === 0) {
@@ -3392,9 +3482,11 @@
         renderMatrix();
       } catch (err) {
         console.error(err);
-        updateSearchStatus("A apărut o eroare la scanarea anuală.", 100, "empty");
+        updateSearchStatus("Serviciul de zboruri nu a putut finaliza scanarea anuală. Încearcă din nou.", 100, "error");
       }
     }
+
+    const EUROPE_COUNTRIES = new Set('AL AD AT BY BE BA BG HR CY CZ DK EE FI FR DE GR HU IS IE IT XK LV LI LT LU MT MD MC ME NL MK NO PL PT RO RU SM RS SK SI ES SE CH TR UA GB VA'.split(' '));
 
     // Live Search on Selected Weekends
     async function runLiveSearch() {
@@ -3404,7 +3496,7 @@
 
       if (selectedWkIds.size === 0) {
         if (destVal !== "any") {
-          return scanEntireYearForDestination();
+          return performYearScan();
         } else {
           alert("Te rugăm să bifezi cel puțin un weekend înainte de a căuta.");
           return;
@@ -3449,6 +3541,7 @@
             try {
               const res = await fetch("https://api.skypicker.com/umbrella/v2/graphql", {
                 method: "POST",
+                signal: AbortSignal.timeout(45000),
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                   query: QUERY_RETURN,
@@ -3482,7 +3575,7 @@
 
           const results = await Promise.all(promises);
           if (failedRequests) {
-            updateSearchStatus(`Căutarea nu a putut fi finalizată (${failedRequests} cereri eșuate). Încearcă din nou.`, 100, "empty");
+            updateSearchStatus(`Căutarea nu a putut fi finalizată (${failedRequests} cereri eșuate). Încearcă din nou.`, 100, "error");
             return;
           }
           updateSearchStatus("Procesăm cele mai bune tarife...", 85, "loading");
@@ -3530,7 +3623,7 @@
                 const airlineLabel = same ? carrierName(outCarrier) : `${carrierName(outCarrier)} + ${carrierName(inCarrier)}`;
                 targetAirline = airlineLabel;
 
-                const links = buildFlightLinks(outOrig, outDest, tripDates.dateOut, tripDates.dateIn, adults, outCarrier);
+                const links = buildFlightLinks(outOrig, outDest, tripDates.dateOut, tripDates.dateIn, adults, same && outSegs.length === 1 && inSegs.length === 1 ? outCarrier : "", outFirst.source.station.slugEn, outLast.destination.station.slugEn);
                 const stopsCount = Math.max(outSegs.length - 1, inSegs.length - 1);
                 const stopsLabel = stopsCount > 0 ? ` (${stopsCount} esc.)` : "";
 
@@ -3547,7 +3640,8 @@
                   skyscannerUrl: links.skyscannerUrl,
                   kayakUrl: links.kayakUrl,
                   kiwiSearchUrl: links.kiwiSearchUrl,
-                  airlineUrl: links.airlineDirectUrl
+                  airlineUrl: links.airlineDirectUrl,
+                  stops: Math.max(outSegs.length - 1, inSegs.length - 1)
                 };
 
                 if (!targetCellsMap[wk.id] || cellObj.perPaxEur < targetCellsMap[wk.id].perPaxEur) {
@@ -3616,6 +3710,7 @@
           try {
             const resOut = await fetch("https://api.skypicker.com/umbrella/v2/graphql", {
               method: "POST",
+              signal: AbortSignal.timeout(45000),
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
                 query: QUERY_ONEWAY,
@@ -3646,7 +3741,7 @@
               if (!lastSeg) continue;
               const destCity = lastSeg.destination?.station?.city;
               const destCountry = lastSeg.destination?.station?.city?.country?.code;
-              if (!includeDomestic && destCountry === "RO") continue;
+              if (!EUROPE_COUNTRIES.has(destCountry) || (!includeDomestic && destCountry === "RO")) continue;
               if (destCity?.id) destCityIds.add(destCity.id);
             }
 
@@ -3654,6 +3749,7 @@
 
             const resRet = await fetch("https://api.skypicker.com/umbrella/v2/graphql", {
               method: "POST",
+              signal: AbortSignal.timeout(45000),
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
                 query: QUERY_RETURN,
@@ -3699,7 +3795,7 @@
               const destCity = outLast.destination.station.city;
               const destCountry = outLast.destination.station.city?.country?.code;
 
-              if (!includeDomestic && destCountry === "RO") continue;
+              if (!EUROPE_COUNTRIES.has(destCountry) || (!includeDomestic && destCountry === "RO")) continue;
 
               const outArrTime = outLast.destination.localTime.slice(11, 16);
               if (!withinArrivalLimit(outLast.destination.localTime, tripDates.dateOut, outArrLimit)) continue;
@@ -3717,7 +3813,7 @@
               const same = (outCarrier === inCarrier);
               const airlineLabel = same ? carrierName(outCarrier) : `${carrierName(outCarrier)} + ${carrierName(inCarrier)}`;
 
-              const links = buildFlightLinks(outOrig, outDest, tripDates.dateOut, tripDates.dateIn, adults, outCarrier);
+              const links = buildFlightLinks(outOrig, outDest, tripDates.dateOut, tripDates.dateIn, adults, same && outSegs.length === 1 && inSegs.length === 1 ? outCarrier : "", outFirst.source.station.slugEn, outLast.destination.station.slugEn);
 
               const cellObj = {
                 perPaxEur: perPaxEur,
@@ -3732,7 +3828,8 @@
                 skyscannerUrl: links.skyscannerUrl,
                 kayakUrl: links.kayakUrl,
                 kiwiSearchUrl: links.kiwiSearchUrl,
-                airlineUrl: links.airlineDirectUrl
+                airlineUrl: links.airlineDirectUrl,
+                stops: Math.max(outSegs.length - 1, inSegs.length - 1)
               };
 
               const key = outDest.toLowerCase();
@@ -3763,7 +3860,7 @@
         }
 
         if (failedRequests) {
-          updateSearchStatus(`Căutarea nu a putut fi finalizată (${failedRequests} weekenduri cu erori). Încearcă din nou.`, 100, "empty");
+          updateSearchStatus(`Căutarea nu a putut fi finalizată (${failedRequests} weekenduri cu erori). Încearcă din nou.`, 100, "error");
           return;
         }
         currentRows = sortRowsByCityGroup([...cityRowsMap.values()]);
@@ -3777,16 +3874,51 @@
         renderMatrix();
       } catch (err) {
         console.error(err);
-        updateSearchStatus("A apărut o problemă la căutare. Încearcă [🔓 Mod permisiv].", 100, "empty");
+        updateSearchStatus("Serviciul de zboruri nu a putut finaliza căutarea. Încearcă din nou.", 100, "error");
       }
     }
 
     function setSimpleTripMode(mode) {
-      selectPreset(mode === 'extended' ? 'extended' : 'next4');
+      currentTripMode = mode === 'extended' ? 'extended' : 'classic';
       document.getElementById('classic-mode').classList.toggle('active', mode === 'classic');
       document.getElementById('extended-mode').classList.toggle('active', mode === 'extended');
+      invalidateSearchResults();
+      renderWeekendSelectorUI();
+      renderCrossEngineBar();
+      renderMatrix();
     }
     document.getElementById('f-max-dur').addEventListener('change', e => { document.getElementById('quick-duration').value = e.target.value; });
+    // Freeze search criteria while a live request is in progress, avoiding stale responses.
+    let searchInProgress = false;
+    async function withSearchLock(action) {
+      if (searchInProgress) return;
+      searchInProgress = true;
+      const panel = document.getElementById('configurator');
+      const previousInert = panel.inert;
+      panel.inert = true;
+      panel.setAttribute('aria-busy', 'true');
+      try { return await action(); }
+      finally { searchInProgress = false; panel.inert = previousInert; panel.removeAttribute('aria-busy'); }
+    }
+    const performLiveSearch = runLiveSearch;
+    const performYearScan = scanEntireYearForDestination;
+    runLiveSearch = () => withSearchLock(performLiveSearch);
+    scanEntireYearForDestination = () => withSearchLock(performYearScan);
+
+    function invalidateSearchResults() {
+      currentRows = [];
+      hasEverSearched = false;
+      searchState = 'idle';
+      document.getElementById('search-status').classList.add('hidden');
+      document.getElementById('city-spotlight-banner')?.classList.add('hidden');
+    }
+    for (const id of ['f-origin', 'f-adults', 'f-bags', 'f-max-dur', 'quick-duration', 'f-stops', 'f-max-price', 'f-fri-dep', 'f-sun-dep', 'f-out-arr', 'f-in-arr', 'f-domestic']) {
+      document.getElementById(id).addEventListener('change', () => {
+        invalidateSearchResults();
+        renderCrossEngineBar();
+        renderMatrix();
+      });
+    }
     // Initialize Page
     currentRows = [];
     hasEverSearched = false;
