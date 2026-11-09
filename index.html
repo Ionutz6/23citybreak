@@ -143,11 +143,11 @@
     html { scroll-behavior: smooth; }
     body { background: #f7f6f2 !important; color:#141516; }
     .site-header { position:relative; z-index:20; background:#111211; color:#fff; }
-    .header-inner { max-width:1440px; margin:auto; padding:21px 6%; display:flex; justify-content:space-between; align-items:center; gap:20px; }
-    .wordmark { font-family:var(--font-display); font-weight:700; font-size:25px; letter-spacing:-1.5px; white-space:nowrap; }
-    .wordmark .wordmark-city { color:#dfa649; } .wordmark small {font-size:11px;letter-spacing:0;margin-left:2px;}
-    .header-right {display:flex;align-items:center;gap:32px;font-size:13px;color:#b5b4b0}.header-right a {color:#fff;border-bottom:1px solid #dfa649;padding-bottom:5px;font-weight:700}.header-right a span {color:#dfa649;margin-left:10px}
-    .site-main { max-width:1440px; width:100%; margin:0 auto; padding:0 clamp(16px,2vw,30px) 80px; }
+    .header-inner { max-width:1440px; margin:auto; padding:18px 6%; display:flex; justify-content:space-between; align-items:center; gap:20px; }
+    .wordmark { font-family:var(--font-display); font-weight:700; font-size:24px; line-height:1.2; letter-spacing:-1.2px; white-space:nowrap; }
+    .wordmark .wordmark-city, .wordmark .plane-icon { color:#dfa649; } .wordmark small {font-size:11px;letter-spacing:0;margin-left:2px;}
+    .header-right {display:flex;align-items:center;gap:32px;font-size:13px;line-height:1.2;color:#b5b4b0}.header-right a {color:#fff;border-bottom:1px solid #dfa649;padding-bottom:5px;font-weight:700}.header-right a span {color:#dfa649;margin-left:10px}
+    .site-main { flex:1; max-width:1440px; width:100%; margin:0 auto; padding:0 clamp(16px,2vw,30px) 80px; }
     .hero {position:relative;display:grid;grid-template-columns:1fr 1.07fr;min-height:390px;background:#111211;color:#fff;margin:0;overflow:hidden;}
     .hero-copy {padding:65px 9% 72px 11%;position:relative;z-index:1}.hero-eyebrow,.field-kicker {font-family:var(--font-display);font-size:10px;font-weight:700;letter-spacing:.16em;color:#9a6a25}.hero-eyebrow {color:#dfa649}.hero-eyebrow span {display:inline-block;width:24px;height:1px;background:#dfa649;vertical-align:middle;margin-right:8px}
     .hero h1 {font-family:var(--font-display);font-size:clamp(38px,4.3vw,66px);line-height:1.06;letter-spacing:-.055em;margin:23px 0;color:white;font-weight:700}.hero h1 em {color:#dfa649;font-style:normal}.hero-copy p {max-width:430px;color:#bdbdb7;font-size:16px;line-height:1.6}.hero-link {display:inline-flex;align-items:center;gap:24px;margin-top:27px;color:#fff;font-size:13px;font-weight:700;border-bottom:1px solid #dfa649;padding-bottom:8px}.hero-link span {color:#dfa649}
@@ -159,7 +159,7 @@
     .search-actions {display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;border-top:1px solid #eeede8;margin-top:20px;padding-top:20px}.search-actions-buttons {display:flex;gap:10px;flex-wrap:wrap}.search-actions #btn-search {background:#dfa649;color:#15130f;border-radius:8px;padding:13px 22px;font-size:13px}.search-actions #btn-scan-year {background:#fff;color:#242522;border:1px solid #deded7;border-radius:8px;padding:13px 18px;font-size:12px}.search-actions p {font-size:11px;color:#858780}
     #advanced-filters-panel {margin-top:24px}.results-heading {display:flex;justify-content:space-between;align-items:end;margin-top:65px;margin-bottom:18px}.results-heading h2 {margin-bottom:0}.site-main > #city-guide-card {margin-top:24px;background:#f7f3e9!important;border-color:#e9e2d3;box-shadow:none}.guide-disclaimer {font-size:11px;color:#777;margin-top:14px}.site-main > #city-spotlight-banner {margin-top:24px}.site-main > #cross-engine-bar {display:none}.site-main > #results-cards-container {margin-top:18px}.empty-mark {font-size:32px;color:#bd8c45;margin-bottom:10px}#cards-grid > .col-span-full {background:#eeede7;border-color:#e5e3da;padding:55px 20px}#section-schedules:has(#schedule-cards:empty) {display:none}
     @media(max-width:900px) { .search-panel > .grid > div:not(.search-field-group-title),.search-panel > .grid > div:nth-child(2),.search-panel > .grid > div:nth-child(3) {grid-column:span 6}.hero {min-height:340px}.hero-copy {padding:50px 8% 65px 11%}.hero h1 {font-size:42px} }
-    @media(max-width:600px) { .header-inner {padding:18px 5%}.header-right span {display:none}.header-right {gap:16px}.header-right a {font-size:13px}.site-main {padding:0 16px 55px}.hero {margin:0;display:flex;flex-direction:column;min-height:0}.hero-copy {padding:50px 6% 35px}.hero h1 {font-size:39px}.hero-copy p {font-size:15px}.hero-image {height:190px;background-image:linear-gradient(0deg,rgba(0,0,0,.4),transparent 70%),url('assets/weekend-hero.webp');}.hero-image-label {bottom:25px}.hero-index {display:none}.search-panel {padding:25px 18px;border-radius:0 0 14px 14px}.search-heading {align-items:flex-start;flex-direction:column}.search-heading h2 {font-size:26px}.search-panel > .grid {gap:8px}.search-panel > .grid > div:nth-child(2),.search-panel > .grid > div:nth-child(3) {grid-column:span 12}.period-options {display:grid;grid-template-columns:1fr 1fr}.period-choice {min-width:0;padding:11px}.search-actions-buttons,.search-actions button {width:100%;justify-content:center}.results-heading {margin-top:45px}.results-heading p {display:none} }
+    @media(max-width:600px) { .header-inner {padding:18px 6%}.wordmark {font-size:21px}.header-right span {display:none}.header-right {gap:16px}.header-right a {font-size:13px}.site-main {padding:0 16px 55px}.hero {margin:0;display:flex;flex-direction:column;min-height:0}.hero-copy {padding:50px 6% 35px}.hero h1 {font-size:39px}.hero-copy p {font-size:15px}.hero-image {height:190px;background-image:linear-gradient(0deg,rgba(0,0,0,.4),transparent 70%),url('assets/weekend-hero.webp');}.hero-image-label {bottom:25px}.hero-index {display:none}.search-panel {padding:25px 18px;border-radius:0 0 14px 14px}.search-heading {align-items:flex-start;flex-direction:column}.search-heading h2 {font-size:26px}.search-panel > .grid {gap:8px}.search-panel > .grid > div:nth-child(2),.search-panel > .grid > div:nth-child(3) {grid-column:span 12}.period-options {display:grid;grid-template-columns:1fr 1fr}.period-choice {min-width:0;padding:11px}.search-actions-buttons,.search-actions button {width:100%;justify-content:center}.results-heading {margin-top:45px}.results-heading p {display:none} }
     @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
 
     .calendar-range-choice { border:1px solid #e4e5df; border-radius:8px; background:#fff; padding:8px 10px; color:#475569; font-size:11px; font-weight:800; cursor:pointer; transition:all .18s; }
@@ -200,11 +200,12 @@
     #search-status { flex:1 1 300px; flex-wrap:wrap; } #search-progress { width:100%; height:8px; accent-color:#b77b20; }
     @media(max-width:900px) { #weekend-chips-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .hero {min-height:250px} }
     @media(max-width:600px) { .hero-copy {padding:25px 6%} .hero h1 {font-size:34px} .hero-image {height:125px} .step-fields,.option-fields {grid-template-columns:1fr} .option-fields > .space-y-3 {grid-column:auto} #weekend-chips-grid {grid-template-columns:repeat(2,minmax(0,1fr))} .period-section,.journey-step {padding:14px} }
+.site-footer{background:#0a0b0d;color:#8a95a6;border-top:1px solid #232730;padding:24px 0;margin-top:48px;font-family:'Source Sans 3',sans-serif;font-size:14px;font-weight:500}.footer-inner{max-width:1536px;width:100%;margin:auto;padding:0 32px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px}.footer-brand{display:flex;align-items:center;gap:8px}.footer-wordmark{font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:700;color:white}.footer-gold,.footer-brand a{color:#dfa649}.footer-brand a{font-weight:600;text-decoration:none}.footer-brand a:hover{text-decoration:underline}@media(max-width:639px){.site-footer{font-size:12px}.footer-inner{padding:0 16px}.footer-wordmark{font-size:14px}}
   </style>
 </head>
 <body class="antialiased min-h-screen flex flex-col bg-white text-[#0a0b0d]">
 
-  <header class="site-header"><div class="header-inner"><a class="wordmark" href="#top" aria-label="23citybreak, pagina principală"><span aria-hidden="true">✈︎ </span><span>23</span><span class="wordmark-city">city</span><span>break</span></a><div class="header-right"><a href="jurnal.html">Jurnal</a></div></div></header>
+  <header class="site-header"><div class="header-inner"><a class="wordmark" href="#top" aria-label="23citybreak, pagina principală"><span class="plane-icon" aria-hidden="true">✈︎ </span><span>23</span><span class="wordmark-city">city</span><span>break</span></a><div class="header-right"><a href="jurnal.html">Jurnal</a></div></div></header>
   <main id="top" class="site-main">
     <section class="hero"><div class="hero-copy"><h1>Weekendul e<br>mai aproape <em>decât crezi.</em></h1><p>Un oraș nou, o masă bună, timp pentru voi. Acordă-ți o evadare scurtă, de weekend, din programul zilnic.</p></div><div class="hero-image"><div class="hero-image-label"><span>COLECȚIA DE WEEKEND</span><strong>Mai multe locuri.<br>Mai multe povești.</strong></div></div></section>
 
@@ -737,16 +738,7 @@
 
   </main>
 
-  <footer class="bg-[#0a0b0d] text-[#8a95a6] border-t border-[#232730] mt-12 py-6">
-    <div class="max-w-[96rem] w-full mx-auto px-4 sm:px-6 lg:px-8 flex flex-wrap items-center justify-between gap-4 text-xs sm:text-sm font-medium">
-      <div class="flex items-center gap-2">
-        <span class="font-bold text-white font-display text-sm sm:text-base"><span class="text-white">23</span><span class="text-[#dfa649]">city</span><span class="text-white">break</span><span class="text-[#dfa649]">.ro</span></span>
-        <span>·</span>
-        <span>Powered by <a href="https://23ai.ro" target="_blank" rel="noopener" class="text-[#dfa649] hover:underline font-semibold">23AI Labs</a> @2026</span>
-      </div>
-      <div>Prețurile și disponibilitatea pot varia; verifică detaliile la furnizor.</div>
-    </div>
-  </footer>
+  <footer class="site-footer"><div class="footer-inner"><div class="footer-brand"><span class="footer-wordmark"><span>23</span><span class="footer-gold">city</span><span>break</span><span class="footer-gold">.ro</span></span><span>·</span><span>Powered by <a href="https://23ai.ro" target="_blank" rel="noopener noreferrer">23AI Labs</a> @2026</span></div><div>Prețurile și disponibilitatea pot varia; verifică detaliile la furnizor.</div></div></footer>
 
   <script>
     // Romanian public holidays (Labour Code, art. 139). Movable dates use Orthodox Easter.
