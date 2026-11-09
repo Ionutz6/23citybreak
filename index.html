@@ -164,6 +164,9 @@
 
     .calendar-range-choice { border:1px solid #e4e5df; border-radius:8px; background:#fff; padding:8px 10px; color:#475569; font-size:11px; font-weight:800; cursor:pointer; transition:all .18s; }
     .calendar-range-choice:hover { border-color:#dfa649; background:#fff8ea; color:#5c3b06; }
+    .selected-years { display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin-top:12px; font-size:12px; color:#5c503e; }
+    .selected-years button { border:1px solid #d7c5a9; border-radius:8px; padding:6px 10px; background:#fff; font-weight:700; cursor:pointer; }
+    .selected-years button[aria-current="true"] { background:#201d18; border-color:#201d18; color:#fff; }
     .calendar-nav-button { width:36px; height:36px; border:1px solid #e4d3b5; border-radius:10px; background:#fffdf8; color:#0a0b0d; font-size:18px; font-weight:800; cursor:pointer; }
     .calendar-nav-button:disabled { opacity:.35; cursor:not-allowed; }
     /* Step 1 contains route, basic criteria and advanced filters; Step 2 follows it. */
@@ -174,22 +177,44 @@
     #configurator.search-panel > #advanced-filters-panel { order:4; }
     #configurator.search-panel > .period-section { order:5; }
     #configurator.search-panel > .search-actions { order:6; }
+
+    #configurator.search-panel > .period-section { order:2; }
+    #configurator.search-panel > .route-step { order:3; }
+    #configurator.search-panel > .options-step { order:4; }
+    #configurator.search-panel > .search-actions { order:5; }
+    #configurator.search-panel > #advanced-filters-panel { display:none; }
+    .hero { min-height:270px; } .hero-copy { padding:35px 9% 38px 11%; } .hero h1 { margin:0 0 15px; font-size:clamp(32px,3.5vw,52px); } .hero-image { transition:background-image .5s; }
+    .period-section, .journey-step { border:1px solid #e6dfd2; border-radius:14px; padding:20px; margin:12px 0 0; }
+    .period-section { background:#f7f0e3; } .route-step { background:#e3f1e7; border-color:#caddcf; } .options-step { background:#dfe2e4; border-color:#c9ced1; }
+    .step-heading h3 { font-family:var(--font-display); font-size:19px; font-weight:700; margin:6px 0 14px; }
+    .step-fields, .option-fields { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+    .step-fields > div, .option-fields > div { grid-column:auto; min-width:0; padding:12px; border:1px solid #e2e4df; border-radius:10px; background:#fff; }
+    .step-fields label, .option-fields label { display:block; font-size:12px; font-weight:700; margin-bottom:5px; }
+    .step-fields select, .step-fields input, .option-fields select { width:100%; }
+    .option-fields > .space-y-3 { grid-column:1/-1; }
+    #weekend-chips-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; }
+    .calendar-month { background:#fff; border:1px solid #e6dfd2; border-radius:10px; padding:10px; min-width:0; }
+    .calendar-month h4 { font-weight:800; font-size:13px; margin:0 0 8px; } .month-weekends { display:grid; gap:5px; } .month-weekends button { width:100%; }
+    #main-matrix-table .matrix-city-column { position:sticky; left:0; z-index:2; background:#fbfbfd; box-shadow:5px 0 8px -8px rgba(10,11,13,.35); }
+    #main-matrix-table th.matrix-city-column { z-index:3; }
+    #search-status { flex:1 1 300px; flex-wrap:wrap; } #search-progress { width:100%; height:8px; accent-color:#b77b20; }
+    @media(max-width:900px) { #weekend-chips-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .hero {min-height:250px} }
+    @media(max-width:600px) { .hero-copy {padding:25px 6%} .hero h1 {font-size:34px} .hero-image {height:125px} .step-fields,.option-fields {grid-template-columns:1fr} .option-fields > .space-y-3 {grid-column:auto} #weekend-chips-grid {grid-template-columns:repeat(2,minmax(0,1fr))} .period-section,.journey-step {padding:14px} }
   </style>
 </head>
 <body class="antialiased min-h-screen flex flex-col bg-white text-[#0a0b0d]">
 
-  <header class="site-header"><div class="header-inner"><a class="wordmark" href="#top" aria-label="23citybreak, pagina principală"><span>23</span><span>city</span><span>break</span><small>.ro</small></a><div class="header-right"><span>O idee bună pentru weekend.</span><a href="jurnal.html">Jurnal</a><a href="#configurator">Începe căutarea <span>↗</span></a></div></div></header>
+  <header class="site-header"><div class="header-inner"><a class="wordmark" href="#top" aria-label="23citybreak, pagina principală"><span>23</span><span>city</span><span>break</span><small>.ro</small></a><div class="header-right"><a href="jurnal.html">Jurnal</a></div></div></header>
   <main id="top" class="site-main">
-    <section class="hero"><div class="hero-copy"><div class="hero-eyebrow"><span></span> PAUZA TA ÎNCEPE AICI</div><h1>Weekendul e<br>mai aproape <em>decât crezi.</em></h1><p>Un oraș nou, o masă bună, timp pentru voi. Găsește zboruri potrivite pentru o escapadă în Europa.</p><a href="#configurator" class="hero-link">Descoperă unde poți pleca <span>↗</span></a></div><div class="hero-image"><div class="hero-image-label"><span>COLECȚIA DE WEEKEND</span><strong>Mai multe locuri.<br>Mai multe povești.</strong></div></div><div class="hero-index">01 / 03 <span>EUROPA, ÎNTR-UN WEEKEND</span></div></section>
+    <section class="hero"><div class="hero-copy"><h1>Weekendul e<br>mai aproape <em>decât crezi.</em></h1><p>Un oraș nou, o masă bună, timp pentru voi. Acordă-ți o evadare scurtă, de weekend, din programul zilnic.</p></div><div class="hero-image"><div class="hero-image-label"><span>COLECȚIA DE WEEKEND</span><strong>Mai multe locuri.<br>Mai multe povești.</strong></div></div></section>
 
     <!-- 2. PASUL 2: Selectare Oraș & Opțiuni Căutare -->
     <section id="configurator" class="search-panel">
       
-      <div class="search-heading"><div><span class="field-kicker">PLANIFICĂ O ESCAPADĂ</span><h2>Hai să găsim următorul weekend.</h2><p id="subtitle-summary">Alege de unde pleci, unde ai vrea să ajungi și când ai timp liber.</p></div><button id="btn-toggle-advanced" type="button" onclick="toggleAdvancedFilters()" aria-controls="advanced-filters-panel" class="advanced-button"><span id="btn-toggle-advanced-text">Mai multe filtre +</span></button></div>
       <!-- Compact Primary Search Console -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3.5 items-end">
         
-        <div class="search-field-group-title"><span class="field-kicker">01 / TRASEUL</span><span>De unde și încotro?</span></div>
+        <div class="search-field-group-title"><span class="field-kicker">02 / TRASEUL</span><span>De unde și încotro?</span></div>
         <!-- 1. Plecare -->
         <div class="lg:col-span-3 bg-[#fdfaf3] p-3 rounded-2xl border border-[#ecd8b0] shadow-2xs hover:border-[#dfa649] transition">
           <label class="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#0a0b0d] mb-1.5 font-display">
@@ -278,12 +303,12 @@
 
       <div id="search-status" role="status" aria-live="polite" class="hidden rounded-xl border px-4 py-3 text-sm flex items-center gap-2">
         <span id="search-status-spinner"></span><span id="search-status-text" class="flex-1"></span>
-        <span id="search-status-pct"></span><button id="search-status-dismiss" type="button" aria-label="Închide mesajul" onclick="document.getElementById('search-status').classList.add('hidden')">✕</button>
+        <span id="search-status-pct"></span><progress id="search-progress" max="100" value="0" aria-label="Progresul căutării"></progress><button id="search-status-dismiss" type="button" aria-label="Închide mesajul" onclick="document.getElementById('search-status').classList.add('hidden')">✕</button>
       </div>
     <!-- 2. PASUL 2: Tip de weekend și calendar -->
     <section class="period-section">
-      <div class="period-heading"><div><span class="field-kicker">02 / CÂND PLECI</span><h3>Ce fel de weekend cauți?</h3><p class="text-xs text-[#64748b] mt-1">Alege tipul, apoi bifează una sau mai multe perioade din calendar.</p></div><span id="selected-wk-badge" class="period-count"></span></div>
-      <div class="period-options"><button type="button" id="classic-mode" class="period-choice active" onclick="setSimpleTripMode('classic')"><strong>Weekend clasic</strong><small>Vineri – duminică · 2 nopți</small></button><button type="button" id="extended-mode" class="period-choice" onclick="setSimpleTripMode('extended')"><strong>Weekend prelungit</strong><small>Include joi sau luni când există sărbătoare legală</small></button></div>
+      <div class="period-heading"><div><h3>1. Hai să găsim următorul weekend.</h3><p id="subtitle-summary" class="text-xs text-[#64748b] mt-1">Alege tipul, apoi bifează una sau mai multe perioade din calendar.</p></div><span id="selected-wk-badge" class="period-count"></span></div>
+      <div class="period-options"><button type="button" id="classic-mode" class="period-choice active" onclick="setSimpleTripMode('classic')"><strong>Weekend clasic</strong><small>Vineri – duminică · 2 nopți</small></button><button type="button" id="extended-mode" class="period-choice" onclick="setSimpleTripMode('extended')"><strong>Weekend prelungit</strong><small>Sărbători legale și zile-punte · pot necesita concediu</small></button></div>
       <div class="mt-4 rounded-xl border border-[#eee5d4] bg-[#fffdf8] p-3"><div class="text-[11px] font-black uppercase tracking-wider text-[#8a5d14] mb-2">Alege perioada</div><div class="flex flex-wrap gap-2"><button class="calendar-range-choice" onclick="selectCalendarRange('next-month')">Luna următoare</button><button class="calendar-range-choice" onclick="selectCalendarRange('next-2-months')">Următoarele 2 luni</button><button id="range-winter" class="calendar-range-choice" onclick="selectCalendarRange('winter')">Iarna <span data-range-year></span></button><button id="range-spring" class="calendar-range-choice" onclick="selectCalendarRange('spring')">Primăvara <span data-range-year></span></button><button id="range-summer" class="calendar-range-choice" onclick="selectCalendarRange('summer')">Vara <span data-range-year></span></button><button id="range-autumn" class="calendar-range-choice" onclick="selectCalendarRange('autumn')">Toamna <span data-range-year></span></button><button class="calendar-range-choice" onclick="selectCalendarRange('year')">Tot anul <span data-range-year></span></button></div></div>
       <div class="calendar-details calendar-details-open">
       <!-- Quick Preset Buttons (Clasice, Extinse, Iarnă, Primăvară) - FĂRĂ vacanțe copii -->
@@ -313,10 +338,12 @@
 
       <div class="flex items-center justify-between gap-3 pt-3 border-t border-[#eef0f3]">
         <button id="calendar-prev-year" type="button" onclick="shiftCalendarYear(-1)" class="calendar-nav-button" aria-label="Anul anterior">←</button>
-        <div class="text-center"><div id="calendar-year-label" class="font-display text-lg font-black text-[#0a0b0d]"></div><div class="text-[11px] text-[#64748b]">următoarele 12 luni · poți selecta mai multe weekenduri</div></div>
+        <div class="text-center"><div id="calendar-year-label" class="font-display text-lg font-black text-[#0a0b0d]"></div><div class="text-[11px] text-[#64748b]">toate lunile anului · poți selecta mai multe weekenduri</div></div>
         <button id="calendar-next-year" type="button" onclick="shiftCalendarYear(1)" class="calendar-nav-button" aria-label="Anul următor">→</button>
       </div>
       <div class="flex flex-wrap items-center justify-between gap-2 pt-3 text-xs font-bold text-[#475569]"><span id="calendar-selection-help">Selectează perioadele care ți se potrivesc.</span><button onclick="selectPreset('clear')" class="text-rose-600 hover:text-rose-700 font-bold hover:underline cursor-pointer font-display flex items-center gap-1.5 bg-rose-50 px-2.5 py-1 rounded-lg border border-rose-200 transition"><span>✕</span> Golește selecția</button></div>
+
+      <div id="selected-years" class="selected-years" aria-label="Weekenduri selectate pe ani" aria-live="polite"></div>
 
       <!-- Weekend Chips Grid -->
       <div id="weekend-chips-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 pt-2">
@@ -331,7 +358,7 @@
           <button id="btn-search" onclick="runLiveSearch()"
                   class="bg-[#dfa649] hover:bg-[#c98f33] active:bg-[#b57f2a] text-[#0a0b0d] text-xs sm:text-sm font-black px-5 py-2.5 rounded-xl shadow-xs transition flex items-center gap-2 cursor-pointer font-display">
             <span id="btn-search-icon" aria-hidden="true">↗</span>
-            <span id="btn-search-text">Caută escapade</span>
+            <span id="btn-search-text">Caută zboruri</span>
           </button>
           <button id="btn-scan-year" hidden onclick="scanEntireYearForDestination()"
                   title="Scanează toate cele 52 de weekenduri din an pentru a găsi cel mai mic preț"
@@ -434,7 +461,7 @@
                   <option value="23:00">Până la 23:00</option>
                   <option value="23:59">Până la 24:00</option>
                   <option value="01:00" selected>Până la 01:00</option>
-                  <option value="03:00">Până la 03:00 a doua zi</option>
+                  <option value="02:00">Până la 02:00</option>
                 </select>
               </div>
             </div>
@@ -455,7 +482,7 @@
                   <option value="23:00">Până la 23:00</option>
                   <option value="23:59">Până la 24:00</option>
                   <option value="01:00" selected>Până la 01:00</option>
-                  <option value="03:00">Până la 03:00</option>
+                  <option value="02:00">Până la 02:00</option>
                 </select>
               </div>
             </div>
@@ -636,44 +663,6 @@
       </table>
     </div>
 
-    <!-- Color Legend -->
-    <div class="flex flex-wrap items-center gap-4 text-xs sm:text-sm text-[#0a0b0d] font-bold pt-1 font-display">
-      <div class="flex items-center gap-2">
-        <span class="w-4 h-4 rounded-md tier-1 inline-block shadow-xs"></span>
-        <span id="leg-1">până la 75 €</span>
-      </div>
-      <div class="flex items-center gap-2">
-        <span class="w-4 h-4 rounded-md tier-2 inline-block shadow-xs"></span>
-        <span id="leg-2">76–100 €</span>
-      </div>
-      <div class="flex items-center gap-2">
-        <span class="w-4 h-4 rounded-md tier-3 inline-block shadow-xs"></span>
-        <span id="leg-3">101–125 €</span>
-      </div>
-      <div class="flex items-center gap-2">
-        <span class="w-4 h-4 rounded-md tier-4 inline-block shadow-xs"></span>
-        <span id="leg-4">126–150 €</span>
-      </div>
-      <div class="flex items-center gap-2">
-        <span class="w-4 h-4 rounded-md tier-empty inline-block shadow-xs"></span>
-        <span>nicio variantă în filtre</span>
-      </div>
-      <div class="flex items-center gap-2">
-        <span class="w-4 h-4 rounded-md border-2 border-[#0a0b0d] inline-block shadow-xs"></span>
-        <span>cel mai ieftin din weekend</span>
-      </div>
-    </div>
-
-    <!-- 10. Flight Schedules & Details Section -->
-    <section id="section-schedules" class="pt-3">
-      <h2 id="schedule-section-title" class="text-base sm:text-lg font-bold text-[#0a0b0d] mb-3 font-display">
-        Orele zborurilor și linkuri directe la companiile aeriene
-      </h2>
-      <div id="schedule-cards" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        <!-- Rendered dynamically by JS -->
-      </div>
-    </section>
-
     <!-- 11. Interactive Destination & Weather Modal (Accessible from cards or matrix table) -->
     <div id="city-guide-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-3 sm:p-6 bg-black/75 backdrop-blur-sm" onclick="if(event.target === this) closeCityGuideModal()">
       <div class="relative w-full max-w-2xl bg-white rounded-3xl overflow-hidden shadow-2xl border border-[#ecd8b0] flex flex-col max-h-[92vh] animate-fade-in font-display">
@@ -753,7 +742,7 @@
       <div class="flex items-center gap-2">
         <span class="font-bold text-white font-display text-sm sm:text-base"><span class="text-white">23</span><span class="text-[#dfa649]">city</span><span class="text-white">break</span><span class="text-[#dfa649]">.ro</span></span>
         <span>·</span>
-        <span>Powered by <a href="https://23ai.ro" target="_blank" rel="noopener" class="text-[#dfa649] hover:underline font-semibold">23AI</a> Design System (2026 – 2027)</span>
+        <span>Powered by <a href="https://23ai.ro" target="_blank" rel="noopener" class="text-[#dfa649] hover:underline font-semibold">23AI Labs</a> @2026</span>
       </div>
       <div>Prețurile și disponibilitatea pot varia; verifică detaliile la furnizor.</div>
     </div>
@@ -828,44 +817,14 @@
         let isHoliday = false;
         let holidayType = null; // 'extended' | 'school'
 
-        if (friStr === "2026-11-27") {
-          tag = "🇷🇴 Sf. Andrei & 1 Dec";
-          isHoliday = true;
-          holidayType = "extended";
-        } else if (friStr === "2026-12-25") {
-          tag = "🎄 Crăciun";
-          isHoliday = true;
-          holidayType = "school";
-        } else if (friStr === "2027-01-01") {
-          tag = "🎉 Revelion";
-          isHoliday = true;
-          holidayType = "school";
-        } else if (friStr >= "2026-12-18" && friStr <= "2027-01-08") {
-          tag = "🎒 Vacanță Iarnă";
-          isHoliday = true;
-          holidayType = "school";
-        } else if (friStr >= "2027-02-12" && friStr <= "2027-02-26") {
-          tag = "⛷️ Vacanță Schi";
-          isHoliday = true;
-          holidayType = "school";
-        } else if (friStr === "2027-04-30") {
-          tag = "🥚 Paște & 1 Mai";
-          isHoliday = true;
-          holidayType = "extended";
-        } else if (friStr === "2027-06-18") {
-          tag = "🕊️ Rusalii";
-          isHoliday = true;
-          holidayType = "extended";
-        } else if (friStr >= "2027-06-25" && friStr <= "2027-09-03") {
-          tag = "☀️ Vacanță Vară";
-          isHoliday = true;
-          holidayType = "school";
-        }
-
+        const dateOffset = (offset) => { const day = new Date(fri); day.setDate(day.getDate() + offset); return fmt(day); };
+        const thursdayHoliday = romanianPublicHolidays(thu.getFullYear()).get(thuStr);
+        const tueStr = dateOffset(4);
+        const tuesdayHoliday = romanianPublicHolidays(Number(tueStr.slice(0, 4))).get(tueStr);
         const fridayHoliday = romanianPublicHolidays(fri.getFullYear()).get(friStr);
         const mondayHoliday = romanianPublicHolidays(mon.getFullYear()).get(monStr);
-        if (fridayHoliday || mondayHoliday) {
-          tag = [...new Set([fridayHoliday, mondayHoliday].filter(Boolean))].join(' · ');
+        if (thursdayHoliday || fridayHoliday || mondayHoliday || tuesdayHoliday) {
+          tag = [...new Set([thursdayHoliday, fridayHoliday, mondayHoliday, tuesdayHoliday].filter(Boolean))].join(' · ');
           isHoliday = true;
           holidayType = 'extended';
         }
@@ -886,6 +845,8 @@
           tag: tag,
           isHoliday: isHoliday,
           holidayType: holidayType,
+          wed: dateOffset(-2), tue: tueStr,
+          thursdayHoliday: Boolean(thursdayHoliday), tuesdayHoliday: Boolean(tuesdayHoliday),
           fridayHoliday: Boolean(fridayHoliday),
           mondayHoliday: Boolean(mondayHoliday)
         });
@@ -1523,7 +1484,10 @@
     function getTripDates(wk) {
       if (!wk) return { dateOut: "2026-11-13", dateIn: "2026-11-15" };
       if (currentTripMode === "extended") {
-        return { dateOut: wk.fridayHoliday ? wk.thu : wk.fri, dateIn: wk.mondayHoliday ? wk.mon : wk.sun };
+        if (wk.thursdayHoliday) return { dateOut: wk.wed, dateIn: wk.sun };
+        if (wk.tuesdayHoliday || wk.mondayHoliday) return { dateOut: wk.fri, dateIn: wk.tue };
+        if (wk.fridayHoliday) return { dateOut: wk.thu, dateIn: wk.sun };
+        return { dateOut: wk.fri, dateIn: wk.sun };
       } else if (currentTripMode === "school_week") {
         return { dateOut: wk.fri, dateIn: wk.nextSun || wk.sun };
       }
@@ -2079,7 +2043,7 @@
       }
       nativeSelect.value = city.id;
 
-      document.getElementById("btn-scan-year").hidden = Boolean(city.isAll);
+      document.getElementById("btn-scan-year").hidden = true;
       if (city.isAll) {
         input.value = "🌟 Oricare (Toată Europa)";
         input.placeholder = "🌟 Oricare (Toată Europa)";
@@ -2091,7 +2055,7 @@
       } else {
         input.value = `${city.flag} ${city.name} (${city.iata}) · ${city.country}`;
         clearBtn.classList.remove("hidden");
-        if (searchBtnText) searchBtnText.textContent = `Caută în weekendurile alese către ${city.name}`;
+        if (searchBtnText) searchBtnText.textContent = "Caută zboruri";
         if (scanBtnText) scanBtnText.textContent = `Cel mai bun weekend în ${city.name}`;
 
         // Render City Break Insights & Guide IMMEDIATELY
@@ -2162,7 +2126,9 @@
       document.getElementById('calendar-next-year').disabled = calendarYear >= Number(ALL_WEEKENDS.at(-1).fri.slice(0, 4));
       
       let chipsHtml = "";
+      let lastMonth = "";
       visibleWks.forEach(w => {
+        if (w.monthKey !== lastMonth) { if (lastMonth) chipsHtml += "</div></section>"; lastMonth = w.monthKey; chipsHtml += `<section class="calendar-month"><h4>${w.monthName}</h4><div class="month-weekends">`; }
         const isSel = selectedWkIds.has(w.id);
         const tripDates = getTripDates(w);
         const tagBadge = w.tag ? `<span class="text-[10px] px-1.5 py-0.5 rounded-md font-bold ${isSel ? 'bg-[#dfa649] text-[#0a0b0d]' : 'bg-[#fce8bd] text-[#5c3b06]'} ml-1">${w.tag}</span>` : "";
@@ -2177,10 +2143,26 @@
           </button>
         `;
       });
+      if (lastMonth) chipsHtml += "</div></section>";
       gridEl.innerHTML = chipsHtml;
 
+      const selectedYears = [...selectedWkIds].reduce((counts, id) => {
+        const year = Number(id.slice(0, 4));
+        counts.set(year, (counts.get(year) || 0) + 1);
+        return counts;
+      }, new Map());
+      const yearsEl = document.getElementById('selected-years');
+      yearsEl.innerHTML = selectedYears.size ? '<span>Selecția pe ani:</span>' + [...selectedYears].sort((a, b) => a[0] - b[0]).map(([year, count]) =>
+        `<button type="button" onclick="showCalendarYear(${year})" aria-current="${year === calendarYear}" aria-label="Vezi ${count} weekenduri selectate în ${year}">${year}: ${count} weekend${count === 1 ? '' : 'uri'}</button>`
+      ).join('') : '';
       document.getElementById("selected-wk-badge").textContent = selectedWkIds.size ? `${selectedWkIds.size} weekend${selectedWkIds.size === 1 ? '' : 'uri'} selectate` : 'Nicio perioadă selectată';
       document.getElementById('calendar-selection-help').textContent = selectedWkIds.size ? 'Poți adăuga sau elimina oricând perioade.' : 'Selectează cel puțin un weekend pentru a căuta.';
+    }
+
+    function showCalendarYear(year) {
+      if (year < Number(ALL_WEEKENDS[0].fri.slice(0, 4)) || year > Number(ALL_WEEKENDS.at(-1).fri.slice(0, 4))) return;
+      calendarYear = year;
+      renderWeekendSelectorUI();
     }
 
     function shiftCalendarYear(offset) {
@@ -2202,7 +2184,7 @@
       } else if (range === 'next-2-months') {
         end.setMonth(end.getMonth() + 2);
       } else if (range === 'winter') {
-        start.setFullYear(year, 11, 1); end.setFullYear(year + 1, 1, 28);
+        start.setFullYear(year, 11, 1); end.setFullYear(year + 1, 2, 0);
       } else if (range === 'spring') {
         start.setFullYear(year, 2, 1); end.setFullYear(year, 4, 31);
       } else if (range === 'summer') {
@@ -2475,6 +2457,9 @@
       if (state === 'loading' || state === 'error') renderMatrix();
       const statusBox = document.getElementById("search-status");
       const statusText = document.getElementById("search-status-text");
+      const progress = document.getElementById('search-progress');
+      progress.hidden = state !== 'loading';
+      progress.removeAttribute("value");
       const statusPct = document.getElementById("search-status-pct");
       const spinner = document.getElementById("search-status-spinner");
       const dismissBtn = document.getElementById("search-status-dismiss");
@@ -2486,8 +2471,7 @@
         spinner.textContent = "⚡";
         spinner.className = "text-base loading-pulse";
         dismissBtn.classList.add("hidden");
-        statusPct.classList.remove("hidden");
-        statusPct.textContent = pct + "%";
+        statusPct.classList.add("hidden");
         statusText.textContent = text;
       } else if (state === "success") {
         statusBox.classList.add("bg-[#f0fdf4]", "border-emerald-500", "text-emerald-950");
@@ -2503,7 +2487,7 @@
         statusPct.classList.add("hidden");
         dismissBtn.classList.remove("hidden");
         if (text.includes('[[RESET_PERMISSIVE]]')) {
-          statusText.innerHTML = `${text.replace('[[RESET_PERMISSIVE]]', '')} <button type="button" class="ml-1 underline font-black text-[#8a5d14] hover:text-[#0a0b0d]" onclick="resetToPermissive(); runLiveSearch();">🔓 Resetează filtre și caută din nou</button>`;
+          statusText.innerHTML = `${text.replace('[[RESET_PERMISSIVE]]', '')}`;
         } else {
           statusText.textContent = text;
         }
@@ -2556,24 +2540,10 @@
 
         const cityKey = (r.code || r.iata || r.city).toLowerCase();
         const photoUrl = getCityPhoto(cityKey);
-        const vibes = getCityVibes(cityKey);
         const p1 = bestCell ? Math.round(bestCell.perPaxEur) : "—";
         const pTot = bestCell ? Math.round(bestCell.totalEur) : "—";
         const priceDisplay = (currentMode === 1) ? `${p1} €` : `${pTot} €`;
         const priceSub = (currentMode === 1) ? "per persoană" : "total grup";
-
-        const zeroConcediu = bestCell ? isZeroConcediu(bestCell) : false;
-        const zeroBadge = zeroConcediu ? `
-          <span class="inline-flex items-center gap-1 bg-emerald-500/90 text-white text-[10px] font-bold px-2 py-0.5 rounded-md shadow-xs">
-            <span>✨</span> 0 zile concediu
-          </span>
-        ` : '';
-
-        const vibeBadge = vibes[0] ? `
-          <span class="inline-flex items-center bg-black/60 text-[#dfa649] border border-[#dfa649]/40 text-[10px] font-bold px-2 py-0.5 rounded-md backdrop-blur-sm">
-            ${vibes[0] === 'food' ? '🍕 Foodie' : vibes[0] === 'shopping' ? '🛍️ Shopping' : vibes[0] === 'sea' ? '☀️ Plajă' : '🏛️ Cultură'}
-          </span>
-        ` : '';
 
         const tripD = bestWk ? getTripDates(bestWk) : null;
         const datesLabel = tripD ? formatTripSpan(tripD.dateOut, tripD.dateIn, "card") : 'Selectează weekend';
@@ -2586,22 +2556,11 @@
           <div class="card-23ai city-card-bg rounded-3xl overflow-hidden flex flex-col justify-between border border-[#e4e7eb] shadow-sm relative group"
                style="background-image: linear-gradient(180deg, rgba(10, 11, 13, 0.45) 0%, rgba(10, 11, 13, 0.88) 60%, rgba(10, 11, 13, 0.98) 100%), url('${photoUrl}'); min-height: 340px;">
             
-            <!-- Top Card Header: Badges & IATA -->
-            <div class="p-4 flex items-start justify-between gap-2 z-10">
-              <div class="flex flex-wrap items-center gap-1.5">
-                ${zeroBadge}
-                ${vibeBadge}
-              </div>
-              <div class="flex items-center gap-1.5">
-                <button onclick="openCityGuideModal('${cityKey}', '${r.city}', '${r.iata || r.code}')"
-                        title="Vezi Vremea & Ghidul de 48h"
-                        class="bg-black/60 hover:bg-black text-[#dfa649] hover:text-white border border-[#dfa649]/40 text-[10px] font-bold px-2.5 py-1 rounded-lg backdrop-blur-sm transition cursor-pointer flex items-center gap-1 shadow-2xs font-display">
-                  <span>☀️</span> <span class="hidden sm:inline">Vreme & Ghid</span>
-                </button>
-                <span class="glass-dark text-white font-mono text-xs font-black px-2 py-1 rounded-lg border border-white/20">
-                  ${r.iata || r.code?.toUpperCase()}
-                </span>
-              </div>
+            <div class="p-4 z-10">
+              <button type="button" onclick="openCityGuideModal('${cityKey}', '${r.city}', '${r.iata || r.code}')"
+                      class="w-full bg-black/60 hover:bg-black text-[#dfa649] hover:text-white border border-[#dfa649]/40 text-xs font-bold px-4 py-2 rounded-lg transition cursor-pointer font-display">
+                Ghid turistic →
+              </button>
             </div>
 
             <!-- Bottom Card Content: Price, Route, Schedule & Booking -->
@@ -2609,7 +2568,6 @@
               <div>
                 <h3 class="font-display text-xl sm:text-2xl font-black text-white tracking-tight flex items-center gap-2 flex-wrap drop-shadow-md">
                   <span>${r.city}</span>
-                  ${r.airportName ? `<span class="text-xs font-bold text-[#dfa649] bg-black/60 px-2 py-0.5 rounded-md border border-[#dfa649]/40 backdrop-blur-sm">${r.airportName}</span>` : ''}
                 </h3>
                 <div class="text-xs text-[#cbd5e1] font-medium font-body flex items-center gap-1.5 mt-0.5">
                   <span>📅</span> <span>${datesLabel}</span>
@@ -2811,7 +2769,7 @@
       });
 
       // Render Table Header
-      let headHtml = `<tr><th class="text-left py-3 px-3 min-w-[210px] sm:min-w-[250px] text-xs font-black uppercase tracking-wider text-[#0a0b0d] font-display">Destinație / Aeroport</th>`;
+      let headHtml = `<tr><th class="matrix-city-column text-left py-3 px-3 min-w-[210px] sm:min-w-[250px] text-xs font-black uppercase tracking-wider text-[#0a0b0d] font-display">Destinație / Aeroport</th>`;
       activeWks.forEach(wk => {
         const tripDates = getTripDates(wk);
         const tagBadge = wk.tag ? `<div class="text-[9px] px-1.5 py-0.5 rounded-md bg-[#fce8bd] text-[#5c3b06] font-bold mt-1 inline-block border border-[#dfa649]/60">${wk.tag}</div>` : '';
@@ -2849,14 +2807,7 @@
                 <div class="text-xs sm:text-sm text-[#5c3b06] mt-1 font-medium font-body max-w-lg mx-auto">
                   Alege orice oraș din Europa sau lasă pe «🌟 Oricare» pentru cele mai bune oferte. Apasă mai jos pentru a căuta zboruri live.
                 </div>
-                <div class="mt-5 flex flex-wrap items-center justify-center gap-3 font-display">
-                  <button onclick="runLiveSearch()" class="bg-[#dfa649] hover:bg-[#c98f33] active:bg-[#b57f2a] text-[#0a0b0d] text-xs sm:text-sm font-black px-6 py-3 rounded-xl shadow-sm transition inline-flex items-center gap-2 cursor-pointer">
-                    🔍 Caută zboruri în weekendurile alese
-                  </button>
-                  <button onclick="scanEntireYearForDestination()" class="bg-[#0a0b0d] hover:bg-[#1a1e27] text-[#dfa649] text-xs sm:text-sm font-black px-6 py-3 rounded-xl shadow-xs transition inline-flex items-center gap-2 cursor-pointer">
-                    📅 Scanează tot anul (52 weekenduri)
-                  </button>
-                </div>
+
               </td>
             </tr>
           `;
@@ -2872,13 +2823,9 @@
                 Nu am găsit zboruri care să respecte toate criteriile pentru ${destTitle}
               </div>
               <div class="text-xs sm:text-sm text-[#64748b] mt-1 font-medium font-body max-w-md mx-auto">
-                Filtrele actuale (ore stricte sau fără escale) pot fi prea restrictive pentru aceste date.
+                Încearcă alte ore, un buget mai mare sau alte weekenduri.
               </div>
-              <div class="mt-5 flex flex-wrap items-center justify-center gap-3 font-display">
-                <button onclick="resetToPermissive(); runLiveSearch();" class="bg-[#dfa649] hover:bg-[#c98f33] active:bg-[#b57f2a] text-[#0a0b0d] text-xs sm:text-sm font-black px-6 py-3 rounded-xl shadow-sm transition inline-flex items-center gap-2 cursor-pointer">
-                  🔓 Caută în Mod Permisiv (permite 1 escală / ore flexibile)
-                </button>
-              </div>
+
             </td>
           </tr>
         `;
@@ -2889,7 +2836,7 @@
         const tr = document.createElement("tr");
 
         const tdLabel = document.createElement("td");
-        tdLabel.className = "py-2.5 px-3 align-middle min-w-[210px] sm:min-w-[250px]";
+        tdLabel.className = "matrix-city-column py-2.5 px-3 align-middle min-w-[210px] sm:min-w-[250px]";
         const airportBadge = r.airportName ? `<span class="text-[10px] font-bold text-[#8a5d14] bg-[#fdf3dc] border border-[#dfa649]/40 px-1.5 py-0.5 rounded-md">${r.airportName} (${r.iata})</span>` : '';
         const cityKey = (r.code || r.iata || r.city).toLowerCase();
         tdLabel.innerHTML = `
@@ -2948,157 +2895,6 @@
         tbody.appendChild(tr);
       });
 
-      // Update Legend Numbers
-      const mult = currentMode === 1 ? 1 : adults;
-      const q1 = Math.round(maxBudget * 0.5 * mult);
-      const q2 = Math.round(maxBudget * 0.67 * mult);
-      const q3 = Math.round(maxBudget * 0.84 * mult);
-      const q4 = Math.round(maxBudget * mult);
-      document.getElementById("leg-1").textContent = `până la ${q1} €`;
-      document.getElementById("leg-2").textContent = `${q1 + 1}–${q2} €`;
-      document.getElementById("leg-3").textContent = `${q2 + 1}–${q3} €`;
-      document.getElementById("leg-4").textContent = `${q3 + 1}–${q4} €`;
-
-      renderSchedules();
-    }
-
-    function renderScheduleCardHtml(r, wk, c) {
-      const tripDates = getTripDates(wk);
-      const datesLabel = formatTripSpan(tripDates.dateOut, tripDates.dateIn);
-      const airportBadge = r.airportName ? `<span class="text-[10px] font-bold text-[#8a5d14] bg-[#fdf3dc] border border-[#dfa649]/40 px-1.5 py-0.5 rounded">${r.airportName} (${r.iata})</span>` : `<span class="text-[10px] font-bold text-[#422904] bg-[#fce8bd] px-1.5 py-0.5 rounded font-mono">${r.iata}</span>`;
-      const p1 = Math.round(c.perPaxEur);
-      const bookUrl = c.googleFlightsUrl || c.skyscannerUrl || c.bookingUrl;
-
-      return `
-        <div class="card-23ai rounded-2xl p-4 shadow-2xs hover:border-[#dfa649] transition flex flex-col justify-between border border-[#e4e7eb] bg-white">
-          <div>
-            <div class="flex items-center justify-between border-b border-[#eef0f3] pb-2 mb-2.5">
-              <div class="flex items-center gap-1.5 flex-wrap">
-                <span class="font-bold text-sm text-[#0a0b0d] font-display">${r.city}</span>
-                ${airportBadge}
-              </div>
-              <span class="text-[11px] font-bold text-[#475569] bg-[#f1f4f8] px-2 py-0.5 rounded-md">${c.airlineLabel}</span>
-            </div>
-            
-            <div class="text-[11px] font-semibold text-[#8a5d14] mb-2 flex items-center justify-between">
-              <span class="flex items-center gap-1"><span>📅</span> ${datesLabel}</span>
-              <span class="text-[10px] font-bold bg-[#fce8bd] text-[#5c3b06] px-1.5 py-0.2 rounded">${wk.label}</span>
-            </div>
-
-            <div class="space-y-1.5 text-xs text-[#334155] bg-[#fafbfc] p-2.5 rounded-xl border border-[#edf0f3]">
-              <div class="flex justify-between font-medium">
-                <span class="text-[#0a0b0d] font-bold">🛫 Tur:</span>
-                <span class="font-mono font-bold text-[#0a0b0d]">${c.outRoute} (${c.outTime})</span>
-              </div>
-              <div class="flex justify-between font-medium">
-                <span class="text-[#0a0b0d] font-bold">🛬 Retur:</span>
-                <span class="font-mono font-bold text-[#0a0b0d]">${c.inRoute} (${c.inTime})</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="pt-3 mt-3 border-t border-[#eef0f3] flex items-center justify-between">
-            <span class="text-sm font-black text-[#0a0b0d]">${p1} € <span class="font-normal text-[11px] text-[#64748b]">/ pers.</span></span>
-            <div class="flex items-center gap-2">
-              <a href="${bookUrl}" target="_blank" rel="noopener noreferrer"
-                 class="text-xs font-bold text-[#0a0b0d] hover:text-[#dfa649] font-display flex items-center gap-1 bg-[#fff8eb] border border-[#dfa649]/60 px-2.5 py-1 rounded-lg transition hover:bg-[#dfa649] hover:text-black shadow-2xs">
-                Google Flights ↗
-              </a>
-              ${c.skyscannerUrl ? `
-              <a href="${c.skyscannerUrl}" target="_blank" rel="noopener noreferrer" title="Verifică pe Skyscanner"
-                 class="text-xs font-bold text-[#475569] hover:text-[#0a0b0d] font-display px-2 py-1 rounded-lg bg-[#f1f4f8] hover:bg-[#e2e8f0] transition">
-                Sky ↗
-              </a>` : ''}
-            </div>
-          </div>
-        </div>
-      `;
-    }
-
-    function renderSchedules() {
-      const section = document.getElementById("section-schedules");
-      const container = document.getElementById("schedule-cards");
-      const title = document.getElementById("schedule-section-title");
-      if (!container) return;
-
-      const destSelect = document.getElementById("f-destination");
-      const destVal = destSelect?.value || "any";
-      const activeWks = getSelectedWeekendsList();
-
-      if (!currentRows || currentRows.length === 0) {
-        if (section) section.classList.add("hidden");
-        return;
-      }
-
-      if (section) section.classList.remove("hidden");
-
-      // 1. If a specific destination is selected (e.g. Rome, Bologna, Liverpool)
-      if (destVal !== "any" && selectedCityObj && !selectedCityObj.isAll) {
-        const cityName = selectedCityObj.name;
-        const iata = (selectedCityObj.iata || "").toLowerCase();
-        const cityRows = currentRows.filter(r => 
-          r.cityId === destVal || 
-          (iata && (r.iata?.toLowerCase() === iata || r.code?.toLowerCase() === iata)) || 
-          (r.city && r.city.toLowerCase().includes(cityName.toLowerCase())) ||
-          (r.cityGroup && r.cityGroup.toLowerCase().includes(cityName.toLowerCase()))
-        );
-
-        const scheduleCards = [];
-        cityRows.forEach(row => {
-          activeWks.forEach(wk => {
-            const c = row.cellsMap[wk.id];
-            if (c) {
-              scheduleCards.push({
-                row: row,
-                wk: wk,
-                cell: c
-              });
-            }
-          });
-        });
-
-        if (scheduleCards.length > 0) {
-          if (title) title.textContent = `Orele zborurilor și opțiuni de zbor către ${cityName}`;
-          scheduleCards.sort((a, b) => a.cell.perPaxEur - b.cell.perPaxEur);
-          container.innerHTML = scheduleCards.slice(0, 8).map(item => renderScheduleCardHtml(item.row, item.wk, item.cell)).join("");
-          return;
-        }
-
-        if (section) section.classList.add("hidden");
-        return;
-      }
-
-      // 2. Default: "Toată Europa" (any) - Render real flights from search results / currentRows
-      if (title) title.textContent = "Orele zborurilor și linkuri directe pentru cele mai bune oferte găsite";
-
-      const rowsToShow = sortRowsByCityGroup(currentRows).slice(0, 8);
-      let cardsHtml = "";
-
-      rowsToShow.forEach(r => {
-        let bestCell = null;
-        let bestWk = null;
-
-        activeWks.forEach(wk => {
-          const c = r.cellsMap[wk.id];
-          if (c) {
-            if (!bestCell || c.perPaxEur < bestCell.perPaxEur) {
-              bestCell = c;
-              bestWk = wk;
-            }
-          }
-        });
-
-        if (bestCell && bestWk) {
-          cardsHtml += renderScheduleCardHtml(r, bestWk, bestCell);
-        }
-      });
-
-      if (!cardsHtml) {
-        if (section) section.classList.add("hidden");
-        return;
-      }
-
-      container.innerHTML = cardsHtml;
     }
 
     function setMode(m) {
@@ -3131,9 +2927,9 @@
       document.getElementById("f-max-dur").value = "360"; // 6 hours
       document.getElementById("f-stops").value = "1";     // 1 escală scurtă
       document.getElementById("f-fri-dep").value = "06:00"; // de dimineață
-      document.getElementById("f-out-arr").value = "03:00"; // fără limită
+      document.getElementById("f-out-arr").value = "02:00";
       document.getElementById("f-sun-dep").value = "12:00";
-      document.getElementById("f-in-arr").value = "03:00";  // fără limită
+      document.getElementById("f-in-arr").value = "02:00";
       document.getElementById("f-domestic").checked = true;
 
       document.getElementById("subtitle-summary").textContent =
@@ -3189,9 +2985,9 @@
       document.getElementById("f-max-dur").value = "360";
       document.getElementById("f-stops").value = "1";
       document.getElementById("f-fri-dep").value = "18:00";
-      document.getElementById("f-out-arr").value = "03:00";
+      document.getElementById("f-out-arr").value = "02:00";
       document.getElementById("f-sun-dep").value = "12:00";
-      document.getElementById("f-in-arr").value = "03:00";
+      document.getElementById("f-in-arr").value = "02:00";
       document.getElementById("f-domestic").checked = true;
 
       document.getElementById("subtitle-summary").textContent =
@@ -3213,9 +3009,9 @@
       document.getElementById("f-max-dur").value = "360";
       document.getElementById("f-stops").value = "1";
       document.getElementById("f-fri-dep").value = "06:00";
-      document.getElementById("f-out-arr").value = "03:00";
+      document.getElementById("f-out-arr").value = "02:00";
       document.getElementById("f-sun-dep").value = "12:00";
-      document.getElementById("f-in-arr").value = "03:00";
+      document.getElementById("f-in-arr").value = "02:00";
       document.getElementById("f-domestic").checked = true;
 
       document.getElementById("subtitle-summary").textContent =
@@ -3332,11 +3128,11 @@
       const originCityId = originSelect.value;
       const originIata = originSelect?.selectedOptions?.[0]?.dataset?.iata || "OTP";
       const adults = parseInt(document.getElementById("f-adults").value, 10) || 2;
-      const bagType = document.getElementById("f-bags").value;
+      const bagType = "small";
       const handBags = Array(adults).fill(bagType === "cabin" ? 1 : 0);
       const holdBags = Array(adults).fill(bagType === "hold" ? 1 : 0);
       const maxDurMin = Number(document.getElementById("f-max-dur").value);
-      const maxStops = Number(document.getElementById("f-stops").value);
+      const maxStops = Infinity;
       const maxPrice = Number(document.getElementById("f-max-price").value);
       const friDep = document.getElementById("f-fri-dep").value;
       const sunDep = document.getElementById("f-sun-dep").value;
@@ -3507,12 +3303,8 @@
       const destVal = destSelect.value;
 
       if (selectedWkIds.size === 0) {
-        if (destVal !== "any") {
-          return performYearScan();
-        } else {
-          alert("Te rugăm să bifezi cel puțin un weekend înainte de a căuta.");
-          return;
-        }
+        alert("Te rugăm să bifezi cel puțin un weekend înainte de a căuta.");
+        return;
       }
 
       const originSelect = document.getElementById("f-origin");
@@ -3520,9 +3312,9 @@
       const originIata = originSelect?.selectedOptions?.[0]?.dataset?.iata || "OTP";
       const maxPrice1Pax = parseFloat(document.getElementById("f-max-price").value) || 350;
       const adults = parseInt(document.getElementById("f-adults").value, 10) || 2;
-      const bagType = document.getElementById("f-bags").value;
+      const bagType = "small";
       const maxDurMin = parseInt(document.getElementById("f-max-dur").value, 10) || 360;
-      const maxStops = parseInt(document.getElementById("f-stops").value, 10) || 0;
+      const maxStops = Infinity;
       const friDep = document.getElementById("f-fri-dep").value;
       const outArrLimit = document.getElementById("f-out-arr").value;
       const sunDep = document.getElementById("f-sun-dep").value;
@@ -3689,7 +3481,7 @@
           } else if (totalFound > 0) {
             updateSearchStatus(`✅ Căutare finalizată! S-au găsit zboruri în ${Object.keys(targetCellsMap).length} weekenduri pentru ${cityName}.`, 100, "success");
           } else {
-            updateSearchStatus(`⚠️ Nu s-au găsit zboruri pentru ${cityName} cu filtrele actuale (ore/directe). [[RESET_PERMISSIVE]]`, 100, "empty");
+            updateSearchStatus(`⚠️ Nu s-au găsit zboruri pentru ${cityName} cu criteriile actuale. Încearcă alte ore sau un buget mai mare.`, 100, "empty");
           }
 
           renderMatrix();
@@ -3880,7 +3672,7 @@
         if (totalFound > 0) {
           updateSearchStatus(`✅ Căutare finalizată! S-au găsit zboruri în ${currentRows.length} orașe din Europa.`, 100, "success");
         } else {
-          updateSearchStatus(`⚠️ Nu s-au găsit zboruri care să respecte toate filtrele tale stricte. Încearcă [🔓 Mod permisiv].`, 100, "empty");
+          updateSearchStatus(`⚠️ Nu s-au găsit zboruri care să respecte toate filtrele tale stricte. Încearcă alte ore sau un buget mai mare.`, 100, "empty");
         }
 
         renderMatrix();
@@ -3892,6 +3684,7 @@
 
     function setSimpleTripMode(mode) {
       currentTripMode = mode === 'extended' ? 'extended' : 'classic';
+      for (const [id, value] of Object.entries({'f-adults':'2', 'f-max-price': mode === 'extended' ? '250' : '150', 'quick-duration':'180', 'f-max-dur':'180', 'f-fri-dep':'18:00', 'f-out-arr':'01:00', 'f-sun-dep':'18:00', 'f-in-arr':'01:00'})) document.getElementById(id).value = value;
       document.getElementById('classic-mode').classList.toggle('active', mode === 'classic');
       document.getElementById('extended-mode').classList.toggle('active', mode === 'extended');
       invalidateSearchResults();
@@ -3931,6 +3724,31 @@
         renderMatrix();
       });
     }
+    // Arrange the existing controls in the order of the search journey.
+    const panel = document.getElementById('configurator');
+    const routeGrid = panel.querySelector(':scope > .grid');
+    const fields = [...routeGrid.children];
+    const period = panel.querySelector('.period-section');
+    const route = document.createElement('section'); route.className = 'journey-step route-step';
+    route.innerHTML = '<div class="step-heading"><h3>2. Alege orașele</h3></div><div class="step-fields"></div>';
+    route.querySelector('.step-fields').append(fields[1], fields[2]);
+    const options = document.createElement('section'); options.className = 'journey-step options-step';
+    options.innerHTML = '<div class="step-heading"><h3>3. Selectează opțiuni</h3></div><div class="option-fields"></div>';
+    const optionFields = options.querySelector('.option-fields'); optionFields.append(fields[3], fields[4], fields[5]);
+    const hours = document.getElementById('f-fri-dep').closest('.space-y-3');
+    hours.querySelector('.font-display').textContent = 'Orar zbor';
+    ['Plecare la dus', 'Sosire la destinație', 'Plecare la retur', 'Sosire acasă'].forEach((label, i) => hours.querySelectorAll('label')[i].textContent = label);
+    optionFields.append(hours);
+    routeGrid.remove();
+    panel.insertBefore(route, panel.querySelector('.search-actions'));
+    panel.insertBefore(options, panel.querySelector('.search-actions'));
+    panel.querySelector('.search-actions').append(document.getElementById('search-status'));
+    const heroImages = ['assets/weekend-hero.webp', 'https://images.unsplash.com/photo-1552832230-c0197dd311b5?auto=format&fit=crop&w=1200&q=80', 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=1200&q=80'];
+    let heroIndex = Math.floor(Math.random() * heroImages.length);
+    const hero = document.querySelector('.hero-image');
+    function showHero() { hero.style.backgroundImage = `linear-gradient(90deg,#111211 0%,transparent 24%), linear-gradient(0deg,rgba(0,0,0,.44),transparent 60%), url("${heroImages[heroIndex]}")`; }
+    showHero();
+    if (!matchMedia('(prefers-reduced-motion: reduce)').matches) setInterval(() => { heroIndex = (heroIndex + 1) % heroImages.length; showHero(); }, 7000);
     // Initialize Page
     currentRows = [];
     hasEverSearched = false;
