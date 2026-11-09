@@ -2810,6 +2810,18 @@
       });
     }
 
+    // Compare the displayed, eligible weekends for one destination.
+    function lowestVisibleFareCents(row, weekends, destVal, maxBudget) {
+      let minCents = Infinity;
+      for (const wk of weekends) {
+        const fare = row.cellsMap[wk.id]?.perPaxEur;
+        if (typeof fare !== 'number' || !Number.isFinite(fare) || fare < 0) continue;
+        if (destVal === 'any' && fare > maxBudget) continue;
+        minCents = Math.min(minCents, Math.round(fare * 100));
+      }
+      return minCents;
+    }
+
     // Render Matrix Table & Cards View
     function renderMatrix() {
       document.getElementById("quick-duration").value = document.getElementById("f-max-dur").value;
@@ -2942,25 +2954,6 @@
       // Keep Cards View updated synchronously
       renderCardsView(filteredRows, activeWks, maxBudget);
 
-      // Find per-weekend cheapest
-      const minPerWk = {};
-      activeWks.forEach(wk => {
-        let minVal = Infinity;
-        let minCode = "—";
-        let minCell = null;
-        let minCity = "";
-        filteredRows.forEach(r => {
-          const c = r.cellsMap[wk.id];
-          if (c && c.perPaxEur <= maxBudget && c.perPaxEur < minVal) {
-            minVal = c.perPaxEur;
-            minCode = r.code;
-            minCell = c;
-            minCity = r.city;
-          }
-        });
-        minPerWk[wk.id] = { minVal, minCode, minCell, minCity };
-      });
-
       // Render Table Header
       let headHtml = `<tr><th class="matrix-city-column text-left py-3 px-3 min-w-[210px] sm:min-w-[250px] text-xs font-black uppercase tracking-wider text-[#0a0b0d] font-display">Destinație / Aeroport</th>`;
       activeWks.forEach(wk => {
@@ -3026,6 +3019,7 @@
       }
 
       filteredRows.forEach((r) => {
+        const rowMinCents = lowestVisibleFareCents(r, activeWks, destVal, maxBudget);
         const tr = document.createElement("tr");
 
         const tdLabel = document.createElement("td");
@@ -3063,10 +3057,10 @@
             const pGroup = Math.round(cell.totalEur);
             const displayPrice = formatMoney(currentMode === 1 ? cell.perPaxEur : cell.totalEur);
             const tierClass = getTierClass(p1, maxBudget);
-            const isCheapest = Math.abs(cell.perPaxEur - minPerWk[wk.id].minVal) < 0.01;
+            const isCheapest = Number.isFinite(rowMinCents) && Math.round(cell.perPaxEur * 100) === rowMinCents;
             const outlineClass = isCheapest ? "best-weekend-outline" : "";
             const url = getTargetUrl(cell);
-            const tooltip = `${isCheapest ? "Cel mai ieftin pentru acest weekend · " : ""}Click pentru cumpărare (${cell.airlineLabel}) · Tur: ${cell.outRoute} ${cell.outTime} | Retur: ${cell.inRoute} ${cell.inTime}`;
+            const tooltip = `${isCheapest ? "Cel mai mic preț pentru această destinație · " : ""}Click pentru cumpărare (${cell.airlineLabel}) · Tur: ${cell.outRoute} ${cell.outTime} | Retur: ${cell.inRoute} ${cell.inTime}`;
 
             const a = document.createElement("a");
             a.href = url;
