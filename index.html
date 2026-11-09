@@ -215,6 +215,17 @@
     .guide-content>div{background:rgba(255,255,255,.86)!important;backdrop-filter:blur(3px)}
     #guide-image-credit{color:#745019;text-decoration:underline;margin-right:8px}
 .illustrated-map{overflow:hidden;border:1px solid #e1d0b0;border-radius:14px;background:#fffaf0}.illustrated-map img{display:block;width:100%;border-radius:0}.illustrated-map-places{padding:15px}.illustrated-map-places h4{font-family:var(--font-display);font-size:14px;font-weight:800;color:#744d1c;margin:0 0 10px}.illustrated-legend{display:grid;grid-template-columns:1fr;gap:10px;margin:0;padding:0;list-style:none}.illustrated-legend li{display:flex;gap:9px;align-items:flex-start;font-size:13px;line-height:1.35}.illustrated-legend li strong,.illustrated-legend li small{display:block}.illustrated-legend li small{font-size:12px;color:#59616b;margin-top:2px}.legend-number{display:flex;align-items:center;justify-content:center;flex:none;width:24px;height:24px;border-radius:50%;background:#a75e22;color:white;font-weight:800}.illustrated-day{margin-top:14px;padding:12px;border:1px solid #e4d6bc;border-radius:12px;background:rgba(255,255,255,.84)}.illustrated-day strong{font-size:14px;color:#744d1c}.illustrated-day p{margin:5px 0}.illustrated-day a{font-weight:700}
+  
+    /* Palette and editorial hierarchy inspired by the Prague guide. */
+    .illustrated-map{border-color:#d9c9ad;background:#f9f1df}
+    .illustrated-map-header{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:end;padding:20px;background:linear-gradient(135deg,#15283d,#263f57);color:#fff8e9}
+    .illustrated-map-header h4{font-family:Georgia,serif;font-size:clamp(27px,3vw,39px);line-height:1;margin:4px 0 7px;color:#fff8e9;font-weight:700;letter-spacing:-.035em}
+    .map-overline{font-size:9px;letter-spacing:.16em;font-weight:800;color:#e8cda4}.map-subtitle{font-family:Georgia,serif;font-size:13px}
+    .map-summary{border-left:1px solid rgba(255,255,255,.3);padding-left:13px;line-height:1.35;font-size:11px}.map-summary strong,.map-summary span{display:block}.map-summary strong{color:#efcfa7;margin-bottom:4px;font-size:10px;text-transform:uppercase;letter-spacing:.08em}
+    .illustrated-map-places{background:#fbf3e4}.illustrated-map-places h4{color:#1e3d5d}.legend-number{background:#a82026}
+    .illustrated-day{padding:0;overflow:hidden;background:#fbf3e4;border-color:#dac8ab}.illustrated-day strong{display:block;color:#fff;padding:9px 12px;font-family:Georgia,serif;font-size:15px}.illustrated-day-1 strong{background:#a82129}.illustrated-day-2 strong{background:#174d85}.illustrated-day p{padding:0 12px;margin:10px 0 5px}.illustrated-day a{display:inline-block;margin:0 12px 12px}
+    @media(max-width:400px){.illustrated-map-header{padding:15px;grid-template-columns:1fr;gap:10px}.map-summary{border-left:0;border-top:1px solid rgba(255,255,255,.3);padding:8px 0 0}}
+
   </style>
 </head>
 <body class="antialiased min-h-screen flex flex-col bg-white text-[#0a0b0d]">
@@ -2466,8 +2477,8 @@
       const illustrated = illustratedGuides[city?.id];
       if (illustrated) {
         const legend = illustrated.legend.map(([number, name, description]) => `<li><span class="legend-number">${escapeHtml(number)}</span><span><strong>${escapeHtml(name)}</strong><small>${escapeHtml(description)}</small></span></li>`).join('');
-        const days = illustrated.days.map((day,index) => `<div class="illustrated-day"><strong>Ziua ${index + 1}</strong><p>${escapeHtml(day.story)}</p><a href="${itineraryDirections(day.stops)}" target="_blank" rel="noopener noreferrer">Deschide traseul în Google Maps ↗</a></div>`).join('');
-        map.innerHTML = `<h3>Descoperă ${escapeHtml(illustrated.city)} în două zile</h3><p>Derulează pentru denumiri, descrieri și traseele pe zile.</p><div class="illustrated-map"><a href="assets/guides/${illustrated.image}.webp" target="_blank" rel="noopener noreferrer"><img src="assets/guides/${illustrated.image}.webp" alt="Ilustrație de explorare inspirată de ${escapeHtml(illustrated.city)}"></a><div class="illustrated-map-places"><h4>Repere de descoperit</h4><ul class="illustrated-legend">${legend}</ul></div></div><p>Ilustrație schematică: pozițiile și traseul desenat sunt orientative; numerele nemenționate sunt decorative. Verifică traseele, orarele și accesul înainte de plecare.</p>${days}`;
+        const days = illustrated.days.map((day,index) => `<div class="illustrated-day illustrated-day-${index + 1}"><strong>Ziua ${index + 1}</strong><p>${escapeHtml(day.story)}</p><a href="${itineraryDirections(day.stops)}" target="_blank" rel="noopener noreferrer">Deschide traseul în Google Maps ↗</a></div>`).join('');
+        map.innerHTML = `<h3>Descoperă ${escapeHtml(illustrated.city)} în două zile</h3><p>Derulează pentru denumiri, descrieri și traseele pe zile.</p><div class="illustrated-map"><header class="illustrated-map-header"><div><span class="map-overline">GHID DE WEEKEND</span><h4>${escapeHtml(illustrated.city)}</h4><span class="map-subtitle">Traseu de două zile</span></div><div class="map-summary"><strong>De descoperit</strong><span>${illustrated.legend.slice(0,3).map(([,name])=>escapeHtml(name)).join(" · ")}</span></div></header><a href="assets/guides-prague-style/${illustrated.image}.png" target="_blank" rel="noopener noreferrer"><img src="assets/guides-prague-style/${illustrated.image}.png" alt="Ilustrație de explorare inspirată de ${escapeHtml(illustrated.city)}"></a><div class="illustrated-map-places"><h4>Repere de descoperit</h4><ul class="illustrated-legend">${legend}</ul></div></div><p>Ilustrație schematică: pozițiile și traseul desenat sunt orientative; numerele nemenționate sunt decorative. Verifică traseele, orarele și accesul înainte de plecare.</p>${days}`;
         return;
       }
       if (isPrague) {
@@ -2762,7 +2773,7 @@
       cardsGrid.querySelectorAll('[data-city-id]').forEach(async card => {
         const photo = await getCityPhotoAsset(card.dataset.cityId);
         if (!card.isConnected || !photo) return;
-        card.style.backgroundImage = `linear-gradient(180deg,rgba(10,11,13,.35),rgba(10,11,13,.94) 72%,rgba(10,11,13,.98)),url("${photo.url}")`;
+        card.style.backgroundImage = `linear-gradient(180deg,rgba(10,11,13,.27),rgba(10,11,13,.86) 72%,rgba(10,11,13,.95)),url("${photo.url}")`;
       });
     }
 
