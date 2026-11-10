@@ -232,6 +232,12 @@
     /* The fixed city column cannot paint over the rounded fare edge. */
     #main-matrix-table .matrix-city-column{box-shadow:inset -1px 0 #e4e7eb}
     #main-matrix-table td.matrix-city-column + td{padding-left:10px}
+    #main-matrix-table .matrix-month {padding:8px 10px;text-align:center;text-transform:capitalize;font-size:12px;font-weight:800;letter-spacing:.02em;border-radius:9px 9px 0 0;color:#526275}
+    #main-matrix-table .matrix-month-label {position:sticky;left:260px;display:inline-block;white-space:nowrap}
+    @media(max-width:639px) { #main-matrix-table .matrix-month-label {left:220px} }
+    #main-matrix-table .matrix-month-0, #main-matrix-table .matrix-weekend-0 {background:#edf2f6}
+    #main-matrix-table .matrix-month-1, #main-matrix-table .matrix-weekend-1 {background:#f4f0e8}
+
     .whatsapp-share{background:#127b39!important;color:white!important;border:1.5px solid #65d98a!important}
     .whatsapp-share:hover{background:#0c6b30!important}.whatsapp-share:focus-visible{outline:3px solid #b2f4c4;outline-offset:2px}
     /* Reserve three headline lines so carousel changes do not move the page. */
@@ -2820,18 +2826,37 @@
       // Keep Cards View updated synchronously
       renderCardsView(filteredRows, activeWks, maxBudget);
 
-      // Render Table Header
-      let headHtml = `<tr><th class="matrix-city-column text-left py-3 px-3 min-w-[210px] sm:min-w-[250px] text-xs font-black uppercase tracking-wider text-[#0a0b0d] font-display">Destinație / Aeroport</th>`;
+      // Group consecutive weekend columns by departure month.
+      const monthNames = ["ianuarie", "februarie", "martie", "aprilie", "mai", "iunie", "iulie", "august", "septembrie", "octombrie", "noiembrie", "decembrie"];
+      const shortMonths = ["ian", "feb", "mar", "apr", "mai", "iun", "iul", "aug", "sep", "oct", "noi", "dec"];
+      const monthGroups = [];
       activeWks.forEach(wk => {
-        const tripDates = getTripDates(wk);
-        const tagBadge = wk.tag ? `<div class="text-[9px] px-1.5 py-0.5 rounded-md bg-[#fce8bd] text-[#5c3b06] font-bold mt-1 inline-block border border-[#dfa649]/60">${wk.tag}</div>` : '';
-        headHtml += `
-          <th class="text-center py-2.5 px-2 rounded-xl text-xs sm:text-sm font-bold text-[#0a0b0d] min-w-[95px] sm:min-w-[115px] bg-[#f8f9fb] border border-[#e4e7eb] font-display">
-            <div>${wk.dLabel}</div>
-            <div class="text-[#64748b] font-medium text-[10px] sm:text-[11px] font-body mt-0.5 whitespace-nowrap">${formatTripSpan(tripDates.dateOut, tripDates.dateIn)}</div>
-            ${tagBadge}
-          </th>
-        `;
+        const dates = getTripDates(wk);
+        const monthKey = dates.dateOut.slice(0, 7);
+        let group = monthGroups[monthGroups.length - 1];
+        if (!group || group.key !== monthKey) {
+          const [year, month] = monthKey.split('-').map(Number);
+          group = { key: monthKey, label: `${monthNames[month - 1]} ${year}`, weekends: [] };
+          monthGroups.push(group);
+        }
+        group.weekends.push({ wk, dates });
+      });
+      let headHtml = `<tr><th rowspan="2" scope="col" class="matrix-city-column text-left py-3 px-3 min-w-[210px] sm:min-w-[250px] text-xs font-black uppercase tracking-wider text-[#0a0b0d] font-display">Destinație / Aeroport</th>`;
+      monthGroups.forEach((group, index) => {
+        headHtml += `<th scope="colgroup" colspan="${group.weekends.length}" class="matrix-month matrix-month-${index % 2}"><span class="matrix-month-label">${group.label}</span></th>`;
+      });
+      headHtml += `</tr><tr>`;
+      monthGroups.forEach((group, index) => {
+        group.weekends.forEach(({ wk, dates }) => {
+          const [outYear, outMonth, outDay] = dates.dateOut.split('-').map(Number);
+          const [inYear, inMonth, inDay] = dates.dateIn.split('-').map(Number);
+          const spansMonths = outMonth !== inMonth || outYear !== inYear;
+          const period = spansMonths
+            ? `${outDay} ${shortMonths[outMonth - 1]} – ${inDay} ${shortMonths[inMonth - 1]}${outYear !== inYear ? ` ${inYear}` : ''}`
+            : `${outDay}–${inDay}`;
+          const tagBadge = wk.tag ? `<div class="text-[9px] px-1.5 py-0.5 rounded-md bg-[#fce8bd] text-[#5c3b06] font-bold mt-1 inline-block border border-[#dfa649]/60">${escapeHtml(wk.tag)}</div>` : '';
+          headHtml += `<th scope="col" class="matrix-weekend matrix-weekend-${index % 2} text-center py-2.5 px-2 rounded-xl text-xs sm:text-sm font-bold text-[#0a0b0d] min-w-[95px] sm:min-w-[115px] border border-[#e4e7eb] font-display"><span class="whitespace-nowrap">${period}</span>${tagBadge}</th>`;
+        });
       });
       headHtml += `</tr>`;
       thead.innerHTML = headHtml;
@@ -2935,9 +2960,7 @@
             a.title = tooltip;
             a.className = `price-cell h-12 sm:h-14 rounded-xl ${tierClass} ${outlineClass} flex items-center justify-center no-underline cursor-pointer px-2 shadow-2xs`;
             a.innerHTML = `
-              <span class="font-black text-sm sm:text-base md:text-lg leading-none whitespace-nowrap">
-                ${displayPrice} <span class="text-xs font-normal opacity-75">↗</span>
-              </span>
+              <span class="font-black text-sm sm:text-base md:text-lg leading-none whitespace-nowrap">${displayPrice}</span>
             `;
             a.addEventListener("mouseenter", () => showQuickBuy(r, wk.id));
             td.appendChild(a);
