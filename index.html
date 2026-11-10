@@ -350,9 +350,9 @@
 
       </div>
 
-      <div id="search-status" role="status" aria-live="polite" class="hidden rounded-xl border px-4 py-3 text-sm flex items-center gap-2">
+      <div id="search-status" role="status" aria-live="polite" class="hidden rounded-xl border px-4 py-3 text-sm flex flex-wrap items-center gap-2">
         <span id="search-status-spinner"></span><span id="search-status-text" class="flex-1"></span>
-        <button id="similar-search-button" type="button" hidden onclick="runSimilarSearch()" class="rounded-lg bg-[#dfa649] px-3 py-2 text-xs font-bold text-[#0a0b0d]">Caută perioade asemănătoare ±1 zi</button><span id="search-status-pct"></span><progress id="search-progress" max="100" value="0" aria-label="Progresul căutării"></progress><button id="search-status-dismiss" type="button" aria-label="Închide mesajul" onclick="document.getElementById('search-status').classList.add('hidden')">✕</button>
+        <button id="expand-search-button" type="button" hidden onclick="expandSearchFilters()" class="rounded-lg border border-[#bc852c] bg-white px-3 py-2 text-xs font-bold text-[#0a0b0d]">Extinde filtrele la maximum</button><button id="similar-search-button" type="button" hidden onclick="runSimilarSearch()" class="rounded-lg bg-[#dfa649] px-3 py-2 text-xs font-bold text-[#0a0b0d]">Caută perioade asemănătoare ±1 zi</button><span id="search-status-pct"></span><progress id="search-progress" max="100" value="0" aria-label="Progresul căutării"></progress><button id="search-status-dismiss" type="button" aria-label="Închide mesajul" onclick="document.getElementById('search-status').classList.add('hidden')">✕</button>
       </div>
     <!-- 2. PASUL 2: Tip de weekend și calendar -->
     <section class="period-section">
@@ -1096,6 +1096,7 @@
     let currentLinkMode = "google"; // Default external search provider
     let currentRows = [];
     let similarResultPeriods = null;
+    let lastEmptyWasSimilar = false;
     let searchState = "idle";
     let hasEverSearched = false;
     let selectedCityObj = null;
@@ -2258,6 +2259,7 @@
     }
 
     function getTierClass(price1Pax, maxBudget) {
+      if (!Number.isFinite(maxBudget)) maxBudget = 999;
       if (price1Pax <= maxBudget * 0.5) return "tier-1";
       if (price1Pax <= maxBudget * 0.67) return "tier-2";
       if (price1Pax <= maxBudget * 0.84) return "tier-3";
@@ -2618,6 +2620,7 @@
       const statusBox = document.getElementById("search-status");
       const statusText = document.getElementById("search-status-text");
       document.getElementById('similar-search-button').hidden = true;
+      document.getElementById('expand-search-button').hidden = true;
       const progress = document.getElementById('search-progress');
       progress.hidden = state !== 'loading';
       progress.value = Math.max(0, Math.min(99, Math.floor(pct)));
@@ -2805,7 +2808,8 @@
       document.getElementById("quick-duration").value = document.getElementById("f-max-dur").value;
       const thead = document.getElementById("matrix-head");
       const tbody = document.getElementById("matrix-body");
-      const maxBudget = parseFloat(document.getElementById("f-max-price").value) || 350;
+      const selectedBudget = Number(document.getElementById("f-max-price").value);
+      const maxBudget = selectedBudget === 999 ? Infinity : selectedBudget || 350;
       const adults = parseInt(document.getElementById("f-adults").value, 10) || 2;
       document.getElementById("lbl-group-count").textContent = adults;
       updateCurrencyLabels();
@@ -3246,7 +3250,8 @@
       const holdBags = Array(adults).fill(bagType === "hold" ? 1 : 0);
       const maxDurMin = Number(document.getElementById("f-max-dur").value);
       const maxStops = Infinity;
-      const maxPrice = Number(document.getElementById("f-max-price").value);
+      const selectedBudget = Number(document.getElementById("f-max-price").value);
+      const maxPrice = selectedBudget === 999 ? Infinity : selectedBudget;
       const friDep = document.getElementById("f-fri-dep").value;
       const sunDep = document.getElementById("f-sun-dep").value;
       const outLimit = document.getElementById("f-out-arr").value;
@@ -3412,7 +3417,8 @@
       const originSelect = document.getElementById("f-origin");
       const originCityId = originSelect.value;
       const originIata = originSelect?.selectedOptions?.[0]?.dataset?.iata || "OTP";
-      const maxPrice1Pax = parseFloat(document.getElementById("f-max-price").value) || 350;
+      const selectedBudget = Number(document.getElementById("f-max-price").value);
+      const maxPrice1Pax = selectedBudget === 999 ? Infinity : selectedBudget || 350;
       const adults = parseInt(document.getElementById("f-adults").value, 10) || 2;
       const bagType = "small";
       const maxDurMin = parseInt(document.getElementById("f-max-dur").value, 10) || 360;
@@ -3627,7 +3633,9 @@
             updateSearchStatus(`✅ Căutare finalizată! S-au găsit zboruri în ${Object.keys(targetCellsMap).length} ${category} pentru ${cityName}.`, 100, "success");
           } else {
             updateSearchStatus(searchSimilar ? `Nu s-au găsit perioade asemănătoare cu minimum 2 nopți pentru ${cityName}, în filtrele alese.` : `Nu s-au găsit zboruri pentru ${cityName} cu criteriile actuale. Poți extinde filtrele sau căuta perioade asemănătoare.`, 100, "empty");
-            if (!searchSimilar) document.getElementById('similar-search-button').hidden = false;
+            lastEmptyWasSimilar = searchSimilar;
+            document.getElementById('similar-search-button').hidden = false;
+            document.getElementById('expand-search-button').hidden = false;
           }
 
           renderMatrix();
@@ -3820,7 +3828,9 @@
         if (totalFound > 0) {
           updateSearchStatus(`✅ Căutare finalizată! S-au găsit zboruri în ${currentRows.length} orașe din Europa.`, 100, "success");
         } else {
-          updateSearchStatus(`⚠️ Nu s-au găsit zboruri care să respecte toate filtrele tale stricte. Încearcă alte ore sau un buget mai mare.`, 100, "empty");
+          updateSearchStatus(`Nu s-au găsit zboruri în filtrele alese. Poți extinde filtrele la maximum.`, 100, "empty");
+          lastEmptyWasSimilar = false;
+          document.getElementById('expand-search-button').hidden = false;
         }
 
         renderMatrix();
@@ -3857,6 +3867,12 @@
     const performYearScan = scanEntireYearForDestination;
     runLiveSearch = () => withSearchLock(() => performLiveSearch(false));
     function runSimilarSearch() { return withSearchLock(() => performLiveSearch(true)); }
+    function expandSearchFilters() {
+      const searchSimilar = lastEmptyWasSimilar;
+      for (const [id, value] of Object.entries({ 'f-max-price': '999', 'f-max-dur': '360', 'quick-duration': '360', 'f-fri-dep': '06:00', 'f-out-arr': '02:00', 'f-sun-dep': '12:00', 'f-in-arr': '02:00' })) document.getElementById(id).value = value;
+      renderCrossEngineBar();
+      return withSearchLock(() => performLiveSearch(searchSimilar));
+    }
     scanEntireYearForDestination = () => withSearchLock(performYearScan);
 
     function invalidateSearchResults() {
@@ -3864,6 +3880,7 @@
       similarResultPeriods = null;
       document.getElementById('similar-results-note').hidden = true;
       document.getElementById('similar-search-button').hidden = true;
+      document.getElementById('expand-search-button').hidden = true;
       hasEverSearched = false;
       searchState = 'idle';
       document.getElementById('search-status').classList.add('hidden');
