@@ -13,6 +13,7 @@ Se adaugă numele obiectivelor direct pe hărțile existente, în stilul aprobat
 - Bruxelles
 - Budapesta
 - Atena
+- Veneția
 
 Harta originală pentru Praga avea deja etichete. Celelalte orașe din `assets/guides-prague-style/` necesită în continuare verificare și prelucrare. Actualizează această listă în același commit cu fiecare lot nou.
 
