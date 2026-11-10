@@ -568,7 +568,7 @@
 
         <!-- Link Mode Selector -->
         <div class="inline-flex items-center gap-2 text-xs sm:text-sm text-[#0a0b0d] font-bold">
-          <span class="hidden sm:inline">La click:</span>
+          <span>La click pe preț, deschide linkul:</span>
           <select id="link-mode" onchange="setLinkMode(this.value)" class="rounded-xl bg-[#fffdf8] border border-[#dce1e7] px-3 py-1.5 text-xs sm:text-sm font-bold text-[#0a0b0d] focus:outline-none focus:ring-2 focus:ring-[#dfa649] shadow-2xs font-display">
             <option value="kiwi" selected>Kiwi.com</option>
             <option value="google">Google Flights</option>
@@ -620,10 +620,9 @@
             <span>💡</span> <span>Apasă pe o căsuță din tabel pentru a cumpăra biletele direct!</span>
           </div>
           <div id="qb-sub" class="text-[11px] sm:text-xs text-[#64748b] font-medium font-body">
-            Fiecare căsuță de preț din tabel are link direct de cumpărare în spate. Mută cursorul pe un preț pentru orar și opțiuni de rezervare.
+            Fiecare căsuță de preț din tabel are link direct de cumpărare în spate. Mută cursorul pe un preț pentru orarul zborurilor.
           </div>
         </div>
-        <div id="qb-actions" class="flex flex-wrap items-center gap-2"></div>
       </div>
 
       <div class="flex items-center justify-between mb-3 text-xs text-[#64748b] font-bold">
@@ -2315,8 +2314,7 @@
 
       const qbTitle = document.getElementById("qb-title");
       const qbSub = document.getElementById("qb-sub");
-      const qbActions = document.getElementById("qb-actions");
-      if (!qbTitle || !qbSub || !qbActions) return;
+      if (!qbTitle || !qbSub) return;
 
       const pVal = formatMoney(currentMode === 1 ? cell.perPaxEur : cell.totalEur);
       const pUnit = currentMode === 1 ? "/ pers." : "total grup";
@@ -2324,30 +2322,16 @@
       qbTitle.innerHTML = `<span>✈️</span> <span>${row.city} · Weekend ${wk ? wk.label : ''} · <span class="text-[#8a5d14] font-black">${pVal} ${pUnit}</span></span>`;
       qbSub.textContent = `Tur: ${cell.outRoute} (${cell.outTime}) | Retur: ${cell.inRoute} (${cell.inTime}) · ${cell.airlineLabel}`;
 
-      const kiwiUrl = kiwiTargetUrl(cell);
-      const primary = "bg-[#dfa649] hover:bg-[#c98f33] text-[#0a0b0d] text-xs font-black px-3.5 py-2 rounded-xl transition shadow-xs font-display flex items-center gap-1";
-      const secondary = "bg-[#f4f5f8] hover:bg-[#eaeef3] text-[#0a0b0d] text-xs font-bold px-3 py-2 rounded-xl border border-[#dce1e7] transition font-display";
 
-      qbActions.innerHTML = `
-        ${kiwiUrl ? `<a href="${kiwiUrl}" target="_blank" rel="noopener noreferrer" class="${primary}">Kiwi.com →</a>` : ""}
-        <a href="${cell.googleFlightsUrl}" target="_blank" rel="noopener noreferrer" class="${kiwiUrl ? secondary : primary}">Google Flights${kiwiUrl ? "" : " →"}</a>
-        <a href="${cell.skyscannerUrl}" target="_blank" rel="noopener noreferrer"
-           class="bg-[#0a0b0d] hover:bg-[#1e232e] text-[#dfa649] text-xs font-bold px-3 py-2 rounded-xl border border-[#0a0b0d] transition font-display flex items-center gap-1">
-          Skyscanner ↗
-        </a>
-        <a href="${cell.airlineUrl}" target="_blank" rel="noopener noreferrer" class="${secondary}">Companie aeriană</a>
-      `;
     }
 
     function resetQuickBuyBar() {
       const qbTitle = document.getElementById("qb-title");
       const qbSub = document.getElementById("qb-sub");
-      const qbActions = document.getElementById("qb-actions");
-      if (!qbTitle || !qbSub || !qbActions) return;
+      if (!qbTitle || !qbSub) return;
 
       qbTitle.innerHTML = `<span>💡</span> <span>Apasă pe o căsuță din tabel pentru a cumpăra biletele direct!</span>`;
-      qbSub.textContent = "Fiecare căsuță de preț din tabel are link direct de cumpărare în spate. Mută cursorul pe un preț pentru orar și opțiuni de rezervare.";
-      qbActions.innerHTML = "";
+      qbSub.textContent = "Fiecare căsuță de preț din tabel are link direct de cumpărare în spate. Mută cursorul pe un preț pentru orarul zborurilor.";
     }
 
     // Modal & Guide Helpers for Destination Weather & 48h Itinerary
