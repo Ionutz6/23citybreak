@@ -3468,7 +3468,7 @@
           const queryJob = async ({ wk, airport }) => {
             const tripDates = getTripDates(wk);
             try {
-              const res = await fetch("https://api.skypicker.com/umbrella/v2/graphql", {
+              const request = () => fetch("https://api.skypicker.com/umbrella/v2/graphql", {
                 method: "POST",
                 signal: AbortSignal.timeout(45000),
                 headers: { "Content-Type": "application/json" },
@@ -3494,7 +3494,16 @@
                   }
                 })
               });
-              const json = await readFlightResponse(res);
+              let json;
+              for (let attempt = 0; attempt < 2; attempt++) {
+                try {
+                  json = await readFlightResponse(await request());
+                  break;
+                } catch (error) {
+                  if (attempt === 1) throw error;
+                  await new Promise(resolve => setTimeout(resolve, 500));
+                }
+              }
               return { wk, airport, itins: json?.data?.returnItineraries?.itineraries || [] };
             } catch (e) {
               failedRequests++;
@@ -3505,9 +3514,12 @@
             }
           };
 
-          const results = searchSimilar ? await mapWithConcurrency(jobs, 6, queryJob) : await Promise.all(jobs.map(queryJob));
+          const results = await mapWithConcurrency(jobs, 4, queryJob);
           if (failedRequests) {
-            updateSearchStatus(`Căutarea nu a putut fi finalizată (${failedRequests} cereri eșuate). Încearcă din nou.`, 100, "error");
+            updateSearchStatus(`Nu am putut verifica toate zborurile (${failedRequests} cereri eșuate). Poți încerca din nou sau căuta perioade asemănătoare; disponibilitatea pentru datele inițiale nu a putut fi confirmată.`, 100, "error");
+            lastEmptyWasSimilar = searchSimilar;
+            document.getElementById('similar-search-button').hidden = false;
+            document.getElementById('expand-search-button').hidden = false;
             return;
           }
           updateSearchStatus("Procesăm cele mai bune tarife...", 98, "loading");
