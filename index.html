@@ -3501,7 +3501,7 @@
                   break;
                 } catch (error) {
                   if (attempt === 1) throw error;
-                  await new Promise(resolve => setTimeout(resolve, 500));
+                  await new Promise(resolve => setTimeout(resolve, 500 + Math.random() * 1000));
                 }
               }
               return { wk, airport, itins: json?.data?.returnItineraries?.itineraries || [] };
@@ -3514,7 +3514,7 @@
             }
           };
 
-          const results = await mapWithConcurrency(jobs, 4, queryJob);
+          const results = await mapWithConcurrency(jobs, 40, queryJob);
           if (failedRequests) {
             updateSearchStatus(`Nu am putut verifica toate zborurile (${failedRequests} cereri eșuate). Poți încerca din nou sau căuta perioade asemănătoare; disponibilitatea pentru datele inițiale nu a putut fi confirmată.`, 100, "error");
             lastEmptyWasSimilar = searchSimilar;
