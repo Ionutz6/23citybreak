@@ -3516,7 +3516,7 @@
             }
           };
 
-          const results = (await mapWithConcurrency(jobs, 40, queryJob, () => completedRequests >= 40 && failedRequests === completedRequests)).filter(Boolean);
+          const results = (await mapWithConcurrency(jobs, 12, queryJob, () => completedRequests >= 12 && failedRequests === completedRequests)).filter(Boolean);
           const incompleteSearch = failedRequests > 0 || completedRequests < jobs.length;
           if (completedRequests === failedRequests) {
             updateSearchStatus(`Serviciul de zboruri nu a răspuns la cererile verificate (${failedRequests} eșuate). Căutarea a fost oprită; nu putem spune dacă există zboruri. Încearcă din nou.`, 100, "error");
