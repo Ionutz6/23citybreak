@@ -345,7 +345,7 @@
       </div>
     <!-- 2. PASUL 2: Tip de weekend și calendar -->
     <section class="period-section">
-      <div class="period-heading"><div><h3>1. Hai să găsim următorul weekend.</h3><p id="subtitle-summary" class="text-xs text-[#64748b] mt-1">Alege tipul, apoi bifează una sau mai multe perioade din calendar.</p></div><span id="selected-wk-badge" class="period-count"></span></div>
+      <div class="period-heading"><div><h3>1. Hai să găsim următorul zbor.</h3><p id="subtitle-summary" class="text-xs text-[#64748b] mt-1">Alege tipul de weekend, apoi bifează una sau mai multe perioade din calendar.</p></div><span id="selected-wk-badge" class="period-count"></span></div>
       <div class="period-options"><button type="button" id="classic-mode" class="period-choice active" onclick="setSimpleTripMode('classic')"><strong>Weekend clasic</strong><small>Vineri – duminică · 2 nopți</small></button><button type="button" id="extended-mode" class="period-choice" onclick="setSimpleTripMode('extended')"><strong>Weekend prelungit</strong><small>Sărbători legale și zile-punte · pot necesita concediu</small></button></div>
       <div class="mt-4 rounded-xl border border-[#eee5d4] bg-[#fffdf8] p-3"><div class="text-[11px] font-black uppercase tracking-wider text-[#8a5d14] mb-2">Alege perioada</div><div class="flex flex-wrap gap-2"><button class="calendar-range-choice" onclick="selectCalendarRange('next-month')">Luna următoare</button><button class="calendar-range-choice" onclick="selectCalendarRange('next-2-months')">Următoarele 2 luni</button><button id="range-winter" class="calendar-range-choice" onclick="selectCalendarRange('winter')">Iarna <span data-range-year></span></button><button id="range-spring" class="calendar-range-choice" onclick="selectCalendarRange('spring')">Primăvara <span data-range-year></span></button><button id="range-summer" class="calendar-range-choice" onclick="selectCalendarRange('summer')">Vara <span data-range-year></span></button><button id="range-autumn" class="calendar-range-choice" onclick="selectCalendarRange('autumn')">Toamna <span data-range-year></span></button><button class="calendar-range-choice" onclick="selectCalendarRange('year')">Tot anul <span data-range-year></span></button></div></div>
       <div class="calendar-details calendar-details-open">
@@ -570,47 +570,6 @@
           </div>
         </div>
       </div>
-    </div>
-
-    <!-- 4. Destination 48h Guide & Weather (Independent Card with Photo Ambient & Glassmorphism) -->
-    <div id="city-guide-card" class="hidden card-23ai rounded-3xl p-6 text-xs sm:text-sm text-[#0a0b0d] shadow-sm transition space-y-4 border border-[#ecd8b0]">
-      <div class="flex flex-wrap items-center justify-between gap-2 border-b border-[#ecd8b0] pb-3">
-        <div class="flex items-center gap-2.5">
-          <span class="w-8 h-8 rounded-xl bg-[#0a0b0d] text-[#dfa649] flex items-center justify-center text-xs font-black shadow-xs">48h</span>
-          <h3 id="guide-city-title" class="font-display text-base sm:text-lg font-black text-[#0a0b0d]">Ghid de Weekend 23AI</h3>
-        </div>
-        <span class="text-[11px] font-bold text-[#5c3b06] bg-[#fce8bd] px-2.5 py-0.5 rounded-md border border-[#dfa649]/60 font-display">Informații orientative</span>
-      </div>
-      
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-        <div class="space-y-1.5 border-b md:border-b-0 md:border-r border-[#ecd8b0] pb-3 md:pb-0 md:pr-4">
-          <div class="font-bold uppercase tracking-wider text-[#5c3b06] text-xs font-display flex items-center gap-1.5">
-            <span>☀️</span> <span>Vreme & Sezon optim</span>
-          </div>
-          <div id="guide-weather" class="font-medium text-[#334155] leading-relaxed font-body">
-            <!-- Rendered by JS -->
-          </div>
-        </div>
-        
-        <div class="space-y-1.5 border-b md:border-b-0 md:border-r border-[#ecd8b0] pb-3 md:pb-0 md:pr-4">
-          <div class="font-bold uppercase tracking-wider text-[#5c3b06] text-xs font-display flex items-center gap-1.5">
-            <span>🚆</span> <span>Transfer Aeroport → Centru</span>
-          </div>
-          <div id="guide-transfer" class="font-medium text-[#334155] leading-relaxed font-body">
-            <!-- Rendered by JS -->
-          </div>
-        </div>
-        
-        <div class="space-y-1.5">
-          <div class="font-bold uppercase tracking-wider text-[#5c3b06] text-xs font-display flex items-center gap-1.5">
-            <span>🎒</span> <span>Vibe & Ce faci în 48 de ore</span>
-          </div>
-          <div id="guide-vibe" class="font-medium text-[#334155] leading-relaxed font-body">
-            <!-- Rendered by JS -->
-          </div>
-        </div>
-      </div>
-      <p class="guide-disclaimer">Informațiile și costurile de transfer sunt orientative. Verifică prețul și ruta pentru aeroportul ales înainte de plecare.</p>
     </div>
 
     <div class="results-heading"><div><h2>Alege următoarea destinație.</h2></div><p>Ofertele apar aici după căutare.</p></div>
@@ -1954,18 +1913,7 @@
         }, 200);
       }
 
-      // If user typed an exact or close city name, preview its guide
-      if (q) {
-        const cleanQ = q.replace(/[^\p{L}\p{N}\s]/gu, '').trim().toLowerCase();
-        const match = ALL_EUROPE_CITIES.find(c => !c.isAll && (normalizeDestQuery(c.name) === cleanQ || normalizeDestQuery(c.iata) === cleanQ));
-        if (match) {
-          renderCityGuide(match);
-        } else {
-          document.getElementById("city-guide-card").classList.add("hidden");
-        }
-      } else {
-        document.getElementById("city-guide-card").classList.add("hidden");
-      }
+
     }
 
     function showDestDropdown(show) {
@@ -2093,15 +2041,12 @@
         if (searchBtnText) searchBtnText.textContent = "Caută zboruri";
         if (scanBtnText) scanBtnText.textContent = "Cel mai bun weekend din an";
         document.getElementById("city-spotlight-banner")?.classList.add("hidden");
-        document.getElementById("city-guide-card")?.classList.add("hidden");
       } else {
         input.value = `${city.flag} ${city.name} (${city.iata}) · ${city.country}`;
         clearBtn.classList.remove("hidden");
         if (searchBtnText) searchBtnText.textContent = "Caută zboruri";
         if (scanBtnText) scanBtnText.textContent = `Cel mai bun weekend în ${city.name}`;
 
-        // Render City Break Insights & Guide IMMEDIATELY
-        renderCityGuide(city);
       }
 
       invalidateSearchResults();
@@ -2112,29 +2057,6 @@
 
     function clearDestSelection() {
       selectDestination("any");
-    }
-
-    function renderCityGuide(city) {
-      const guideCard = document.getElementById("city-guide-card");
-      if (!city || city.isAll) {
-        guideCard.classList.add("hidden");
-        return;
-      }
-
-      const key = (city.code || city.iata || city.name).toLowerCase();
-      const slug = city.id?.split(':')[1]?.split('_')[0] || key;
-      const insight = getCityInsight(slug, city.name, city.iata);
-
-      const photoUrl = getCityPhoto(key);
-      guideCard.style.backgroundImage = `linear-gradient(rgba(253, 250, 243, 0.94), rgba(253, 250, 243, 0.88)), url('${photoUrl}')`;
-      guideCard.style.backgroundSize = "cover";
-      guideCard.style.backgroundPosition = "center";
-
-      document.getElementById("guide-city-title").textContent = `Ghid de Weekend 23AI · ${city.flag} ${city.name} (${city.iata})`;
-      document.getElementById("guide-weather").textContent = insight.weather;
-      document.getElementById("guide-transfer").textContent = insight.transfer;
-      document.getElementById("guide-vibe").textContent = insight.vibe;
-      guideCard.classList.remove("hidden");
     }
 
     // Close autocomplete on click outside
@@ -2472,6 +2394,7 @@
       return cityPhotoCache.get(cityId);
     }
     const illustratedGuides = {
+      "City:cologne_de": {"image": "koln-bonn", "city": "Köln și Bonn", "legend": [["•", "Domul din Köln", "Catedrala gotică și cele două turnuri ale sale domină centrul orașului."], ["•", "Podul Hohenzollern", "Pod feroviar și pietonal peste Rin, cunoscut pentru lacătele iubirii."], ["•", "Orașul vechi din Köln", "Străduțe, piețe și case colorate aproape de malul Rinului."], ["•", "Muzeul Ciocolatei", "Muzeu pe malul Rinului, dedicat istoriei și producerii ciocolatei."], ["•", "Münsterplatz din Bonn", "Piață centrală lângă bazilica Bonn Minster și monumentul Beethoven."], ["•", "Casa Beethoven din Bonn", "Casa natală a compozitorului, amenajată ca muzeu."]], "days": [{"story": "Descoperă Köln la pas: începe la Dom, traversează Podul Hohenzollern pentru o panoramă, apoi revino în orașul vechi și urmează malul Rinului spre Muzeul Ciocolatei.", "stops": ["Cologne Cathedral, Cologne, Germany", "Hohenzollern Bridge, Cologne, Germany", "Fischmarkt, Cologne, Germany", "Schokoladenmuseum, Cologne, Germany"]}, {"story": "Ia trenul din Köln spre Bonn, apoi explorează centrul istoric: Casa Beethoven, Marktplatz și Bonn Minster. Traseul Google Maps arată plimbarea din Bonn; călătoria cu trenul se face separat.", "stops": ["Beethoven-Haus Bonn, Germany", "Marktplatz, Bonn, Germany", "Bonn Minster, Bonn, Germany", "Hofgarten Bonn, Germany"]}], "insight": {"city": "Köln și Bonn · Germania", "weather": "Primăvara și toamna sunt plăcute pentru plimbări; vara poate fi caldă, iar iarna răcoroasă. O jachetă de ploaie este utilă în orice anotimp.", "transfer": "Aeroportul Köln/Bonn (CGN) are gară proprie și legături feroviare spre Köln și Bonn; verifică ruta și orarul pentru gara de destinație. Între cele două orașe există trenuri regulate.", "vibe": "Catedrala din Köln, promenade pe Rin, orașe vechi și moștenirea muzicală a lui Beethoven în Bonn."}, "imageNote": "Ilustrația prezintă Köln; pentru Bonn găsești itinerarul în ziua a doua.", "extension": "webp"},
       "City:glasgow_gb": {"image": "glasgow", "city": "Glasgow", "legend": [["•", "Catedrala Glasgow", "Catedrală medievală în estul centrului."], ["•", "George Square", "Piață centrală lângă City Chambers."], ["•", "City Chambers", "Clădire civică victoriană."], ["•", "Universitatea din Glasgow", "Ansamblu istoric în West End."], ["•", "Kelvingrove", "Muzeu și galerie de artă lângă parc."]], "days": [{"story": "Începe în George Square și continuă spre Catedrala Glasgow și Necropolis, pentru priveliști asupra orașului.", "stops": ["George Square, Glasgow, UK", "Glasgow Cathedral, UK", "Glasgow Necropolis, UK"]}, {"story": "Explorează West End: Universitatea, Kelvingrove Park și muzeul Kelvingrove. Folosește transportul public între centru și West End.", "stops": ["University of Glasgow, UK", "Kelvingrove Park, Glasgow, UK", "Kelvingrove Art Gallery and Museum, Glasgow, UK"]}], "insight": {"city": "Glasgow · Regatul Unit", "weather": "Vremea este schimbătoare, iar ploaia poate apărea tot anul; ia o jachetă impermeabilă.", "transfer": "Aeroportul Glasgow are legături cu autobuzul spre centru. Dacă aterizezi la Prestwick, verifică legătura feroviară separat.", "vibe": "Arhitectură victoriană, muzee, muzică și cartiere cu cafenele."}, "extension": "webp"},
       "City:ljubljana_si": {"image": "ljubljana", "city": "Ljubljana", "legend": [["•", "Castelul Ljubljana", "Castel pe colină deasupra centrului."], ["•", "Podul Triplu", "Ansamblu de poduri lângă Piața Prešeren."], ["•", "Podul Dragonilor", "Pod decorat cu dragoni, simbolul orașului."], ["•", "Piața Prešeren", "Piață centrală lângă râu."], ["•", "Râul Ljubljanica", "Maluri cu cafenele și promenade."]], "days": [{"story": "Începe în Piața Prešeren, traversează Podul Triplu și plimbă-te pe malul râului până la Podul Dragonilor.", "stops": ["Prešeren Square, Ljubljana, Slovenia", "Triple Bridge, Ljubljana, Slovenia", "Dragon Bridge, Ljubljana, Slovenia"]}, {"story": "Urcă pe colină la Castelul Ljubljana, apoi coboară spre Piața Orașului și malurile Ljubljanicăi.", "stops": ["Ljubljana Castle, Slovenia", "Town Square, Ljubljana, Slovenia", "Cobblers' Bridge, Ljubljana, Slovenia"]}], "insight": {"city": "Ljubljana · Slovenia", "weather": "Primăvara și toamna sunt plăcute; vara poate fi caldă, iar iarna rece. Ia o jachetă de ploaie.", "transfer": "Autobuzele leagă aeroportul Ljubljana de oraș. Verifică orarul și stațiile pentru ora sosirii.", "vibe": "Centru compact, poduri, cafenele pe malul râului și priveliști de la castel."}, "extension": "webp"},
       "City:vilnius_lt": {"image": "vilnius", "city": "Vilnius", "legend": [["•", "Catedrala Vilnius", "Catedrală neoclasică lângă piața centrală."], ["•", "Turnul Gediminas", "Turn istoric pe colină, cu priveliști."], ["•", "Poarta Zorilor", "Poartă istorică și capelă la marginea centrului vechi."], ["•", "Biserica Sfânta Ana", "Biserică gotică de cărămidă."], ["•", "Centrul Vechi", "Cartiere istorice cu străduțe și curți."]], "days": [{"story": "Pornește din Piața Catedralei, urcă spre Turnul Gediminas și continuă către Biserica Sfânta Ana.", "stops": ["Vilnius Cathedral, Lithuania", "Gediminas Castle Tower, Vilnius, Lithuania", "St Anne's Church, Vilnius, Lithuania"]}, {"story": "Explorează centrul vechi, treci prin Piața Primăriei și încheie la Poarta Zorilor.", "stops": ["Vilnius University, Lithuania", "Town Hall Square, Vilnius, Lithuania", "Gate of Dawn, Vilnius, Lithuania"]}], "insight": {"city": "Vilnius · Lituania", "weather": "Primăvara și vara sunt bune pentru plimbări; iarna poate fi rece și cu zăpadă.", "transfer": "Aeroportul Vilnius este conectat prin autobuze și tren la oraș. Verifică orarul și stația potrivită.", "vibe": "Străduțe baroce, curți ascunse, cafenele și priveliști de pe coline."}, "extension": "webp"},
@@ -2553,7 +2476,7 @@
       if (illustrated) {
         const legend = illustrated.legend.map(([number, name, description]) => `<li><span class="legend-number">${escapeHtml(number)}</span><span><strong>${escapeHtml(name)}</strong><small>${escapeHtml(description)}</small></span></li>`).join('');
         const days = illustrated.days.map((day,index) => `<div class="illustrated-day illustrated-day-${index + 1}"><strong>Ziua ${index + 1}</strong><p>${escapeHtml(day.story)}</p><a href="${itineraryDirections(day.stops)}" target="_blank" rel="noopener noreferrer">Deschide traseul în Google Maps ↗</a></div>`).join('');
-        map.innerHTML = `<h3>Descoperă ${escapeHtml(illustrated.city)} în două zile</h3><p>Derulează pentru denumiri, descrieri și traseele pe zile.</p><div class="illustrated-map"><header class="illustrated-map-header"><div><span class="map-overline">GHID DE WEEKEND</span><h4>${escapeHtml(illustrated.city)}</h4><span class="map-subtitle">Traseu de două zile</span></div><div class="map-summary"><strong>De descoperit</strong><span>${illustrated.legend.slice(0,3).map(([,name])=>escapeHtml(name)).join(" · ")}</span></div></header><a href="assets/guides-prague-style/${illustrated.image}.${illustrated.extension || 'png'}" target="_blank" rel="noopener noreferrer"><img src="assets/guides-prague-style/${illustrated.image}.${illustrated.extension || 'png'}" alt="Ilustrație de explorare inspirată de ${escapeHtml(illustrated.city)}"></a><div class="illustrated-map-places"><h4>Repere de descoperit</h4><ul class="illustrated-legend">${legend}</ul></div></div><p>Ilustrație schematică: pozițiile și traseul desenat sunt orientative; numerele nemenționate sunt decorative. Verifică traseele, orarele și accesul înainte de plecare.</p>${days}`;
+        map.innerHTML = `<h3>Descoperă ${escapeHtml(illustrated.city)} în două zile</h3><p>Derulează pentru denumiri, descrieri și traseele pe zile.</p><div class="illustrated-map"><header class="illustrated-map-header"><div><span class="map-overline">GHID DE WEEKEND</span><h4>${escapeHtml(illustrated.city)}</h4><span class="map-subtitle">Traseu de două zile</span></div><div class="map-summary"><strong>De descoperit</strong><span>${illustrated.legend.slice(0,3).map(([,name])=>escapeHtml(name)).join(" · ")}</span></div></header><a href="assets/guides-prague-style/${illustrated.image}.${illustrated.extension || 'png'}" target="_blank" rel="noopener noreferrer"><img src="assets/guides-prague-style/${illustrated.image}.${illustrated.extension || 'png'}" alt="Ilustrație de explorare inspirată de ${escapeHtml(illustrated.city)}"></a>${illustrated.imageNote ? `<p>${escapeHtml(illustrated.imageNote)}</p>` : ''}<div class="illustrated-map-places"><h4>Repere de descoperit</h4><ul class="illustrated-legend">${legend}</ul></div></div><p>Ilustrație schematică: pozițiile și traseul desenat sunt orientative; numerele nemenționate sunt decorative. Verifică traseele, orarele și accesul înainte de plecare.</p>${days}`;
         return;
       }
       if (isPrague) {
@@ -3167,7 +3090,6 @@
       currentRows = [];
       hasEverSearched = false;
       document.getElementById("city-spotlight-banner")?.classList.add("hidden");
-      document.getElementById("city-guide-card")?.classList.add("hidden");
 
       updateSearchStatus("Mod permisiv configurat. Apasă pe «Caută zboruri» sau «Scanează tot anul» pentru a căuta variantele disponibile.", 100, "success");
       renderMatrix();
@@ -3198,7 +3120,6 @@
 
       document.getElementById("search-status")?.classList.add("hidden");
       document.getElementById("city-spotlight-banner")?.classList.add("hidden");
-      document.getElementById("city-guide-card")?.classList.add("hidden");
 
       renderMatrix();
     }
