@@ -1496,11 +1496,11 @@
       const day = iso => new Intl.DateTimeFormat('ro-RO', {weekday:'short', day:'numeric', month:'short', year:'numeric', timeZone:'UTC'}).format(new Date(`${iso}T12:00:00Z`));
       return `${day(dateOut)} – ${day(dateIn)}`;
     }
-    async function mapWithConcurrency(items, limit, callback) {
+    async function mapWithConcurrency(items, limit, callback, shouldStop = () => false) {
       const output = new Array(items.length);
       let next = 0;
       await Promise.all(Array.from({length: Math.min(limit, items.length)}, async () => {
-        while (next < items.length) { const index = next++; output[index] = await callback(items[index], index); }
+        while (next < items.length && !shouldStop()) { const index = next++; output[index] = await callback(items[index], index); }
       }));
       return output;
     }
@@ -3507,6 +3507,7 @@
               return { wk, airport, itins: json?.data?.returnItineraries?.itineraries || [] };
             } catch (e) {
               failedRequests++;
+              if (failedRequests === 1) console.warn("Serviciul de zboruri nu a răspuns:", e?.message || "eroare de rețea");
               return { wk, airport, itins: [] };
             } finally {
               completedRequests++;
@@ -3514,9 +3515,10 @@
             }
           };
 
-          const results = await mapWithConcurrency(jobs, 40, queryJob);
-          if (failedRequests) {
-            updateSearchStatus(`Nu am putut verifica toate zborurile (${failedRequests} cereri eșuate). Poți încerca din nou sau căuta perioade asemănătoare; disponibilitatea pentru datele inițiale nu a putut fi confirmată.`, 100, "error");
+          const results = (await mapWithConcurrency(jobs, 40, queryJob, () => completedRequests >= 40 && failedRequests === completedRequests)).filter(Boolean);
+          const incompleteSearch = failedRequests > 0 || completedRequests < jobs.length;
+          if (completedRequests === failedRequests) {
+            updateSearchStatus(`Serviciul de zboruri nu a răspuns la cererile verificate (${failedRequests} eșuate). Căutarea a fost oprită; nu putem spune dacă există zboruri. Încearcă din nou.`, 100, "error");
             lastEmptyWasSimilar = searchSimilar;
             document.getElementById('similar-search-button').hidden = false;
             document.getElementById('expand-search-button').hidden = false;
@@ -3638,7 +3640,13 @@
             document.getElementById('similar-results-note').hidden = false;
           }
 
-          if (fallbackUsed) {
+          if (incompleteSearch) {
+            const details = totalFound > 0 ? `Am găsit oferte, dar rezultatele sunt incomplete` : `Nu putem confirma disponibilitatea`;
+            updateSearchStatus(`${details}: ${failedRequests} cereri nu au reușit${completedRequests < jobs.length ? ", iar restul nu au fost verificate" : ""}. Încearcă din nou sau caută perioade asemănătoare.`, 100, "error");
+            lastEmptyWasSimilar = searchSimilar;
+            document.getElementById('similar-search-button').hidden = false;
+            document.getElementById('expand-search-button').hidden = false;
+          } else if (fallbackUsed) {
             updateSearchStatus(`✅ Am găsit zboruri pentru ${targetCityTitle} (cu 1 escală, neavând zbor direct din București). Sfat: Verifică și Manchester (direct la 45 min de Liverpool)!`, 100, "success");
           } else if (totalFound > 0) {
             const category = searchSimilar ? 'perioade asemănătoare' : 'weekenduri';
