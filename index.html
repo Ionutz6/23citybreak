@@ -570,9 +570,9 @@
         <div class="inline-flex items-center gap-2 text-xs sm:text-sm text-[#0a0b0d] font-bold">
           <span>La click pe preț, deschide linkul:</span>
           <select id="link-mode" onchange="setLinkMode(this.value)" class="rounded-xl bg-[#fffdf8] border border-[#dce1e7] px-3 py-1.5 text-xs sm:text-sm font-bold text-[#0a0b0d] focus:outline-none focus:ring-2 focus:ring-[#dfa649] shadow-2xs font-display">
-            <option value="kiwi" selected>Kiwi.com</option>
+            <option value="skyscanner" selected>Skyscanner (Comparație)</option>
+            <option value="kiwi">Kiwi.com</option>
             <option value="google">Google Flights</option>
-            <option value="skyscanner">Skyscanner (Comparație)</option>
             <option value="airline">Companie (Wizz / Ryanair)</option>
           </select>
         </div>
@@ -1101,7 +1101,7 @@
     let calendarYear = ALL_WEEKENDS[0]?.fri ? Number(ALL_WEEKENDS[0].fri.slice(0, 4)) : today.getFullYear();
     let currentTripMode = "classic"; // "classic" (2 nopți) | "extended" (3-4 nopți) | "school_week" (7-9 nopți)
     let currentMode = 1; // 1 = per pax, 2 = total grup
-    let currentLinkMode = "kiwi"; // Default external search provider (prices come from Kiwi)
+    let currentLinkMode = "skyscanner"; // Default: price comparison; Kiwi stays one click away
     let currentRows = [];
     let similarResultPeriods = null;
     let lastEmptyWasSimilar = false;
@@ -2724,6 +2724,7 @@
         const flightTimeIn = bestCell ? bestCell.inTime : "—";
         const airline = bestCell ? bestCell.airlineLabel : (r.sub || "Zbor direct");
         const bookUrl = bestCell ? getTargetUrl(bestCell) : "#";
+        const cardKiwiUrl = bestCell && currentLinkMode !== "kiwi" ? kiwiTargetUrl(bestCell) : "";
 
         cardsHtml += `
           <div data-city-id="${escapeHtml(r.cityId || '')}" class="card-23ai city-card-bg rounded-3xl overflow-hidden flex flex-col justify-between border border-[#e4e7eb] shadow-sm relative group"
@@ -2770,7 +2771,7 @@
                   <div class="font-num text-2xl font-black text-[#dfa649] leading-none">${priceDisplay}</div>
                   <div class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">${priceSub}</div>
                 </div>
-                <div class="ml-auto flex items-center gap-1.5">
+                <div class="ml-auto flex flex-wrap items-center gap-1.5" style="justify-content:flex-end">
                   <button onclick="shareTripWhatsApp('${r.city}', '${datesLabel}', '${bestCell ? bestCell.perPaxEur : 0}', '${flightTimeOut} / ${flightTimeIn}', '${bookUrl}')"
                           title="Trimite pe WhatsApp"
                           class="whatsapp-share bg-emerald-700 hover:bg-emerald-600 text-white h-10 box-border px-3 py-0 rounded-xl transition cursor-pointer shadow-xs font-display flex items-center justify-center gap-1.5 font-bold text-xs whitespace-nowrap" aria-label="Trimite oferta pe WhatsApp">
@@ -2780,6 +2781,8 @@
                      class="bg-[#dfa649] hover:bg-[#c98f33] active:bg-[#b57f2a] text-[#0a0b0d] font-black text-xs h-10 box-border px-3.5 py-0 rounded-xl transition shadow-xs font-display flex items-center justify-center whitespace-nowrap">
                     <span>Verifică oferta</span>
                   </a>
+                  ${cardKiwiUrl ? `<a href="${cardKiwiUrl}" target="_blank" rel="noopener noreferrer" title="Deschide oferta pe Kiwi.com"
+                     style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.35);color:#fff" class="font-bold text-xs h-10 box-border px-3 py-0 rounded-xl transition font-display flex items-center justify-center whitespace-nowrap">Kiwi</a>` : ""}
                 </div>
               </div>
 
