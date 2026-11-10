@@ -215,7 +215,7 @@
       #weekend-chips-grid .calendar-month.mobile-current h4 {display:none}
     }
     .calendar-legend {display:flex;gap:14px;flex-wrap:wrap;margin:12px 0 2px;color:#656961;font-size:11px;font-weight:700}.calendar-legend span {display:flex;align-items:center;gap:6px}.calendar-legend i {width:17px;height:15px;border-radius:4px;border:1px solid #e0b675;background:#fff8ea}.calendar-legend .selected {background:#171816;border-color:#171816}.calendar-legend .holiday {box-shadow:inset 0 -3px #dfa649}
-    @media(max-width:600px) {.period-section #weekend-chips-grid {grid-template-columns:1fr}.calendar-month {padding:12px}.calendar-day {height:42px;font-size:13px}.calendar-days,.calendar-weekdays {gap:2px} .calendar-holidays {font-size:11px}}
+    @media(max-width:600px) {.period-section #weekend-chips-grid {grid-template-columns:1fr}.calendar-month {padding:12px;height:390px;overflow:hidden}.calendar-days {grid-template-rows:repeat(6,42px);align-content:start}.calendar-day {height:42px;font-size:13px}.calendar-days,.calendar-weekdays {gap:2px} .calendar-holidays {font-size:11px;max-height:76px;overflow-y:auto}}
 
     .calendar-month h4 { font-weight:800; font-size:13px; margin:0 0 8px; } .month-weekends { display:grid; gap:5px; } .month-weekends button { width:100%; }
     #main-matrix-table .matrix-city-column { position:sticky; left:0; z-index:2; background:#fbfbfd; box-shadow:5px 0 8px -8px rgba(10,11,13,.35); }
