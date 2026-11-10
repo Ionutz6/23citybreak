@@ -178,9 +178,9 @@
     #configurator.search-panel > .period-section { order:5; }
     #configurator.search-panel > .search-actions { order:6; }
 
-    #configurator.search-panel > .period-section { order:2; }
-    #configurator.search-panel > .route-step { order:3; }
-    #configurator.search-panel > .options-step { order:4; }
+    #configurator.search-panel > .route-step { order:2; }
+    #configurator.search-panel > .options-step { order:3; }
+    #configurator.search-panel > .period-section { order:4; }
     #configurator.search-panel > .search-actions { order:5; }
     #configurator.search-panel > #advanced-filters-panel { display:none; }
     .hero { min-height:270px; } .hero-copy { padding:35px 9% 38px 11%; } .hero h1 { margin:0 0 15px; font-size:clamp(32px,3.5vw,52px); } .hero-image { transition:background-image .5s; }
@@ -200,7 +200,12 @@
     .calendar-day {height:32px;min-width:0;display:grid;place-items:center;border:1px solid transparent;border-radius:5px;font-size:12px;color:#4c504b}
     .calendar-day.available {background:#fff8ea;border-color:#e9c88d;color:#3c3428;cursor:pointer;font-weight:700}
     .calendar-day.available:hover {background:#f9e5bb}.calendar-day.available.selected {background:#171816;color:#f2c379;border-color:#171816}
-    .calendar-day.holiday:not(.selected) {box-shadow:inset 0 -3px #dfa649}.calendar-day:focus-visible {outline:3px solid #bd8c45;outline-offset:1px;position:relative;z-index:2}
+    .calendar-day.holiday:not(.selected) {box-shadow:inset 0 -3px #dfa649}
+    .calendar-day.today {background:#2ecc71;border-color:#1f9d55;color:#0a0b0d;font-weight:800}
+    .calendar-day.available.today:not(.selected) {background:#fff8ea;border:2px solid #2ecc71}
+    .calendar-day.available.selected.today {border:2px solid #2ecc71}
+    .calendar-month.past {opacity:.45;filter:grayscale(1)}
+    .calendar-month.past-row {display:none}.calendar-day:focus-visible {outline:3px solid #bd8c45;outline-offset:1px;position:relative;z-index:2}
     .calendar-holidays {font-size:10px;line-height:1.4;color:#805a21;margin:9px 0 0;overflow-wrap:anywhere}
     .mobile-month-nav,.mobile-month-tip {display:none}
     @media(max-width:600px) {
@@ -389,7 +394,7 @@
       </div>
     <!-- 2. PASUL 2: Tip de weekend și calendar -->
     <section class="period-section">
-      <div class="period-heading"><div><h3>1. Hai să găsim următorul zbor.</h3><p id="subtitle-summary" class="text-xs text-[#64748b] mt-1">Alege tipul de weekend, apoi bifează una sau mai multe perioade din calendar.</p></div><span id="selected-wk-badge" class="period-count"></span></div>
+      <div class="period-heading"><div><h3>3. Alege weekendurile</h3><p id="subtitle-summary" class="text-xs text-[#64748b] mt-1">Alege tipul de weekend, apoi bifează una sau mai multe perioade din calendar.</p></div><span id="selected-wk-badge" class="period-count"></span></div>
       <div class="period-options"><button type="button" id="classic-mode" class="period-choice active" onclick="setSimpleTripMode('classic')"><strong>Weekend clasic</strong><small>Vineri – duminică · 2 nopți</small></button><button type="button" id="extended-mode" class="period-choice" onclick="setSimpleTripMode('extended')"><strong>Weekend prelungit</strong><small>Sărbători legale și zile-punte · pot necesita concediu</small></button></div>
       <div class="mt-4 rounded-xl border border-[#eee5d4] bg-[#fffdf8] p-3"><div class="text-[11px] font-black uppercase tracking-wider text-[#8a5d14] mb-2">Alege perioada</div><div class="flex flex-wrap gap-2"><button class="calendar-range-choice" onclick="selectCalendarRange('next-month')">Luna următoare</button><button class="calendar-range-choice" onclick="selectCalendarRange('next-2-months')">Următoarele 2 luni</button><button id="range-spring" class="calendar-range-choice" onclick="selectCalendarRange('spring')">Primăvara <span data-range-year></span></button><button id="range-summer" class="calendar-range-choice" onclick="selectCalendarRange('summer')">Vara <span data-range-year></span></button><button id="range-autumn" class="calendar-range-choice" onclick="selectCalendarRange('autumn')">Toamna <span data-range-year></span></button><button id="range-winter" class="calendar-range-choice" onclick="selectCalendarRange('winter')">Iarna <span data-range-year></span></button><button class="calendar-range-choice" onclick="selectCalendarRange('year')">Tot anul <span data-range-year></span></button></div></div>
       <div class="calendar-details calendar-details-open">
@@ -2185,7 +2190,8 @@
         const firstWeekday = (first.getUTCDay() + 6) % 7;
         const daysInMonth = new Date(Date.UTC(calendarYear, month + 1, 0)).getUTCDate();
         const monthPrefix = `${calendarYear}-${String(month + 1).padStart(2, '0')}`;
-        chipsHtml += `<section class="calendar-month${monthPrefix === mobileCalendarMonth ? ' mobile-current' : ''}" aria-label="${monthNames[month]} ${calendarYear}"><h4>${monthNames[month]}</h4><div class="calendar-weekdays" aria-hidden="true">${weekdays.map(d => `<span>${d}</span>`).join('')}</div><div class="calendar-days">`;
+        const pastMonth = monthPrefix < minMonth;
+        chipsHtml += `<section class="calendar-month${monthPrefix === mobileCalendarMonth ? ' mobile-current' : ''}${pastMonth ? ' past' : ''}" data-month="${monthPrefix}" aria-label="${monthNames[month]} ${calendarYear}"><h4>${monthNames[month]}</h4><div class="calendar-weekdays" aria-hidden="true">${weekdays.map(d => `<span>${d}</span>`).join('')}</div><div class="calendar-days">`;
         chipsHtml += '<span class="calendar-day" aria-hidden="true"></span>'.repeat(firstWeekday);
         const holidayNotes = [];
         for (let day = 1; day <= daysInMonth; day++) {
@@ -2197,14 +2203,17 @@
             const trip = getTripDates(weekend);
             const selected = selectedWkIds.has(weekend.id);
             const label = `${day} ${monthNames[month]} ${calendarYear}${holiday ? ', ' + holiday : ''}. Perioada ${formatTripSpan(trip.dateOut, trip.dateIn)}${weekend.tag ? ', ' + weekend.tag : ''}`;
-            chipsHtml += `<button type="button" class="calendar-day available${selected ? ' selected' : ''}${holiday ? ' holiday' : ''}" data-calendar-date="${date}" aria-label="${escapeHtml(label)}" aria-pressed="${selected}" onclick="toggleCalendarDay('${weekend.id}', '${date}')">${day}</button>`;
+            chipsHtml += `<button type="button" class="calendar-day available${selected ? ' selected' : ''}${holiday ? ' holiday' : ''}${date === todayStr ? ' today' : ''}" data-calendar-date="${date}" aria-label="${escapeHtml(label)}" aria-pressed="${selected}" onclick="toggleCalendarDay('${weekend.id}', '${date}')">${day}</button>`;
           } else {
-            chipsHtml += `<span class="calendar-day${holiday ? ' holiday' : ''}"${holiday ? ` title="${escapeHtml(holiday)}"` : ''}>${day}</span>`;
+            const isToday = date === todayStr;
+            const dayTitle = [isToday ? 'Azi' : '', holiday || ''].filter(Boolean).join(' · ');
+            chipsHtml += `<span class="calendar-day${holiday ? ' holiday' : ''}${isToday ? ' today' : ''}"${dayTitle ? ` title="${escapeHtml(dayTitle)}"` : ''}${isToday ? ' aria-label="Azi"' : ''}>${day}</span>`;
           }
         }
         chipsHtml += `</div>${holidayNotes.length ? `<p class="calendar-holidays">${holidayNotes.map(escapeHtml).join(' · ')}</p>` : ''}</section>`;
       }
       gridEl.innerHTML = chipsHtml;
+      hidePastCalendarRows(gridEl);
 
       const selectedYears = [...selectedWkIds].reduce((counts, id) => {
         const year = Number(id.slice(0, 4));
@@ -2218,6 +2227,22 @@
       document.getElementById("selected-wk-badge").textContent = selectedWkIds.size ? `${selectedWkIds.size} weekend${selectedWkIds.size === 1 ? '' : 'uri'} selectate` : 'Nicio perioadă selectată';
       document.getElementById('calendar-selection-help').textContent = selectedWkIds.size ? 'Poți adăuga sau elimina oricând perioade.' : 'Selectează cel puțin un weekend pentru a căuta.';
     }
+
+    // Hide whole rows of months that are already over; months in a partly past row stay, greyed out.
+    function hidePastCalendarRows(gridEl) {
+      const months = [...gridEl.querySelectorAll('.calendar-month')];
+      const columns = getComputedStyle(gridEl).gridTemplateColumns.split(' ').filter(Boolean).length || 1;
+      const pastCount = months.filter(m => m.classList.contains('past')).length;
+      const hiddenCount = columns > 1 ? Math.floor(pastCount / columns) * columns : 0;
+      months.forEach((m, i) => m.classList.toggle('past-row', i < hiddenCount));
+    }
+    let calendarColumns = 0;
+    window.addEventListener('resize', () => {
+      const gridEl = document.getElementById('weekend-chips-grid');
+      if (!gridEl) return;
+      const columns = getComputedStyle(gridEl).gridTemplateColumns.split(' ').filter(Boolean).length;
+      if (columns !== calendarColumns) { calendarColumns = columns; hidePastCalendarRows(gridEl); }
+    });
 
     function showCalendarYear(year) {
       if (year < today.getFullYear() || year > Number(ALL_WEEKENDS.at(-1).fri.slice(0, 4))) return;
@@ -4068,18 +4093,18 @@
     const fields = [...routeGrid.children];
     const period = panel.querySelector('.period-section');
     const route = document.createElement('section'); route.className = 'journey-step route-step';
-    route.innerHTML = '<div class="step-heading"><h3>2. Alege orașele</h3></div><div class="step-fields"></div>';
+    route.innerHTML = '<div class="step-heading"><h3>1. Alege orașele</h3></div><div class="step-fields"></div>';
     route.querySelector('.step-fields').append(fields[1], fields[2]);
     const options = document.createElement('section'); options.className = 'journey-step options-step';
-    options.innerHTML = '<div class="step-heading"><h3>3. Selectează opțiuni</h3></div><div class="option-fields"></div>';
+    options.innerHTML = '<div class="step-heading"><h3>2. Selectează opțiuni</h3></div><div class="option-fields"></div>';
     const optionFields = options.querySelector('.option-fields'); optionFields.append(fields[3], fields[4], fields[5]);
     const hours = document.getElementById('f-fri-dep').closest('.space-y-3');
     hours.querySelector('.font-display').textContent = 'Orar zbor';
     ['Plecare la dus', 'Sosire la destinație', 'Plecare la retur', 'Sosire acasă'].forEach((label, i) => hours.querySelectorAll('label')[i].textContent = label);
     optionFields.append(hours);
     routeGrid.remove();
-    panel.insertBefore(route, panel.querySelector('.search-actions'));
-    panel.insertBefore(options, panel.querySelector('.search-actions'));
+    panel.insertBefore(route, period);
+    panel.insertBefore(options, period);
     panel.querySelector('.search-actions').append(document.getElementById('search-status'));
     // Thirty fixed city photographs, shuffled once per visit.
     const heroImages = [{"name":"Roma","country":"Italia","image":"https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7e/Trevi_Fountain%2C_Rome%2C_Italy_2_-_May_2007.jpg/330px-Trevi_Fountain%2C_Rome%2C_Italy_2_-_May_2007.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"},{"name":"Paris","country":"Franța","image":"https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4b/La_Tour_Eiffel_vue_de_la_Tour_Saint-Jacques%2C_Paris_ao%C3%BBt_2014_%282%29.jpg/330px-La_Tour_Eiffel_vue_de_la_Tour_Saint-Jacques%2C_Paris_ao%C3%BBt_2014_%282%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"},{"name":"Milano","country":"Italia","image":"https://thumb.wikimedia.org/wikipedia/commons/thumb/7/70/Milan_Cathedral_from_Piazza_del_Duomo.jpg/330px-Milan_Cathedral_from_Piazza_del_Duomo.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"},{"name":"Veneția","country":"Italia","image":"https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4f/Venezia_aerial_view.jpg/330px-Venezia_aerial_view.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"},{"name":"Florența","country":"Italia","image":"https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3a/Firenze_-_Piazzale_Michelangelo%2C_Firenze%2C_Italy_-_April_6%2C_2015_02.jpg/330px-Firenze_-_Piazzale_Michelangelo%2C_Firenze%2C_Italy_-_April_6%2C_2015_02.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"},{"name":"Bologna","country":"Italia","image":"https://thumb.wikimedia.org/wikipedia/commons/thumb/d/dd/Torri_di_Bologna%2C_Bologna.jpg/330px-Torri_di_Bologna%2C_Bologna.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"},{"name":"Viena","country":"Austria","image":"https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5b/Schoenbrunn_philharmoniker_2012.jpg/330px-Schoenbrunn_philharmoniker_2012.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"},{"name":"Praga","country":"Cehia","image":"https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a7/Prague_%286365119737%29.jpg/330px-Prague_%286365119737%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"},{"name":"Amsterdam","country":"Țările de Jos","image":"https://thumb.wikimedia.org/wikipedia/commons/thumb/5/57/Imagen_de_los_canales_conc%C3%A9ntricos_en_%C3%81msterdam.png/330px-Imagen_de_los_canales_conc%C3%A9ntricos_en_%C3%81msterdam.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"},{"name":"Lisabona","country":"Portugalia","image":"https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f2/Lisboa_-_Portugal_%2852597836992%29.jpg/330px-Lisboa_-_Portugal_%2852597836992%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"},{"name":"Porto","country":"Portugalia","image":"https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e5/Puente_Don_Luis_I%2C_Oporto%2C_Portugal%2C_2012-05-09%2C_DD_13.JPG/330px-Puente_Don_Luis_I%2C_Oporto%2C_Portugal%2C_2012-05-09%2C_DD_13.JPG?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"},{"name":"Barcelona","country":"Spania","image":"https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a6/Evening_light_over_Barcelona.jpg/330px-Evening_light_over_Barcelona.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"},{"name":"Madrid","country":"Spania","image":"https://thumb.wikimedia.org/wikipedia/commons/thumb/1/14/Madrid_-_Sky_Bar_360%C2%BA_%28Hotel_Riu_Plaza_Espa%C3%B1a%29%2C_vistas_19.jpg/330px-Madrid_-_Sky_Bar_360%C2%BA_%28Hotel_Riu_Plaza_Espa%C3%B1a%29%2C_vistas_19.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"},{"name":"Atena","country":"Grecia","image":"https://thumb.wikimedia.org/wikipedia/commons/thumb/6/68/Athens_Acropolis_at_Daybreak.jpg/330px-Athens_Acropolis_at_Daybreak.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"},{"name":"Budapesta","country":"Ungaria","image":"https://thumb.wikimedia.org/wikipedia/commons/thumb/5/53/View_from_Gell%C3%A9rt_Hill_to_the_Danube%2C_Hungary_-_Budapest_%2828493220635%29.jpg/330px-View_from_Gell%C3%A9rt_Hill_to_the_Danube%2C_Hungary_-_Budapest_%2828493220635%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"},{"name":"Varșovia","country":"Polonia","image":"https://thumb.wikimedia.org/wikipedia/commons/thumb/3/35/Aleja_Niepdleglosci_Warsaw_2022_aerial_%28cropped%29.jpg/330px-Aleja_Niepdleglosci_Warsaw_2022_aerial_%28cropped%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"},{"name":"Cracovia","country":"Polonia","image":"https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a3/Krakow_Rynek_Glowny_panorama_2.jpg/330px-Krakow_Rynek_Glowny_panorama_2.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"},{"name":"Copenhaga","country":"Danemarca","image":"https://thumb.wikimedia.org/wikipedia/commons/thumb/1/15/2018_-_Christiansborg_from_the_Marble_Bridge.jpg/330px-2018_-_Christiansborg_from_the_Marble_Bridge.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"},{"name":"Stockholm","country":"Suedia","image":"https://thumb.wikimedia.org/wikipedia/commons/thumb/5/56/Munkbroleden_with_Kornhamstorg_at_Gamla_Stan%2C_Stockholm%2C_Sweden_01.jpg/330px-Munkbroleden_with_Kornhamstorg_at_Gamla_Stan%2C_Stockholm%2C_Sweden_01.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"},{"name":"Oslo","country":"Norvegia","image":"https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9a/Nationaltheatret_evening.jpg/330px-Nationaltheatret_evening.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"},{"name":"Helsinki","country":"Finlanda","image":"https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3e/Suomenlinna_%28cropped%29.jpg/330px-Suomenlinna_%28cropped%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"},{"name":"Edinburgh","country":"Regatul Unit","image":"https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1a/Skyline_of_Edinburgh.jpg/330px-Skyline_of_Edinburgh.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"},{"name":"Londra","country":"Regatul Unit","image":"https://thumb.wikimedia.org/wikipedia/commons/thumb/6/67/London_Skyline_%28125508655%29.jpeg/330px-London_Skyline_%28125508655%29.jpeg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"},{"name":"Bruxelles","country":"Belgia","image":"https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ae/Grand_Place_Bruselas_2.jpg/330px-Grand_Place_Bruselas_2.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"},{"name":"Berlin","country":"Germania","image":"https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f7/Museumsinsel_Berlin_Juli_2021_1_%28cropped%29_b.jpg/330px-Museumsinsel_Berlin_Juli_2021_1_%28cropped%29_b.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"},{"name":"Dubrovnik","country":"Croația","image":"https://thumb.wikimedia.org/wikipedia/commons/thumb/6/67/The_walls_of_the_fortress_and_View_of_the_old_city._panorama.jpg/330px-The_walls_of_the_fortress_and_View_of_the_old_city._panorama.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"},{"name":"Lyon","country":"Franța","image":"https://thumb.wikimedia.org/wikipedia/commons/thumb/9/97/Lyon-part-dieu-2023.jpg/330px-Lyon-part-dieu-2023.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"},{"name":"Tallinn","country":"Estonia","image":"https://thumb.wikimedia.org/wikipedia/commons/thumb/7/70/Raekoja_plats_at_night.jpg/330px-Raekoja_plats_at_night.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"},{"name":"Bruges","country":"Belgia","image":"https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9a/Br%C3%BCgge_Blick_vom_Belfried_4.jpg/330px-Br%C3%BCgge_Blick_vom_Belfried_4.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"},{"name":"Istanbul","country":"Turcia","image":"https://thumb.wikimedia.org/wikipedia/commons/thumb/c/cb/Historical_peninsula_and_modern_skyline_of_Istanbul.jpg/330px-Historical_peninsula_and_modern_skyline_of_Istanbul.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"}];
