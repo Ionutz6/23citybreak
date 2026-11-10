@@ -247,21 +247,20 @@
     <section class="hero"><div class="hero-copy"><h1 id="hero-headline">Weekendul e mai aproape <em>decât crezi.</em></h1><script>
       (() => {
         const headlines = [
-          ['6 ore bară la bară pe Valea Prahovei?', 'Mai bine...'],
-          ['Locuim în orașul Europa.', 'I-am văzut toate cartierele?'],
-          ['Am văzut toate clădirile faimoase din Europa?', 'Da, pe toate, mai puțin...'],
-          ['Ce faci weekendul acesta?', 'Îți schimbi puțin orizontul.'],
-          ['Tot aceleași străzi?', 'Hai să descoperim unele noi.'],
-          ['Vineri seara acasă?', 'Sau la cină într-un oraș nou?'],
-          ['Cafeaua de sâmbătă are gust mai bun', 'cu o priveliște nouă.'],
-          ['Două zile libere.', 'O mulțime de locuri de descoperit.'],
-          ['Ai un weekend liber?', 'Europa are câteva idei.'],
-          ['Un bagaj mic.', 'O poveste mare de adus acasă.'],
+          ['Stai 6 ore bară la bară pe Valea Prahovei?', 'Mai bine zbori spre un oraș nou.'],
+          ['Locuiești în orașul Europa.', 'I-ai văzut toate cartierele?'],
+          ['Ai văzut toate clădirile faimoase din Europa?', 'Sau ți-a mai rămas una de descoperit?'],
+          ['Te-ai săturat de aceleași străzi?', 'Descoperă unele noi.'],
+          ['Îți petreci vineri seara acasă?', 'Sau iei cina într-un oraș nou?'],
+          ['Savurează-ți cafeaua de sâmbătă', 'cu o priveliște nouă.'],
+          ['Ai două zile libere.', 'Descoperă o mulțime de locuri noi.'],
+          ['Ai un weekend liber?', 'Alege-ți o destinație în Europa.'],
+          ['Ia cu tine un bagaj mic.', 'Adu acasă o poveste mare.'],
           ['Schimbă pentru două zile rutina', 'cu străzile unui oraș nou.'],
-          ['De câte ori ai spus „cândva”?', 'Poate că acum e weekendul potrivit.'],
+          ['De câte ori ai spus „cândva”?', 'Alege weekendul acesta.'],
           ['Nu ai nevoie de o vacanță lungă', 'ca să vezi lumea altfel.'],
-          ['Cum sună Big Ben la ora exactă?', 'E timpul să-l auzi pe viu.'],
-          ['Ce mai fac vikingii vremurilor noastre?', 'Hai să descoperim nordul Europei.']
+          ['Cum sună Big Ben la ora exactă?', 'E timpul să afli pe viu.'],
+          ['Ce mai fac vikingii vremurilor noastre?', 'E timpul să afli.']
         ];
         let last = -1;
         try { last = Number(sessionStorage.getItem('hero-headline-index') ?? -1); } catch (_) {}
@@ -274,7 +273,7 @@
         highlight.textContent = headlines[index][1];
         heading.appendChild(highlight);
       })();
-    </script><p>Un oraș nou, o masă bună, timp pentru voi. Acordă-ți o evadare scurtă, de weekend, din programul zilnic.</p></div><div class="hero-image"><div class="hero-image-label"><span>DESTINAȚIE DE WEEKEND</span><strong id="hero-city">Europa</strong></div></div></section>
+    </script><p>Un oraș nou, o masă bună, timp pentru tine. Acordă-ți o evadare scurtă, de weekend, din programul zilnic.</p></div><div class="hero-image"><div class="hero-image-label"><span>DESTINAȚIE DE WEEKEND</span><strong id="hero-city">Europa</strong></div></div></section>
 
     <!-- 2. PASUL 2: Selectare Oraș & Opțiuni Căutare -->
     <section id="configurator" class="search-panel">
