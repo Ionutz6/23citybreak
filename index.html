@@ -244,7 +244,37 @@
 
   <header class="site-header"><div class="header-inner"><a class="wordmark" href="#top" aria-label="23citybreak, pagina principală"><span class="plane-icon" aria-hidden="true">✈︎ </span><span>23</span><span class="wordmark-city">city</span><span>break</span></a><div class="header-right"><a href="jurnal.html">Jurnal</a></div></div></header>
   <main id="top" class="site-main">
-    <section class="hero"><div class="hero-copy"><h1>Weekendul e<br>mai aproape <em>decât crezi.</em></h1><p>Un oraș nou, o masă bună, timp pentru voi. Acordă-ți o evadare scurtă, de weekend, din programul zilnic.</p></div><div class="hero-image"><div class="hero-image-label"><span>DESTINAȚIE DE WEEKEND</span><strong id="hero-city">Europa</strong></div></div></section>
+    <section class="hero"><div class="hero-copy"><h1 id="hero-headline">Weekendul e mai aproape <em>decât crezi.</em></h1><script>
+      (() => {
+        const headlines = [
+          ['6 ore bară la bară pe Valea Prahovei?', 'Mai bine...'],
+          ['Locuim în orașul Europa.', 'I-am văzut toate cartierele?'],
+          ['Am văzut toate clădirile faimoase din Europa?', 'Da, pe toate, mai puțin...'],
+          ['Ce faci weekendul acesta?', 'Îți schimbi puțin orizontul.'],
+          ['Tot aceleași străzi?', 'Hai să descoperim unele noi.'],
+          ['Vineri seara acasă?', 'Sau la cină într-un oraș nou?'],
+          ['Cafeaua de sâmbătă are gust mai bun', 'cu o priveliște nouă.'],
+          ['Două zile libere.', 'O mulțime de locuri de descoperit.'],
+          ['Ai un weekend liber?', 'Europa are câteva idei.'],
+          ['Un bagaj mic.', 'O poveste mare de adus acasă.'],
+          ['Schimbă pentru două zile rutina', 'cu străzile unui oraș nou.'],
+          ['De câte ori ai spus „cândva”?', 'Poate că acum e weekendul potrivit.'],
+          ['Nu ai nevoie de o vacanță lungă', 'ca să vezi lumea altfel.'],
+          ['Cum sună Big Ben la ora exactă?', 'E timpul să-l auzi pe viu.'],
+          ['Ce mai fac vikingii vremurilor noastre?', 'Hai să descoperim nordul Europei.']
+        ];
+        let last = -1;
+        try { last = Number(sessionStorage.getItem('hero-headline-index') ?? -1); } catch (_) {}
+        let index = Math.floor(Math.random() * headlines.length);
+        if (headlines.length > 1 && index === last) index = (index + 1 + Math.floor(Math.random() * (headlines.length - 1))) % headlines.length;
+        try { sessionStorage.setItem('hero-headline-index', String(index)); } catch (_) {}
+        const heading = document.getElementById('hero-headline');
+        heading.replaceChildren(document.createTextNode(headlines[index][0] + ' '));
+        const highlight = document.createElement('em');
+        highlight.textContent = headlines[index][1];
+        heading.appendChild(highlight);
+      })();
+    </script><p>Un oraș nou, o masă bună, timp pentru voi. Acordă-ți o evadare scurtă, de weekend, din programul zilnic.</p></div><div class="hero-image"><div class="hero-image-label"><span>DESTINAȚIE DE WEEKEND</span><strong id="hero-city">Europa</strong></div></div></section>
 
     <!-- 2. PASUL 2: Selectare Oraș & Opțiuni Căutare -->
     <section id="configurator" class="search-panel">
