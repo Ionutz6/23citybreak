@@ -3234,8 +3234,18 @@
     // browser reports a TypeError). Retrying only extends the block, so a refusal stops the search.
     const PROVIDER_LIMIT_MESSAGE = "Furnizorul de zboruri limitează temporar căutările de pe rețeaua ta. Mai încearcă peste aproximativ 30 de minute.";
     let providerCautionUntil = 0;
+    // Only a failure of the network call itself counts as a refusal; a TypeError thrown
+    // later, while processing a valid answer, must not be reported as a provider limit.
+    async function flightFetch(url, options) {
+      try { return await fetch(url, options); }
+      catch (error) {
+        if (error?.name === "TypeError" && navigator.onLine !== false) error.providerRefusal = true;
+        console.warn("Cerere către furnizorul de zboruri eșuată:", error?.name, error?.message);
+        throw error;
+      }
+    }
     function isProviderRefusal(error) {
-      return error?.name === "TypeError" || error?.status === 403 || error?.status === 429;
+      return error?.providerRefusal === true || error?.status === 403 || error?.status === 429;
     }
     function isRetryableFlightError(error) {
       return error?.name === "TimeoutError" || error?.name === "AbortError" || error?.status >= 500;
@@ -3304,7 +3314,7 @@
           const batchPromises = batch.map(async wk => {
             const tripDates = getTripDates(wk);
             try {
-              const res = await fetch("https://api.skypicker.com/umbrella/v2/graphql", {
+              const res = await flightFetch("https://api.skypicker.com/umbrella/v2/graphql", {
                 method: "POST",
                 signal: AbortSignal.timeout(45000),
                 headers: { "Content-Type": "application/json" },
@@ -3500,7 +3510,7 @@
           const queryJob = async ({ wk, airport }) => {
             const tripDates = getTripDates(wk);
             try {
-              const request = () => fetch("https://api.skypicker.com/umbrella/v2/graphql", {
+              const request = () => flightFetch("https://api.skypicker.com/umbrella/v2/graphql", {
                 method: "POST",
                 signal: AbortSignal.timeout(45000),
                 headers: { "Content-Type": "application/json" },
@@ -3726,7 +3736,7 @@
 
           const tripDates = getTripDates(wk);
           try {
-            const resOut = await fetch("https://api.skypicker.com/umbrella/v2/graphql", {
+            const resOut = await flightFetch("https://api.skypicker.com/umbrella/v2/graphql", {
               method: "POST",
               signal: AbortSignal.timeout(45000),
               headers: { "Content-Type": "application/json" },
@@ -3765,7 +3775,7 @@
 
             if (destCityIds.size === 0) continue;
 
-            const resRet = await fetch("https://api.skypicker.com/umbrella/v2/graphql", {
+            const resRet = await flightFetch("https://api.skypicker.com/umbrella/v2/graphql", {
               method: "POST",
               signal: AbortSignal.timeout(45000),
               headers: { "Content-Type": "application/json" },
