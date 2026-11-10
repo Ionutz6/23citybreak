@@ -16,9 +16,11 @@ Se adaugă numele obiectivelor direct pe hărțile existente, în stilul aprobat
 - Veneția
 - Amsterdam
 - Viena
+- Milano
+- Madrid
 
 Harta originală pentru Praga avea deja etichete. Celelalte orașe din `assets/guides-prague-style/` necesită în continuare verificare și prelucrare. Actualizează această listă în același commit cu fiecare lot nou.
 
-Ilustrațiile fără etichete sunt păstrate în istoricul Git: pentru Roma și Barcelona folosește fișierul de la commitul `14f016a`, iar pentru Paris, Londra, Lisabona, Berlin și Bruxelles de la `508e691`. Pentru Budapesta, Atena, Veneția, Amsterdam și Viena se pot folosi originalele de la `48efdd5`. Copii locale sunt în `/workspace/guide-batch/original-illustrations` când acel director este disponibil. Păstrează imaginile originale pentru quiz.
+Ilustrațiile fără etichete sunt păstrate în istoricul Git: pentru Roma și Barcelona folosește fișierul de la commitul `14f016a`, iar pentru Paris, Londra, Lisabona, Berlin și Bruxelles de la `508e691`. Pentru Budapesta, Atena, Veneția, Amsterdam, Viena, Milano și Madrid se pot folosi originalele de la `48efdd5`. Copii locale sunt în `/workspace/guide-batch/original-illustrations` când acel director este disponibil. Păstrează imaginile originale pentru quiz.
 
 Nu modifica funcționalitatea de căutare a zborurilor în cadrul acestei activități.
