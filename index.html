@@ -1496,25 +1496,13 @@
       const day = iso => new Intl.DateTimeFormat('ro-RO', {weekday:'short', day:'numeric', month:'short', year:'numeric', timeZone:'UTC'}).format(new Date(`${iso}T12:00:00Z`));
       return `${day(dateOut)} – ${day(dateIn)}`;
     }
-    async function mapWithConcurrency(items, callback, shouldStop = () => false) {
+    async function mapWithConcurrency(items, limit, callback, shouldStop = () => false) {
       const output = new Array(items.length);
-      let next = 0, active = 0, limit = 12;
-      return new Promise((resolve, reject) => {
-        function pump() {
-          if (active === 0 && (next >= items.length || shouldStop())) return resolve(output);
-          while (next < items.length && active < limit && !shouldStop()) {
-            const index = next++;
-            active++;
-            Promise.resolve().then(() => callback(items[index], index)).then(result => {
-              output[index] = result;
-              active--;
-              limit = result.failed ? Math.max(4, Math.floor(limit / 2)) : Math.min(40, limit + 1);
-              pump();
-            }, reject);
-          }
-        }
-        pump();
-      });
+      let next = 0;
+      await Promise.all(Array.from({length: Math.min(limit, items.length)}, async () => {
+        while (next < items.length && !shouldStop()) { const index = next++; output[index] = await callback(items[index], index); }
+      }));
+      return output;
     }
 
     function carrierName(code) {
@@ -3541,7 +3529,7 @@
             }
           };
 
-          const results = (await mapWithConcurrency(jobs, queryJob, () => completedRequests >= 12 && failedRequests === completedRequests)).filter(Boolean);
+          const results = (await mapWithConcurrency(jobs, 40, queryJob, () => completedRequests >= 40 && failedRequests === completedRequests)).filter(Boolean);
           const incompleteSearch = failedRequests > 0 || completedRequests < jobs.length;
           if (completedRequests === failedRequests) {
             updateSearchStatus(`Serviciul de zboruri nu a răspuns la cererile verificate (${failedRequests} eșuate). Căutarea a fost oprită; nu putem spune dacă există zboruri. Încearcă din nou.`, 100, "error");
