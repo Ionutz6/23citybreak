@@ -194,6 +194,17 @@
     .option-fields > .space-y-3 { grid-column:1/-1; }
     #weekend-chips-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; }
     .calendar-month { background:#fff; border:1px solid #e6dfd2; border-radius:10px; padding:10px; min-width:0; }
+
+    .calendar-weekdays,.calendar-days {display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:2px}
+    .calendar-weekdays {margin-bottom:4px}.calendar-weekdays span {text-align:center;color:#777a76;font-size:10px;font-weight:700}
+    .calendar-day {height:32px;min-width:0;display:grid;place-items:center;border:1px solid transparent;border-radius:5px;font-size:12px;color:#4c504b}
+    .calendar-day.available {background:#fff8ea;border-color:#e9c88d;color:#3c3428;cursor:pointer;font-weight:700}
+    .calendar-day.available:hover {background:#f9e5bb}.calendar-day.available.selected {background:#171816;color:#f2c379;border-color:#171816}
+    .calendar-day.holiday:not(.selected) {box-shadow:inset 0 -3px #dfa649}.calendar-day:focus-visible {outline:3px solid #bd8c45;outline-offset:1px;position:relative;z-index:2}
+    .calendar-holidays {font-size:10px;line-height:1.4;color:#805a21;margin:9px 0 0;overflow-wrap:anywhere}
+    .calendar-legend {display:flex;gap:14px;flex-wrap:wrap;margin:12px 0 2px;color:#656961;font-size:11px;font-weight:700}.calendar-legend span {display:flex;align-items:center;gap:6px}.calendar-legend i {width:17px;height:15px;border-radius:4px;border:1px solid #e0b675;background:#fff8ea}.calendar-legend .selected {background:#171816;border-color:#171816}.calendar-legend .holiday {box-shadow:inset 0 -3px #dfa649}
+    @media(max-width:600px) {.period-section #weekend-chips-grid {grid-template-columns:1fr}.calendar-month {padding:12px}.calendar-day {height:42px;font-size:13px}.calendar-days,.calendar-weekdays {gap:2px} .calendar-holidays {font-size:11px}}
+
     .calendar-month h4 { font-weight:800; font-size:13px; margin:0 0 8px; } .month-weekends { display:grid; gap:5px; } .month-weekends button { width:100%; }
     #main-matrix-table .matrix-city-column { position:sticky; left:0; z-index:2; background:#fbfbfd; box-shadow:5px 0 8px -8px rgba(10,11,13,.35); }
     #main-matrix-table th.matrix-city-column { z-index:3; }
@@ -405,6 +416,7 @@
       <div id="selected-years" class="selected-years" aria-label="Weekenduri selectate pe ani" aria-live="polite"></div>
 
       <!-- Weekend Chips Grid -->
+      <div class="calendar-legend" aria-label="Legenda calendarului"><span><i aria-hidden="true"></i> Perioadă disponibilă</span><span><i class="selected" aria-hidden="true"></i> Perioadă selectată</span><span><i class="holiday" aria-hidden="true"></i> Sărbătoare legală</span></div>
       <div id="weekend-chips-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 pt-2">
         <!-- Rendered by JS -->
       </div>
@@ -1131,7 +1143,7 @@
           : `Până la ${formatMoney(amount)}`;
       });
       document.getElementById('unit-label').textContent = `Preț în ${displayCurrency === 'RON' ? 'RON (orientativ)' : '€'} ${currentMode === 1 ? 'per persoană' : 'total grup'}, tur–retur (click pe orice căsuță pentru cumpărare)`;
-      document.getElementById('currency-note').textContent = displayCurrency === 'RON' ? `Bugetul în RON este rotunjit orientativ la 1 EUR ≈ 5 RON; filtrul folosește praguri în EUR. Prețurile afișate folosesc cursul BCE: 1 EUR = ${ronRate.toFixed(4)} RON (${ronRateDate}). Plata se verifică la furnizor.` : '';
+      document.getElementById('currency-note').textContent = '';
     }
     // View Mode & Vibe State (Option 4 Redesign)
     let currentViewMode = "cards"; // "cards" | "table"
@@ -2133,25 +2145,42 @@
       document.getElementById('calendar-prev-year').disabled = calendarYear <= Number(ALL_WEEKENDS[0].fri.slice(0, 4));
       document.getElementById('calendar-next-year').disabled = calendarYear >= Number(ALL_WEEKENDS.at(-1).fri.slice(0, 4));
       
-      let chipsHtml = "";
-      let lastMonth = "";
-      visibleWks.forEach(w => {
-        if (w.monthKey !== lastMonth) { if (lastMonth) chipsHtml += "</div></section>"; lastMonth = w.monthKey; chipsHtml += `<section class="calendar-month"><h4>${w.monthName}</h4><div class="month-weekends">`; }
-        const isSel = selectedWkIds.has(w.id);
-        const tripDates = getTripDates(w);
-        const tagBadge = w.tag ? `<span class="holiday-badge text-[10px] px-1.5 py-0.5 rounded-md font-bold ${isSel ? 'bg-[#dfa649] text-[#0a0b0d]' : 'bg-[#fce8bd] text-[#5c3b06]'} ml-1">${w.tag}</span>` : "";
-        chipsHtml += `
-          <button onclick="toggleWeekend('${w.id}')"
-                  class="flex items-center justify-between p-2.5 rounded-xl text-xs transition cursor-pointer border text-left font-display shadow-2xs ${isSel ? 'bg-[#0a0b0d] text-[#dfa649] border-[#0a0b0d] font-bold shadow-xs' : 'bg-[#f8f9fa] text-[#0a0b0d] border-[#dce1e7] hover:bg-[#fce8bd] hover:border-[#dfa649]'}">
-            <div>
-              <div class="leading-tight font-bold">${w.dLabel} ${w.mLabel} ${tagBadge}</div>
-              <div class="text-[10px] opacity-75 mt-0.5 font-normal whitespace-nowrap">${formatTripSpan(tripDates.dateOut, tripDates.dateIn)}</div>
-            </div>
-            <span class="text-sm ml-1 font-bold">${isSel ? '✓' : '+'}</span>
-          </button>
-        `;
-      });
-      if (lastMonth) chipsHtml += "</div></section>";
+      const monthNames = ["Ianuarie", "Februarie", "Martie", "Aprilie", "Mai", "Iunie", "Iulie", "August", "Septembrie", "Octombrie", "Noiembrie", "Decembrie"];
+      const weekdays = ["Lu", "Ma", "Mi", "Jo", "Vi", "Sâ", "Du"];
+      const holidayNames = romanianPublicHolidays(calendarYear);
+      const dayPeriods = new Map();
+      for (const weekend of ALL_WEEKENDS) {
+        if (currentTripMode === 'extended' && weekend.holidayType !== 'extended') continue;
+        const trip = getTripDates(weekend);
+        for (let day = trip.dateOut; day <= trip.dateIn; day = shiftCivilDate(day, 1)) {
+          if (!dayPeriods.has(day)) dayPeriods.set(day, weekend);
+        }
+      }
+      let chipsHtml = '';
+      for (let month = 0; month < 12; month++) {
+        const first = new Date(Date.UTC(calendarYear, month, 1));
+        const firstWeekday = (first.getUTCDay() + 6) % 7;
+        const daysInMonth = new Date(Date.UTC(calendarYear, month + 1, 0)).getUTCDate();
+        const monthPrefix = `${calendarYear}-${String(month + 1).padStart(2, '0')}`;
+        chipsHtml += `<section class="calendar-month" aria-label="${monthNames[month]} ${calendarYear}"><h4>${monthNames[month]}</h4><div class="calendar-weekdays" aria-hidden="true">${weekdays.map(d => `<span>${d}</span>`).join('')}</div><div class="calendar-days">`;
+        chipsHtml += '<span class="calendar-day" aria-hidden="true"></span>'.repeat(firstWeekday);
+        const holidayNotes = [];
+        for (let day = 1; day <= daysInMonth; day++) {
+          const date = `${monthPrefix}-${String(day).padStart(2, '0')}`;
+          const holiday = holidayNames.get(date);
+          const weekend = dayPeriods.get(date);
+          if (holiday) holidayNotes.push(`${day} ${holiday}`);
+          if (weekend) {
+            const trip = getTripDates(weekend);
+            const selected = selectedWkIds.has(weekend.id);
+            const label = `${day} ${monthNames[month]} ${calendarYear}${holiday ? ', ' + holiday : ''}. Perioada ${formatTripSpan(trip.dateOut, trip.dateIn)}${weekend.tag ? ', ' + weekend.tag : ''}`;
+            chipsHtml += `<button type="button" class="calendar-day available${selected ? ' selected' : ''}${holiday ? ' holiday' : ''}" data-calendar-date="${date}" aria-label="${escapeHtml(label)}" aria-pressed="${selected}" onclick="toggleCalendarDay('${weekend.id}', '${date}')">${day}</button>`;
+          } else {
+            chipsHtml += `<span class="calendar-day${holiday ? ' holiday' : ''}"${holiday ? ` title="${escapeHtml(holiday)}"` : ''}>${day}</span>`;
+          }
+        }
+        chipsHtml += `</div>${holidayNotes.length ? `<p class="calendar-holidays">${holidayNotes.map(escapeHtml).join(' · ')}</p>` : ''}</section>`;
+      }
       gridEl.innerHTML = chipsHtml;
 
       const selectedYears = [...selectedWkIds].reduce((counts, id) => {
@@ -2211,6 +2240,11 @@
       renderWeekendSelectorUI();
       renderCrossEngineBar();
       renderMatrix();
+    }
+
+    function toggleCalendarDay(id, date) {
+      toggleWeekend(id);
+      document.querySelector(`[data-calendar-date="${date}"]`)?.focus({preventScroll:true});
     }
 
     function toggleWeekend(id) {
@@ -3918,6 +3952,7 @@
 
     function setSimpleTripMode(mode) {
       currentTripMode = mode === 'extended' ? 'extended' : 'classic';
+      if (currentTripMode === 'extended') selectedWkIds = new Set([...selectedWkIds].filter(id => ALL_WEEKENDS.some(w => w.id === id && w.holidayType === 'extended')));
       for (const [id, value] of Object.entries({'f-adults':'2', 'f-max-price': mode === 'extended' ? '250' : '150', 'quick-duration':'180', 'f-max-dur':'180', 'f-fri-dep':'18:00', 'f-out-arr':'01:00', 'f-sun-dep':'15:00', 'f-in-arr':'02:00'})) document.getElementById(id).value = value;
       document.getElementById('classic-mode').classList.toggle('active', mode === 'classic');
       document.getElementById('extended-mode').classList.toggle('active', mode === 'extended');
