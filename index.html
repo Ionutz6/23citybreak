@@ -234,6 +234,10 @@
     #main-matrix-table td.matrix-city-column + td{padding-left:10px}
     .whatsapp-share{background:#127b39!important;color:white!important;border:1.5px solid #65d98a!important}
     .whatsapp-share:hover{background:#0c6b30!important}.whatsapp-share:focus-visible{outline:3px solid #b2f4c4;outline-offset:2px}
+    /* Reserve three headline lines so carousel changes do not move the page. */
+    .hero h1 { --hero-title-base: clamp(32px, 3.5vw, 52px); font-size: var(--hero-title-base); line-height: 1.08; height: calc(var(--hero-title-base) * 3.24); transition: none !important; }
+    .hero h1 em { transition: none !important; }
+    @media(max-width:600px) { .hero h1 { --hero-title-base: 32px; } }
     .hero-image-label strong{text-shadow:0 2px 10px rgba(0,0,0,.65)}
     .photo-credits{max-width:1440px;width:100%;margin:18px auto 0;padding:0 clamp(16px,2vw,30px);color:#606b61;font-size:12px}
     .photo-credits summary{cursor:pointer;font-weight:700}.photo-credits ul{padding-left:18px;margin:8px 0}.photo-credits a{text-decoration:underline}
@@ -348,7 +352,7 @@
     <section class="period-section">
       <div class="period-heading"><div><h3>1. Hai să găsim următorul zbor.</h3><p id="subtitle-summary" class="text-xs text-[#64748b] mt-1">Alege tipul de weekend, apoi bifează una sau mai multe perioade din calendar.</p></div><span id="selected-wk-badge" class="period-count"></span></div>
       <div class="period-options"><button type="button" id="classic-mode" class="period-choice active" onclick="setSimpleTripMode('classic')"><strong>Weekend clasic</strong><small>Vineri – duminică · 2 nopți</small></button><button type="button" id="extended-mode" class="period-choice" onclick="setSimpleTripMode('extended')"><strong>Weekend prelungit</strong><small>Sărbători legale și zile-punte · pot necesita concediu</small></button></div>
-      <div class="mt-4 rounded-xl border border-[#eee5d4] bg-[#fffdf8] p-3"><div class="text-[11px] font-black uppercase tracking-wider text-[#8a5d14] mb-2">Alege perioada</div><div class="flex flex-wrap gap-2"><button class="calendar-range-choice" onclick="selectCalendarRange('next-month')">Luna următoare</button><button class="calendar-range-choice" onclick="selectCalendarRange('next-2-months')">Următoarele 2 luni</button><button id="range-winter" class="calendar-range-choice" onclick="selectCalendarRange('winter')">Iarna <span data-range-year></span></button><button id="range-spring" class="calendar-range-choice" onclick="selectCalendarRange('spring')">Primăvara <span data-range-year></span></button><button id="range-summer" class="calendar-range-choice" onclick="selectCalendarRange('summer')">Vara <span data-range-year></span></button><button id="range-autumn" class="calendar-range-choice" onclick="selectCalendarRange('autumn')">Toamna <span data-range-year></span></button><button class="calendar-range-choice" onclick="selectCalendarRange('year')">Tot anul <span data-range-year></span></button></div></div>
+      <div class="mt-4 rounded-xl border border-[#eee5d4] bg-[#fffdf8] p-3"><div class="text-[11px] font-black uppercase tracking-wider text-[#8a5d14] mb-2">Alege perioada</div><div class="flex flex-wrap gap-2"><button class="calendar-range-choice" onclick="selectCalendarRange('next-month')">Luna următoare</button><button class="calendar-range-choice" onclick="selectCalendarRange('next-2-months')">Următoarele 2 luni</button><button id="range-spring" class="calendar-range-choice" onclick="selectCalendarRange('spring')">Primăvara <span data-range-year></span></button><button id="range-summer" class="calendar-range-choice" onclick="selectCalendarRange('summer')">Vara <span data-range-year></span></button><button id="range-autumn" class="calendar-range-choice" onclick="selectCalendarRange('autumn')">Toamna <span data-range-year></span></button><button id="range-winter" class="calendar-range-choice" onclick="selectCalendarRange('winter')">Iarna <span data-range-year></span></button><button class="calendar-range-choice" onclick="selectCalendarRange('year')">Tot anul <span data-range-year></span></button></div></div>
       <div class="calendar-details calendar-details-open">
       <!-- Quick Preset Buttons (Clasice, Extinse, Iarnă, Primăvară) - FĂRĂ vacanțe copii -->
       <div class="hidden">
@@ -3969,6 +3973,22 @@
         img.src = url;
       });
     }
+    function fitHeroHeadline() {
+      const heading = document.getElementById('hero-headline');
+      if (!heading) return;
+      heading.style.fontSize = '';
+      let size = parseFloat(getComputedStyle(heading).fontSize);
+      const range = document.createRange();
+      range.selectNodeContents(heading);
+      const lineCount = () => new Set(Array.from(range.getClientRects(), rect => rect.width ? Math.round(rect.top) : null).filter(top => top !== null)).size;
+      while ((lineCount() > 3 || heading.scrollHeight > heading.clientHeight + 1) && size > 16) {
+        size -= 0.5;
+        heading.style.fontSize = `${size}px`;
+      }
+    }
+    window.addEventListener('resize', fitHeroHeadline);
+    document.fonts?.ready.then(fitHeroHeadline);
+    fitHeroHeadline();
     async function advanceHero() {
       let shown = false;
       for (let attempts = 0; attempts < 4 && !shown; attempts++) {
@@ -3988,6 +4008,7 @@
         const highlight = document.createElement('em');
         highlight.textContent = headline[1];
         heading.replaceChildren(document.createTextNode(headline[0] + ' '), highlight);
+        fitHeroHeadline();
         registerPhotoCredit(item.image, `${item.name}, ${item.country}`, photo);
         shown = true;
       }
