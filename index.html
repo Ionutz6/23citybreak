@@ -301,6 +301,7 @@
             </div>
           </div>
 
+          <p id="bruges-transfer-note" hidden class="mt-2 text-xs text-[#64748b] leading-relaxed">Căutăm zboruri către Ostend–Bruges (OST), Bruxelles (BRU) și Charleroi (CRL). Transferul spre Bruges se organizează separat și nu este inclus în preț.</p>
           <select id="f-destination" class="hidden">
             <option value="any" selected>🌟 Oricare (Toată Europa)</option>
           </select>
@@ -915,6 +916,7 @@
       { id: "City:basel_ch", name: "Basel", country: "Elveția", flag: "🇨🇭", iata: "BSL", code: "bsl" },
 
       // Benelux
+      { id: "City:bruges_be", name: "Bruges", country: "Belgia", flag: "🇧🇪", iata: "OST / BRU / CRL", code: "bruges" },
       { id: "City:brussels_be", name: "Bruxelles", country: "Belgia", flag: "🇧🇪", iata: "BRU", code: "crl" },
       { id: "City:amsterdam_nl", name: "Amsterdam", country: "Olanda", flag: "🇳🇱", iata: "AMS", code: "ams" },
       { id: "City:eindhoven_nl", name: "Eindhoven", country: "Olanda", flag: "🇳🇱", iata: "EIN", code: "ein" },
@@ -1973,6 +1975,7 @@
       if (!city) return;
 
       selectedCityObj = city;
+      document.getElementById("bruges-transfer-note").hidden = city.id !== "City:bruges_be";
       const input = document.getElementById("dest-search-input");
       const clearBtn = document.getElementById("dest-clear-btn");
       const nativeSelect = document.getElementById("f-destination");
@@ -2352,6 +2355,7 @@
       return cityPhotoCache.get(cityId);
     }
     const illustratedGuides = {
+      "City:bruges_be": {"image": "bruges", "extension": "webp", "city": "Bruges", "legend": [["•", "Markt și Belfort", "Piața centrală și clopotnița medievală."], ["•", "Burg", "Piață istorică lângă primărie și bazilică."], ["•", "Basilica Sfântului Sânge", "Bazilică istorică în Piața Burg."], ["•", "Rozenhoedkaai", "Colț al canalului cunoscut pentru priveliștile spre oraș."], ["•", "Begijnhof", "Ansamblu liniștit de case și curți istorice."]], "days": [{"story": "Începe în Markt, admiră Belfort și continuă spre Piața Burg și Basilica Sfântului Sânge. Încheie la Rozenhoedkaai, lângă canal.", "stops": ["Markt, Bruges, Belgium", "Belfry of Bruges, Belgium", "Burg Square, Bruges, Belgium", "Basilica of the Holy Blood, Bruges, Belgium", "Rozenhoedkaai, Bruges, Belgium"]}, {"story": "Plimbă-te de-a lungul canalelor spre Biserica Maicii Domnului, Begijnhof și lacul Minnewater.", "stops": ["Church of Our Lady Bruges, Belgium", "Begijnhof Bruges, Belgium", "Minnewater Park, Bruges, Belgium"]}], "insight": {"city": "Bruges · Belgia", "weather": "Primăvara și vara oferă zile mai lungi pentru plimbări; ploaia este posibilă în orice anotimp.", "transfer": "Pentru Ostend–Bruges, verifică legăturile spre gara Ostend și apoi trenul către Bruges. Din Bruxelles (BRU) sau Charleroi (CRL), verifică trenurile și autobuzele disponibile. Transferul nu este inclus în prețul zborului.", "vibe": "Canale, piețe medievale, clopotnițe, ciocolată belgiană și străzi de explorat la pas."}},
       "City:cologne_de": {"image": "koln-bonn", "city": "Köln și Bonn", "legend": [["•", "Domul din Köln", "Catedrala gotică și cele două turnuri ale sale domină centrul orașului."], ["•", "Podul Hohenzollern", "Pod feroviar și pietonal peste Rin, cunoscut pentru lacătele iubirii."], ["•", "Orașul vechi din Köln", "Străduțe, piețe și case colorate aproape de malul Rinului."], ["•", "Muzeul Ciocolatei", "Muzeu pe malul Rinului, dedicat istoriei și producerii ciocolatei."], ["•", "Münsterplatz din Bonn", "Piață centrală lângă bazilica Bonn Minster și monumentul Beethoven."], ["•", "Casa Beethoven din Bonn", "Casa natală a compozitorului, amenajată ca muzeu."]], "days": [{"story": "Descoperă Köln la pas: începe la Dom, traversează Podul Hohenzollern pentru o panoramă, apoi revino în orașul vechi și urmează malul Rinului spre Muzeul Ciocolatei.", "stops": ["Cologne Cathedral, Cologne, Germany", "Hohenzollern Bridge, Cologne, Germany", "Fischmarkt, Cologne, Germany", "Schokoladenmuseum, Cologne, Germany"]}, {"story": "Ia trenul din Köln spre Bonn, apoi explorează centrul istoric: Casa Beethoven, Marktplatz și Bonn Minster. Traseul Google Maps arată plimbarea din Bonn; călătoria cu trenul se face separat.", "stops": ["Beethoven-Haus Bonn, Germany", "Marktplatz, Bonn, Germany", "Bonn Minster, Bonn, Germany", "Hofgarten Bonn, Germany"]}], "insight": {"city": "Köln și Bonn · Germania", "weather": "Primăvara și toamna sunt plăcute pentru plimbări; vara poate fi caldă, iar iarna răcoroasă. O jachetă de ploaie este utilă în orice anotimp.", "transfer": "Aeroportul Köln/Bonn (CGN) are gară proprie și legături feroviare spre Köln și Bonn; verifică ruta și orarul pentru gara de destinație. Între cele două orașe există trenuri regulate.", "vibe": "Catedrala din Köln, promenade pe Rin, orașe vechi și moștenirea muzicală a lui Beethoven în Bonn."}, "imageNote": "Ilustrația prezintă Köln; pentru Bonn găsești itinerarul în ziua a doua.", "extension": "webp"},
       "City:glasgow_gb": {"image": "glasgow", "city": "Glasgow", "legend": [["•", "Catedrala Glasgow", "Catedrală medievală în estul centrului."], ["•", "George Square", "Piață centrală lângă City Chambers."], ["•", "City Chambers", "Clădire civică victoriană."], ["•", "Universitatea din Glasgow", "Ansamblu istoric în West End."], ["•", "Kelvingrove", "Muzeu și galerie de artă lângă parc."]], "days": [{"story": "Începe în George Square și continuă spre Catedrala Glasgow și Necropolis, pentru priveliști asupra orașului.", "stops": ["George Square, Glasgow, UK", "Glasgow Cathedral, UK", "Glasgow Necropolis, UK"]}, {"story": "Explorează West End: Universitatea, Kelvingrove Park și muzeul Kelvingrove. Folosește transportul public între centru și West End.", "stops": ["University of Glasgow, UK", "Kelvingrove Park, Glasgow, UK", "Kelvingrove Art Gallery and Museum, Glasgow, UK"]}], "insight": {"city": "Glasgow · Regatul Unit", "weather": "Vremea este schimbătoare, iar ploaia poate apărea tot anul; ia o jachetă impermeabilă.", "transfer": "Aeroportul Glasgow are legături cu autobuzul spre centru. Dacă aterizezi la Prestwick, verifică legătura feroviară separat.", "vibe": "Arhitectură victoriană, muzee, muzică și cartiere cu cafenele."}, "extension": "webp"},
       "City:ljubljana_si": {"image": "ljubljana", "city": "Ljubljana", "legend": [["•", "Castelul Ljubljana", "Castel pe colină deasupra centrului."], ["•", "Podul Triplu", "Ansamblu de poduri lângă Piața Prešeren."], ["•", "Podul Dragonilor", "Pod decorat cu dragoni, simbolul orașului."], ["•", "Piața Prešeren", "Piață centrală lângă râu."], ["•", "Râul Ljubljanica", "Maluri cu cafenele și promenade."]], "days": [{"story": "Începe în Piața Prešeren, traversează Podul Triplu și plimbă-te pe malul râului până la Podul Dragonilor.", "stops": ["Prešeren Square, Ljubljana, Slovenia", "Triple Bridge, Ljubljana, Slovenia", "Dragon Bridge, Ljubljana, Slovenia"]}, {"story": "Urcă pe colină la Castelul Ljubljana, apoi coboară spre Piața Orașului și malurile Ljubljanicăi.", "stops": ["Ljubljana Castle, Slovenia", "Town Square, Ljubljana, Slovenia", "Cobblers' Bridge, Ljubljana, Slovenia"]}], "insight": {"city": "Ljubljana · Slovenia", "weather": "Primăvara și toamna sunt plăcute; vara poate fi caldă, iar iarna rece. Ia o jachetă de ploaie.", "transfer": "Autobuzele leagă aeroportul Ljubljana de oraș. Verifică orarul și stațiile pentru ora sosirii.", "vibe": "Centru compact, poduri, cafenele pe malul râului și priveliști de la castel."}, "extension": "webp"},
@@ -2678,6 +2682,7 @@
                 <h3 class="font-display text-xl sm:text-2xl font-black text-white tracking-tight flex items-center gap-2 flex-wrap drop-shadow-md">
                   <span>${r.city}</span>
                 </h3>
+                ${r.cityId === "City:bruges_be" ? `<div class="text-xs text-[#e2e8f0] mt-1">Aeroport: ${escapeHtml(r.airportName)} (${escapeHtml(r.iata)}) · transfer spre Bruges separat</div>` : ""}
                 <div class="text-xs text-[#cbd5e1] font-medium font-body flex items-center gap-1.5 mt-0.5">
                   <span>📅</span> <span>${datesLabel}</span>
                 </div>
@@ -3370,8 +3375,15 @@
 
           let failedRequests = 0;
           let completedRequests = 0;
-          updateSearchStatus(`Căutăm zboruri pentru ${cityName} (0/${activeWks.length})...`, 0, "loading");
-          const promises = activeWks.map(async (wk, i) => {
+          const isBruges = destVal === "City:bruges_be";
+          const searchAirports = isBruges ? [
+            { id: "Station:airport:OST", iata: "OST", name: "Ostend–Bruges" },
+            { id: "Station:airport:BRU", iata: "BRU", name: "Bruxelles" },
+            { id: "Station:airport:CRL", iata: "CRL", name: "Charleroi" }
+          ] : [{ id: destVal, iata: null }];
+          const jobs = activeWks.flatMap(wk => searchAirports.map(airport => ({ wk, airport })));
+          updateSearchStatus(`Căutăm zboruri pentru ${cityName} (0/${jobs.length})...`, 0, "loading");
+          const promises = jobs.map(async ({ wk, airport }) => {
             const tripDates = getTripDates(wk);
             try {
               const res = await fetch("https://api.skypicker.com/umbrella/v2/graphql", {
@@ -3386,7 +3398,7 @@
                       cabinClass: { cabinClass: "ECONOMY" },
                       itinerary: {
                         source: { ids: [originCityId] },
-                        destination: { ids: [destVal] },
+                        destination: { ids: [airport.id] },
                         outboundDepartureDate: { start: `${tripDates.dateOut}T${friDep}:00`, end: `${tripDates.dateOut}T23:59:59` },
                         inboundDepartureDate: { start: `${tripDates.dateIn}T${sunDep}:00`, end: `${tripDates.dateIn}T23:59:59` }
                       }
@@ -3401,13 +3413,13 @@
                 })
               });
               const json = await readFlightResponse(res);
-              return { wk, itins: json?.data?.returnItineraries?.itineraries || [] };
+              return { wk, airport, itins: json?.data?.returnItineraries?.itineraries || [] };
             } catch (e) {
               failedRequests++;
-              return { wk, itins: [] };
+              return { wk, airport, itins: [] };
             } finally {
               completedRequests++;
-              updateSearchStatus(`Căutăm zboruri pentru ${cityName} (${completedRequests}/${activeWks.length})...`, Math.floor(completedRequests / activeWks.length * 95), "loading");
+              updateSearchStatus(`Căutăm zboruri pentru ${cityName} (${completedRequests}/${jobs.length})...`, Math.floor(completedRequests / jobs.length * 95), "loading");
             }
           });
 
@@ -3419,13 +3431,14 @@
           updateSearchStatus("Procesăm cele mai bune tarife...", 98, "loading");
 
           const targetCellsMap = {};
+          const brugesCellsByAirport = new Map();
           let targetCityTitle = cityName;
           let targetCode = destIata.toLowerCase();
           let targetAirline = "Companie aeriană";
           let totalFound = 0;
 
           function processItineraries(allowStops, allowDurMin) {
-            results.forEach(({ wk, itins }) => {
+            results.forEach(({ wk, airport, itins }) => {
               const tripDates = getTripDates(wk);
               for (const it of itins) {
                 const outSegs = it.outbound?.sectorSegments || [];
@@ -3442,6 +3455,7 @@
 
                 const outOrig = outFirst.source.station.code;
                 const outDest = outLast.destination.station.code;
+                if (isBruges && outDest !== airport.iata) continue;
                 targetCode = outDest.toLowerCase();
                 targetCityTitle = outLast.destination.station.city?.name || cityName;
 
@@ -3482,6 +3496,11 @@
                   stops: Math.max(outSegs.length - 1, inSegs.length - 1)
                 };
 
+                if (isBruges) {
+                  if (!brugesCellsByAirport.has(outDest)) brugesCellsByAirport.set(outDest, { airport, cellsMap: {} });
+                  const cells = brugesCellsByAirport.get(outDest).cellsMap;
+                  if (!cells[wk.id] || cellObj.perPaxEur < cells[wk.id].perPaxEur) cells[wk.id] = cellObj;
+                }
                 if (!targetCellsMap[wk.id] || cellObj.perPaxEur < targetCellsMap[wk.id].perPaxEur) {
                   targetCellsMap[wk.id] = cellObj;
                   totalFound++;
@@ -3507,8 +3526,14 @@
             cellsMap: targetCellsMap
           };
 
-          currentRows = currentRows.filter(r => r.cityId !== destVal && r.code !== targetCode);
-          currentRows.unshift(newRow);
+          currentRows = currentRows.filter(r => r.cityId !== destVal && (isBruges || r.code !== targetCode));
+          if (isBruges) {
+            for (const [iata, result] of brugesCellsByAirport) {
+              currentRows.push({ city: "Bruges", airportName: result.airport.name, cityGroup: "Bruges", sub: `${iata} · transfer spre Bruges separat`, code: iata.toLowerCase(), iata, cityId: destVal, skyTo: iata.toLowerCase(), cellsMap: result.cellsMap });
+            }
+          } else {
+            currentRows.unshift(newRow);
+          }
 
           if (fallbackUsed) {
             updateSearchStatus(`✅ Am găsit zboruri pentru ${targetCityTitle} (cu 1 escală, neavând zbor direct din București). Sfat: Verifică și Manchester (direct la 45 min de Liverpool)!`, 100, "success");
