@@ -1242,7 +1242,7 @@
     }
 
     function shareTripWhatsApp(cityName, dates, price, flightInfo, bookUrl) {
-      const text = `✈️ City Break în ${cityName}!\n📅 Weekend: ${dates}\n💰 De la ${formatMoney(Number(price))} / pers tur–retur\n🛫 Zbor: ${flightInfo}\n🔗 Rezervă direct: ${bookUrl || 'https://23citybreak.ro/'}`;
+      const text = `Am găsit escapada asta pe 23citybreak ✈️\n\n📍 ${cityName}\n📅 Weekend: ${dates}\n💰 De la ${formatMoney(Number(price))} / persoană, tur-retur\n🔗 Vezi oferta: ${bookUrl || 'https://23citybreak.ro/'}\n\nDescoperă și alte zboruri: https://23citybreak.ro/`;
       const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
       window.open(url, '_blank');
     }
