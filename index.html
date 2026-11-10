@@ -202,6 +202,18 @@
     .calendar-day.available:hover {background:#f9e5bb}.calendar-day.available.selected {background:#171816;color:#f2c379;border-color:#171816}
     .calendar-day.holiday:not(.selected) {box-shadow:inset 0 -3px #dfa649}.calendar-day:focus-visible {outline:3px solid #bd8c45;outline-offset:1px;position:relative;z-index:2}
     .calendar-holidays {font-size:10px;line-height:1.4;color:#805a21;margin:9px 0 0;overflow-wrap:anywhere}
+    .mobile-month-nav,.mobile-month-tip {display:none}
+    @media(max-width:600px) {
+      .mobile-month-nav {display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0 3px}
+      .mobile-month-nav strong {font-family:var(--font-display);font-size:15px;text-align:center}
+      .mobile-month-nav button {width:42px;height:42px;border:1px solid #e4d3b5;border-radius:10px;background:#fffdf8;font-size:20px;cursor:pointer}
+      .mobile-month-nav button:disabled {opacity:.35;cursor:default}
+      .mobile-month-nav button:focus-visible {outline:3px solid #bd8c45;outline-offset:2px}
+      .mobile-month-tip {display:block;font-size:11px;color:#777a76;text-align:center;margin:3px 0 0}
+      #weekend-chips-grid {touch-action:pan-y}
+      #weekend-chips-grid .calendar-month:not(.mobile-current) {display:none}
+      #weekend-chips-grid .calendar-month.mobile-current h4 {display:none}
+    }
     .calendar-legend {display:flex;gap:14px;flex-wrap:wrap;margin:12px 0 2px;color:#656961;font-size:11px;font-weight:700}.calendar-legend span {display:flex;align-items:center;gap:6px}.calendar-legend i {width:17px;height:15px;border-radius:4px;border:1px solid #e0b675;background:#fff8ea}.calendar-legend .selected {background:#171816;border-color:#171816}.calendar-legend .holiday {box-shadow:inset 0 -3px #dfa649}
     @media(max-width:600px) {.period-section #weekend-chips-grid {grid-template-columns:1fr}.calendar-month {padding:12px}.calendar-day {height:42px;font-size:13px}.calendar-days,.calendar-weekdays {gap:2px} .calendar-holidays {font-size:11px}}
 
@@ -417,6 +429,8 @@
 
       <!-- Weekend Chips Grid -->
       <div class="calendar-legend" aria-label="Legenda calendarului"><span><i aria-hidden="true"></i> Perioadă disponibilă</span><span><i class="selected" aria-hidden="true"></i> Perioadă selectată</span><span><i class="holiday" aria-hidden="true"></i> Sărbătoare legală</span></div>
+      <div class="mobile-month-nav" aria-label="Navigare între luni"><button type="button" id="mobile-month-prev" aria-label="Luna anterioară" onclick="shiftMobileCalendarMonth(-1)">←</button><strong id="mobile-month-title" aria-live="polite"></strong><button type="button" id="mobile-month-next" aria-label="Luna următoare" onclick="shiftMobileCalendarMonth(1)">→</button></div>
+      <p class="mobile-month-tip">Glisează spre stânga sau dreapta pentru a schimba luna.</p>
       <div id="weekend-chips-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 pt-2">
         <!-- Rendered by JS -->
       </div>
@@ -1115,7 +1129,8 @@
     // Selection State
     let selectedWkIds = new Set();
     let currentMonthFilter = "all";
-    let calendarYear = ALL_WEEKENDS[0]?.fri ? Number(ALL_WEEKENDS[0].fri.slice(0, 4)) : today.getFullYear();
+    let calendarYear = today.getFullYear();
+    let mobileCalendarMonth = todayStr.slice(0, 7);
     let currentTripMode = "classic"; // "classic" (2 nopți) | "extended" (3-4 nopți) | "school_week" (7-9 nopți)
     let currentMode = 1; // 1 = per pax, 2 = total grup
     let currentLinkMode = "skyscanner"; // Default: price comparison; Kiwi stays one click away
@@ -2142,11 +2157,19 @@
         if (!button) return;
         button.hidden = !ALL_WEEKENDS.some(w => { const d = new Date(`${w.fri}T12:00:00`); return d >= from && d <= to; });
       });
-      document.getElementById('calendar-prev-year').disabled = calendarYear <= Number(ALL_WEEKENDS[0].fri.slice(0, 4));
+      document.getElementById('calendar-prev-year').disabled = calendarYear <= today.getFullYear();
       document.getElementById('calendar-next-year').disabled = calendarYear >= Number(ALL_WEEKENDS.at(-1).fri.slice(0, 4));
       
       const monthNames = ["Ianuarie", "Februarie", "Martie", "Aprilie", "Mai", "Iunie", "Iulie", "August", "Septembrie", "Octombrie", "Noiembrie", "Decembrie"];
       const weekdays = ["Lu", "Ma", "Mi", "Jo", "Vi", "Sâ", "Du"];
+      const minMonth = todayStr.slice(0, 7);
+      const maxMonth = ALL_WEEKENDS.at(-1).fri.slice(0, 7);
+      if (Number(mobileCalendarMonth.slice(0, 4)) !== calendarYear) mobileCalendarMonth = `${calendarYear}-01`;
+      if (mobileCalendarMonth < minMonth) mobileCalendarMonth = minMonth;
+      if (mobileCalendarMonth > maxMonth) mobileCalendarMonth = maxMonth;
+      document.getElementById('mobile-month-title').textContent = `${monthNames[Number(mobileCalendarMonth.slice(5, 7)) - 1]} ${calendarYear}`;
+      document.getElementById('mobile-month-prev').disabled = mobileCalendarMonth <= minMonth;
+      document.getElementById('mobile-month-next').disabled = mobileCalendarMonth >= maxMonth;
       const holidayNames = romanianPublicHolidays(calendarYear);
       const dayPeriods = new Map();
       for (const weekend of ALL_WEEKENDS) {
@@ -2162,7 +2185,7 @@
         const firstWeekday = (first.getUTCDay() + 6) % 7;
         const daysInMonth = new Date(Date.UTC(calendarYear, month + 1, 0)).getUTCDate();
         const monthPrefix = `${calendarYear}-${String(month + 1).padStart(2, '0')}`;
-        chipsHtml += `<section class="calendar-month" aria-label="${monthNames[month]} ${calendarYear}"><h4>${monthNames[month]}</h4><div class="calendar-weekdays" aria-hidden="true">${weekdays.map(d => `<span>${d}</span>`).join('')}</div><div class="calendar-days">`;
+        chipsHtml += `<section class="calendar-month${monthPrefix === mobileCalendarMonth ? ' mobile-current' : ''}" aria-label="${monthNames[month]} ${calendarYear}"><h4>${monthNames[month]}</h4><div class="calendar-weekdays" aria-hidden="true">${weekdays.map(d => `<span>${d}</span>`).join('')}</div><div class="calendar-days">`;
         chipsHtml += '<span class="calendar-day" aria-hidden="true"></span>'.repeat(firstWeekday);
         const holidayNotes = [];
         for (let day = 1; day <= daysInMonth; day++) {
@@ -2197,19 +2220,47 @@
     }
 
     function showCalendarYear(year) {
-      if (year < Number(ALL_WEEKENDS[0].fri.slice(0, 4)) || year > Number(ALL_WEEKENDS.at(-1).fri.slice(0, 4))) return;
+      if (year < today.getFullYear() || year > Number(ALL_WEEKENDS.at(-1).fri.slice(0, 4))) return;
       calendarYear = year;
       renderWeekendSelectorUI();
     }
 
     function shiftCalendarYear(offset) {
       const next = calendarYear + offset;
-      const min = Number(ALL_WEEKENDS[0].fri.slice(0, 4));
+      const min = today.getFullYear();
       const max = Number(ALL_WEEKENDS.at(-1).fri.slice(0, 4));
       if (next < min || next > max) return;
       calendarYear = next;
       renderWeekendSelectorUI();
     }
+
+    function shiftMobileCalendarMonth(delta) {
+      const [year, month] = mobileCalendarMonth.split('-').map(Number);
+      const next = new Date(Date.UTC(year, month - 1 + delta, 1));
+      const nextMonth = `${next.getUTCFullYear()}-${String(next.getUTCMonth() + 1).padStart(2, '0')}`;
+      if (nextMonth < todayStr.slice(0, 7) || nextMonth > ALL_WEEKENDS.at(-1).fri.slice(0, 7)) return;
+      mobileCalendarMonth = nextMonth;
+      calendarYear = next.getUTCFullYear();
+      renderWeekendSelectorUI();
+    }
+    (() => {
+      const grid = document.getElementById('weekend-chips-grid');
+      let start = null;
+      grid.addEventListener('touchstart', event => {
+        if (event.touches.length === 1) start = {x:event.touches[0].clientX, y:event.touches[0].clientY};
+      }, {passive:true});
+      grid.addEventListener('touchend', event => {
+        if (!start || !matchMedia('(max-width: 600px)').matches || event.changedTouches.length !== 1) { start = null; return; }
+        const dx = event.changedTouches[0].clientX - start.x;
+        const dy = event.changedTouches[0].clientY - start.y;
+        start = null;
+        if (Math.abs(dx) >= 55 && Math.abs(dx) > Math.abs(dy) * 1.3) {
+          event.preventDefault();
+          shiftMobileCalendarMonth(dx < 0 ? 1 : -1);
+        }
+      }, {passive:false});
+      grid.addEventListener('touchcancel', () => { start = null; }, {passive:true});
+    })();
 
     function selectCalendarRange(range) {
       const first = ALL_WEEKENDS[0];
@@ -2236,7 +2287,14 @@
         const eligibleType = currentTripMode === 'extended' ? w.holidayType === 'extended' : true;
         return eligibleType && date >= start && date <= end;
       }).map(w => w.id));
-      calendarYear = Number((selectedWkIds.values().next().value || first.fri).slice(0, 4));
+      const firstSelectedId = selectedWkIds.values().next().value;
+      calendarYear = Number((firstSelectedId || first.fri).slice(0, 4));
+      if (firstSelectedId && matchMedia('(max-width: 600px)').matches) {
+        const firstWeekend = ALL_WEEKENDS.find(w => w.id === firstSelectedId);
+        mobileCalendarMonth = getTripDates(firstWeekend).dateOut.slice(0, 7);
+        if (mobileCalendarMonth < todayStr.slice(0, 7)) mobileCalendarMonth = todayStr.slice(0, 7);
+        calendarYear = Number(mobileCalendarMonth.slice(0, 4));
+      }
       renderWeekendSelectorUI();
       renderCrossEngineBar();
       renderMatrix();
