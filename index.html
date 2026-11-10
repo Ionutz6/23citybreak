@@ -570,10 +570,10 @@
         <div class="inline-flex items-center gap-2 text-xs sm:text-sm text-[#0a0b0d] font-bold">
           <span class="hidden sm:inline">La click:</span>
           <select id="link-mode" onchange="setLinkMode(this.value)" class="rounded-xl bg-[#fffdf8] border border-[#dce1e7] px-3 py-1.5 text-xs sm:text-sm font-bold text-[#0a0b0d] focus:outline-none focus:ring-2 focus:ring-[#dfa649] shadow-2xs font-display">
-            <option value="google" selected>Google Flights</option>
+            <option value="kiwi" selected>Kiwi.com</option>
+            <option value="google">Google Flights</option>
             <option value="skyscanner">Skyscanner (Comparație)</option>
             <option value="airline">Companie (Wizz / Ryanair)</option>
-            <option value="kiwi">Kiwi.com</option>
           </select>
         </div>
       </div>
@@ -1102,7 +1102,7 @@
     let calendarYear = ALL_WEEKENDS[0]?.fri ? Number(ALL_WEEKENDS[0].fri.slice(0, 4)) : today.getFullYear();
     let currentTripMode = "classic"; // "classic" (2 nopți) | "extended" (3-4 nopți) | "school_week" (7-9 nopți)
     let currentMode = 1; // 1 = per pax, 2 = total grup
-    let currentLinkMode = "google"; // Default external search provider
+    let currentLinkMode = "kiwi"; // Default external search provider (prices come from Kiwi)
     let currentRows = [];
     let similarResultPeriods = null;
     let lastEmptyWasSimilar = false;
@@ -2290,11 +2290,18 @@
       return "tier-over";
     }
 
+    // A Kiwi link is usable only when it points at a specific search, not at the Kiwi home page.
+    function kiwiTargetUrl(cell) {
+      if (cell?.kiwiCheckoutUrl) return cell.kiwiCheckoutUrl;
+      const url = cell?.kiwiSearchUrl || "";
+      return url.startsWith("https://www.kiwi.com/en/search/") ? url : "";
+    }
+
     function getTargetUrl(cell) {
       if (!cell) return "#";
       if (currentLinkMode === "skyscanner") return cell.skyscannerUrl || cell.googleFlightsUrl;
       if (currentLinkMode === "airline") return cell.airlineUrl || cell.googleFlightsUrl;
-      if (currentLinkMode === "kiwi") return cell.kiwiCheckoutUrl || cell.kiwiSearchUrl || cell.bookingUrl;
+      if (currentLinkMode === "kiwi") return kiwiTargetUrl(cell) || cell.googleFlightsUrl || cell.bookingUrl;
       return cell.googleFlightsUrl || cell.skyscannerUrl || cell.bookingUrl;
     }
 
@@ -2317,25 +2324,18 @@
       qbTitle.innerHTML = `<span>✈️</span> <span>${row.city} · Weekend ${wk ? wk.label : ''} · <span class="text-[#8a5d14] font-black">${pVal} ${pUnit}</span></span>`;
       qbSub.textContent = `Tur: ${cell.outRoute} (${cell.outTime}) | Retur: ${cell.inRoute} (${cell.inTime}) · ${cell.airlineLabel}`;
 
-      const kiwiUrl = cell.kiwiCheckoutUrl || cell.kiwiSearchUrl || cell.bookingUrl;
+      const kiwiUrl = kiwiTargetUrl(cell);
+      const primary = "bg-[#dfa649] hover:bg-[#c98f33] text-[#0a0b0d] text-xs font-black px-3.5 py-2 rounded-xl transition shadow-xs font-display flex items-center gap-1";
+      const secondary = "bg-[#f4f5f8] hover:bg-[#eaeef3] text-[#0a0b0d] text-xs font-bold px-3 py-2 rounded-xl border border-[#dce1e7] transition font-display";
 
       qbActions.innerHTML = `
-        <a href="${cell.googleFlightsUrl}" target="_blank" rel="noopener noreferrer"
-           class="bg-[#dfa649] hover:bg-[#c98f33] text-[#0a0b0d] text-xs font-black px-3.5 py-2 rounded-xl transition shadow-xs font-display flex items-center gap-1">
-          Google Flights →
-        </a>
+        ${kiwiUrl ? `<a href="${kiwiUrl}" target="_blank" rel="noopener noreferrer" class="${primary}">Kiwi.com →</a>` : ""}
+        <a href="${cell.googleFlightsUrl}" target="_blank" rel="noopener noreferrer" class="${kiwiUrl ? secondary : primary}">Google Flights${kiwiUrl ? "" : " →"}</a>
         <a href="${cell.skyscannerUrl}" target="_blank" rel="noopener noreferrer"
            class="bg-[#0a0b0d] hover:bg-[#1e232e] text-[#dfa649] text-xs font-bold px-3 py-2 rounded-xl border border-[#0a0b0d] transition font-display flex items-center gap-1">
           Skyscanner ↗
         </a>
-        <a href="${cell.airlineUrl}" target="_blank" rel="noopener noreferrer"
-           class="bg-[#f4f5f8] hover:bg-[#eaeef3] text-[#0a0b0d] text-xs font-bold px-3 py-2 rounded-xl border border-[#dce1e7] transition font-display">
-          Companie aeriană
-        </a>
-        <a href="${kiwiUrl}" target="_blank" rel="noopener noreferrer"
-           class="bg-[#f4f5f8] hover:bg-[#eaeef3] text-[#0a0b0d] text-xs font-bold px-3 py-2 rounded-xl border border-[#dce1e7] transition font-display">
-          Kiwi Live
-        </a>
+        <a href="${cell.airlineUrl}" target="_blank" rel="noopener noreferrer" class="${secondary}">Companie aeriană</a>
       `;
     }
 
