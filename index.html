@@ -1777,10 +1777,16 @@
     function handleDestKeyDown(event, input) {
       if (event.key === "Enter") {
         event.preventDefault();
+        if (event.repeat) return;
         const drop = document.getElementById("dest-autocomplete-dropdown");
         const first = drop && !drop.classList.contains("hidden") ? drop.querySelector("button[data-destination-id]") : null;
-        if (first) selectDestination(first.dataset.destinationId);
-        else resolveTypedDestination();
+        if (first) {
+          selectDestination(first.dataset.destinationId);
+        } else if (drop?.classList.contains("hidden") && isSelectedDestinationText(input.value)) {
+          runLiveSearch();
+        } else {
+          resolveTypedDestination();
+        }
         if (drop) drop.classList.add("hidden");
       } else if (event.key === "Escape") {
         const drop = document.getElementById("dest-autocomplete-dropdown");
@@ -1804,9 +1810,16 @@
       return s.normalize("NFD").replace(/\p{M}/gu, "");
     }
 
+    function isSelectedDestinationText(value) {
+      if (!selectedCityObj || document.getElementById("f-destination").value !== selectedCityObj.id) return false;
+      const selectedText = selectedCityObj.isAll ? "🌟 Oricare (Toată Europa)" : `${selectedCityObj.flag} ${selectedCityObj.name} (${selectedCityObj.iata}) · ${selectedCityObj.country}`;
+      return value.trim() === selectedText;
+    }
+
     function resolveTypedDestination() {
       const input = document.getElementById("dest-search-input");
       if (!input) return;
+      if (isSelectedDestinationText(input.value)) return true;
       const raw = input.value.trim();
       const q = normalizeDestQuery(raw);
 
