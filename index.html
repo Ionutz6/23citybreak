@@ -2786,7 +2786,7 @@
       cardsGrid.querySelectorAll('[data-city-id]').forEach(async card => {
         const photo = await getCityPhotoAsset(card.dataset.cityId);
         if (!card.isConnected || !photo) return;
-        card.style.backgroundImage = `linear-gradient(180deg,rgba(10,11,13,.27),rgba(10,11,13,.86) 72%,rgba(10,11,13,.95)),url("${photo.url}")`;
+        card.style.backgroundImage = `linear-gradient(180deg,rgba(10,11,13,.21),rgba(10,11,13,.80) 72%,rgba(10,11,13,.90)),url("${photo.url}")`;
         const city = ALL_EUROPE_CITIES.find(c => c.id === card.dataset.cityId);
         registerPhotoCredit(card.dataset.cityId, city?.name || card.dataset.cityId, photo);
       });
