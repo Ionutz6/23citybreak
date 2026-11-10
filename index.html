@@ -352,7 +352,7 @@
 
       <div id="search-status" role="status" aria-live="polite" class="hidden rounded-xl border px-4 py-3 text-sm flex items-center gap-2">
         <span id="search-status-spinner"></span><span id="search-status-text" class="flex-1"></span>
-        <span id="search-status-pct"></span><progress id="search-progress" max="100" value="0" aria-label="Progresul căutării"></progress><button id="search-status-dismiss" type="button" aria-label="Închide mesajul" onclick="document.getElementById('search-status').classList.add('hidden')">✕</button>
+        <button id="similar-search-button" type="button" hidden onclick="runSimilarSearch()" class="rounded-lg bg-[#dfa649] px-3 py-2 text-xs font-bold text-[#0a0b0d]">Caută perioade asemănătoare ±1 zi</button><span id="search-status-pct"></span><progress id="search-progress" max="100" value="0" aria-label="Progresul căutării"></progress><button id="search-status-dismiss" type="button" aria-label="Închide mesajul" onclick="document.getElementById('search-status').classList.add('hidden')">✕</button>
       </div>
     <!-- 2. PASUL 2: Tip de weekend și calendar -->
     <section class="period-section">
@@ -541,6 +541,7 @@
 
     </section>
 
+    <div id="similar-results-note" hidden class="mt-6 rounded-xl border border-[#e9d8ae] bg-[#fff8e8] px-4 py-3 text-sm text-[#604817]">Perioade asemănătoare cu datele alese (±1 zi), cu cel puțin 2 nopți în destinație. Unele pot necesita concediu.</div>
     <div class="results-heading"><div><h2>Alege următoarea destinație.</h2></div><p>Ofertele apar aici după căutare.</p></div>
     <!-- 6. Dual View Mode & Booking Controls Bar -->
     <div class="flex flex-wrap items-center justify-between gap-4 pt-2">
@@ -1094,6 +1095,7 @@
     let currentMode = 1; // 1 = per pax, 2 = total grup
     let currentLinkMode = "google"; // Default external search provider
     let currentRows = [];
+    let similarResultPeriods = null;
     let searchState = "idle";
     let hasEverSearched = false;
     let selectedCityObj = null;
@@ -1453,6 +1455,7 @@
     }
 
     function getTripDates(wk) {
+      if (wk?.similarDates) return wk.similarDates;
       if (!wk) return { dateOut: "2026-11-13", dateIn: "2026-11-15" };
       if (currentTripMode === "extended") {
         if (wk.thursdayHoliday) return { dateOut: wk.wed, dateIn: wk.sun };
@@ -1463,6 +1466,42 @@
         return { dateOut: wk.fri, dateIn: wk.nextSun || wk.sun };
       }
       return { dateOut: wk.fri, dateIn: wk.sun };
+    }
+
+    function shiftCivilDate(iso, days) {
+      const date = new Date(`${iso}T00:00:00Z`);
+      date.setUTCDate(date.getUTCDate() + days);
+      return date.toISOString().slice(0, 10);
+    }
+    function nightsBetween(first, last) {
+      return Math.round((Date.parse(`${last}T00:00:00Z`) - Date.parse(`${first}T00:00:00Z`)) / 86400000);
+    }
+    function makeSimilarPeriods(weekends) {
+      const originals = new Set(weekends.map(wk => { const d = getTripDates(wk); return `${d.dateOut}|${d.dateIn}`; }));
+      const unique = new Map();
+      for (const wk of weekends) {
+        const base = getTripDates(wk);
+        for (const outShift of [-1, 0, 1]) for (const inShift of [-1, 0, 1]) {
+          if (!outShift && !inShift) continue;
+          const dateOut = shiftCivilDate(base.dateOut, outShift), dateIn = shiftCivilDate(base.dateIn, inShift);
+          const key = `${dateOut}|${dateIn}`;
+          if (dateOut < todayStr || originals.has(key) || nightsBetween(dateOut, dateIn) < 2) continue;
+          if (!unique.has(key)) unique.set(key, { id: `similar:${dateOut}:${dateIn}`, fri: dateOut, sun: dateIn, similarDates: {dateOut, dateIn}, label: formatTripSpan(dateOut, dateIn, "card") });
+        }
+      }
+      return [...unique.values()].sort((a, b) => a.fri.localeCompare(b.fri) || a.sun.localeCompare(b.sun));
+    }
+    function formatSimilarDateSpan(dateOut, dateIn) {
+      const day = iso => new Intl.DateTimeFormat('ro-RO', {weekday:'short', day:'numeric', month:'short', year:'numeric', timeZone:'UTC'}).format(new Date(`${iso}T12:00:00Z`));
+      return `${day(dateOut)} – ${day(dateIn)}`;
+    }
+    async function mapWithConcurrency(items, limit, callback) {
+      const output = new Array(items.length);
+      let next = 0;
+      await Promise.all(Array.from({length: Math.min(limit, items.length)}, async () => {
+        while (next < items.length) { const index = next++; output[index] = await callback(items[index], index); }
+      }));
+      return output;
     }
 
     function carrierName(code) {
@@ -2240,7 +2279,7 @@
       if (!row) return;
       const cell = row.cellsMap[wkId];
       if (!cell) return;
-      const wk = ALL_WEEKENDS.find(w => w.id === wkId);
+      const wk = (similarResultPeriods || ALL_WEEKENDS).find(w => w.id === wkId);
 
       const qbTitle = document.getElementById("qb-title");
       const qbSub = document.getElementById("qb-sub");
@@ -2578,6 +2617,7 @@
       if (state === 'loading' || state === 'error') renderMatrix();
       const statusBox = document.getElementById("search-status");
       const statusText = document.getElementById("search-status-text");
+      document.getElementById('similar-search-button').hidden = true;
       const progress = document.getElementById('search-progress');
       progress.hidden = state !== 'loading';
       progress.value = Math.max(0, Math.min(99, Math.floor(pct)));
@@ -2669,7 +2709,7 @@
         const priceSub = (currentMode === 1) ? "per persoană" : "total grup";
 
         const tripD = bestWk ? getTripDates(bestWk) : null;
-        const datesLabel = tripD ? formatTripSpan(tripD.dateOut, tripD.dateIn, "card") : 'Selectează weekend';
+        const datesLabel = tripD ? (bestWk?.similarDates ? `${formatSimilarDateSpan(tripD.dateOut, tripD.dateIn)} · ${bestCell.nightsAtDestination} nopți în destinație` : formatTripSpan(tripD.dateOut, tripD.dateIn, "card")) : 'Selectează weekend';
         const flightTimeOut = bestCell ? bestCell.outTime : "—";
         const flightTimeIn = bestCell ? bestCell.inTime : "—";
         const airline = bestCell ? bestCell.airlineLabel : (r.sub || "Zbor direct");
@@ -2771,7 +2811,7 @@
       updateCurrencyLabels();
       resetQuickBuyBar();
 
-      const activeWks = getSelectedWeekendsList();
+      const activeWks = similarResultPeriods || getSelectedWeekendsList();
 
       if (activeWks.length === 0) {
         document.getElementById('cards-grid').innerHTML = '<div class="col-span-full p-6 text-center">Alege cel puțin un weekend sau scanează cele 52 de weekenduri pentru orașul ales.</div>';
@@ -2824,7 +2864,8 @@
       }
 
       // Keep Cards View updated synchronously
-      renderCardsView(filteredRows, activeWks, maxBudget);
+      const cardRows = similarResultPeriods ? filteredRows.flatMap(row => activeWks.filter(wk => row.cellsMap[wk.id]).map(wk => ({...row, cellsMap: {[wk.id]: row.cellsMap[wk.id]}}))) : filteredRows;
+      renderCardsView(cardRows, activeWks, maxBudget);
 
       // Group consecutive weekend columns by departure month.
       const monthNames = ["ianuarie", "februarie", "martie", "aprilie", "mai", "iunie", "iulie", "august", "septembrie", "octombrie", "noiembrie", "decembrie"];
@@ -3358,7 +3399,7 @@
     const EUROPE_COUNTRIES = new Set('AL AD AT BY BE BA BG HR CY CZ DK EE FI FR DE GR HU IS IE IT XK LV LI LT LU MT MD MC ME NL MK NO PL PT RO RU SM RS SK SI ES SE CH TR UA GB VA'.split(' '));
 
     // Live Search on Selected Weekends
-    async function runLiveSearch() {
+    async function runLiveSearch(searchSimilar = false) {
       if (!resolveTypedDestination()) return;
       const destSelect = document.getElementById("f-destination");
       const destVal = destSelect.value;
@@ -3385,7 +3426,15 @@
       const cityName = selectedCityObj?.name || (selectedCityObj ? selectedCityObj.name : "Toată Europa");
       const destIata = selectedCityObj?.iata || "";
 
-      const activeWks = getSelectedWeekendsList();
+      const selectedWeekends = getSelectedWeekendsList();
+      if (searchSimilar && destVal === "any") return;
+      const activeWks = searchSimilar ? makeSimilarPeriods(selectedWeekends) : selectedWeekends;
+      similarResultPeriods = null;
+      document.getElementById('similar-results-note').hidden = true;
+      if (searchSimilar && activeWks.length === 0) {
+        updateSearchStatus("Nu există perioade viitoare de minimum 2 nopți în intervalul ±1 zi.", 100, "empty");
+        return;
+      }
 
       const handBags = Array(adults).fill(bagType === "cabin" ? 1 : 0);
       const holdBags = Array(adults).fill(bagType === "hold" ? 1 : 0);
@@ -3398,7 +3447,7 @@
       try {
         // TARGETED CITY SEARCH
         if (destVal !== "any") {
-          updateSearchStatus(`Interogăm live toate cele ${activeWks.length} weekenduri alese pentru ${cityName}...`, 0, "loading");
+          updateSearchStatus(`Interogăm live ${activeWks.length} ${searchSimilar ? "perioade asemănătoare" : "weekenduri alese"} pentru ${cityName}...`, 0, "loading");
 
           let failedRequests = 0;
           let completedRequests = 0;
@@ -3410,7 +3459,7 @@
           ] : [{ id: destVal, iata: null }];
           const jobs = activeWks.flatMap(wk => searchAirports.map(airport => ({ wk, airport })));
           updateSearchStatus(`Căutăm zboruri pentru ${cityName} (0/${jobs.length})...`, 0, "loading");
-          const promises = jobs.map(async ({ wk, airport }) => {
+          const queryJob = async ({ wk, airport }) => {
             const tripDates = getTripDates(wk);
             try {
               const res = await fetch("https://api.skypicker.com/umbrella/v2/graphql", {
@@ -3448,9 +3497,9 @@
               completedRequests++;
               updateSearchStatus(`Căutăm zboruri pentru ${cityName} (${completedRequests}/${jobs.length})...`, Math.floor(completedRequests / jobs.length * 95), "loading");
             }
-          });
+          };
 
-          const results = await Promise.all(promises);
+          const results = searchSimilar ? await mapWithConcurrency(jobs, 6, queryJob) : await Promise.all(jobs.map(queryJob));
           if (failedRequests) {
             updateSearchStatus(`Căutarea nu a putut fi finalizată (${failedRequests} cereri eșuate). Încearcă din nou.`, 100, "error");
             return;
@@ -3482,6 +3531,10 @@
 
                 const outOrig = outFirst.source.station.code;
                 const outDest = outLast.destination.station.code;
+                const arrivalDay = outLast.destination.localTime?.slice(0, 10);
+                const departureDay = inFirst.source.localTime?.slice(0, 10);
+                const destinationNights = arrivalDay && departureDay ? nightsBetween(arrivalDay, departureDay) : NaN;
+                if (searchSimilar && (!Number.isFinite(destinationNights) || destinationNights < 2)) continue;
                 if (isBruges && outDest !== airport.iata) continue;
                 targetCode = outDest.toLowerCase();
                 targetCityTitle = outLast.destination.station.city?.name || cityName;
@@ -3509,6 +3562,7 @@
                 const cellObj = {
                   totalEur: totalEur,
                   perPaxEur: perPaxEur,
+                  nightsAtDestination: destinationNights,
                   outRoute: `${outOrig} → ${outDest}`,
                   outTime: `${outFirst.source.localTime.slice(11, 16)} → ${outArrTime}${stopsLabel}`,
                   inRoute: `${inFirst.source.station.code} → ${inLast.destination.station.code}`,
@@ -3558,16 +3612,22 @@
             for (const [iata, result] of brugesCellsByAirport) {
               currentRows.push({ city: "Bruges", airportName: result.airport.name, cityGroup: "Bruges", sub: `${iata} · transfer spre Bruges separat`, code: iata.toLowerCase(), iata, cityId: destVal, skyTo: iata.toLowerCase(), cellsMap: result.cellsMap });
             }
-          } else {
+          } else if (totalFound > 0) {
             currentRows.unshift(newRow);
+          }
+          if (searchSimilar && totalFound > 0) {
+            similarResultPeriods = activeWks.filter(wk => currentRows.some(row => row.cellsMap[wk.id]));
+            document.getElementById('similar-results-note').hidden = false;
           }
 
           if (fallbackUsed) {
             updateSearchStatus(`✅ Am găsit zboruri pentru ${targetCityTitle} (cu 1 escală, neavând zbor direct din București). Sfat: Verifică și Manchester (direct la 45 min de Liverpool)!`, 100, "success");
           } else if (totalFound > 0) {
-            updateSearchStatus(`✅ Căutare finalizată! S-au găsit zboruri în ${Object.keys(targetCellsMap).length} weekenduri pentru ${cityName}.`, 100, "success");
+            const category = searchSimilar ? 'perioade asemănătoare' : 'weekenduri';
+            updateSearchStatus(`✅ Căutare finalizată! S-au găsit zboruri în ${Object.keys(targetCellsMap).length} ${category} pentru ${cityName}.`, 100, "success");
           } else {
-            updateSearchStatus(`⚠️ Nu s-au găsit zboruri pentru ${cityName} cu criteriile actuale. Încearcă alte ore sau un buget mai mare.`, 100, "empty");
+            updateSearchStatus(searchSimilar ? `Nu s-au găsit perioade asemănătoare cu minimum 2 nopți pentru ${cityName}, în filtrele alese.` : `Nu s-au găsit zboruri pentru ${cityName} cu criteriile actuale. Poți extinde filtrele sau căuta perioade asemănătoare.`, 100, "empty");
+            if (!searchSimilar) document.getElementById('similar-search-button').hidden = false;
           }
 
           renderMatrix();
@@ -3795,11 +3855,15 @@
     }
     const performLiveSearch = runLiveSearch;
     const performYearScan = scanEntireYearForDestination;
-    runLiveSearch = () => withSearchLock(performLiveSearch);
+    runLiveSearch = () => withSearchLock(() => performLiveSearch(false));
+    function runSimilarSearch() { return withSearchLock(() => performLiveSearch(true)); }
     scanEntireYearForDestination = () => withSearchLock(performYearScan);
 
     function invalidateSearchResults() {
       currentRows = [];
+      similarResultPeriods = null;
+      document.getElementById('similar-results-note').hidden = true;
+      document.getElementById('similar-search-button').hidden = true;
       hasEverSearched = false;
       searchState = 'idle';
       document.getElementById('search-status').classList.add('hidden');
