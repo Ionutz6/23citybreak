@@ -151,7 +151,7 @@
     .hero {position:relative;display:grid;grid-template-columns:1fr 1.07fr;min-height:390px;background:#111211;color:#fff;margin:0;overflow:hidden;}
     .hero-copy {padding:65px 9% 72px 11%;position:relative;z-index:1}.hero-eyebrow,.field-kicker {font-family:var(--font-display);font-size:10px;font-weight:700;letter-spacing:.16em;color:#9a6a25}.hero-eyebrow {color:#dfa649}.hero-eyebrow span {display:inline-block;width:24px;height:1px;background:#dfa649;vertical-align:middle;margin-right:8px}
     .hero h1 {font-family:var(--font-display);font-size:clamp(38px,4.3vw,66px);line-height:1.06;letter-spacing:-.055em;margin:23px 0;color:white;font-weight:700}.hero h1 em {color:#dfa649;font-style:normal}.hero-copy p {max-width:430px;color:#bdbdb7;font-size:16px;line-height:1.6}.hero-link {display:inline-flex;align-items:center;gap:24px;margin-top:27px;color:#fff;font-size:13px;font-weight:700;border-bottom:1px solid #dfa649;padding-bottom:8px}.hero-link span {color:#dfa649}
-    .hero-image {position:relative;background:linear-gradient(90deg,#111211 0%,transparent 24%),linear-gradient(0deg,rgba(0,0,0,.44),transparent 60%),url('assets/weekend-hero.webp') center 45%/cover,#8b806d}.hero-image-label {position:absolute;right:9%;bottom:50px;display:flex;flex-direction:column;gap:8px;text-align:right}.hero-image-label span {font-size:9px;letter-spacing:.16em;color:#f5d9a3;font-weight:700}.hero-image-label strong {font-family:var(--font-display);font-size:18px;line-height:1.3}.hero-index {position:absolute;bottom:20px;left:6%;font-size:10px;color:#dfa649;letter-spacing:.12em}.hero-index span {color:#777;margin-left:12px}
+    .hero-image {position:relative;background:linear-gradient(90deg,#111211 0%,transparent 24%),linear-gradient(0deg,rgba(0,0,0,.44),transparent 60%),url('assets/praga/praga-1.jpg') center 45%/cover,#8b806d}.hero-image-label {position:absolute;right:9%;bottom:50px;display:flex;flex-direction:column;gap:8px;text-align:right}.hero-image-label span {font-size:9px;letter-spacing:.16em;color:#f5d9a3;font-weight:700}.hero-image-label strong {font-family:var(--font-display);font-size:18px;line-height:1.3}.hero-index {position:absolute;bottom:20px;left:6%;font-size:10px;color:#dfa649;letter-spacing:.12em}.hero-index span {color:#777;margin-left:12px}
     .search-panel {position:relative;background:#fff;border:1px solid #e9e6df;border-radius:18px;padding:30px 34px;margin-top:-1px;box-shadow:0 12px 50px rgba(25,20,10,.04)}
     .search-heading {display:flex;justify-content:space-between;align-items:center;gap:20px;margin-bottom:25px}.search-heading h2,.results-heading h2 {font-family:var(--font-display);font-size:clamp(24px,2.2vw,33px);letter-spacing:-.045em;font-weight:700;margin:7px 0}.search-heading p,.results-heading p {font-size:14px;color:#777a76}.advanced-button {border:1px solid #e2e1dc;border-radius:8px;padding:11px 15px;white-space:nowrap;font-size:12px;font-weight:700}
     .search-panel > .grid {display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:12px}.search-field-group-title {grid-column:1/-1;display:flex;gap:15px;align-items:center;margin:0 0 2px}.search-field-group-title>span+span {font-size:13px;color:#777}.search-panel > .grid > div:not(.search-field-group-title) {background:#f8f8f5;border:1px solid #e9e9e3;border-radius:9px;padding:13px 14px;min-width:0;grid-column:span 2;box-shadow:none}.search-panel > .grid > div:nth-child(2) {grid-column:span 3}.search-panel > .grid > div:nth-child(3) {grid-column:span 3}.search-panel > .grid label,.duration-field label {display:block;color:#6d716c;font-family:var(--font-body);font-size:11px;font-weight:700;letter-spacing:0;text-transform:none;margin-bottom:6px}.search-panel > .grid select,.search-panel > .grid input {border:0;background:transparent;padding:0;box-shadow:none;font-family:var(--font-display);font-size:13px;font-weight:700;min-height:24px;width:100%;color:#1a1b19}.search-panel > .grid .relative>div.flex {padding:0;border:0;background:transparent}.search-panel > .grid .relative>div.flex>span {display:none} #dest-type-badge {display:none}
@@ -244,36 +244,7 @@
 
   <header class="site-header"><div class="header-inner"><a class="wordmark" href="#top" aria-label="23citybreak, pagina principală"><span class="plane-icon" aria-hidden="true">✈︎ </span><span>23</span><span class="wordmark-city">city</span><span>break</span></a><div class="header-right"><a href="jurnal.html">Jurnal</a></div></div></header>
   <main id="top" class="site-main">
-    <section class="hero"><div class="hero-copy"><h1 id="hero-headline">Weekendul e mai aproape <em>decât crezi.</em></h1><script>
-      (() => {
-        const headlines = [
-          ['Stai 6 ore bară la bară pe Valea Prahovei?', 'Mai bine zbori spre un oraș nou.'],
-          ['Locuiești în orașul Europa.', 'I-ai văzut toate cartierele?'],
-          ['Ai văzut toate clădirile faimoase din Europa?', 'Sau ți-a mai rămas una de descoperit?'],
-          ['Te-ai săturat de aceleași străzi?', 'Descoperă unele noi.'],
-          ['Îți petreci vineri seara acasă?', 'Sau iei cina într-un oraș nou?'],
-          ['Savurează-ți cafeaua de sâmbătă', 'cu o priveliște nouă.'],
-          ['Ai două zile libere.', 'Descoperă o mulțime de locuri noi.'],
-          ['Ai un weekend liber?', 'Alege-ți o destinație în Europa.'],
-          ['Ia cu tine un bagaj mic.', 'Adu acasă o poveste mare.'],
-          ['Schimbă pentru două zile rutina', 'cu străzile unui oraș nou.'],
-          ['De câte ori ai spus „cândva”?', 'Alege weekendul acesta.'],
-          ['Nu ai nevoie de o vacanță lungă', 'ca să vezi lumea altfel.'],
-          ['Cum sună Big Ben la ora exactă?', 'E timpul să afli pe viu.'],
-          ['Ce mai fac vikingii vremurilor noastre?', 'E timpul să afli.']
-        ];
-        let last = -1;
-        try { last = Number(sessionStorage.getItem('hero-headline-index') ?? -1); } catch (_) {}
-        let index = Math.floor(Math.random() * headlines.length);
-        if (headlines.length > 1 && index === last) index = (index + 1 + Math.floor(Math.random() * (headlines.length - 1))) % headlines.length;
-        try { sessionStorage.setItem('hero-headline-index', String(index)); } catch (_) {}
-        const heading = document.getElementById('hero-headline');
-        heading.replaceChildren(document.createTextNode(headlines[index][0] + ' '));
-        const highlight = document.createElement('em');
-        highlight.textContent = headlines[index][1];
-        heading.appendChild(highlight);
-      })();
-    </script><p>Un oraș nou, o masă bună, timp pentru tine. Acordă-ți o evadare scurtă, de weekend, din programul zilnic.</p></div><div class="hero-image"><div class="hero-image-label"><span>DESTINAȚIE DE WEEKEND</span><strong id="hero-city">Europa</strong></div></div></section>
+    <section class="hero"><div class="hero-copy"><h1 id="hero-headline">Ai numărat podurile din Praga? <em>Descoperă-le la pas.</em></h1><p>Un oraș nou, o masă bună, timp pentru tine. Acordă-ți o evadare scurtă, de weekend, din programul zilnic.</p></div><div class="hero-image"><div class="hero-image-label"><span>DESTINAȚIE DE WEEKEND</span><strong id="hero-city">Praga · Cehia</strong></div></div></section>
 
     <!-- 2. PASUL 2: Selectare Oraș & Opțiuni Căutare -->
     <section id="configurator" class="search-panel">
@@ -3810,6 +3781,128 @@
     panel.querySelector('.search-actions').append(document.getElementById('search-status'));
     // Thirty fixed city photographs, shuffled once per visit.
     const heroImages = [{"name":"Roma","country":"Italia","image":"https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7e/Trevi_Fountain%2C_Rome%2C_Italy_2_-_May_2007.jpg/330px-Trevi_Fountain%2C_Rome%2C_Italy_2_-_May_2007.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"},{"name":"Paris","country":"Franța","image":"https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4b/La_Tour_Eiffel_vue_de_la_Tour_Saint-Jacques%2C_Paris_ao%C3%BBt_2014_%282%29.jpg/330px-La_Tour_Eiffel_vue_de_la_Tour_Saint-Jacques%2C_Paris_ao%C3%BBt_2014_%282%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"},{"name":"Milano","country":"Italia","image":"https://thumb.wikimedia.org/wikipedia/commons/thumb/7/70/Milan_Cathedral_from_Piazza_del_Duomo.jpg/330px-Milan_Cathedral_from_Piazza_del_Duomo.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"},{"name":"Veneția","country":"Italia","image":"https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4f/Venezia_aerial_view.jpg/330px-Venezia_aerial_view.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"},{"name":"Florența","country":"Italia","image":"https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3a/Firenze_-_Piazzale_Michelangelo%2C_Firenze%2C_Italy_-_April_6%2C_2015_02.jpg/330px-Firenze_-_Piazzale_Michelangelo%2C_Firenze%2C_Italy_-_April_6%2C_2015_02.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"},{"name":"Bologna","country":"Italia","image":"https://thumb.wikimedia.org/wikipedia/commons/thumb/d/dd/Torri_di_Bologna%2C_Bologna.jpg/330px-Torri_di_Bologna%2C_Bologna.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"},{"name":"Viena","country":"Austria","image":"https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5b/Schoenbrunn_philharmoniker_2012.jpg/330px-Schoenbrunn_philharmoniker_2012.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"},{"name":"Praga","country":"Cehia","image":"https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a7/Prague_%286365119737%29.jpg/330px-Prague_%286365119737%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"},{"name":"Amsterdam","country":"Țările de Jos","image":"https://thumb.wikimedia.org/wikipedia/commons/thumb/5/57/Imagen_de_los_canales_conc%C3%A9ntricos_en_%C3%81msterdam.png/330px-Imagen_de_los_canales_conc%C3%A9ntricos_en_%C3%81msterdam.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"},{"name":"Lisabona","country":"Portugalia","image":"https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f2/Lisboa_-_Portugal_%2852597836992%29.jpg/330px-Lisboa_-_Portugal_%2852597836992%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"},{"name":"Porto","country":"Portugalia","image":"https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e5/Puente_Don_Luis_I%2C_Oporto%2C_Portugal%2C_2012-05-09%2C_DD_13.JPG/330px-Puente_Don_Luis_I%2C_Oporto%2C_Portugal%2C_2012-05-09%2C_DD_13.JPG?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"},{"name":"Barcelona","country":"Spania","image":"https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a6/Evening_light_over_Barcelona.jpg/330px-Evening_light_over_Barcelona.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"},{"name":"Madrid","country":"Spania","image":"https://thumb.wikimedia.org/wikipedia/commons/thumb/1/14/Madrid_-_Sky_Bar_360%C2%BA_%28Hotel_Riu_Plaza_Espa%C3%B1a%29%2C_vistas_19.jpg/330px-Madrid_-_Sky_Bar_360%C2%BA_%28Hotel_Riu_Plaza_Espa%C3%B1a%29%2C_vistas_19.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"},{"name":"Atena","country":"Grecia","image":"https://thumb.wikimedia.org/wikipedia/commons/thumb/6/68/Athens_Acropolis_at_Daybreak.jpg/330px-Athens_Acropolis_at_Daybreak.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"},{"name":"Budapesta","country":"Ungaria","image":"https://thumb.wikimedia.org/wikipedia/commons/thumb/5/53/View_from_Gell%C3%A9rt_Hill_to_the_Danube%2C_Hungary_-_Budapest_%2828493220635%29.jpg/330px-View_from_Gell%C3%A9rt_Hill_to_the_Danube%2C_Hungary_-_Budapest_%2828493220635%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"},{"name":"Varșovia","country":"Polonia","image":"https://thumb.wikimedia.org/wikipedia/commons/thumb/3/35/Aleja_Niepdleglosci_Warsaw_2022_aerial_%28cropped%29.jpg/330px-Aleja_Niepdleglosci_Warsaw_2022_aerial_%28cropped%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"},{"name":"Cracovia","country":"Polonia","image":"https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a3/Krakow_Rynek_Glowny_panorama_2.jpg/330px-Krakow_Rynek_Glowny_panorama_2.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"},{"name":"Copenhaga","country":"Danemarca","image":"https://thumb.wikimedia.org/wikipedia/commons/thumb/1/15/2018_-_Christiansborg_from_the_Marble_Bridge.jpg/330px-2018_-_Christiansborg_from_the_Marble_Bridge.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"},{"name":"Stockholm","country":"Suedia","image":"https://thumb.wikimedia.org/wikipedia/commons/thumb/5/56/Munkbroleden_with_Kornhamstorg_at_Gamla_Stan%2C_Stockholm%2C_Sweden_01.jpg/330px-Munkbroleden_with_Kornhamstorg_at_Gamla_Stan%2C_Stockholm%2C_Sweden_01.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"},{"name":"Oslo","country":"Norvegia","image":"https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9a/Nationaltheatret_evening.jpg/330px-Nationaltheatret_evening.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"},{"name":"Helsinki","country":"Finlanda","image":"https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3e/Suomenlinna_%28cropped%29.jpg/330px-Suomenlinna_%28cropped%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"},{"name":"Edinburgh","country":"Regatul Unit","image":"https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1a/Skyline_of_Edinburgh.jpg/330px-Skyline_of_Edinburgh.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"},{"name":"Londra","country":"Regatul Unit","image":"https://thumb.wikimedia.org/wikipedia/commons/thumb/6/67/London_Skyline_%28125508655%29.jpeg/330px-London_Skyline_%28125508655%29.jpeg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"},{"name":"Bruxelles","country":"Belgia","image":"https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ae/Grand_Place_Bruselas_2.jpg/330px-Grand_Place_Bruselas_2.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"},{"name":"Berlin","country":"Germania","image":"https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f7/Museumsinsel_Berlin_Juli_2021_1_%28cropped%29_b.jpg/330px-Museumsinsel_Berlin_Juli_2021_1_%28cropped%29_b.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"},{"name":"Dubrovnik","country":"Croația","image":"https://thumb.wikimedia.org/wikipedia/commons/thumb/6/67/The_walls_of_the_fortress_and_View_of_the_old_city._panorama.jpg/330px-The_walls_of_the_fortress_and_View_of_the_old_city._panorama.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"},{"name":"Lyon","country":"Franța","image":"https://thumb.wikimedia.org/wikipedia/commons/thumb/9/97/Lyon-part-dieu-2023.jpg/330px-Lyon-part-dieu-2023.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"},{"name":"Tallinn","country":"Estonia","image":"https://thumb.wikimedia.org/wikipedia/commons/thumb/7/70/Raekoja_plats_at_night.jpg/330px-Raekoja_plats_at_night.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"},{"name":"Bruges","country":"Belgia","image":"https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9a/Br%C3%BCgge_Blick_vom_Belfried_4.jpg/330px-Br%C3%BCgge_Blick_vom_Belfried_4.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"},{"name":"Istanbul","country":"Turcia","image":"https://thumb.wikimedia.org/wikipedia/commons/thumb/c/cb/Historical_peninsula_and_modern_skyline_of_Istanbul.jpg/330px-Historical_peninsula_and_modern_skyline_of_Istanbul.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"}];
+    const heroHeadlines = {
+  "Roma": [
+    "Ai aruncat o monedă în Fontana di Trevi?",
+    "Mai ai o dorință de pus în Roma."
+  ],
+  "Paris": [
+    "Ai văzut Parisul de sus?",
+    "Turnul Eiffel te așteaptă."
+  ],
+  "Milano": [
+    "Ai urcat pe acoperișul Domului din Milano?",
+    "Orașul se vede altfel de acolo."
+  ],
+  "Veneția": [
+    "Ai rătăcit vreodată pe străzile Veneției?",
+    "Lasă canalele să-ți arate drumul."
+  ],
+  "Florența": [
+    "Ai admirat Florența deasupra râului Arno?",
+    "Descoperă orașul Renașterii."
+  ],
+  "Bologna": [
+    "Ai gustat un ragù la Bologna?",
+    "Ia loc la masă în inima Italiei."
+  ],
+  "Viena": [
+    "Ai timp de o cafea la Viena?",
+    "Palatele și cafenelele te așteaptă."
+  ],
+  "Praga": [
+    "Ai numărat podurile din Praga?",
+    "Descoperă-le la pas."
+  ],
+  "Amsterdam": [
+    "Ai văzut Amsterdamul de pe malul canalelor?",
+    "Alege-ți podul preferat."
+  ],
+  "Lisabona": [
+    "Ai urcat pe străzile Lisabonei?",
+    "Priveliștea merită fiecare pas."
+  ],
+  "Porto": [
+    "Ai privit apusul peste Douro?",
+    "Descoperă Porto de pe ambele maluri."
+  ],
+  "Barcelona": [
+    "Ai descoperit Barcelona lui Gaudí?",
+    "Privește orașul cu alți ochi."
+  ],
+  "Madrid": [
+    "Ai ieșit la tapas în Madrid?",
+    "Serile de aici merită descoperite."
+  ],
+  "Atena": [
+    "Ai văzut Acropola din Atena?",
+    "Pășește prin mii de ani de istorie."
+  ],
+  "Budapesta": [
+    "Ai văzut Budapesta luminată?",
+    "Descoper-o de pe malul Dunării."
+  ],
+  "Varșovia": [
+    "Ai descoperit orașul vechi din Varșovia?",
+    "Lasă-te surprins de povestea lui."
+  ],
+  "Cracovia": [
+    "Ai ascultat trompeta din Cracovia?",
+    "Descoperă piața ei medievală."
+  ],
+  "Copenhaga": [
+    "Ai văzut casele colorate din Copenhaga?",
+    "Plimbă-te pe lângă canalul Nyhavn."
+  ],
+  "Stockholm": [
+    "Câte insule poți descoperi în Stockholm?",
+    "Începe cu străduțele din Gamla Stan."
+  ],
+  "Oslo": [
+    "Ce mai fac vikingii vremurilor noastre?",
+    "E timpul să descoperi Oslo."
+  ],
+  "Helsinki": [
+    "Ai savurat o cafea în Helsinki?",
+    "Descoperă farmecul nordului."
+  ],
+  "Edinburgh": [
+    "Ai văzut castelul din Edinburgh?",
+    "Urcă spre poveștile Scoției."
+  ],
+  "Londra": [
+    "Cum sună Big Ben la ora exactă?",
+    "E timpul să afli pe viu, la Londra."
+  ],
+  "Bruxelles": [
+    "Ai văzut Grand-Place din Bruxelles?",
+    "Ia-ți timp și pentru o ciocolată belgiană."
+  ],
+  "Berlin": [
+    "Câte povești încap în Berlin?",
+    "Descoperă-le pe străzile orașului."
+  ],
+  "Dubrovnik": [
+    "Ai văzut Adriatica de pe zidurile Dubrovnikului?",
+    "Urcă pentru priveliște."
+  ],
+  "Lyon": [
+    "Ai descoperit pasajele ascunse din Lyon?",
+    "Începe cu orașul vechi."
+  ],
+  "Tallinn": [
+    "Ai pășit prin Tallinnul medieval?",
+    "Descoperă-l dincolo de ziduri."
+  ],
+  "Bruges": [
+    "Ai descoperit canalele din Bruges?",
+    "Ia-o la pas prin orașul medieval."
+  ],
+  "Istanbul": [
+    "Ai privit Bosforul din Istanbul?",
+    "Descoperă orașul dintre două continente."
+  ]
+};
     for (let i = heroImages.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [heroImages[i], heroImages[j]] = [heroImages[j], heroImages[i]];
@@ -3865,6 +3958,11 @@
         }
         hero.style.backgroundImage = `linear-gradient(90deg,#111211 0%,transparent 24%),linear-gradient(0deg,rgba(0,0,0,.52),transparent 60%),url("${url}")`;
         heroCity.textContent = `${item.name} · ${item.country}`;
+        const headline = heroHeadlines[item.name] || [`Descoperă ${item.name}.`, 'Alege-ți următorul weekend.'];
+        const heading = document.getElementById('hero-headline');
+        const highlight = document.createElement('em');
+        highlight.textContent = headline[1];
+        heading.replaceChildren(document.createTextNode(headline[0] + ' '), highlight);
         registerPhotoCredit(item.image, `${item.name}, ${item.country}`, photo);
         shown = true;
       }
