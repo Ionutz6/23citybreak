@@ -1,0 +1,435 @@
+# Lista orașelor pentru harta „Orașe vizitate”.
+# Format: Nume RO;Nume în GeoNames;Cod țară[;opțiuni]
+# Opțiuni: t = oraș mic turistic, id=City:... (id-ul folosit deja în căutarea de zboruri), ll=lat,lon (coordonate manuale), alt=nume1|nume2 (căutare)
+# Regatul Unit
+Londra;London;GB
+Manchester;Manchester;GB
+Liverpool;Liverpool;GB
+Edinburgh;Edinburgh;GB
+Birmingham;Birmingham;GB
+Bristol;Bristol;GB
+Leeds;Leeds;GB
+Glasgow;Glasgow;GB
+Newcastle;Newcastle upon Tyne;GB;id=City:newcastle_gb
+Belfast;Belfast;GB
+Oxford;Oxford;GB;t
+Cambridge;Cambridge;GB;t
+Bath;Bath;GB;t
+York;York;GB;t
+Brighton;Brighton;GB;t
+Canterbury;Canterbury;GB;t
+Inverness;Inverness;GB;t
+Cardiff;Cardiff;GB
+St Andrews;Saint Andrews;GB;t;alt=st andrews
+Stratford-upon-Avon;Stratford-upon-Avon;GB;t
+# Irlanda
+Dublin;Dublin;IE
+Cork;Cork;IE
+Galway;Gaillimh;IE;t;id=City:galway_ie
+Kilkenny;Kilkenny;IE;t
+# Italia
+Milano;Milan;IT
+Roma;Rome;IT
+Bologna;Bologna;IT
+Veneția;Venice;IT;alt=venezia|venice
+Napoli;Naples;IT;alt=naples
+Pisa;Pisa;IT
+Florența;Florence;IT;alt=firenze|florence
+Catania;Catania;IT
+Palermo;Palermo;IT
+Bari;Bari;IT
+Torino;Turin;IT;alt=turin
+Verona;Verona;IT
+Genova;Genoa;IT;alt=genoa
+Cagliari;Cagliari;IT
+Alghero;Alghero;IT;t
+Pescara;Pescara;IT
+Perugia;Perugia;IT
+Trieste;Trieste;IT
+Siena;Siena;IT;t
+Lucca;Lucca;IT;t
+San Gimignano;San Gimignano;IT;t
+Como;Como;IT;t
+Bergamo;Bergamo;IT
+Bellagio;Bellagio;IT;t
+Sirmione;Sirmione;IT;t
+Matera;Matera;IT;t
+Alberobello;Alberobello;IT;t
+Lecce;Lecce;IT;t
+Polignano a Mare;Polignano a Mare;IT;t
+Sorrento;Sorrento;IT;t
+Positano;Positano;IT;t
+Amalfi;Amalfi;IT;t
+Capri;Capri;IT;t
+Pompei;Pompei;IT;t;alt=pompeii
+Taormina;Taormina;IT;t
+Siracuza;Syracuse;IT;t;ll=37.0755,15.2866;alt=siracusa|syracuse
+Cefalù;Cefalù;IT;t
+Cinque Terre (Vernazza);Vernazza;IT;t;alt=cinque terre|monterosso|manarola
+Portofino;Portofino;IT;t
+Parma;Parma;IT
+Modena;Modena;IT
+Ravenna;Ravenna;IT;t
+Rimini;Rimini;IT
+Padova;Padova;IT;alt=padua
+Mantova;Mantova;IT;t;alt=mantua
+Bolzano;Bolzano;IT;t
+Cortina d'Ampezzo;Cortina d'Ampezzo;IT;t
+Assisi;Assisi;IT;t
+Orvieto;Orvieto;IT;t
+Olbia;Olbia;IT
+# Vatican, San Marino, Monaco
+Vatican;Vatican City;VA;t;ll=41.9029,12.4534
+San Marino;San Marino;SM;t
+Monaco;Monaco;MC;t;alt=monte carlo
+# Spania
+Barcelona;Barcelona;ES
+Madrid;Madrid;ES
+Valencia;Valencia;ES
+Málaga;Málaga;ES;id=City:malaga_es;alt=malaga
+Sevilla;Sevilla;ES;id=City:seville_es;alt=seville
+Alicante;Alicante;ES
+Bilbao;Bilbao;ES
+Palma de Mallorca;Palma;ES;id=City:palma_es;ll=39.5696,2.6502;alt=mallorca|majorca
+Ibiza;Ibiza;ES;ll=38.9067,1.4206
+Menorca (Mahón);Mahon;ES;id=City:menorca_es;ll=39.8885,4.2658;alt=menorca|mahon
+Tenerife;Santa Cruz de Tenerife;ES;id=City:tenerife_es;alt=tenerife
+Gran Canaria;Las Palmas de Gran Canaria;ES;id=City:gran-canaria_es;alt=las palmas
+Lanzarote (Arrecife);Arrecife;ES;id=City:lanzarote_es;alt=lanzarote
+Fuerteventura;Puerto del Rosario;ES;id=City:fuerteventura_es;alt=fuerteventura
+Santander;Santander;ES
+Zaragoza;Zaragoza;ES
+Granada;Granada;ES
+Córdoba;Córdoba;ES;alt=cordoba
+Toledo;Toledo;ES;t
+Segovia;Segovia;ES;t
+Salamanca;Salamanca;ES;t
+San Sebastián;San Sebastián;ES;t;ll=43.3183,-1.9812;alt=donostia|san sebastian
+Santiago de Compostela;Santiago de Compostela;ES;t
+Ronda;Ronda;ES;t
+Cádiz;Cádiz;ES;t;alt=cadiz
+Marbella;Marbella;ES;t
+Girona;Girona;ES;t
+Tarragona;Tarragona;ES
+Cuenca;Cuenca;ES;t
+Mérida;Mérida;ES;t;ll=38.9161,-6.3437
+Oviedo;Oviedo;ES
+Pamplona;Pamplona;ES
+Benidorm;Benidorm;ES;t
+Sitges;Sitges;ES;t
+# Portugalia
+Lisabona;Lisbon;PT;alt=lisbon|lisboa
+Porto;Porto;PT
+Faro;Faro;PT
+Funchal (Madeira);Funchal;PT;alt=madeira
+Sintra;Sintra;PT;t
+Cascais;Cascais;PT;t
+Lagos;Lagos;PT;t;ll=37.1028,-8.6742
+Óbidos;Óbidos;PT;t;ll=39.3606,-9.1571;alt=obidos
+Coimbra;Coimbra;PT;t
+Évora;Évora;PT;t;alt=evora
+Braga;Braga;PT
+Aveiro;Aveiro;PT;t
+Ponta Delgada (Azore);Ponta Delgada;PT;alt=azore|azores
+# Franța
+Paris;Paris;FR
+Nisa;Nice;FR;alt=nice
+Lyon;Lyon;FR
+Marsilia;Marseille;FR;alt=marseille
+Bordeaux;Bordeaux;FR
+Toulouse;Toulouse;FR
+Nantes;Nantes;FR
+Strasbourg;Strasbourg;FR
+Lille;Lille;FR
+Colmar;Colmar;FR;t
+Annecy;Annecy;FR;t
+Avignon;Avignon;FR;t
+Arles;Arles;FR;t
+Aix-en-Provence;Aix-en-Provence;FR;t
+Cannes;Cannes;FR;t
+Antibes;Antibes;FR;t
+Èze;Èze;FR;t;ll=43.7280,7.3617;alt=eze
+Saint-Tropez;Saint-Tropez;FR;t
+Carcassonne;Carcassonne;FR;t
+Mont-Saint-Michel;Mont-Saint-Michel;FR;t;ll=48.6361,-1.5115
+Saint-Malo;Saint-Malo;FR;t
+Rouen;Rouen;FR
+Reims;Reims;FR
+Chamonix;Chamonix-Mont-Blanc;FR;t;ll=45.9237,6.8694;alt=chamonix
+Biarritz;Biarritz;FR;t
+Montpellier;Montpellier;FR
+Dijon;Dijon;FR
+Tours;Tours;FR
+Versailles;Versailles;FR;t
+Ajaccio (Corsica);Ajaccio;FR;alt=corsica
+Rocamadour;Rocamadour;FR;t;ll=44.7993,1.6178
+Étretat;Étretat;FR;t;ll=49.7069,0.2033;alt=etretat
+# Germania
+Berlin;Berlin;DE
+München;Munich;DE;alt=munich|munchen
+Frankfurt;Frankfurt am Main;DE;id=City:frankfurt_de
+Hamburg;Hamburg;DE
+Köln;Köln;DE;id=City:cologne_de;alt=koln|koeln|cologne
+Bonn;Bonn;DE
+Düsseldorf;Düsseldorf;DE;id=City:dusseldorf_de;alt=dusseldorf
+Stuttgart;Stuttgart;DE
+Nürnberg;Nürnberg;DE;id=City:nuremberg_de;alt=nurnberg|nuremberg
+Dortmund;Dortmund;DE
+Memmingen;Memmingen;DE
+Hannover;Hannover;DE;id=City:hannover_de
+Leipzig;Leipzig;DE
+Bremen;Bremen;DE
+Karlsruhe;Karlsruhe;DE
+Baden-Baden;Baden-Baden;DE;t
+Dresda;Dresden;DE;alt=dresden
+Heidelberg;Heidelberg;DE;t
+Rothenburg ob der Tauber;Rothenburg ob der Tauber;DE;t
+Füssen (Neuschwanstein);Füssen;DE;t;alt=neuschwanstein|fussen
+Bamberg;Bamberg;DE;t
+Regensburg;Regensburg;DE;t
+Würzburg;Würzburg;DE;t;alt=wurzburg
+Lübeck;Lübeck;DE;t;alt=lubeck
+Aachen;Aachen;DE
+Trier;Trier;DE;t
+Freiburg;Freiburg;DE;ll=47.9990,7.8421
+Potsdam;Potsdam;DE;t
+Weimar;Weimar;DE;t
+Garmisch-Partenkirchen;Garmisch-Partenkirchen;DE;t
+Cochem;Cochem;DE;t
+Quedlinburg;Quedlinburg;DE;t
+# Austria
+Viena;Vienna;AT;alt=wien|vienna
+Salzburg;Salzburg;AT
+Innsbruck;Innsbruck;AT
+Graz;Graz;AT
+Hallstatt;Hallstatt;AT;t;ll=47.5622,13.6493
+Linz;Linz;AT
+Zell am See;Zell am See;AT;t
+Dürnstein (Wachau);Dürnstein;AT;t;ll=48.3953,15.5197;alt=wachau|durnstein
+Bad Ischl;Bad Ischl;AT;t
+# Elveția și Liechtenstein
+Zürich;Zurich;CH;alt=zurich
+Geneva;Genève;CH;id=City:geneva_ch;alt=geneve|genf
+Basel;Basel;CH
+Berna;Bern;CH;alt=bern
+Lucerna;Luzern;CH;id=City:lucerne_ch;alt=luzern|lucerne
+Interlaken;Interlaken;CH;t
+Zermatt;Zermatt;CH;t
+Lausanne;Lausanne;CH
+Montreux;Montreux;CH;t
+Lugano;Lugano;CH;t
+Grindelwald;Grindelwald;CH;t
+St. Moritz;Saint Moritz;CH;t;ll=46.4908,9.8355;alt=st moritz
+Vaduz;Vaduz;LI;t
+# Benelux
+Bruxelles;Brussels;BE;alt=brussels
+Bruges;Brugge;BE;id=City:bruges_be;alt=brugge
+Gent;Gent;BE;t;alt=ghent
+Antwerpen;Antwerpen;BE;alt=anvers|antwerp
+Dinant;Dinant;BE;t
+Amsterdam;Amsterdam;NL
+Eindhoven;Eindhoven;NL
+Rotterdam;Rotterdam;NL
+Haga;The Hague;NL;alt=den haag|the hague;ll=52.0767,4.2986
+Utrecht;Utrecht;NL
+Delft;Delft;NL;t
+Giethoorn;Giethoorn;NL;t
+Maastricht;Maastricht;NL;t
+Haarlem;Haarlem;NL;t
+Luxemburg;Luxembourg;LU
+# Țările nordice
+Copenhaga;Copenhagen;DK;alt=kobenhavn|copenhagen
+Billund;Billund;DK
+Aarhus;Århus;DK;id=City:aarhus_dk
+Odense;Odense;DK;t
+Stockholm;Stockholm;SE
+Göteborg;Göteborg;SE;id=City:gothenburg_se;alt=goteborg|gothenburg
+Malmö;Malmö;SE;id=City:malmo_se;alt=malmo
+Uppsala;Uppsala;SE
+Visby;Visby;SE;t
+Kiruna;Kiruna;SE;t
+Oslo;Oslo;NO
+Bergen;Bergen;NO
+Tromsø;Tromsø;NO;id=City:tromso_no;alt=tromso
+Stavanger;Stavanger;NO
+Ålesund;Ålesund;NO;t;alt=alesund
+Flåm;Flåm;NO;t;ll=60.8628,7.1137;alt=flam
+Lofoten (Reine);Reine;NO;t;ll=67.9326,13.0889;alt=lofoten
+Trondheim;Trondheim;NO
+Helsinki;Helsinki;FI
+Rovaniemi;Rovaniemi;FI
+Turku;Turku;FI
+Tampere;Tampere;FI
+Porvoo;Porvoo;FI;t
+Reykjavik;Reykjavík;IS;id=City:reykjavik_is
+Akureyri;Akureyri;IS;t
+Vík;Vík;IS;t;ll=63.4186,-19.0060;alt=vik
+Tórshavn (Feroe);Tórshavn;FO;t;alt=torshavn|faroe|feroe
+# Țările baltice
+Tallinn;Tallinn;EE
+Tartu;Tartu;EE
+Riga;Riga;LV
+Jūrmala;Jūrmala;LV;t;alt=jurmala
+Vilnius;Vilnius;LT
+Kaunas;Kaunas;LT
+Trakai;Trakai;LT;t
+# Polonia
+Varșovia;Warsaw;PL;alt=warszawa|warsaw
+Cracovia;Kraków;PL;id=City:krakow_pl;alt=krakow
+Katowice;Katowice;PL
+Gdańsk;Gdańsk;PL;id=City:gdansk_pl;alt=gdansk
+Wrocław;Wrocław;PL;id=City:wroclaw_pl;alt=wroclaw
+Poznań;Poznań;PL;id=City:poznan_pl;alt=poznan
+Zakopane;Zakopane;PL;t
+Toruń;Toruń;PL;t;alt=torun
+Łódź;Łódź;PL;alt=lodz
+Lublin;Lublin;PL
+Sopot;Sopot;PL;t
+Malbork;Malbork;PL;t
+# Cehia, Slovacia, Ungaria
+Praga;Prague;CZ;alt=praha|prague
+Brno;Brno;CZ
+Český Krumlov;Český Krumlov;CZ;t;alt=cesky krumlov
+Karlovy Vary;Karlovy Vary;CZ;t
+Kutná Hora;Kutná Hora;CZ;t;alt=kutna hora
+Olomouc;Olomouc;CZ;t
+Plzeň;Pilsen;CZ;id=City:plzen_cz;alt=plzen|pilsen
+Bratislava;Bratislava;SK
+Košice;Košice;SK;alt=kosice
+Banská Štiavnica;Banská Štiavnica;SK;t;alt=banska stiavnica
+Budapesta;Budapest;HU;alt=budapest
+Debrecen;Debrecen;HU
+Szentendre;Szentendre;HU;t
+Eger;Eger;HU;t
+Pécs;Pécs;HU;alt=pecs
+Szeged;Szeged;HU
+Hévíz (Balaton);Hévíz;HU;t;alt=balaton|heviz
+Gyula;Gyula;HU;t
+# Slovenia, Croația
+Ljubljana;Ljubljana;SI
+Bled;Bled;SI;t
+Piran;Piran;SI;t
+Maribor;Maribor;SI
+Zagreb;Zagreb;HR
+Split;Split;HR
+Dubrovnik;Dubrovnik;HR
+Zadar;Zadar;HR
+Pula;Pula;HR
+Rovinj;Rovinj;HR;t
+Hvar;Hvar;HR;t;ll=43.1729,16.4411
+Šibenik;Šibenik;HR;t;alt=sibenik
+Trogir;Trogir;HR;t
+Plitvice;Plitvice;HR;t;ll=44.8654,15.5820;alt=plitvicka jezera
+Opatija;Opatija;HR;t
+Rijeka;Rijeka;HR
+Korčula;Korčula;HR;t;ll=42.9600,17.1356;alt=korcula
+# Balcanii de Vest
+Belgrad;Belgrade;RS;alt=beograd|belgrade
+Novi Sad;Novi Sad;RS
+Niš;Niš;RS;alt=nis
+Sarajevo;Sarajevo;BA
+Mostar;Mostar;BA;t
+Podgorica;Podgorica;ME
+Tivat;Tivat;ME
+Kotor;Kotor;ME;t
+Budva;Budva;ME;t
+Skopje;Skopje;MK
+Ohrid;Ohrid;MK;t
+Tirana;Tirana;AL
+Berat;Berat;AL;t
+Gjirokastër;Gjirokastër;AL;t;alt=gjirokaster
+Sarandë;Sarandë;AL;t;alt=sarande
+Shkodër;Shkodër;AL;t;alt=shkoder
+Priștina;Pristina;XK;alt=pristina;ll=42.6629,21.1655
+Prizren;Prizren;XK;t;ll=42.2139,20.7397
+# Grecia
+Atena;Athens;GR;alt=athens|athina
+Salonic;Thessaloníki;GR;id=City:thessaloniki_gr;alt=thessaloniki
+Heraklion (Creta);Irákleion;GR;id=City:heraklion_gr;alt=creta|crete|iraklio
+Chania (Creta);Chania;GR;alt=creta|crete|hania
+Rhodos;Ródos;GR;id=City:rhodes_gr;alt=rodos|rhodes
+Corfu;Kerkyra;GR;id=City:corfu_gr;alt=kerkyra;ll=39.6243,19.9217
+Santorini;Fira;GR;id=City:santorini_gr;t;ll=36.4167,25.4318;alt=thira|fira
+Mykonos;Mykonos;GR;t;ll=37.4467,25.3289
+Zakynthos;Zakynthos;GR;ll=37.7870,20.8999;alt=zante
+Nafplio;Nafplio;GR;t;alt=nafplion
+Meteora (Kalambaka);Kalampáka;GR;t;ll=39.7069,21.6264;alt=meteora|kalambaka
+Delphi;Delfoí;GR;t;ll=38.4824,22.5010;alt=delfi
+Paros;Paros;GR;t;ll=37.0853,25.1489;alt=parikia
+Naxos;Naxos;GR;t;ll=37.1036,25.3766
+Kefalonia (Argostoli);Argostólion;GR;id=City:argostoli_gr;t;alt=kefalonia|cephalonia
+Lefkada;Lefkada;GR;t;ll=38.8300,20.7050
+Kavala;Kavala;GR
+Thassos;Thasos;GR;t;ll=40.7800,24.7100;alt=thasos
+Ioannina;Ioannina;GR
+# Cipru și Malta
+Larnaca;Larnaca;CY
+Paphos;Paphos;CY;alt=pafos
+Nicosia;Nicosia;CY;alt=lefkosia
+Limassol;Limassol;CY
+Ayia Napa;Ayia Napa;CY;t;ll=34.9823,34.0000
+Valletta (Malta);Valletta;MT;id=City:luqa_mt;alt=malta
+Mdina;Mdina;MT;t;ll=35.8858,14.4031
+Gozo (Victoria);Victoria;MT;t;ll=36.0444,14.2397;alt=gozo
+# România
+București;Bucharest;RO;alt=bucuresti|bucharest
+Cluj-Napoca;Cluj-Napoca;RO;alt=cluj
+Timișoara;Timișoara;RO;alt=timisoara
+Iași;Iaşi;RO;id=City:iasi_ro;alt=iasi
+Sibiu;Sibiu;RO
+Suceava;Suceava;RO
+Craiova;Craiova;RO
+Brașov;Braşov;RO;id=City:brasov_ro;alt=brasov
+Bacău;Bacău;RO;id=City:bacau_ro;alt=bacau
+Oradea;Oradea;RO
+Constanța;Constanţa;RO;id=City:constanta_ro;alt=constanta
+Sighișoara;Sighişoara;RO;t;alt=sighisoara
+Sinaia;Sinaia;RO;t
+Bran;Bran;RO;t;ll=45.5150,25.3672
+Alba Iulia;Alba Iulia;RO;t
+Târgu Mureș;Târgu-Mureş;RO;id=City:targu-mures_ro;alt=targu mures
+Satu Mare;Satu Mare;RO
+Baia Mare;Baia Mare;RO
+Sighetu Marmației;Sighetu Marmaţiei;RO;t;alt=sighet|maramures
+Tulcea (Delta Dunării);Tulcea;RO;t;alt=delta|sulina
+Arad;Arad;RO
+Hunedoara;Hunedoara;RO;t;alt=castelul corvinilor
+Vama Veche;Vama Veche;RO;t;ll=43.7533,28.5733
+Gura Humorului;Gura Humorului;RO;t;alt=bucovina|manastiri
+Băile Herculane;Băile Herculane;RO;t;ll=44.8792,22.4125;alt=baile herculane
+Piatra Neamț;Piatra Neamţ;RO;alt=piatra neamt
+Galați;Galaţi;RO;alt=galati
+Târgu Jiu;Târgu Jiu;RO;alt=targu jiu
+# Moldova, Ucraina
+Chișinău;Chişinău;MD;id=City:chisinau_md;alt=chisinau
+Lviv;Lviv;UA;t;alt=lvov|lemberg
+Odesa;Odesa;UA;alt=odessa;ll=46.4825,30.7233
+Kiev;Kyiv;UA;alt=kyiv|kiev;ll=50.4501,30.5234
+Cernăuți;Chernivtsi;UA;t;alt=cernauti|chernivtsi
+# Bulgaria
+Sofia;Sofia;BG
+Varna;Varna;BG
+Burgas;Burgas;BG
+Plovdiv;Plovdiv;BG
+Veliko Tarnovo;Veliko Tŭrnovo;BG;t;alt=veliko tarnovo
+Nesebar;Nesebar;BG;t;alt=nessebar
+Sozopol;Sozopol;BG;t
+Bansko;Bansko;BG;t
+Balcic;Balchik;BG;t;alt=balchik
+Ruse;Ruse;BG
+Rila (Mănăstirea);Rila;BG;t;ll=42.1333,23.3404;alt=rila monastery
+# Turcia (partea europeană + destinații din căutare)
+Istanbul;Istanbul;TR
+Antalya;Antalya;TR
+Izmir;İzmir;TR;id=City:izmir_tr;alt=izmir
+Bodrum;Bodrum;TR
+Edirne;Edirne;TR;t
+Cappadocia (Göreme);Göreme;TR;t;ll=38.6431,34.8289;alt=cappadocia|goreme
+Efes (Selçuk);Selçuk;TR;t;ll=37.9497,27.3683;alt=ephesus|efes
+Fethiye;Fethiye;TR;t
+# Caucaz
+Tbilisi;Tbilisi;GE
+Kutaisi;Kutaisi;GE
+Batumi;Batumi;GE
+Erevan;Yerevan;AM;alt=yerevan
+Baku;Baku;AZ

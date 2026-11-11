@@ -1,0 +1,355 @@
+id;nume;tara;fisier;nume_prompt;tara_prompt
+lviv_ua;Lviv;Ucraina;ilustratii-orase/lviv_ua.webp;Lviv;Ukraine
+chernivtsi_ua;Cernăuți;Ucraina;ilustratii-orase/chernivtsi_ua.webp;Chernivtsi;Ukraine
+gent_be;Gent;Belgia;ilustratii-orase/gent_be.webp;Gent;Belgium
+lubeck_de;Lübeck;Germania;ilustratii-orase/lubeck_de.webp;Lübeck;Germany
+torun_pl;Toruń;Polonia;ilustratii-orase/torun_pl.webp;Toruń;Poland
+prizren_xk;Prizren;Kosovo;ilustratii-orase/prizren_xk.webp;Prizren;Kosovo
+oxford_gb;Oxford;Marea Britanie;ilustratii-orase/oxford_gb.webp;Oxford;United Kingdom
+cambridge_gb;Cambridge;Marea Britanie;ilustratii-orase/cambridge_gb.webp;Cambridge;United Kingdom
+salamanca_es;Salamanca;Spania;ilustratii-orase/salamanca_es.webp;Salamanca;Spain
+york_gb;York;Marea Britanie;ilustratii-orase/york_gb.webp;York;United Kingdom
+haarlem_nl;Haarlem;Olanda;ilustratii-orase/haarlem_nl.webp;Haarlem;Netherlands
+aix-en-provence_fr;Aix-en-Provence;Franța;ilustratii-orase/aix-en-provence_fr.webp;Aix-en-Provence;France
+odense_dk;Odense;Danemarca;ilustratii-orase/odense_dk.webp;Odense;Denmark
+potsdam_de;Potsdam;Germania;ilustratii-orase/potsdam_de.webp;Potsdam;Germany
+heidelberg_de;Heidelberg;Germania;ilustratii-orase/heidelberg_de.webp;Heidelberg;Germany
+brighton_gb;Brighton;Marea Britanie;ilustratii-orase/brighton_gb.webp;Brighton;United Kingdom
+marbella_es;Marbella;Spania;ilustratii-orase/marbella_es.webp;Marbella;Spain
+wurzburg_de;Würzburg;Germania;ilustratii-orase/wurzburg_de.webp;Würzburg;Germany
+regensburg_de;Regensburg;Germania;ilustratii-orase/regensburg_de.webp;Regensburg;Germany
+cadiz_es;Cádiz;Spania;ilustratii-orase/cadiz_es.webp;Cádiz;Spain
+edirne_tr;Edirne;Turcia;ilustratii-orase/edirne_tr.webp;Edirne;Türkiye
+maastricht_nl;Maastricht;Olanda;ilustratii-orase/maastricht_nl.webp;Maastricht;Netherlands
+coimbra_pt;Coimbra;Portugalia;ilustratii-orase/coimbra_pt.webp;Coimbra;Portugal
+mostar_ba;Mostar;Bosnia și Herțegovina;ilustratii-orase/mostar_ba.webp;Mostar;Bosnia & Herzegovina
+olomouc_cz;Olomouc;Cehia;ilustratii-orase/olomouc_cz.webp;Olomouc;Czechia
+trier_de;Trier;Germania;ilustratii-orase/trier_de.webp;Trier;Germany
+bolzano_it;Bolzano;Italia;ilustratii-orase/bolzano_it.webp;Bolzano;Italy
+girona_es;Girona;Spania;ilustratii-orase/girona_es.webp;Girona;Spain
+santiago-de-compostela_es;Santiago de Compostela;Spania;ilustratii-orase/santiago-de-compostela_es.webp;Santiago de Compostela;Spain
+delft_nl;Delft;Olanda;ilustratii-orase/delft_nl.webp;Delft;Netherlands
+bath_gb;Bath;Marea Britanie;ilustratii-orase/bath_gb.webp;Bath;United Kingdom
+tulcea_ro;Tulcea (Delta Dunării);România;ilustratii-orase/tulcea_ro.webp;Tulcea;Romania
+avignon_fr;Avignon;Franța;ilustratii-orase/avignon_fr.webp;Avignon;France
+shkoder_al;Shkodër;Albania;ilustratii-orase/shkoder_al.webp;Shkodër;Albania
+versailles_fr;Versailles;Franța;ilustratii-orase/versailles_fr.webp;Versailles;France
+toledo_es;Toledo;Spania;ilustratii-orase/toledo_es.webp;Toledo;Spain
+como_it;Como;Italia;ilustratii-orase/como_it.webp;Como;Italy
+lucca_it;Lucca;Italia;ilustratii-orase/lucca_it.webp;Lucca;Italy
+ravenna_it;Ravenna;Italia;ilustratii-orase/ravenna_it.webp;Ravenna;Italy
+lecce_it;Lecce;Italia;ilustratii-orase/lecce_it.webp;Lecce;Italy
+antibes_fr;Antibes;Franța;ilustratii-orase/antibes_fr.webp;Antibes;France
+benidorm_es;Benidorm;Spania;ilustratii-orase/benidorm_es.webp;Benidorm;Spain
+galway_ie;Galway;Irlanda;ilustratii-orase/galway_ie.webp;Gaillimh;Ireland
+bamberg_de;Bamberg;Germania;ilustratii-orase/bamberg_de.webp;Bamberg;Germany
+cannes_fr;Cannes;Franța;ilustratii-orase/cannes_fr.webp;Cannes;France
+hunedoara_ro;Hunedoara;România;ilustratii-orase/hunedoara_ro.webp;Hunedoara;Romania
+veliko-turnovo_bg;Veliko Tarnovo;Bulgaria;ilustratii-orase/veliko-turnovo_bg.webp;Veliko Tŭrnovo;Bulgaria
+alba-iulia_ro;Alba Iulia;România;ilustratii-orase/alba-iulia_ro.webp;Alba Iulia;Romania
+colmar_fr;Colmar;Franța;ilustratii-orase/colmar_fr.webp;Colmar;France
+weimar_de;Weimar;Germania;ilustratii-orase/weimar_de.webp;Weimar;Germany
+lugano_ch;Lugano;Elveția;ilustratii-orase/lugano_ch.webp;Lugano;Switzerland
+fethiye_tr;Fethiye;Turcia;ilustratii-orase/fethiye_tr.webp;Fethiye;Türkiye
+segovia_es;Segovia;Spania;ilustratii-orase/segovia_es.webp;Segovia;Spain
+eger_hu;Eger;Ungaria;ilustratii-orase/eger_hu.webp;Eger;Hungary
+merida_es;Mérida;Spania;ilustratii-orase/merida_es.webp;Mérida;Spain
+cuenca_es;Cuenca;Spania;ilustratii-orase/cuenca_es.webp;Cuenca;Spain
+evora_pt;Évora;Portugalia;ilustratii-orase/evora_pt.webp;Évora;Portugal
+canterbury_gb;Canterbury;Marea Britanie;ilustratii-orase/canterbury_gb.webp;Canterbury;United Kingdom
+ohrid_mk;Ohrid;Macedonia de Nord;ilustratii-orase/ohrid_mk.webp;Ohrid;North Macedonia
+matera_it;Matera;Italia;ilustratii-orase/matera_it.webp;Matera;Italy
+baden-baden_de;Baden-Baden;Germania;ilustratii-orase/baden-baden_de.webp;Baden-Baden;Germany
+aveiro_pt;Aveiro;Portugalia;ilustratii-orase/aveiro_pt.webp;Aveiro;Portugal
+jurmala_lv;Jūrmala;Letonia;ilustratii-orase/jurmala_lv.webp;Jūrmala;Latvia
+arles_fr;Arles;Franța;ilustratii-orase/arles_fr.webp;Arles;France
+karlovy-vary_cz;Karlovy Vary;Cehia;ilustratii-orase/karlovy-vary_cz.webp;Karlovy Vary;Czechia
+saint-malo_fr;Saint-Malo;Franța;ilustratii-orase/saint-malo_fr.webp;Saint-Malo;France
+carcassonne_fr;Carcassonne;Franța;ilustratii-orase/carcassonne_fr.webp;Carcassonne;France
+annecy_fr;Annecy;Franța;ilustratii-orase/annecy_fr.webp;Annecy;France
+porvoo_fi;Porvoo;Finlanda;ilustratii-orase/porvoo_fi.webp;Porvoo;Finland
+inverness_gb;Inverness;Marea Britanie;ilustratii-orase/inverness_gb.webp;Inverness;United Kingdom
+berat_al;Berat;Albania;ilustratii-orase/berat_al.webp;Berat;Albania
+alesund_no;Ålesund;Norvegia;ilustratii-orase/alesund_no.webp;Ålesund;Norway
+siena_it;Siena;Italia;ilustratii-orase/siena_it.webp;Siena;Italy
+sighetu-marmatiei_ro;Sighetu Marmației;România;ilustratii-orase/sighetu-marmatiei_ro.webp;Sighetu Marmaţiei;Romania
+sopot_pl;Sopot;Polonia;ilustratii-orase/sopot_pl.webp;Sopot;Poland
+mantova_it;Mantova;Italia;ilustratii-orase/mantova_it.webp;Mantova;Italy
+malbork_pl;Malbork;Polonia;ilustratii-orase/malbork_pl.webp;Malbork;Poland
+sibenik_hr;Šibenik;Croația;ilustratii-orase/sibenik_hr.webp;Šibenik;Croatia
+ronda_es;Ronda;Spania;ilustratii-orase/ronda_es.webp;Ronda;Spain
+cascais_pt;Cascais;Portugalia;ilustratii-orase/cascais_pt.webp;Cascais;Portugal
+sighisoara_ro;Sighișoara;România;ilustratii-orase/sighisoara_ro.webp;Sighişoara;Romania
+alghero_it;Alghero;Italia;ilustratii-orase/alghero_it.webp;Alghero;Italy
+biarritz_fr;Biarritz;Franța;ilustratii-orase/biarritz_fr.webp;Biarritz;France
+monaco_mc;Monaco;Monaco;ilustratii-orase/monaco_mc.webp;Monaco;Monaco
+gyula_hu;Gyula;Ungaria;ilustratii-orase/gyula_hu.webp;Gyula;Hungary
+selcuk_tr;Efes (Selçuk);Turcia;ilustratii-orase/selcuk_tr.webp;Selçuk;Türkiye
+stratford-upon-avon_gb;Stratford-upon-Avon;Marea Britanie;ilustratii-orase/stratford-upon-avon_gb.webp;Stratford-upon-Avon;United Kingdom
+sitges_es;Sitges;Spania;ilustratii-orase/sitges_es.webp;Sitges;Spain
+zakopane_pl;Zakopane;Polonia;ilustratii-orase/zakopane_pl.webp;Zakopane;Poland
+sintra_pt;Sintra;Portugalia;ilustratii-orase/sintra_pt.webp;Sintra;Portugal
+garmisch-partenkirchen_de;Garmisch-Partenkirchen;Germania;ilustratii-orase/garmisch-partenkirchen_de.webp;Garmisch-Partenkirchen;Germany
+pompei_it;Pompei;Italia;ilustratii-orase/pompei_it.webp;Pompei;Italy
+szentendre_hu;Szentendre;Ungaria;ilustratii-orase/szentendre_hu.webp;Szentendre;Hungary
+gjirokaster_al;Gjirokastër;Albania;ilustratii-orase/gjirokaster_al.webp;Gjirokastër;Albania
+visby_se;Visby;Suedia;ilustratii-orase/visby_se.webp;Visby;Sweden
+montreux_ch;Montreux;Elveția;ilustratii-orase/montreux_ch.webp;Montreux;Switzerland
+quedlinburg_de;Quedlinburg;Germania;ilustratii-orase/quedlinburg_de.webp;Quedlinburg;Germany
+kilkenny_ie;Kilkenny;Irlanda;ilustratii-orase/kilkenny_ie.webp;Kilkenny;Ireland
+kutna-hora_cz;Kutná Hora;Cehia;ilustratii-orase/kutna-hora_cz.webp;Kutná Hora;Czechia
+lagos_pt;Lagos;Portugalia;ilustratii-orase/lagos_pt.webp;Lagos;Portugal
+budva_me;Budva;Muntenegru;ilustratii-orase/budva_me.webp;Budva;Montenegro
+akureyri_is;Akureyri;Islanda;ilustratii-orase/akureyri_is.webp;Akureyri;Iceland
+kiruna_se;Kiruna;Suedia;ilustratii-orase/kiruna_se.webp;Kiruna;Sweden
+saint-andrews_gb;St Andrews;Marea Britanie;ilustratii-orase/saint-andrews_gb.webp;Saint Andrews;United Kingdom
+gura-humorului_ro;Gura Humorului;România;ilustratii-orase/gura-humorului_ro.webp;Gura Humorului;Romania
+sarande_al;Sarandë;Albania;ilustratii-orase/sarande_al.webp;Sarandë;Albania
+sorrento_it;Sorrento;Italia;ilustratii-orase/sorrento_it.webp;Sorrento;Italy
+nafplio_gr;Nafplio;Grecia;ilustratii-orase/nafplio_gr.webp;Nafplio;Greece
+cesky-krumlov_cz;Český Krumlov;Cehia;ilustratii-orase/cesky-krumlov_cz.webp;Český Krumlov;Czechia
+fussen_de;Füssen (Neuschwanstein);Germania;ilustratii-orase/fussen_de.webp;Füssen;Germany
+rovinj_hr;Rovinj;Croația;ilustratii-orase/rovinj_hr.webp;Rovinj;Croatia
+polignano-a-mare_it;Polignano a Mare;Italia;ilustratii-orase/polignano-a-mare_it.webp;Polignano a Mare;Italy
+torshavn_fo;Tórshavn (Feroe);Insulele Feroe;ilustratii-orase/torshavn_fo.webp;Tórshavn;Faroe Islands
+balchik_bg;Balcic;Bulgaria;ilustratii-orase/balchik_bg.webp;Balchik;Bulgaria
+dinant_be;Dinant;Belgia;ilustratii-orase/dinant_be.webp;Dinant;Belgium
+sinaia_ro;Sinaia;România;ilustratii-orase/sinaia_ro.webp;Sinaia;Romania
+cefalu_it;Cefalù;Italia;ilustratii-orase/cefalu_it.webp;Cefalù;Italy
+obidos_pt;Óbidos;Portugalia;ilustratii-orase/obidos_pt.webp;Óbidos;Portugal
+rothenburg-ob-der-tauber_de;Rothenburg ob der Tauber;Germania;ilustratii-orase/rothenburg-ob-der-tauber_de.webp;Rothenburg ob der Tauber;Germany
+trogir_hr;Trogir;Croația;ilustratii-orase/trogir_hr.webp;Trogir;Croatia
+chamonix-mont-blanc_fr;Chamonix;Franța;ilustratii-orase/chamonix-mont-blanc_fr.webp;Chamonix-Mont-Blanc;France
+banska-stiavnica_sk;Banská Štiavnica;Slovacia;ilustratii-orase/banska-stiavnica_sk.webp;Banská Štiavnica;Slovakia
+argostoli_gr;Kefalonia (Argostoli);Grecia;ilustratii-orase/argostoli_gr.webp;Argostólion;Greece
+alberobello_it;Alberobello;Italia;ilustratii-orase/alberobello_it.webp;Alberobello;Italy
+bansko_bg;Bansko;Bulgaria;ilustratii-orase/bansko_bg.webp;Bansko;Bulgaria
+lefkada_gr;Lefkada;Grecia;ilustratii-orase/lefkada_gr.webp;Lefkada;Greece
+kalampaka_gr;Meteora (Kalambaka);Grecia;ilustratii-orase/kalampaka_gr.webp;Kalampáka;Greece
+opatija_hr;Opatija;Croația;ilustratii-orase/opatija_hr.webp;Opatija;Croatia
+zell-am-see_at;Zell am See;Austria;ilustratii-orase/zell-am-see_at.webp;Zell am See;Austria
+naxos_gr;Naxos;Grecia;ilustratii-orase/naxos_gr.webp;Naxos;Greece
+sirmione_it;Sirmione;Italia;ilustratii-orase/sirmione_it.webp;Sirmione;Italy
+capri_it;Capri;Italia;ilustratii-orase/capri_it.webp;Capri;Italy
+zermatt_ch;Zermatt;Elveția;ilustratii-orase/zermatt_ch.webp;Zermatt;Switzerland
+victoria_mt;Gozo (Victoria);Malta;ilustratii-orase/victoria_mt.webp;Victoria;Malta
+goreme_tr;Cappadocia (Göreme);Turcia;ilustratii-orase/goreme_tr.webp;Göreme;Türkiye
+nesebar_bg;Nesebar;Bulgaria;ilustratii-orase/nesebar_bg.webp;Nesebar;Bulgaria
+baile-herculane_ro;Băile Herculane;România;ilustratii-orase/baile-herculane_ro.webp;Băile Herculane;Romania
+saint-tropez_fr;Saint-Tropez;Franța;ilustratii-orase/saint-tropez_fr.webp;Saint-Tropez;France
+taormina_it;Taormina;Italia;ilustratii-orase/taormina_it.webp;Taormina;Italy
+trakai_lt;Trakai;Lituania;ilustratii-orase/trakai_lt.webp;Trakai;Lithuania
+orvieto_it;Orvieto;Italia;ilustratii-orase/orvieto_it.webp;Orvieto;Italy
+cortina-d-ampezzo_it;Cortina d'Ampezzo;Italia;ilustratii-orase/cortina-d-ampezzo_it.webp;Cortina d'Ampezzo;Italy
+kotor_me;Kotor;Muntenegru;ilustratii-orase/kotor_me.webp;Kotor;Montenegro
+paros_gr;Paros;Grecia;ilustratii-orase/paros_gr.webp;Paros;Greece
+cochem_de;Cochem;Germania;ilustratii-orase/cochem_de.webp;Cochem;Germany
+vaduz_li;Vaduz;Liechtenstein;ilustratii-orase/vaduz_li.webp;Vaduz;Liechtenstein
+bled_si;Bled;Slovenia;ilustratii-orase/bled_si.webp;Bled;Slovenia
+bran_ro;Bran;România;ilustratii-orase/bran_ro.webp;Bran;Romania
+interlaken_ch;Interlaken;Elveția;ilustratii-orase/interlaken_ch.webp;Interlaken;Switzerland
+amalfi_it;Amalfi;Italia;ilustratii-orase/amalfi_it.webp;Amalfi;Italy
+san-marino_sm;San Marino;San Marino;ilustratii-orase/san-marino_sm.webp;San Marino;San Marino
+sozopol_bg;Sozopol;Bulgaria;ilustratii-orase/sozopol_bg.webp;Sozopol;Bulgaria
+heviz_hu;Hévíz (Balaton);Ungaria;ilustratii-orase/heviz_hu.webp;Hévíz;Hungary
+piran_si;Piran;Slovenia;ilustratii-orase/piran_si.webp;Piran;Slovenia
+mykonos_gr;Mykonos;Grecia;ilustratii-orase/mykonos_gr.webp;Mykonos;Greece
+assisi_it;Assisi;Italia;ilustratii-orase/assisi_it.webp;Assisi;Italy
+grindelwald_ch;Grindelwald;Elveția;ilustratii-orase/grindelwald_ch.webp;Grindelwald;Switzerland
+hvar_hr;Hvar;Croația;ilustratii-orase/hvar_hr.webp;Hvar;Croatia
+san-gimignano_it;San Gimignano;Italia;ilustratii-orase/san-gimignano_it.webp;San Gimignano;Italy
+thasos_gr;Thassos;Grecia;ilustratii-orase/thasos_gr.webp;Thasos;Greece
+korcula_hr;Korčula;Croația;ilustratii-orase/korcula_hr.webp;Korčula;Croatia
+rila_bg;Rila (Mănăstirea);Bulgaria;ilustratii-orase/rila_bg.webp;Rila;Bulgaria
+bellagio_it;Bellagio;Italia;ilustratii-orase/bellagio_it.webp;Bellagio;Italy
+ayia-napa_cy;Ayia Napa;Cipru;ilustratii-orase/ayia-napa_cy.webp;Ayia Napa;Cyprus
+eze_fr;Èze;Franța;ilustratii-orase/eze_fr.webp;Èze;France
+santorini_gr;Santorini;Grecia;ilustratii-orase/santorini_gr.webp;Fira;Greece
+positano_it;Positano;Italia;ilustratii-orase/positano_it.webp;Positano;Italy
+giethoorn_nl;Giethoorn;Olanda;ilustratii-orase/giethoorn_nl.webp;Giethoorn;Netherlands
+bad-ischl_at;Bad Ischl;Austria;ilustratii-orase/bad-ischl_at.webp;Bad Ischl;Austria
+etretat_fr;Étretat;Franța;ilustratii-orase/etretat_fr.webp;Étretat;France
+vatican-city_va;Vatican;Vatican;ilustratii-orase/vatican-city_va.webp;Vatican City;Vatican City
+vernazza_it;Cinque Terre (Vernazza);Italia;ilustratii-orase/vernazza_it.webp;Vernazza;Italy
+portofino_it;Portofino;Italia;ilustratii-orase/portofino_it.webp;Portofino;Italy
+reine_no;Lofoten (Reine);Norvegia;ilustratii-orase/reine_no.webp;Reine;Norway
+durnstein_at;Dürnstein (Wachau);Austria;ilustratii-orase/durnstein_at.webp;Dürnstein;Austria
+syracuse_it;Siracuza;Italia;ilustratii-orase/syracuse_it.webp;Syracuse;Italy
+san-sebastian_es;San Sebastián;Spania;ilustratii-orase/san-sebastian_es.webp;San Sebastián;Spain
+mont-saint-michel_fr;Mont-Saint-Michel;Franța;ilustratii-orase/mont-saint-michel_fr.webp;Mont-Saint-Michel;France
+rocamadour_fr;Rocamadour;Franța;ilustratii-orase/rocamadour_fr.webp;Rocamadour;France
+hallstatt_at;Hallstatt;Austria;ilustratii-orase/hallstatt_at.webp;Hallstatt;Austria
+saint-moritz_ch;St. Moritz;Elveția;ilustratii-orase/saint-moritz_ch.webp;Saint Moritz;Switzerland
+flam_no;Flåm;Norvegia;ilustratii-orase/flam_no.webp;Flåm;Norway
+vik_is;Vík;Islanda;ilustratii-orase/vik_is.webp;Vík;Iceland
+plitvice_hr;Plitvice;Croația;ilustratii-orase/plitvice_hr.webp;Plitvice;Croatia
+delfoi_gr;Delphi;Grecia;ilustratii-orase/delfoi_gr.webp;Delfoí;Greece
+mdina_mt;Mdina;Malta;ilustratii-orase/mdina_mt.webp;Mdina;Malta
+vama-veche_ro;Vama Veche;România;ilustratii-orase/vama-veche_ro.webp;Vama Veche;Romania
+kyiv_ua;Kiev;Ucraina;ilustratii-orase/kyiv_ua.webp;Kyiv;Ukraine
+izmir_tr;Izmir;Turcia;ilustratii-orase/izmir_tr.webp;İzmir;Türkiye
+bucharest_ro;București;România;ilustratii-orase/bucharest_ro.webp;Bucharest;Romania
+hamburg_de;Hamburg;Germania;ilustratii-orase/hamburg_de.webp;Hamburg;Germany
+prague_cz;Praga;Cehia;ilustratii-orase/prague_cz.webp;Prague;Czechia
+baku_az;Baku;Azerbaidjan;ilustratii-orase/baku_az.webp;Baku;Azerbaijan
+yerevan_am;Erevan;Armenia;ilustratii-orase/yerevan_am.webp;Yerevan;Armenia
+tbilisi_ge;Tbilisi;Georgia;ilustratii-orase/tbilisi_ge.webp;Tbilisi;Georgia
+birmingham_gb;Birmingham;Marea Britanie;ilustratii-orase/birmingham_gb.webp;Birmingham;United Kingdom
+turin_it;Torino;Italia;ilustratii-orase/turin_it.webp;Turin;Italy
+liverpool_gb;Liverpool;Marea Britanie;ilustratii-orase/liverpool_gb.webp;Liverpool;United Kingdom
+odz_pl;Łódź;Polonia;ilustratii-orase/odz_pl.webp;Łódź;Poland
+antalya_tr;Antalya;Turcia;ilustratii-orase/antalya_tr.webp;Antalya;Türkiye
+zagreb_hr;Zagreb;Croația;ilustratii-orase/zagreb_hr.webp;Zagreb;Croatia
+sarajevo_ba;Sarajevo;Bosnia și Herțegovina;ilustratii-orase/sarajevo_ba.webp;Sarajevo;Bosnia & Herzegovina
+zaragoza_es;Zaragoza;Spania;ilustratii-orase/zaragoza_es.webp;Zaragoza;Spain
+frankfurt_de;Frankfurt;Germania;ilustratii-orase/frankfurt_de.webp;Frankfurt am Main;Germany
+wroclaw_pl;Wrocław;Polonia;ilustratii-orase/wroclaw_pl.webp;Wrocław;Poland
+bristol_gb;Bristol;Marea Britanie;ilustratii-orase/bristol_gb.webp;Bristol;United Kingdom
+rotterdam_nl;Rotterdam;Olanda;ilustratii-orase/rotterdam_nl.webp;Rotterdam;Netherlands
+stuttgart_de;Stuttgart;Germania;ilustratii-orase/stuttgart_de.webp;Stuttgart;Germany
+dortmund_de;Dortmund;Germania;ilustratii-orase/dortmund_de.webp;Dortmund;Germany
+genoa_it;Genova;Italia;ilustratii-orase/genoa_it.webp;Genoa;Italy
+dusseldorf_de;Düsseldorf;Germania;ilustratii-orase/dusseldorf_de.webp;Düsseldorf;Germany
+gothenburg_se;Göteborg;Suedia;ilustratii-orase/gothenburg_se.webp;Göteborg;Sweden
+poznan_pl;Poznań;Polonia;ilustratii-orase/poznan_pl.webp;Poznań;Poland
+pristina_xk;Priștina;Kosovo;ilustratii-orase/pristina_xk.webp;Pristina;Kosovo
+bremen_de;Bremen;Germania;ilustratii-orase/bremen_de.webp;Bremen;Germany
+hannover_de;Hannover;Germania;ilustratii-orase/hannover_de.webp;Hannover;Germany
+leipzig_de;Leipzig;Germania;ilustratii-orase/leipzig_de.webp;Leipzig;Germany
+nuremberg_de;Nürnberg;Germania;ilustratii-orase/nuremberg_de.webp;Nürnberg;Germany
+dresden_de;Dresda;Germania;ilustratii-orase/dresden_de.webp;Dresden;Germany
+skopje_mk;Skopje;Macedonia de Nord;ilustratii-orase/skopje_mk.webp;Skopje;North Macedonia
+the-hague_nl;Haga;Olanda;ilustratii-orase/the-hague_nl.webp;The Hague;Netherlands
+gdansk_pl;Gdańsk;Polonia;ilustratii-orase/gdansk_pl.webp;Gdańsk;Poland
+antwerpen_be;Antwerpen;Belgia;ilustratii-orase/antwerpen_be.webp;Antwerpen;Belgium
+leeds_gb;Leeds;Marea Britanie;ilustratii-orase/leeds_gb.webp;Leeds;United Kingdom
+cardiff_gb;Cardiff;Marea Britanie;ilustratii-orase/cardiff_gb.webp;Cardiff;United Kingdom
+toulouse_fr;Toulouse;Franța;ilustratii-orase/toulouse_fr.webp;Toulouse;France
+palma_es;Palma de Mallorca;Spania;ilustratii-orase/palma_es.webp;Palma;Spain
+manchester_gb;Manchester;Marea Britanie;ilustratii-orase/manchester_gb.webp;Manchester;United Kingdom
+gran-canaria_es;Gran Canaria;Spania;ilustratii-orase/gran-canaria_es.webp;Las Palmas de Gran Canaria;Spain
+tirana_al;Tirana;Albania;ilustratii-orase/tirana_al.webp;Tirana;Albania
+kaunas_lt;Kaunas;Lituania;ilustratii-orase/kaunas_lt.webp;Kaunas;Lithuania
+brno_cz;Brno;Cehia;ilustratii-orase/brno_cz.webp;Brno;Czechia
+lublin_pl;Lublin;Polonia;ilustratii-orase/lublin_pl.webp;Lublin;Poland
+bilbao_es;Bilbao;Spania;ilustratii-orase/bilbao_es.webp;Bilbao;Spain
+plovdiv_bg;Plovdiv;Bulgaria;ilustratii-orase/plovdiv_bg.webp;Plovdiv;Bulgaria
+alicante_es;Alicante;Spania;ilustratii-orase/alicante_es.webp;Alicante;Spain
+cordoba_es;Córdoba;Spania;ilustratii-orase/cordoba_es.webp;Córdoba;Spain
+iasi_ro;Iași;România;ilustratii-orase/iasi_ro.webp;Iaşi;Romania
+katowice_pl;Katowice;Polonia;ilustratii-orase/katowice_pl.webp;Katowice;Poland
+cluj-napoca_ro;Cluj-Napoca;România;ilustratii-orase/cluj-napoca_ro.webp;Cluj-Napoca;Romania
+timisoara_ro;Timișoara;România;ilustratii-orase/timisoara_ro.webp;Timișoara;Romania
+bonn_de;Bonn;Germania;ilustratii-orase/bonn_de.webp;Bonn;Germany
+varna_bg;Varna;Bulgaria;ilustratii-orase/varna_bg.webp;Varna;Bulgaria
+craiova_ro;Craiova;România;ilustratii-orase/craiova_ro.webp;Craiova;Romania
+constanta_ro;Constanța;România;ilustratii-orase/constanta_ro.webp;Constanţa;Romania
+malmo_se;Malmö;Suedia;ilustratii-orase/malmo_se.webp;Malmö;Sweden
+galati_ro;Galați;România;ilustratii-orase/galati_ro.webp;Galaţi;Romania
+utrecht_nl;Utrecht;Olanda;ilustratii-orase/utrecht_nl.webp;Utrecht;Netherlands
+karlsruhe_de;Karlsruhe;Germania;ilustratii-orase/karlsruhe_de.webp;Karlsruhe;Germany
+nantes_fr;Nantes;Franța;ilustratii-orase/nantes_fr.webp;Nantes;France
+brasov_ro;Brașov;România;ilustratii-orase/brasov_ro.webp;Braşov;Romania
+strasbourg_fr;Strasbourg;Franța;ilustratii-orase/strasbourg_fr.webp;Strasbourg;France
+belfast_gb;Belfast;Marea Britanie;ilustratii-orase/belfast_gb.webp;Belfast;United Kingdom
+aachen_de;Aachen;Germania;ilustratii-orase/aachen_de.webp;Aachen;Germany
+nis_rs;Niš;Serbia;ilustratii-orase/nis_rs.webp;Niš;Serbia
+montpellier_fr;Montpellier;Franța;ilustratii-orase/montpellier_fr.webp;Montpellier;France
+aarhus_dk;Aarhus;Danemarca;ilustratii-orase/aarhus_dk.webp;Århus;Denmark
+kosice_sk;Košice;Slovacia;ilustratii-orase/kosice_sk.webp;Košice;Slovakia
+granada_es;Granada;Spania;ilustratii-orase/granada_es.webp;Granada;Spain
+lille_fr;Lille;Franța;ilustratii-orase/lille_fr.webp;Lille;France
+oviedo_es;Oviedo;Spania;ilustratii-orase/oviedo_es.webp;Oviedo;Spain
+tenerife_es;Tenerife;Spania;ilustratii-orase/tenerife_es.webp;Santa Cruz de Tenerife;Spain
+graz_at;Graz;Austria;ilustratii-orase/graz_at.webp;Graz;Austria
+verona_it;Verona;Italia;ilustratii-orase/verona_it.webp;Verona;Italy
+freiburg_de;Freiburg;Germania;ilustratii-orase/freiburg_de.webp;Freiburg;Germany
+novi-sad_rs;Novi Sad;Serbia;ilustratii-orase/novi-sad_rs.webp;Novi Sad;Serbia
+bergen_no;Bergen;Norvegia;ilustratii-orase/bergen_no.webp;Bergen;Norway
+eindhoven_nl;Eindhoven;Olanda;ilustratii-orase/eindhoven_nl.webp;Eindhoven;Netherlands
+oradea_ro;Oradea;România;ilustratii-orase/oradea_ro.webp;Oradea;Romania
+linz_at;Linz;Austria;ilustratii-orase/linz_at.webp;Linz;Austria
+debrecen_hu;Debrecen;Ungaria;ilustratii-orase/debrecen_hu.webp;Debrecen;Hungary
+padova_it;Padova;Italia;ilustratii-orase/padova_it.webp;Padova;Italy
+tampere_fi;Tampere;Finlanda;ilustratii-orase/tampere_fi.webp;Tampere;Finland
+nicosia_cy;Nicosia;Cipru;ilustratii-orase/nicosia_cy.webp;Nicosia;Cyprus
+pamplona_es;Pamplona;Spania;ilustratii-orase/pamplona_es.webp;Pamplona;Spain
+reims_fr;Reims;Franța;ilustratii-orase/reims_fr.webp;Reims;France
+burgas_bg;Burgas;Bulgaria;ilustratii-orase/burgas_bg.webp;Burgas;Bulgaria
+newcastle_gb;Newcastle;Marea Britanie;ilustratii-orase/newcastle_gb.webp;Newcastle upon Tyne;United Kingdom
+cork_ie;Cork;Irlanda;ilustratii-orase/cork_ie.webp;Cork;Ireland
+trieste_it;Trieste;Italia;ilustratii-orase/trieste_it.webp;Trieste;Italy
+geneva_ch;Geneva;Elveția;ilustratii-orase/geneva_ch.webp;Genève;Switzerland
+santander_es;Santander;Spania;ilustratii-orase/santander_es.webp;Santander;Spain
+kutaisi_ge;Kutaisi;Georgia;ilustratii-orase/kutaisi_ge.webp;Kutaisi;Georgia
+turku_fi;Turku;Finlanda;ilustratii-orase/turku_fi.webp;Turku;Finland
+bacau_ro;Bacău;România;ilustratii-orase/bacau_ro.webp;Bacău;Romania
+arad_ro;Arad;România;ilustratii-orase/arad_ro.webp;Arad;Romania
+szeged_hu;Szeged;Ungaria;ilustratii-orase/szeged_hu.webp;Szeged;Hungary
+basel_ch;Basel;Elveția;ilustratii-orase/basel_ch.webp;Basel;Switzerland
+plzen_cz;Plzeň;Cehia;ilustratii-orase/plzen_cz.webp;Pilsen;Czechia
+modena_it;Modena;Italia;ilustratii-orase/modena_it.webp;Modena;Italy
+pecs_hu;Pécs;Ungaria;ilustratii-orase/pecs_hu.webp;Pécs;Hungary
+ruse_bg;Ruse;Bulgaria;ilustratii-orase/ruse_bg.webp;Ruse;Bulgaria
+limassol_cy;Limassol;Cipru;ilustratii-orase/limassol_cy.webp;Limassol;Cyprus
+salzburg_at;Salzburg;Austria;ilustratii-orase/salzburg_at.webp;Salzburg;Austria
+sibiu_ro;Sibiu;România;ilustratii-orase/sibiu_ro.webp;Sibiu;Romania
+dijon_fr;Dijon;Franța;ilustratii-orase/dijon_fr.webp;Dijon;France
+cagliari_it;Cagliari;Italia;ilustratii-orase/cagliari_it.webp;Cagliari;Italy
+uppsala_se;Uppsala;Suedia;ilustratii-orase/uppsala_se.webp;Uppsala;Sweden
+trondheim_no;Trondheim;Norvegia;ilustratii-orase/trondheim_no.webp;Trondheim;Norway
+targu-mures_ro;Târgu Mureș;România;ilustratii-orase/targu-mures_ro.webp;Târgu-Mureş;Romania
+parma_it;Parma;Italia;ilustratii-orase/parma_it.webp;Parma;Italy
+tours_fr;Tours;Franța;ilustratii-orase/tours_fr.webp;Tours;France
+rijeka_hr;Rijeka;Croația;ilustratii-orase/rijeka_hr.webp;Rijeka;Croatia
+tarragona_es;Tarragona;Spania;ilustratii-orase/tarragona_es.webp;Tarragona;Spain
+heraklion_gr;Heraklion (Creta);Grecia;ilustratii-orase/heraklion_gr.webp;Irákleion;Greece
+baia-mare_ro;Baia Mare;România;ilustratii-orase/baia-mare_ro.webp;Baia Mare;Romania
+podgorica_me;Podgorica;Muntenegru;ilustratii-orase/podgorica_me.webp;Podgorica;Montenegro
+innsbruck_at;Innsbruck;Austria;ilustratii-orase/innsbruck_at.webp;Innsbruck;Austria
+batumi_ge;Batumi;Georgia;ilustratii-orase/batumi_ge.webp;Batumi;Georgia
+bern_ch;Berna;Elveția;ilustratii-orase/bern_ch.webp;Bern;Switzerland
+stavanger_no;Stavanger;Norvegia;ilustratii-orase/stavanger_no.webp;Stavanger;Norway
+braga_pt;Braga;Portugalia;ilustratii-orase/braga_pt.webp;Braga;Portugal
+perugia_it;Perugia;Italia;ilustratii-orase/perugia_it.webp;Perugia;Italy
+reykjavik_is;Reykjavik;Islanda;ilustratii-orase/reykjavik_is.webp;Reykjavík;Iceland
+rimini_it;Rimini;Italia;ilustratii-orase/rimini_it.webp;Rimini;Italy
+lausanne_ch;Lausanne;Elveția;ilustratii-orase/lausanne_ch.webp;Lausanne;Switzerland
+pescara_it;Pescara;Italia;ilustratii-orase/pescara_it.webp;Pescara;Italy
+bergamo_it;Bergamo;Italia;ilustratii-orase/bergamo_it.webp;Bergamo;Italy
+rouen_fr;Rouen;Franța;ilustratii-orase/rouen_fr.webp;Rouen;France
+satu-mare_ro;Satu Mare;România;ilustratii-orase/satu-mare_ro.webp;Satu Mare;Romania
+suceava_ro;Suceava;România;ilustratii-orase/suceava_ro.webp;Suceava;Romania
+piatra-neamt_ro;Piatra Neamț;România;ilustratii-orase/piatra-neamt_ro.webp;Piatra Neamţ;Romania
+tartu_ee;Tartu;Estonia;ilustratii-orase/tartu_ee.webp;Tartu;Estonia
+funchal_pt;Funchal (Madeira);Portugalia;ilustratii-orase/funchal_pt.webp;Funchal;Portugal
+targu-jiu_ro;Târgu Jiu;România;ilustratii-orase/targu-jiu_ro.webp;Târgu Jiu;Romania
+maribor_si;Maribor;Slovenia;ilustratii-orase/maribor_si.webp;Maribor;Slovenia
+luxembourg_lu;Luxemburg;Luxemburg;ilustratii-orase/luxembourg_lu.webp;Luxembourg;Luxembourg
+larnaca_cy;Larnaca;Cipru;ilustratii-orase/larnaca_cy.webp;Larnaca;Cyprus
+zadar_hr;Zadar;Croația;ilustratii-orase/zadar_hr.webp;Zadar;Croatia
+ioannina_gr;Ioannina;Grecia;ilustratii-orase/ioannina_gr.webp;Ioannina;Greece
+lanzarote_es;Lanzarote (Arrecife);Spania;ilustratii-orase/lanzarote_es.webp;Arrecife;Spain
+pula_hr;Pula;Croația;ilustratii-orase/pula_hr.webp;Pula;Croatia
+lucerne_ch;Lucerna;Elveția;ilustratii-orase/lucerne_ch.webp;Luzern;Switzerland
+rhodes_gr;Rhodos;Grecia;ilustratii-orase/rhodes_gr.webp;Ródos;Greece
+ajaccio_fr;Ajaccio (Corsica);Franța;ilustratii-orase/ajaccio_fr.webp;Ajaccio;France
+kavala_gr;Kavala;Grecia;ilustratii-orase/kavala_gr.webp;Kavala;Greece
+chania_gr;Chania (Creta);Grecia;ilustratii-orase/chania_gr.webp;Chania;Greece
+tromso_no;Tromsø;Norvegia;ilustratii-orase/tromso_no.webp;Tromsø;Norway
+ibiza_es;Ibiza;Spania;ilustratii-orase/ibiza_es.webp;Ibiza;Spain
+olbia_it;Olbia;Italia;ilustratii-orase/olbia_it.webp;Olbia;Italy
+faro_pt;Faro;Portugalia;ilustratii-orase/faro_pt.webp;Faro;Portugal
+memmingen_de;Memmingen;Germania;ilustratii-orase/memmingen_de.webp;Memmingen;Germany
+bodrum_tr;Bodrum;Turcia;ilustratii-orase/bodrum_tr.webp;Bodrum;Türkiye
+paphos_cy;Paphos;Cipru;ilustratii-orase/paphos_cy.webp;Paphos;Cyprus
+fuerteventura_es;Fuerteventura;Spania;ilustratii-orase/fuerteventura_es.webp;Puerto del Rosario;Spain
+rovaniemi_fi;Rovaniemi;Finlanda;ilustratii-orase/rovaniemi_fi.webp;Rovaniemi;Finland
+ponta-delgada_pt;Ponta Delgada (Azore);Portugalia;ilustratii-orase/ponta-delgada_pt.webp;Ponta Delgada;Portugal
+zakynthos_gr;Zakynthos;Grecia;ilustratii-orase/zakynthos_gr.webp;Zakynthos;Greece
+luqa_mt;Valletta (Malta);Malta;ilustratii-orase/luqa_mt.webp;Valletta;Malta
+tivat_me;Tivat;Muntenegru;ilustratii-orase/tivat_me.webp;Tivat;Montenegro
+billund_dk;Billund;Danemarca;ilustratii-orase/billund_dk.webp;Billund;Denmark
+menorca_es;Menorca (Mahón);Spania;ilustratii-orase/menorca_es.webp;Mahon;Spain
+corfu_gr;Corfu;Grecia;ilustratii-orase/corfu_gr.webp;Kerkyra;Greece
+odesa_ua;Odesa;Ucraina;ilustratii-orase/odesa_ua.webp;Odesa;Ukraine
