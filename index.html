@@ -11,13 +11,13 @@
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://23citybreak.ro/" />
   <meta property="og:title" content="23citybreak — Căutare Inteligentă Zboruri de Weekend" />
-  <meta property="og:description" content="Găsește rapid zboruri de weekend în Europa fără zile de concediu pierdute. București și marile aeroporturi din România." />
+  <meta property="og:description" content="Găsește rapid zboruri de weekend în Europa fără zile de concediu pierdute. Din România (București, Cluj, Iași, Timișoara) și din Valencia, Alicante, Paris, München, Frankfurt." />
   <meta property="og:site_name" content="23citybreak.ro" />
 
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="23citybreak — Zboruri de Weekend" />
-  <meta name="twitter:description" content="Planifică weekendul perfect în Europa cu zboruri vineri–duminică din România." />
+  <meta name="twitter:description" content="Planifică weekendul perfect în Europa cu zboruri vineri–duminică din România și din marile orașe europene." />
   
   <!-- Google Fonts with FULL Romanian Diacritics Support (latin-ext) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -309,10 +309,19 @@
             Oraș de plecare
           </label>
           <select id="f-origin" class="w-full rounded-xl border border-[#e4d3b5] bg-[#fffdf8] px-3 py-2 text-xs sm:text-sm font-bold text-[#0a0b0d] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#dfa649] transition font-body">
-            <option value="City:bucharest_ro" data-sky="otp" data-iata="OTP" selected>București (OTP / BBU)</option>
-            <option value="City:cluj-napoca_ro" data-sky="clj" data-iata="CLJ">Cluj-Napoca (CLJ)</option>
-            <option value="City:iasi_ro" data-sky="ias" data-iata="IAS">Iași (IAS)</option>
-            <option value="City:timisoara_ro" data-sky="tsr" data-iata="TSR">Timișoara (TSR)</option>
+            <optgroup label="România">
+            <option value="City:bucharest_ro" data-sky="otp" data-iata="OTP" data-country="RO" selected>București (OTP / BBU)</option>
+            <option value="City:cluj-napoca_ro" data-sky="clj" data-iata="CLJ" data-country="RO">Cluj-Napoca (CLJ)</option>
+            <option value="City:iasi_ro" data-sky="ias" data-iata="IAS" data-country="RO">Iași (IAS)</option>
+            <option value="City:timisoara_ro" data-sky="tsr" data-iata="TSR" data-country="RO">Timișoara (TSR)</option>
+            </optgroup>
+            <optgroup label="Europa">
+            <option value="City:valencia_es" data-sky="vlc" data-iata="VLC" data-country="ES">Valencia (VLC)</option>
+            <option value="City:alicante_es" data-sky="alc" data-iata="ALC" data-country="ES">Alicante (ALC)</option>
+            <option value="City:paris_fr" data-sky="pari" data-iata="PAR" data-country="FR">Paris (CDG / ORY / BVA)</option>
+            <option value="City:munich_de" data-sky="muc" data-iata="MUC" data-country="DE">München (MUC)</option>
+            <option value="City:frankfurt_de" data-sky="fra" data-iata="FRA" data-country="DE">Frankfurt (FRA)</option>
+            </optgroup>
           </select>
         </div>
 
@@ -507,7 +516,7 @@
             <div>
               <label class="inline-flex items-center gap-2 text-xs font-bold text-[#0a0b0d] cursor-pointer pt-1">
                 <input type="checkbox" id="f-domestic" class="accent-[#dfa649] rounded w-4 h-4 cursor-pointer" />
-                <span>Include zboruri interne în RO</span>
+                <span>Include zboruri interne (în țara de plecare)</span>
               </label>
             </div>
           </div>
@@ -1032,6 +1041,7 @@
       { id: "City:luqa_mt", name: "Malta", country: "Malta", flag: "🇲🇹", iata: "MLA", code: "mla" },
 
       // România (zboruri interne)
+      { id: "City:bucharest_ro", name: "București", country: "România", flag: "🇷🇴", iata: "OTP", code: "otp" },
       { id: "City:cluj-napoca_ro", name: "Cluj-Napoca", country: "România", flag: "🇷🇴", iata: "CLJ", code: "clj" },
       { id: "City:timisoara_ro", name: "Timișoara", country: "România", flag: "🇷🇴", iata: "TSR", code: "tsr" },
       { id: "City:iasi_ro", name: "Iași", country: "România", flag: "🇷🇴", iata: "IAS", code: "ias" },
@@ -1415,7 +1425,8 @@
       "geneva": "Geneva",
       "zurich": "Zürich",
       "naples": "Napoli",
-      "turin": "Torino"
+      "turin": "Torino",
+      "bucharest": "București"
     };
 
     const AIRPORT_INFO = {
@@ -1439,7 +1450,8 @@
       VCE: { cityRo: "Veneția", airport: "Marco Polo", group: "Veneția" },
       BER: { cityRo: "Berlin", airport: "Brandenburg", group: "Berlin" },
       BLQ: { cityRo: "Bologna", airport: "Guglielmo Marconi", group: "Bologna" },
-      RMO: { cityRo: "Chișinău", airport: "Internațional", group: "Chișinău" }
+      RMO: { cityRo: "Chișinău", airport: "Internațional", group: "Chișinău" },
+      OTP: { cityRo: "București", airport: "Otopeni", group: "București" }
     };
 
     function resolveDestinationDisplay(iata, rawCityName) {
@@ -2733,6 +2745,9 @@
       const tripDates = getTripDates(firstWk);
 
       const links = buildFlightLinks(origIata, targetIata, tripDates.dateOut, tripDates.dateIn, Number(document.getElementById("f-adults").value));
+      // Skyscanner uses its own city codes for multi-airport cities (e.g. "pari" for Paris).
+      const origSky = originSelect?.selectedOptions?.[0]?.dataset?.sky;
+      if (origSky) links.skyscannerUrl = links.skyscannerUrl.replace(`/flights/${origIata.toLowerCase()}/`, `/flights/${origSky}/`);
 
       container.innerHTML = `
         <a href="${links.googleFlightsUrl}" target="_blank" rel="noopener noreferrer"
@@ -3184,7 +3199,6 @@
     // 1) Permissive Reset
     function resetToPermissive() {
       currentTripMode = "classic";
-      document.getElementById("f-origin").value = "City:bucharest_ro";
       document.getElementById("f-max-price").value = 350;
       document.getElementById("lbl-max-price").textContent = "350 €";
       document.getElementById("f-adults").value = "2";
@@ -3210,7 +3224,6 @@
     // 2) Strict Classic Reset
     function resetToStrict() {
       currentTripMode = "classic";
-      document.getElementById("f-origin").value = "City:bucharest_ro";
       clearDestSelection();
       document.getElementById("f-max-price").value = 150;
       if (document.getElementById("lbl-max-price")) document.getElementById("lbl-max-price").textContent = "150 €";
@@ -3238,7 +3251,6 @@
     // 3) Extended Weekend Preset (3-4 nights, bank holidays)
     function presetExtendedWeekend() {
       currentTripMode = "extended";
-      document.getElementById("f-origin").value = "City:bucharest_ro";
       document.getElementById("f-max-price").value = 250;
       document.getElementById("lbl-max-price").textContent = "250 €";
       document.getElementById("f-adults").value = "2";
@@ -3262,7 +3274,6 @@
     // 4) School Holidays Preset (1 week, family friendly)
     function presetSchoolHolidays() {
       currentTripMode = "school_week";
-      document.getElementById("f-origin").value = "City:bucharest_ro";
       document.getElementById("f-max-price").value = 350;
       document.getElementById("lbl-max-price").textContent = "350 €";
       document.getElementById("f-adults").value = "2";
@@ -3572,6 +3583,17 @@
       }
     }
 
+    // Selected departure city: Kiwi id, IATA (PAR = all Paris airports), country code and display name.
+    function getOrigin() {
+      const option = document.getElementById("f-origin")?.selectedOptions?.[0];
+      return {
+        cityId: option?.value || "City:bucharest_ro",
+        iata: option?.dataset?.iata || "OTP",
+        country: option?.dataset?.country || "RO",
+        name: (option?.dataset?.label || option?.textContent || "București").replace(/^★\s*/, "").replace(/\s*\(.*$/, "")
+      };
+    }
+
     const EUROPE_COUNTRIES = new Set('AL AD AT BY BE BA BG HR CY CZ DK EE FI FR DE GR HU IS IE IT XK LV LI LT LU MT MD MC ME NL MK NO PL PT RO RU SM RS SK SI ES SE CH TR UA GB VA'.split(' '));
 
     // Live Search on Selected Weekends
@@ -3588,6 +3610,11 @@
       const originSelect = document.getElementById("f-origin");
       const originCityId = originSelect.value;
       const originIata = originSelect?.selectedOptions?.[0]?.dataset?.iata || "OTP";
+      const origin = getOrigin();
+      if (destVal === originCityId) {
+        updateSearchStatus(`Plecarea și destinația sunt același oraș (${origin.name}). Alege altă destinație sau alt oraș de plecare.`, 100, "empty");
+        return;
+      }
       const selectedBudget = Number(document.getElementById("f-max-price").value);
       const maxPrice1Pax = selectedBudget === 999 ? Infinity : selectedBudget || 350;
       const adults = parseInt(document.getElementById("f-adults").value, 10) || 2;
@@ -3826,7 +3853,7 @@
             document.getElementById('similar-search-button').hidden = providerRefused;
             document.getElementById('expand-search-button').hidden = providerRefused;
           } else if (fallbackUsed) {
-            updateSearchStatus(`✅ Am găsit zboruri pentru ${targetCityTitle} (cu 1 escală, neavând zbor direct din București). Sfat: Verifică și Manchester (direct la 45 min de Liverpool)!`, 100, "success");
+            updateSearchStatus(`✅ Am găsit zboruri pentru ${targetCityTitle} (cu 1 escală, neavând zbor direct din ${origin.name}).`, 100, "success");
           } else if (totalFound > 0) {
             const category = searchSimilar ? 'perioade asemănătoare' : 'weekenduri';
             updateSearchStatus(`✅ Căutare finalizată! S-au găsit zboruri în ${Object.keys(targetCellsMap).length} ${category} pentru ${cityName}.`, 100, "success");
@@ -3899,8 +3926,8 @@
               if (!lastSeg) continue;
               const destCity = lastSeg.destination?.station?.city;
               const destCountry = lastSeg.destination?.station?.city?.country?.code;
-              if (!EUROPE_COUNTRIES.has(destCountry) || (!includeDomestic && destCountry === "RO")) continue;
-              if (destCity?.id) destCityIds.add(destCity.id);
+              if (!EUROPE_COUNTRIES.has(destCountry) || (!includeDomestic && destCountry === origin.country)) continue;
+              if (destCity?.id && destCity.id !== originCityId) destCityIds.add(destCity.id);
             }
 
             if (destCityIds.size === 0) continue;
@@ -3953,7 +3980,8 @@
               const destCity = outLast.destination.station.city;
               const destCountry = outLast.destination.station.city?.country?.code;
 
-              if (!EUROPE_COUNTRIES.has(destCountry) || (!includeDomestic && destCountry === "RO")) continue;
+              if (!EUROPE_COUNTRIES.has(destCountry) || (!includeDomestic && destCountry === origin.country)) continue;
+              if (destCity?.id === originCityId) continue;
 
               const outArrTime = outLast.destination.localTime.slice(11, 16);
               if (!withinArrivalLimit(outLast.destination.localTime, tripDates.dateOut, outArrLimit)) continue;
