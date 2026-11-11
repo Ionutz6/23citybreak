@@ -56,7 +56,7 @@ if (missingIll.length) warn.push('ilustrații fără oraș: ' + missingIll.join(
 const W = 1000, H = 860;
 const all = topo.feature(atlas, atlas.objects.countries).features;
 const europeBox = {type: 'Feature', geometry: {type: 'Polygon', coordinates: [[[-25, 34], [-25, 71.5], [45, 71.5], [45, 34], [-25, 34]]]}};
-const proj = d3.geoConicConformal().rotate([-12, 0]).parallels([40, 62]).fitExtent([[10, 10], [W - 10, H - 10]], {type: 'FeatureCollection', features: out.filter(c => c.lat > 34.5 && c.lon > -25).map(c => ({type: 'Feature', geometry: {type: 'Point', coordinates: [c.lon, c.lat]}}))});
+const proj = d3.geoConicConformal().rotate([-12, 0]).parallels([40, 62]).fitExtent([[190, 10], [W - 10, H - 10]], {type: 'FeatureCollection', features: out.filter(c => c.lat > 34.5 && c.lon > -25).map(c => ({type: 'Feature', geometry: {type: 'Point', coordinates: [c.lon, c.lat]}}))});
 const clip = d3.geoPath(proj);
 const pathGen = d3.geoPath(proj).digits(1);
 const countries = [];
@@ -73,20 +73,30 @@ for (const f of all) {
   proj.clipExtent(null);
 }
 for (const c of out) { const [x, y] = proj([c.lon, c.lat]); c.x = +x.toFixed(1); c.y = +y.toFixed(1); }
-// Insulele Canare/Azore sunt în afara cadrului: le aducem într-un chenar în colțul stânga-jos.
-const inset = {x: 14, y: H - 150, w: 190, h: 136};
+// Azorele sunt în afara cadrului: le desenăm într-un chenar în Atlantic, la sud de Islanda și la vest de Irlanda
+// (marginea din stânga a hărții e lăsată liberă prin fitExtent, așa că Canarele și Madeira intră în cadru la locul lor).
+const inset = {x: 14, y: 330, w: 150, h: 110};
 const outside = out.filter(c => c.x < 0 || c.y > H || c.x > W || c.y < 0);
 if (outside.length) {
-  const lons = outside.map(c => c.lon), lats = outside.map(c => c.lat);
-  const [x0, x1, y0, y1] = [Math.min(...lons) - 1, Math.max(...lons) + 1, Math.min(...lats) - 1, Math.max(...lats) + 1];
-  for (const c of outside) { c.x = +(inset.x + 10 + (c.lon - x0) / (x1 - x0) * (inset.w - 20)).toFixed(1); c.y = +(inset.y + 10 + (y1 - c.lat) / (y1 - y0) * (inset.h - 20)).toFixed(1); c.inset = true; }
+  // Azore: centrul arhipelagului, ~7° lățime în chenar
+  const p2 = d3.geoMercator().center([-28, 38.4]).scale(1000).translate([inset.x + inset.w / 2, inset.y + inset.h / 2 - 8]);
+  for (const c of outside) { const [x, y] = p2([c.lon, c.lat]); c.x = +x.toFixed(1); c.y = +y.toFixed(1); c.inset = true; }
+  p2.clipExtent([[inset.x, inset.y], [inset.x + inset.w, inset.y + inset.h]]);
+  inset.land = all.filter(f => ['724', '620'].includes(String(f.id).padStart(3, '0'))).map(f => ({cc: NUM[String(f.id).padStart(3, '0')], d: d3.geoPath(p2).digits(1)(f)})).filter(l => l.d);
 }
+// sanity: chenarul nu are voie să acopere orașe reale
+const covered = out.filter(c => !c.inset && c.x >= inset.x && c.x <= inset.x + inset.w && c.y >= inset.y && c.y <= inset.y + inset.h);
+if (covered.length) warn.push('chenarul acoperă: ' + covered.map(c => c.name).join(', '));
 // Îmbunătățire pentru încadrare la zoom: caseta fiecărei țări calculată din orașele ei, nu din teritoriu (Franța/Norvegia au teritorii îndepărtate)
 for (const k of countries) {
   const cs = out.filter(c => c.cc === k.cc && !c.inset);
   if (cs.length) k.cityBox = [Math.min(...cs.map(c => c.x)), Math.min(...cs.map(c => c.y)), Math.max(...cs.map(c => c.x)), Math.max(...cs.map(c => c.y))].map(Math.round);
 }
-const mapOut = {width: W, height: H, inset: outside.length ? inset : null, countries};
+proj.clipExtent(null);
+const inv = (x, y) => proj.invert([x, y]).map(v => +v.toFixed(3));
+const projection = {type: 'geoConicConformal (d3-geo)', rotate: proj.rotate(), parallels: [40, 62], scale: +proj.scale().toFixed(3), translate: proj.translate().map(v => +v.toFixed(3)),
+  corners: {stangaSus: inv(0, 0), dreaptaSus: inv(W, 0), stangaJos: inv(0, H), dreaptaJos: inv(W, H), centru: inv(W / 2, H / 2)}};
+const mapOut = {width: W, height: H, projection, inset: outside.length ? inset : null, countries};
 fs.mkdirSync(path.join(ROOT, 'assets/visited'), {recursive: true});
 fs.writeFileSync(path.join(ROOT, 'assets/visited/cities-data.json'), JSON.stringify(out));
 fs.writeFileSync(path.join(ROOT, 'assets/visited/europe-map.json'), JSON.stringify(mapOut));

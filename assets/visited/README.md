@@ -11,11 +11,13 @@ Fișiere: `visited-map.js`, `visited-map.css`, `cities-data.json` (408 orașe), 
   const vc = await VisitedCities.mount(document.getElementById('harta'), {
     client: Account.client(),   // clientul Supabase existent; fără client => localStorage
     user,                       // utilizatorul logat
-    mode: 'profile'             // 'profile' (hartă + galerie + share) sau 'onboarding' (hartă + căutare)
+    mode: 'profile'             // 'profile' (hartă + panou țară cu ilustrații + share) sau 'onboarding' (hartă + căutare + chip-uri)
   });
 </script>
 ```
 
+- Hartă: zoom cu rotița, pinch pe mobil, butoane +/− (niveluri 1, 2, 4, 7, 12) și săgeți; drag cu mouse-ul sau degetul. Click pe oraș → fișa cu ilustrația și bifarea; click pe țară → zoom + panoul cu ilustrațiile orașelor din țară (în onboarding, chip-uri rapide).
+- Fundalul se poate înlocui cu o imagine: vezi `FUNDAL-HARTA.md`.
 - `vc.getVisited()` → `['prague_cz', ...]`, `vc.setVisited(ids)`, `vc.toggle(id)`, `vc.isVisited(id)`, `vc.onChange(fn)` (întoarce funcția de dezabonare), `vc.zoomTo('IT')`, `vc.zoomOut()`, `vc.destroy()`.
 - Id-urile sunt slugul Kiwi fără `City:` (`^[a-z0-9-]+_[a-z]{2}$`), aceleași ca în căutarea de zboruri.
 - Cu `client` + `user`, citește și scrie tabela `visited_cities` (`city_id`, `source` = `onboarding` sau `map`; `user_id` vine din `auth.uid()`). Orașele bifate înainte de login (localStorage `23cb-visited`) se urcă automat în cont la prima montare.
