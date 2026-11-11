@@ -16,8 +16,9 @@
   };
   const hasSession = () => { try { return !!localStorage.getItem(TOKEN_KEY); } catch { return false; } };
 
+  // Un singur client Supabase pe pagină: cel din assets/account.js (window.Account).
   let clientPromise;
-  const client = () => clientPromise ||= import(SDK).then(m => m.createClient(SUPABASE_URL, SUPABASE_KEY, {auth: {flowType: 'implicit', detectSessionInUrl: true, persistSession: true}}));
+  const client = () => clientPromise ||= (window.Account ? window.Account.client() : import(SDK).then(m => m.createClient(SUPABASE_URL, SUPABASE_KEY, {auth: {flowType: 'implicit', detectSessionInUrl: true, persistSession: true}})));
 
   async function save(sb, session, result, newsletter) {
     const user = session.user, meta = user.user_metadata || {};
@@ -33,14 +34,31 @@
     if (error) throw error;
     const rank = Array.isArray(data) ? data[0] : data;
     // Emailul pleacă doar când scorul trimis acum e cel mai bun, ca să nu primești un mesaj după fiecare joc.
-    if (result && rank && result.score >= rank.best) sb.functions.invoke('quiz-result-email', {body: {quiz: QUIZ}}).catch(() => {});
+    if (result && rank && result.score >= rank.best) sendResultEmail(sb, user, result).catch(() => {});
     return rank;
+  }
+
+  // Imaginea de scor (aceeași ca pe site) e urcată în Storage și pusă în emailul cu rezultatul.
+  async function sendResultEmail(sb, user, result) {
+    let image_url = null;
+    if (result.cards?.length && window.Quiz?.cardImage) {
+      try {
+        const blob = await window.Quiz.cardImage(result);
+        const path = `${user.id}/${Date.now()}.jpg`;
+        const {error} = await sb.storage.from('quiz-cards').upload(path, blob, {contentType: 'image/jpeg', cacheControl: '31536000'});
+        if (!error) image_url = sb.storage.from('quiz-cards').getPublicUrl(path).data.publicUrl;
+      } catch {}
+    }
+    await sb.functions.invoke('quiz-result-email', {body: {quiz: QUIZ, image_url}});
   }
 
   function rankPanel(target, rank, email, sb) {
     const box = el('div', 'quiz-rank');
     box.append(el('span', 'field-kicker', 'CLASAMENTUL EUROPA'));
-    if (!rank || !rank.players) { box.append(el('p', null, 'Nu am putut calcula clasamentul acum.')); target.replaceChildren(box); return; }
+    if (!rank || !rank.players) {
+      box.append(el('strong', 'quiz-rank-big', 'Încă nu ești în clasament'), el('p', null, 'Joacă un quiz și scorul tău intră automat în clasamentul Europa.'));
+      box.append(accountFoot(target, email, sb)); target.replaceChildren(box); return;
+    }
     const big = rank.players >= MIN_PLAYERS_FOR_PCT
       ? `Ești în top ${rank.top_pct}%`
       : rank.players === 1 ? 'Ești primul jucător din clasament' : `Ești pe locul ${fmt(rank.rank)} din ${fmt(rank.players)}`;
@@ -49,17 +67,24 @@
       ? `dintre ${fmt(rank.players)} de jucători, cu cel mai bun scor al tău: ${fmt(rank.best)} puncte (${rank.best_correct}/10).`
       : `Cel mai bun scor al tău: ${fmt(rank.best)} puncte (${rank.best_correct}/10). Procentul apare de la ${MIN_PLAYERS_FOR_PCT} de jucători.`;
     box.append(el('p', null, detail));
+    box.append(accountFoot(target, email, sb));
+    target.replaceChildren(box);
+  }
+
+  function accountFoot(target, email, sb) {
     const foot = el('p', 'quiz-rank-foot', `Conectat ca ${email}. `);
     const out = el('button', 'quiz-link', 'Nu ești tu? Ieși'); out.type = 'button';
-    out.addEventListener('click', async () => { await sb.auth.signOut(); target.replaceChildren(el('p', 'quiz-rank-foot', 'Ai ieșit din cont.')); });
-    foot.append(out); box.append(foot);
-    target.replaceChildren(box);
+    out.addEventListener('click', async () => { await sb.auth.signOut(); target.replaceChildren(el('p', 'quiz-rank-foot', 'Ai ieșit din cont.')); updateHeader(); });
+    foot.append(out);
+    return foot;
   }
 
   function emailForm(target, result) {
     const form = el('form', 'quiz-email');
-    form.append(el('strong', 'quiz-email-title', 'Află în primii câți la sută ești'));
-    form.append(el('p', null, 'Lasă-ți emailul și îți trimitem un link de confirmare. După ce îl apeși, vezi locul tău în clasamentul Europa și primești rezultatul pe email.'));
+    form.append(el('strong', 'quiz-email-title', result ? 'Află în primii câți la sută ești' : 'Intră în cont'));
+    form.append(el('p', null, result
+      ? 'Lasă-ți emailul și îți trimitem un link de confirmare. După ce îl apeși, vezi locul tău în clasamentul Europa și primești rezultatul pe email.'
+      : 'Fără parolă: îți trimitem un link pe email. După ce îl apeși, ești conectat pe acest dispozitiv și îți vezi locul în clasament.'));
     const row = el('div', 'quiz-email-row');
     const input = el('input'); input.type = 'email'; input.required = true; input.autocomplete = 'email'; input.placeholder = 'adresa@email.ro'; input.setAttribute('aria-label', 'Adresa de email');
     const send = el('button', 'quiz-primary', 'Trimite linkul ↗'); send.type = 'submit';
@@ -73,12 +98,13 @@
     form.addEventListener('submit', async e => {
       e.preventDefault();
       send.disabled = true; status.textContent = 'Se trimite...';
-      store.set(PENDING, {...result, newsletter: box.checked, at: Date.now()});
+      if (result) store.set(PENDING, {...result, newsletter: box.checked, at: Date.now()});
+      else store.set(PENDING, {login: true, newsletter: box.checked, at: Date.now()});
       try {
         const sb = await client();
         const {error} = await sb.auth.signInWithOtp({email: input.value.trim(), options: {emailRedirectTo: location.origin + location.pathname, data: {newsletter: box.checked, consent_text: box.checked ? CONSENT : null}}});
         if (error) throw error;
-        form.replaceChildren(el('strong', 'quiz-email-title', 'Verifică-ți emailul'), el('p', null, `Ți-am trimis un link pe ${input.value.trim()}. Apasă-l (pe orice dispozitiv) și vezi locul tău în clasament. Scorul acesta e păstrat.`));
+        form.replaceChildren(el('strong', 'quiz-email-title', 'Verifică-ți emailul'), el('p', null, `Ți-am trimis un link pe ${input.value.trim()}. Apasă-l și vezi locul tău în clasament.${result ? ' Scorul acesta e păstrat.' : ''}`));
       } catch (err) {
         send.disabled = false;
         status.textContent = /rate|limit|seconds/i.test(err?.message || '') ? 'Ai cerut deja un link. Încearcă din nou peste un minut.' : 'Nu am putut trimite emailul acum. Încearcă din nou puțin mai târziu.';
@@ -123,11 +149,15 @@
       const {data: {session}} = await sb.auth.getSession();
       history.replaceState(null, '', location.pathname + location.search + '#city-quiz');
       if (!session) { target.replaceChildren(el('p', null, 'Nu am putut confirma emailul. Încearcă din nou.')); return; }
-      const rank = await save(sb, session, pending, pending ? pending.newsletter : null);
+      const rank = await save(sb, session, pending?.login ? null : pending, pending ? pending.newsletter : null);
+      updateHeader();
       store.del(PENDING);
       rankPanel(target, rank, session.user.email, sb);
     } catch { target.replaceChildren(el('p', null, 'Nu am putut salva scorul acum. Încearcă din nou puțin mai târziu.')); }
   }
+
+  // Butonul din header e gestionat de assets/account.js.
+  const updateHeader = () => window.Account?.updateHeader();
 
   window.QuizAccount = {mount};
   resume();
