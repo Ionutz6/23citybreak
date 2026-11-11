@@ -287,6 +287,7 @@
   })();
 </script>
   <link rel="stylesheet" href="assets/quiz.css?v=4">
+  <link rel="stylesheet" href="assets/personalizare.css?v=1">
 </head>
 <body class="antialiased min-h-screen flex flex-col bg-white text-[#0a0b0d]">
 
@@ -2855,7 +2856,7 @@
         const cardKiwiUrl = bestCell && currentLinkMode !== "kiwi" ? kiwiTargetUrl(bestCell) : "";
 
         cardsHtml += `
-          <div data-city-id="${escapeHtml(r.cityId || '')}" class="card-23ai city-card-bg rounded-3xl overflow-hidden flex flex-col justify-between border border-[#e4e7eb] shadow-sm relative group"
+          <div data-city-id="${escapeHtml(r.cityId || '')}" data-wk-id="${escapeHtml(bestWk?.id || '')}" class="card-23ai city-card-bg rounded-3xl overflow-hidden flex flex-col justify-between border border-[#e4e7eb] shadow-sm relative group"
                style="background-color:#202b34; min-height: 340px;">
             
             <div class="p-4 z-10">
@@ -2920,6 +2921,7 @@
       });
 
       cardsGrid.innerHTML = cardsHtml;
+      window.CBPersonal?.decorateCards(cardsGrid);
       cardsGrid.querySelectorAll('[data-city-id]').forEach(async card => {
         const photo = await getCityPhotoAsset(card.dataset.cityId);
         if (!card.isConnected || !photo) return;
@@ -3004,6 +3006,9 @@
           });
         }
       }
+
+      // Personalizare: orașe deja văzute și temperatura la destinație (assets/personalizare.js)
+      if (window.CBPersonal) filteredRows = window.CBPersonal.filterRows(filteredRows, activeWks, destVal);
 
       // Keep Cards View updated synchronously
       const cardRows = similarResultPeriods ? filteredRows.flatMap(row => activeWks.filter(wk => row.cellsMap[wk.id]).map(wk => ({...row, cellsMap: {[wk.id]: row.cellsMap[wk.id]}}))) : filteredRows;
@@ -4356,6 +4361,8 @@
 
   </script>
   <script src="assets/option-sliders.js"></script>
+  <script src="assets/city-coords.js?v=1"></script>
+  <script src="assets/personalizare.js?v=1"></script>
   <script src="assets/quiz.js?v=4"></script>
   <script src="assets/quiz-account.js?v=1"></script>
 </body>
