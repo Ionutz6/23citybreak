@@ -111,7 +111,7 @@
       // Favoritele urcă primele, în ordinea din profil; primul favorit e preselectat.
       favs.slice().reverse().forEach(iata => { const o = [...origin.options].find(x => x.dataset.iata === iata); if (o) origin.prepend(o); });
       const first = [...origin.options].find(o => favs.includes(o.dataset.iata));
-      if (first && !searchedOnce) origin.value = first.value;
+      if (first && !searchedOnce) { origin.value = first.value; if (typeof refreshWeekendsForOrigin === 'function') refreshWeekendsForOrigin(); }
       renderOriginChips(favs);
     }
     applyBudget();
