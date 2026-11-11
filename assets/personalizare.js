@@ -2,7 +2,7 @@
 // (Open-Meteo) și reminder lunar pentru orașele căutate dar nemarcate ca văzute.
 //
 // Interfața publică: window.CBPersonal
-//   prefs()            → { departure_airports:[IATA], budget_max_eur, temp_min_c, temp_max_c, city_mode }
+//   prefs()            → { departure_airports:[IATA], budget_max_eur, temp_min_c, temp_max_c, city_mode, currency:'EUR'|'RON' }
 //   visited()          → Set de sluguri Kiwi fără „City:” (ex. prague_cz)
 //   savePrefs(patch)   → salvează local (și în cont, dacă există sesiune)
 //   markVisited(slugs, source)
@@ -15,7 +15,7 @@
 // Nu face nicio cerere suplimentară la Kiwi.
 (() => {
   const K = { prefs: '23cb-prefs', visited: '23cb-visited', searched: '23cb-searched', reminder: '23cb-visited-reminder', wx: '23cb-weather-v1', geo: '23cb-geo-v1' };
-  const DEFAULTS = { departure_airports: [], budget_max_eur: null, temp_min_c: null, temp_max_c: null, city_mode: 'any' };
+  const DEFAULTS = { departure_airports: [], budget_max_eur: null, temp_min_c: null, temp_max_c: null, city_mode: 'any', currency: 'EUR' };
   const DAY = 864e5, REMIND_EVERY = 30 * DAY, MIN_AGE = 3 * DAY;
   const store = {
     get: (k, d) => { try { const v = JSON.parse(localStorage.getItem(k)); return v ?? d; } catch { return d; } },
@@ -46,7 +46,7 @@
       const syncKey = `23cb-synced-${uid}`;
       const firstSync = !store.get(syncKey, false);
       const [{ data: prefRow, error: prefErr }, { data: vis, error: visErr }] = await Promise.all([
-        sb.from('search_preferences').select('departure_airports,budget_max_eur,temp_min_c,temp_max_c,city_mode').maybeSingle(),
+        sb.from('search_preferences').select('*').maybeSingle(),
         sb.from('visited_cities').select('city_id'),
       ]);
       if (prefErr || visErr) throw prefErr || visErr;
@@ -54,7 +54,7 @@
       if (firstSync) {
         const localPrefs = store.get(K.prefs, null);
         const hasLocalPrefs = localPrefs && Object.keys(DEFAULTS).some(k => JSON.stringify(localPrefs[k] ?? DEFAULTS[k]) !== JSON.stringify(DEFAULTS[k]));
-        if (!prefRow && hasLocalPrefs) await sb.from('search_preferences').upsert({ ...DEFAULTS, ...pick(localPrefs) });
+        if (!prefRow && hasLocalPrefs) await upsertPrefs(sb, { ...DEFAULTS, ...pick(localPrefs) });
         const localOnly = store.get(K.visited, []).filter(id => /^[a-z0-9-]+_[a-z]{2}$/.test(id) && !remoteVisited.has(id));
         if (localOnly.length) {
           const { error } = await sb.from('visited_cities').upsert(localOnly.map(city_id => ({ city_id, source: 'manual' })), { onConflict: 'user_id,city_id', ignoreDuplicates: true });
@@ -67,19 +67,29 @@
       } else {
         prefs = { ...DEFAULTS, ...(prefRow ? pick(prefRow) : {}) };
       }
+      // Până la migrarea 20261112_moneda.sql rândul nu are currency: păstrăm alegerea locală.
+      const localCur = store.get(K.prefs, {})?.currency;
+      if (prefRow && !('currency' in prefRow) && localCur) prefs.currency = localCur;
       visited = remoteVisited;
       store.set(K.prefs, prefs); store.set(K.visited, [...visited]);
       return true;
     } catch (e) { console.warn('Preferințele din cont nu au putut fi citite:', e?.message || e); return false; }
   }
   const pick = r => Object.fromEntries(Object.keys(DEFAULTS).filter(k => k in r).map(k => [k, r[k]]));
+  const missingCurrencyCol = e => !!e && /currency/i.test(`${e.message || ''} ${e.details || ''}`) && /column|schema/i.test(e.message || '');
+  async function upsertPrefs(sb, row) {
+    let res = await sb.from('search_preferences').upsert(row);
+    if (missingCurrencyCol(res.error)) { const { currency, ...rest } = row; res = await sb.from('search_preferences').upsert(rest); }
+    if (res.error) throw res.error;
+    return res;
+  }
 
   async function savePrefs(patch) {
     prefs = { ...prefs, ...patch };
     store.set(K.prefs, prefs);
     const acc = account();
     if (acc) {
-      try { const sb = await acc.client(); await sb.from('search_preferences').upsert(pick(prefs)); }
+      try { const sb = await acc.client(); await upsertPrefs(sb, pick(prefs)); }
       catch (e) { console.warn('Preferințele nu au putut fi salvate în cont:', e?.message || e); }
     }
     applyPrefsToForm();
@@ -114,6 +124,7 @@
       renderOriginChips(favs);
     }
     applyBudget();
+    applyCurrency();
     renderBar();
     rerender();
   }
@@ -136,6 +147,22 @@
     // Select-ul e ascuns în spatele slider-ului (option-sliders.js), care se sincronizează doar la „change”.
     sel.dispatchEvent(new Event('change', { bubbles: true }));
   }
+
+  // Moneda: valoarea din profil se aplică pe selectorul din căutare (index.html face conversia cu cursul BCE).
+  // Dacă userul schimbă moneda din căutare, o ținem minte în profil (și local, fără cont).
+  let currencyTouched = false;
+  function applyCurrency() {
+    const sel = $('currency-select');
+    const want = prefs.currency === 'RON' ? 'RON' : 'EUR';
+    if (!sel || currencyTouched || sel.disabled || sel.value === want) return;
+    sel.value = want;
+    sel.dispatchEvent(new Event('change', { bubbles: true }));
+  }
+  window.addEventListener('cb:currency-change', e => {
+    if (!e.detail?.user) return;
+    currencyTouched = true;
+    if (prefs.currency !== e.detail.currency) savePrefs({ currency: e.detail.currency });
+  });
 
   function renderOriginChips(favs) {
     let box = $('pz-origin-chips');
@@ -170,7 +197,7 @@
     const r = profileRange();
     return [
       { k: 'air', label: 'Plecare', value: favs.length ? favs.join(', ') : 'alegi la căutare' },
-      { k: 'budget', label: 'Buget / persoană', value: prefs.budget_max_eur == null ? 'fără limită' : `până la ${prefs.budget_max_eur} €` },
+      { k: 'budget', label: 'Buget / persoană', value: prefs.budget_max_eur == null ? 'fără limită' : prefs.currency === 'RON' ? `până la ~${new Intl.NumberFormat('ro-RO').format(Math.round(prefs.budget_max_eur * 5 / 50) * 50)} RON` : `până la ${prefs.budget_max_eur} €`, sub: prefs.currency === 'RON' ? 'prețuri în lei (curs BCE)' : 'prețuri în euro' },
       { k: 'mode', label: 'Ce orașe', value: prefs.city_mode === 'new' ? 'doar orașe noi' : 'oricare', sub: visited.size ? plural(visited.size, 'oraș văzut', 'orașe văzute') : 'niciun oraș marcat ca văzut' },
       { k: 'temp', label: 'Vremea la destinație', value: r ? `${TEMP_NAMES[r.join(',')] ? TEMP_NAMES[r.join(',')] + ' · ' : ''}${fmtRange(r)}` : 'oricum', sub: r ? 'max. zilnică' : '' },
     ];
@@ -225,7 +252,7 @@
   }
   document.addEventListener('click', e => { if (e.target.closest('[data-pz-open]')) { e.preventDefault(); $('pz-profile')?.scrollIntoView({ behavior: 'smooth', block: 'start' }); if (!$('pz-prefs')) togglePrefsPanel(e.target.closest('[data-pz-open]').dataset.pzOpen); } });
 
-  const GROUP_INDEX = { air: 0, budget: 1, temp: 2, mode: 3 };
+  const GROUP_INDEX = { air: 0, currency: 1, budget: 2, temp: 3, mode: 4 }; // ordinea din Account.prefsForm
   function focusGroup(k) {
     const g = $('pz-prefs')?.querySelectorAll('.acct-group, fieldset')[GROUP_INDEX[k] ?? 0];
     g?.querySelector('button, input, select')?.focus({ preventScroll: true });
@@ -253,12 +280,14 @@
       const v = form.read();
       searchedOnce = false; // aplică imediat noile valori în formular
       budgetTouched = false;
+      currencyTouched = false;
       panel.remove();
       await savePrefs({
         departure_airports: v.departure_airports,
         budget_max_eur: v.budget_max_eur,
         temp_min_c: v.temp_min_c, temp_max_c: v.temp_max_c,
         city_mode: v.city_mode === 'new' ? 'new' : 'any',
+        currency: v.currency === 'RON' ? 'RON' : 'EUR',
       });
       if (typeof renderCrossEngineBar === 'function') renderCrossEngineBar();
     });

@@ -32,6 +32,7 @@ Migrații: `supabase/migrations/20261111_quiz.sql`, `20261111_quiz_cards.sql`, `
 | `budget_max_eur` | int 20–5000 | buget maxim dus-întors per persoană, EUR; `null` = fără limită |
 | `temp_min_c`, `temp_max_c` | int −30…45 | interval de temperatură dorit la destinație; `null` = oricare |
 | `city_mode` | `'new'` \| `'any'` | default pentru întrebarea „oraș nou sau oricare?” la căutare |
+| `currency` | `'EUR'` \| `'RON'`, default `'EUR'` | moneda în care se afișează prețurile; conversia o face pagina (curs BCE). Migrare: `20261112_moneda.sql` |
 | `updated_at` | timestamptz | |
 
 Rândul **poate lipsi** (utilizatorul a sărit pasul): tratează-l ca toate valorile implicite.

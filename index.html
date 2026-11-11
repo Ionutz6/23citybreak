@@ -1244,7 +1244,9 @@
           : `Până la ${formatMoney(amount)}`;
       });
       document.getElementById('unit-label').textContent = `Preț în ${displayCurrency === 'RON' ? 'RON (orientativ)' : '€'} ${currentMode === 1 ? 'per persoană' : 'total grup'}, tur–retur (click pe orice căsuță pentru cumpărare)`;
-      document.getElementById('currency-note').textContent = '';
+      document.getElementById('currency-note').textContent = displayCurrency === 'RON' && ronRate
+        ? `Curs BCE ${ronRateDate.split('-').reverse().join('.')}: 1 € = ${new Intl.NumberFormat('ro-RO', {minimumFractionDigits: 4, maximumFractionDigits: 4}).format(ronRate)} RON. Plata se face în moneda furnizorului.`
+        : '';
     }
     // View Mode & Vibe State (Option 4 Redesign)
     let currentViewMode = "cards"; // "cards" | "table"
@@ -4508,11 +4510,18 @@
         e.target.disabled = true;
         document.getElementById('currency-note').textContent = 'Se încarcă cursul de schimb…';
         try {
-          const response = await fetch('https://api.frankfurter.dev/v1/latest?base=EUR&symbols=RON', {signal: AbortSignal.timeout(12000)});
-          if (!response.ok) throw new Error('Curs indisponibil');
-          const data = await response.json();
-          if (!(data.rates?.RON > 0) || !/^\d{4}-\d{2}-\d{2}$/.test(data.date)) throw new Error('Curs invalid');
-          ronRate = data.rates.RON; ronRateDate = data.date;
+          // Cursul BCE (prin Frankfurter) se schimbă o dată pe zi: îl ținem 6 ore în browser.
+          let cached = null;
+          try { cached = JSON.parse(localStorage.getItem('23cb-fx-eur-ron')); } catch (_) {}
+          if (cached?.rate > 0 && Date.now() - cached.at < 6 * 36e5) { ronRate = cached.rate; ronRateDate = cached.date; }
+          else {
+            const response = await fetch('https://api.frankfurter.dev/v1/latest?base=EUR&symbols=RON', {signal: AbortSignal.timeout(12000)});
+            if (!response.ok) throw new Error('Curs indisponibil');
+            const data = await response.json();
+            if (!(data.rates?.RON > 0) || !/^\d{4}-\d{2}-\d{2}$/.test(data.date)) throw new Error('Curs invalid');
+            ronRate = data.rates.RON; ronRateDate = data.date;
+            try { localStorage.setItem('23cb-fx-eur-ron', JSON.stringify({rate: ronRate, date: ronRateDate, at: Date.now()})); } catch (_) {}
+          }
         } catch (_) {
           e.target.value = 'EUR'; displayCurrency = 'EUR';
           document.getElementById('currency-note').textContent = 'Cursul nu este disponibil. Prețurile rămân în EUR; încearcă din nou.';
@@ -4521,6 +4530,8 @@
         e.target.disabled = false;
       }
       displayCurrency = desired; updateCurrencyLabels(); renderMatrix();
+      // assets/personalizare.js salvează alegerea în profil doar când vine de la user (nu din profil).
+      window.dispatchEvent(new CustomEvent('cb:currency-change', {detail: {currency: desired, user: e.isTrusted}}));
     });
     // Initialize Page
     currentRows = [];
@@ -4534,10 +4545,10 @@
   </script>
   <script src="assets/option-sliders.js"></script>
   <script src="assets/quiz.js?v=5"></script>
-  <script src="assets/account.js?v=2"></script>
+  <script src="assets/account.js?v=3"></script>
   <script src="assets/quiz-account.js?v=3"></script>
   <script src="assets/city-coords.js?v=1"></script>
-  <script src="assets/personalizare.js?v=4"></script>
+  <script src="assets/personalizare.js?v=5"></script>
 <script src="assets/site-header.js?v=1"></script>
 </body>
 </html>
