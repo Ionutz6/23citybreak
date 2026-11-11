@@ -11,7 +11,7 @@
 .quiz-feedback em{font-style:normal;font-weight:600;color:#50875a;font-size:14px}
 .quiz-best{margin-top:12px;font-size:14px;color:#555b50;font-weight:600}
 .quiz-start{font-size:14px!important;padding:13px 20px!important}
-.quiz-final{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-top:10px}.quiz-final strong{font:700 clamp(56px,7vw,84px)/1 var(--font-display);letter-spacing:-.05em}.quiz-final span{font:700 16px var(--font-display);color:#6e716a}
+.quiz-final{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-top:10px}.quiz-final strong{font:700 clamp(56px,7vw,84px)/1.1 var(--font-display);letter-spacing:.02em;padding-top:.05em}.quiz-final span{font:700 16px var(--font-display);color:#6e716a}
 .quiz-share .quiz-wa{background:#25d366;color:#0b2e17;text-decoration:none}
 .quiz-recap-label{margin-top:16px;font-size:12px;color:#8a8d85}
 .quiz-recap{list-style:none;padding:0;margin:8px 0 0;display:grid;grid-template-columns:1fr 1fr;gap:6px}
@@ -30,3 +30,5 @@
 .quiz-rank-big{display:block;font:700 clamp(26px,3vw,34px)/1.1 var(--font-display);letter-spacing:-.04em;color:#141516;margin:8px 0 6px}
 .quiz-link{background:none;border:0;padding:0;color:#8a6a33;text-decoration:underline;font-size:12px;cursor:pointer}
 @media(max-width:700px){.quiz-email-row{flex-direction:column}}
+.header-account{background:#dfa649;color:#15130f;border:0;border-radius:99px;padding:6px 13px;font-size:12px;font-weight:700;cursor:pointer;line-height:1.2}.header-account:hover{background:#e9b862}.header-account:focus-visible{outline:3px solid #fff;outline-offset:2px}
+@media(max-width:440px){.header-right{gap:10px!important}.header-right a{font-size:12px}.header-account{padding:5px 10px;font-size:11px;flex:none}.wordmark{font-size:19px}}
