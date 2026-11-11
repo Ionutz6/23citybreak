@@ -119,14 +119,23 @@
     rerender();
   }
 
-  function applyBudget() {
+  // Bugetul din profil e doar valoarea de pornire: după ce userul mișcă slider-ul, nu-l mai suprascriem
+  // (de ex. când preferințele din cont sosesc după ce pagina s-a încărcat).
+  let budgetTouched = false;
+  document.addEventListener('input', e => { if (e.isTrusted && e.target?.id === 'f-max-price-slider') budgetTouched = true; }, true);
+  document.addEventListener('change', e => { if (e.isTrusted && e.target?.id === 'f-max-price') budgetTouched = true; }, true);
+
+  function applyBudget(force = false) {
     const sel = $('f-max-price');
     const b = prefs.budget_max_eur;
-    if (!sel || searchedOnce) return;
+    if (!sel || (!force && (searchedOnce || budgetTouched))) return;
     if (b == null) return;
     const opts = [...sel.options].map(o => Number(o.value)).filter(n => n !== 999).sort((a, z) => a - z);
-    const fit = opts.find(n => n >= b);
-    sel.value = String(fit ?? 999);
+    const fit = String(opts.find(n => n >= b) ?? 999);
+    if (sel.value === fit) return;
+    sel.value = fit;
+    // Select-ul e ascuns în spatele slider-ului (option-sliders.js), care se sincronizează doar la „change”.
+    sel.dispatchEvent(new Event('change', { bubbles: true }));
   }
 
   function renderOriginChips(favs) {
@@ -237,6 +246,7 @@
       if (tmin != null && tmax != null && tmin > tmax) [tmin, tmax] = [tmax, tmin];
       const b = f('pz-budget').value;
       searchedOnce = false; // aplică imediat noile valori în formular
+      budgetTouched = false;
       cityModeThisSearch = null; tempRange = null;
       await savePrefs({
         departure_airports: [...panel.querySelectorAll('[name="pz-air"]:checked')].map(i => i.value),
@@ -485,7 +495,7 @@
     }
     if (typeof window.setSimpleTripMode === 'function') {
       const orig = window.setSimpleTripMode;
-      window.setSimpleTripMode = (...args) => { const r = orig(...args); const was = searchedOnce; searchedOnce = false; applyBudget(); searchedOnce = was; return r; };
+      window.setSimpleTripMode = (...args) => { const r = orig(...args); budgetTouched = false; applyBudget(true); return r; };
     }
     // Clic pe „Verifică oferta” / „Kiwi” = interes real pentru oraș.
     document.addEventListener('click', e => {
@@ -551,7 +561,7 @@
     applyPrefsToForm();
     loadFromAccount().then(ok => { if (ok) applyPrefsToForm(); });
     window.addEventListener('account:change', () => loadFromAccount().then(() => { applyPrefsToForm(); }));
-    window.addEventListener('storage', e => { if ([K.prefs, K.visited].includes(e.key)) { prefs = { ...DEFAULTS, ...store.get(K.prefs, {}) }; visited = new Set(store.get(K.visited, [])); applyPrefsToForm(); } });
+    window.addEventListener('storage', e => { if ([K.prefs, K.visited].includes(e.key)) { if (e.key === K.prefs) budgetTouched = false; prefs = { ...DEFAULTS, ...store.get(K.prefs, {}) }; visited = new Set(store.get(K.visited, [])); applyPrefsToForm(); } });
     maybeShowReminder(new URLSearchParams(location.search).has('orase-vazute'));
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
