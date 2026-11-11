@@ -1539,6 +1539,32 @@
       };
     }
 
+    // One row per city: airports of the same city (e.g. CIA + FCO = Roma) share a key.
+    function destinationRowKey(iata, rawCityName) {
+      return `grp:${resolveDestinationDisplay(iata, rawCityName).group.toLowerCase()}`;
+    }
+
+    const EXTRA_AIRPORT_NAMES = { OST: "Ostend–Bruges" };
+    function airportLabel(iata) {
+      const code = (iata || "").toUpperCase();
+      return AIRPORT_INFO[code]?.airport || EXTRA_AIRPORT_NAMES[code] || code;
+    }
+
+    // Destination airport of a fare cell, read from its route ("OTP → CIA").
+    function cellDestIata(cell) {
+      return (cell?.outRoute || "").split("→")[1]?.trim().toUpperCase() || "";
+    }
+
+    // Airports present in a row's fares, cheapest first.
+    function rowAirports(row) {
+      const best = new Map();
+      Object.values(row?.cellsMap || {}).forEach(c => {
+        const code = cellDestIata(c);
+        if (code && (!best.has(code) || c.perPaxEur < best.get(code))) best.set(code, c.perPaxEur);
+      });
+      return [...best.entries()].sort((a, b) => a[1] - b[1]).map(([iata, minPrice]) => ({ iata, name: airportLabel(iata), minPrice }));
+    }
+
     function sortRowsByCityGroup(rows) {
       if (!rows || rows.length === 0) return [];
 
@@ -2934,6 +2960,15 @@
         const airline = bestCell ? bestCell.airlineLabel : (r.sub || "Zbor direct");
         const bookUrl = bestCell ? getTargetUrl(bestCell) : "#";
         const cardKiwiUrl = bestCell && currentLinkMode !== "kiwi" ? kiwiTargetUrl(bestCell) : "";
+        // Several airports for the same city: name the one of this offer and, discreetly, the others.
+        const bestIata = cellDestIata(bestCell);
+        const otherAirports = rowAirports(r).filter(a => a.iata !== bestIata);
+        let airportNote = "";
+        if (r.cityId === "City:bruges_be" && bestIata) {
+          airportNote = `<div class="text-xs text-[#e2e8f0] mt-1">Aeroport: ${escapeHtml(airportLabel(bestIata))} (${escapeHtml(bestIata)}) · transfer spre Bruges separat</div>`;
+        } else if (bestIata && otherAirports.length) {
+          airportNote = `<div class="text-[11px] text-[#cbd5e1] mt-1 font-body">✈ ${escapeHtml(airportLabel(bestIata))} (${escapeHtml(bestIata)}) · și ${otherAirports.map(a => `${escapeHtml(a.name)} de la ${formatMoney(currentMode === 1 ? a.minPrice : a.minPrice * (parseInt(document.getElementById("f-adults").value, 10) || 2))}`).join(", ")}</div>`;
+        }
 
         cardsHtml += `
           <div data-city-id="${escapeHtml(r.cityId || '')}" data-wk-id="${escapeHtml(bestWk?.id || '')}" class="card-23ai city-card-bg rounded-3xl overflow-hidden flex flex-col justify-between border border-[#e4e7eb] shadow-sm relative group"
@@ -2952,7 +2987,7 @@
                 <h3 class="font-display text-xl sm:text-2xl font-black text-white tracking-tight flex items-center gap-2 flex-wrap drop-shadow-md">
                   <span>${r.city}</span>
                 </h3>
-                ${r.cityId === "City:bruges_be" ? `<div class="text-xs text-[#e2e8f0] mt-1">Aeroport: ${escapeHtml(r.airportName)} (${escapeHtml(r.iata)}) · transfer spre Bruges separat</div>` : ""}
+                ${airportNote}
                 <div class="text-xs text-[#cbd5e1] font-medium font-body flex items-center gap-1.5 mt-0.5">
                   <span>📅</span> <span>${datesLabel}</span>
                 </div>
@@ -3183,7 +3218,13 @@
 
         const tdLabel = document.createElement("td");
         tdLabel.className = "matrix-city-column py-2.5 px-3 align-middle min-w-[210px] sm:min-w-[250px]";
-        const airportBadge = r.airportName ? `<span class="text-[10px] font-bold text-[#8a5d14] bg-[#fdf3dc] border border-[#dfa649]/40 px-1.5 py-0.5 rounded-md">${r.airportName} (${r.iata})</span>` : '';
+        const airports = rowAirports(r);
+        const multiAirport = airports.length > 1;
+        const badgeText = multiAirport ? airports.map(a => a.name).join(" · ")
+          : airports.length === 1 && airports[0].name !== airports[0].iata ? `${airports[0].name} (${airports[0].iata})`
+          : !airports.length && r.airportName ? `${r.airportName} (${r.iata})` : "";
+        const airportBadge = badgeText ? `<span class="text-[10px] font-bold text-[#8a5d14] bg-[#fdf3dc] border border-[#dfa649]/40 px-1.5 py-0.5 rounded-md">${escapeHtml(badgeText)}</span>` : '';
+        const rowSub = multiAirport ? `${airports.map(a => a.iata).join(" / ")} · cel mai bun preț pe weekend` : airports.length === 1 && r.sub ? r.sub.replace(/^[A-Z]{3}\b/, airports[0].iata) : r.sub;
         const cityKey = (r.code || r.iata || r.city).toLowerCase();
         tdLabel.innerHTML = `
           <div class="font-bold text-sm sm:text-base text-[#0a0b0d] leading-snug font-display flex items-center gap-1.5 flex-wrap">
@@ -3195,7 +3236,7 @@
               ☀️
             </button>
           </div>
-          <div class="text-xs text-[#64748b] font-semibold mt-0.5 leading-tight font-body">${r.sub}</div>
+          <div class="text-xs text-[#64748b] font-semibold mt-0.5 leading-tight font-body">${rowSub}</div>
         `;
         tr.appendChild(tdLabel);
 
@@ -3227,8 +3268,11 @@
             a.rel = "noopener noreferrer";
             a.title = tooltip;
             a.className = `price-cell h-12 sm:h-14 rounded-xl ${tierClass} ${outlineClass} flex items-center justify-center no-underline cursor-pointer px-2 shadow-2xs`;
+            const cellAirport = multiAirport ? cellDestIata(cell) : "";
+            a.className += cellAirport ? " flex-col gap-0.5" : "";
             a.innerHTML = `
               <span class="font-black text-sm sm:text-base md:text-lg leading-none whitespace-nowrap">${displayPrice}</span>
+              ${cellAirport ? `<span class="text-[9px] font-bold opacity-70 leading-none">${cellAirport}</span>` : ""}
             `;
             a.addEventListener("mouseenter", () => showQuickBuy(r, wk.id));
             td.appendChild(a);
@@ -3795,7 +3839,6 @@
           updateSearchStatus("Procesăm cele mai bune tarife...", 98, "loading");
 
           const targetCellsMap = {};
-          const brugesCellsByAirport = new Map();
           let targetCityTitle = cityName;
           let targetCode = destIata.toLowerCase();
           let targetAirline = "Companie aeriană";
@@ -3865,11 +3908,6 @@
                   stops: Math.max(outSegs.length - 1, inSegs.length - 1)
                 };
 
-                if (isBruges) {
-                  if (!brugesCellsByAirport.has(outDest)) brugesCellsByAirport.set(outDest, { airport, cellsMap: {} });
-                  const cells = brugesCellsByAirport.get(outDest).cellsMap;
-                  if (!cells[wk.id] || cellObj.perPaxEur < cells[wk.id].perPaxEur) cells[wk.id] = cellObj;
-                }
                 if (!targetCellsMap[wk.id] || cellObj.perPaxEur < targetCellsMap[wk.id].perPaxEur) {
                   targetCellsMap[wk.id] = cellObj;
                   totalFound++;
@@ -3896,11 +3934,9 @@
           };
 
           currentRows = currentRows.filter(r => r.cityId !== destVal && (isBruges || r.code !== targetCode));
-          if (isBruges) {
-            for (const [iata, result] of brugesCellsByAirport) {
-              currentRows.push({ city: "Bruges", airportName: result.airport.name, cityGroup: "Bruges", sub: `${iata} · transfer spre Bruges separat`, code: iata.toLowerCase(), iata, cityId: destVal, skyTo: iata.toLowerCase(), cellsMap: result.cellsMap });
-            }
-          } else if (totalFound > 0) {
+          if (isBruges && totalFound > 0) {
+            currentRows.push({ city: "Bruges", cityGroup: "Bruges", sub: "transfer spre Bruges separat", code: targetCode, iata: targetCode.toUpperCase(), cityId: destVal, skyTo: targetCode, cellsMap: targetCellsMap });
+          } else if (!isBruges && totalFound > 0) {
             currentRows.unshift(newRow);
           }
           if (searchSimilar && totalFound > 0) {
@@ -3935,8 +3971,18 @@
         // DISCOVERY SEARCH (Toată Europa)
         const cityRowsMap = new Map();
         currentRows.forEach(r => {
-          cityRowsMap.set(r.code, {
+          const key = destinationRowKey(r.iata || r.code, r.cityGroup || r.city);
+          const existing = cityRowsMap.get(key);
+          if (existing) {
+            for (const [wkId, cell] of Object.entries(r.cellsMap || {})) {
+              if (cell && (!existing.cellsMap[wkId] || cell.perPaxEur < existing.cellsMap[wkId].perPaxEur)) existing.cellsMap[wkId] = cell;
+            }
+            return;
+          }
+          cityRowsMap.set(key, {
             city: r.city,
+            airportName: r.airportName,
+            cityGroup: r.cityGroup,
             sub: r.sub,
             code: r.code,
             iata: r.iata || r.code.toUpperCase(),
@@ -4082,7 +4128,7 @@
                 stops: Math.max(outSegs.length - 1, inSegs.length - 1)
               };
 
-              const key = outDest.toLowerCase();
+              const key = destinationRowKey(outDest, destCity?.name);
               if (!cityRowsMap.has(key)) {
                 const disp = resolveDestinationDisplay(outDest, destCity?.name);
                 cityRowsMap.set(key, {
@@ -4090,7 +4136,7 @@
                   airportName: disp.airport,
                   cityGroup: disp.group,
                   sub: `${outDest} · ${airlineLabel}`,
-                  code: key,
+                  code: outDest.toLowerCase(),
                   iata: outDest,
                   cityId: destCity?.id || "",
                   skyTo: outDest.toLowerCase(),
