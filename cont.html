@@ -9,6 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700;800&family=Space+Grotesk:wght@500;700&display=swap&subset=latin,latin-ext" rel="stylesheet">
   <link rel="stylesheet" href="assets/account.css?v=1">
+  <link rel="stylesheet" href="assets/visited/visited-map.css">
 </head>
 <body class="acct-page">
   <header class="site-header"><div class="header-inner"><a class="wordmark" href="index.html" aria-label="23citybreak, pagina principală"><span class="plane-icon" aria-hidden="true">✈︎ </span><span>23</span><span class="wordmark-city">city</span><span>break</span></a><div class="header-right"><a href="index.html">Zboruri</a><a href="index.html#city-quiz">Ghicește orașul</a><a href="jurnal.html">Jurnal</a><button id="account-link" class="header-account" type="button" hidden>Intră</button></div></div></header>
@@ -16,7 +17,8 @@
     <p class="acct-note">Se încarcă...</p>
   </main>
   <footer class="acct-footer">Contul e privat: doar tu îți vezi datele. Datele sunt păstrate de <a href="https://23ai.ro" target="_blank" rel="noopener noreferrer">23ai</a>.</footer>
-  <!-- Harta orașelor văzute (window.VisitedCities) se include aici, înainte de account.js. -->
+  <!-- Harta orașelor văzute (window.VisitedCities, PR #5). Până la merge, profilul arată un placeholder. -->
+  <script src="assets/visited/visited-map.js"></script>
   <script src="assets/account.js?v=1"></script>
   <script src="assets/profile.js?v=1"></script>
 </body>
