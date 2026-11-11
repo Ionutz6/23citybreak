@@ -55,6 +55,17 @@ await sb.from('visited_cities').delete().eq('city_id', 'prague_cz');
 const {data} = await sb.from('visited_cities').select('city_id');
 ```
 
+### `search_history` (orașe căutate, pentru emailul lunar „ai mai văzut vreun oraș nou?”)
+
+| Coloană | Tip | Note |
+|---|---|---|
+| `user_id`, `city_id` | PK compus | `city_id` în același format ca `visited_cities` |
+| `searches` | int | câte căutări |
+| `first_searched_at`, `last_searched_at` | timestamptz | |
+| `reminded_at` | timestamptz | setat de funcția de email (service role) |
+
+Din browser **nu** se scrie direct (doar select/delete): se folosește `rpc('record_search', {p_city_ids: ['prague_cz', ...]})`, max. 20 per apel, care incrementează `searches`.
+
 ### Existente (quiz, faza 2)
 
 - `subscribers`: abonarea la newsletter (comună 23ai + 23citybreak). `newsletter` bool, `consent_text`, `consent_at`, `unsubscribed_at`.
@@ -67,6 +78,7 @@ const {data} = await sb.from('visited_cities').select('city_id');
 | `my_quiz_rank(p_quiz)` | authenticated | cel mai bun scor, locul, numărul de jucători, top % |
 | `unsubscribe(p_token)` | anon | dezabonare din linkul din email |
 | `delete_my_account()` | authenticated | șterge contul și toate datele |
+| `record_search(p_city_ids text[])` | authenticated | înregistrează orașele căutate (max. 20) |
 
 ## `window.Account` (din `assets/account.js`)
 
