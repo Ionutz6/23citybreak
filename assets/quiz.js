@@ -144,7 +144,7 @@
     const hint = el('p', 'quiz-recap-label', 'Pentru Instagram: descarcă imaginea și adaug-o la story sau la o postare.');
     const account = el('div', 'quiz-account');
     content.replaceChildren(kicker, big, h, best, account, actions, hint, recapLabel, list);
-    window.QuizAccount?.mount(account, {score, correct});
+    window.QuizAccount?.mount(account, {score, correct, cards: results.map(r => ({image: r.q.image, ok: r.ok}))});
 
     shareBlob = null;
     image.onload = image.onerror = null;
@@ -163,7 +163,7 @@
     again.addEventListener('click', () => { startGame(); content.querySelector('button')?.focus({preventScroll: true}); });
   }
 
-  async function buildShareImage({score, correct, results}) {
+  async function buildShareImage({score, correct, results}, type = 'image/png', quality) {
     const W = 1080, H = 1350, c = document.createElement('canvas'); c.width = W; c.height = H;
     const x = c.getContext('2d');
     try { await Promise.all(['700 64px "Space Grotesk"', '700 40px "Outfit"'].map(f => document.fonts.load(f))); } catch {}
@@ -178,8 +178,10 @@
     x.fillStyle = '#fff'; x.fillText('break', off, 62);
     x.textAlign = 'right'; x.font = `700 26px ${display}`; x.fillStyle = '#dfa649'; x.fillText('GHICEȘTE ORAȘUL', W - 70, 62);
     x.textAlign = 'left'; x.textBaseline = 'alphabetic'; x.fillStyle = '#141516';
-    x.font = `700 230px ${display}`; x.fillText(`${correct}/10`, 66, 400);
-    x.font = `700 54px ${display}`; x.fillText(`${fmt(score)} puncte`, 72, 480);
+    // Cifrele desenate separat, cu spațiu între ele: altfel steagul lui „1” se lovește de „/” în Space Grotesk.
+    x.font = `700 210px ${display}`; let nx = 66;
+    [String(correct), '/', '10'].forEach((part, i) => { x.fillText(part, nx, 370); nx += x.measureText(part).width + (i < 2 ? 14 : 0); });
+    x.font = `700 54px ${display}`; x.fillText(`${fmt(score)} puncte`, 72, 470);
     x.font = `600 38px ${display}`; x.fillStyle = '#8a6a33'; x.fillText(rating(correct), 72, 545);
     const cols = 5, gap = 18, tw = (W - 140 - gap * (cols - 1)) / cols, th = tw * 1.5, top = 610;
     results.forEach((r, i) => {
@@ -196,9 +198,11 @@
     });
     x.fillStyle = '#141516'; x.font = `700 40px ${display}`; x.fillText('Tu câte orașe recunoști?', 70, H - 70);
     x.textAlign = 'right'; x.fillStyle = '#8a6a33'; x.font = `700 32px ${display}`; x.fillText('23citybreak.ro', W - 70, H - 72);
-    return new Promise((res, rej) => c.toBlob(b => b ? res(b) : rej(new Error('blob')), 'image/png'));
+    return new Promise((res, rej) => c.toBlob(b => b ? res(b) : rej(new Error('blob')), type, quality));
   }
 
-  window.Quiz = {start: startGame, content};
+  // Folosit de quiz-account.js pentru imaginea din emailul cu rezultatul.
+  const cardImage = ({score, correct, cards}) => buildShareImage({score, correct, results: cards.map(c => ({ok: c.ok, q: {image: c.image}}))}, 'image/jpeg', 0.86);
+  window.Quiz = {start: startGame, content, cardImage};
   showStart();
 })();
