@@ -112,9 +112,13 @@
 .vc-city-info{display:flex;flex-direction:column}
 .vc-city-info strong{font:700 24px/1.1 var(--font-display,'Space Grotesk',sans-serif);letter-spacing:-.03em}
 .vc-city-info span{color:var(--vc-muted);font-size:14px}
-.vc-root.has-bg-image .vc-country{fill:transparent;stroke:rgba(80,70,50,.25)}
-.vc-root.has-bg-image .vc-country:hover,.vc-root.has-bg-image .vc-country.is-focus{fill:rgba(255,246,227,.35)}
-.vc-root.has-bg-image .vc-country.is-visited{fill:rgba(223,166,73,.28)}
+.vc-root.has-bg-image .vc-country{fill:transparent;stroke:none}
+.vc-root.has-bg-image .vc-map{background:#c3e2dc}
+.vc-root.has-bg-image .vc-country:hover{fill:rgba(255,250,235,.3)}
+.vc-root.has-bg-image .vc-country.is-focus{fill:rgba(255,250,235,.22);stroke:rgba(120,90,40,.55);stroke-width:calc(var(--vc-u,1) * 1.5)}
+.vc-root.has-bg-image .vc-country.is-visited{fill:rgba(223,166,73,.32)}
+.vc-root.has-bg-image .vc-labels text{stroke:#fbf3e1}
+.vc-root.has-bg-image .vc-inset rect{fill:rgba(255,255,255,.25)}
 .vc-root.has-bg-image .vc-country.is-off{fill:transparent;stroke:none}
 .vc-debug path{stroke:#d0021b;stroke-width:calc(var(--vc-u,1) * 2);fill:none}
 .vc-debug text{fill:#d0021b;font:700 calc(var(--vc-u,1) * 12px) var(--font-display,sans-serif)}
@@ -124,3 +128,14 @@
 .vc-map svg{width:100%}
 .vc-onboarding .vc-map{max-width:calc(58vh * 1000 / 860)}
 .vc-root.is-zoomed .vc-hint{display:none}
+.vc-root.has-bg-image.is-zoomed .vc-country:not(.is-off){fill:transparent}
+.vc-root.has-bg-image.is-zoomed .vc-country.is-visited{fill:rgba(223,166,73,.32)}
+.vc-root.has-bg-image.is-zoomed .vc-country.is-focus{fill:rgba(255,250,235,.22)}
+.vc-root.has-bg-image.is-zoomed .vc-country.is-visited.is-focus{fill:rgba(223,166,73,.4)}
+/* Orașe vizitate: verde plin (cerut de Alex), țările vizitate doar cu o nuanță verde discretă */
+.vc-root{--vc-visited:#22a04b}
+.vc-dot.is-on,.vc-root.is-zoomed .vc-dot.is-on{fill:var(--vc-visited);stroke:#fff;stroke-width:calc(var(--vc-u,1) * 1.8)}
+.vc-country.is-visited,.vc-root.is-zoomed .vc-country.is-visited:not(.is-focus){fill:#dcefd9}
+.vc-country.is-visited:hover{fill:#cbe6c6}
+.vc-root.has-bg-image .vc-country.is-visited,.vc-root.has-bg-image.is-zoomed .vc-country.is-visited{fill:rgba(34,160,75,.07)}
+.vc-root.has-bg-image.is-zoomed .vc-country.is-visited.is-focus{fill:rgba(34,160,75,.1)}

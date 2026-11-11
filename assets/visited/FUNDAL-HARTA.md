@@ -24,6 +24,10 @@ const config = {
 
 Imaginea trebuie să fie exact 3000 × 2580 px (sau 1000 × 860 ori un multiplu), în aceeași proiecție și același cadru ca `tools/fundal-referinta.png`. Recomand WebP calitate ~82 (≈ 400–700 KB).
 
+## Fundalul activ
+
+`assets/visited/fundal-harta.webp`: acuarelă generată cu ChatGPT pornind de la `tools/fundal-referinta.png`. Abaterea țărmurilor față de referință e de 1 px median și 3-5 px la percentila 90, la rezoluția 3000 px. Niciun oraș nu ajunge în mare.
+
 ## Cum testezi un fundal nou fără să schimbi codul
 
 1. Pune imaginea în repo, de exemplu `tools/fundal-nou.webp`.

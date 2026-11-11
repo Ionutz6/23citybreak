@@ -16,7 +16,7 @@
    * Gol = harta vectorială din europe-map.json. Se poate suprascrie per pagină cu mount(el, {background}).
    * Verificarea alinierii: adaugă ?harta-debug=1 în URL. */
   const config = {
-    background: '',
+    background: 'assets/visited/fundal-harta.webp',
     debug: /[?&]harta-debug=1/.test(location.search)
   };
   // Test rapid al unui fundal nou fără modificări de cod: ?harta-debug=1&harta-fundal=tools/fundal-nou.webp (doar căi din site)
@@ -330,7 +330,7 @@
       if (e.pointerType === 'touch') return;
       const {city, cc} = hitTest(e.clientX, e.clientY);
       const txt = city ? `${city.name} · ${city.country}${visited.has(city.id) ? ' ✓' : ''}` : cc ? (map.countries.find(x => x.cc === cc)?.name || '') : '';
-      root.style.cursor = city ? 'pointer' : cc ? 'zoom-in' : 'grab';
+      root.style.cursor = city && s >= 2 ? 'pointer' : city || cc ? 'zoom-in' : 'grab';
       if (!txt) { tip.hidden = true; return; }
       const r = mapBox.getBoundingClientRect();
       tip.textContent = txt; tip.hidden = false;
@@ -345,8 +345,9 @@
       drag = null; container.classList.remove('is-dragging');
       if (wasDrag || e.type === 'pointercancel') return;
       const {city, cc} = hitTest(e.clientX, e.clientY);
-      if (city) openCity(city);
-      else if (cc) zoomTo(cc);
+      // La zoom 1 punctele sunt dese: un click alege țara (zoom + panoul ei); fișa orașului se deschide de la zoom 2
+      if (city && s >= 2) openCity(city);
+      else if (city || cc) zoomTo(city ? city.cc : cc);
     };
     root.addEventListener('pointerup', endPointer);
     root.addEventListener('pointercancel', endPointer);
@@ -508,18 +509,21 @@
     // harta: încadrată pe orașele vizitate (cu minim toată zona centrală) sau toată Europa
     const top = 450, mh = 760, mw = W - 140;
     const s = Math.min(mw / map.width, mh / map.height), ox = 70 + (mw - map.width * s) / 2, oy = top + (mh - map.height * s) / 2;
-    x.save(); x.beginPath(); x.roundRect(70, top, mw, mh, 22); x.fillStyle = '#e7eef0'; x.fill(); x.clip();
+    x.save(); x.beginPath(); x.roundRect(70, top, mw, mh, 22); x.fillStyle = config.background ? '#c3e2dc' : '#e7eef0'; x.fill(); x.clip();
     x.translate(ox, oy); x.scale(s, s);
     x.lineJoin = 'round';
+    const bg = config.background ? await new Promise(res => { const i = new Image(); i.onload = () => res(i); i.onerror = () => res(null); i.src = ROOT + config.background; }) : null;
+    if (bg) x.drawImage(bg, 0, 0, map.width, map.height);
     for (const k of map.countries) {
       const p = new Path2D(k.d);
-      x.fillStyle = ccs.has(k.cc) ? '#f2d9a6' : k.active ? '#fffdf8' : '#efece3'; x.fill(p);
+      if (bg) { if (ccs.has(k.cc)) { x.fillStyle = 'rgba(34,160,75,.08)'; x.fill(p); } continue; }
+      x.fillStyle = ccs.has(k.cc) ? '#dcefd9' : k.active ? '#fffdf8' : '#efece3'; x.fill(p);
       x.strokeStyle = '#cfc8b8'; x.lineWidth = 0.8 / s * 0.9; x.stroke(p);
     }
     for (const city of cities) if (!visited.has(city.id) && !city.inset) { x.fillStyle = 'rgba(20,21,22,.18)'; x.beginPath(); x.arc(city.x, city.y, 2.2, 0, Math.PI * 2); x.fill(); }
     for (const id of ids) {
       const city = byId.get(id); if (city.inset) continue;
-      x.fillStyle = '#dfa649'; x.strokeStyle = '#141516'; x.lineWidth = 1.6;
+      x.fillStyle = '#22a04b'; x.strokeStyle = '#ffffff'; x.lineWidth = 2;
       x.beginPath(); x.arc(city.x, city.y, 6, 0, Math.PI * 2); x.fill(); x.stroke();
     }
     x.restore();
