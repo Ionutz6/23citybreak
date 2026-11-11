@@ -516,14 +516,14 @@
     if (bg) x.drawImage(bg, 0, 0, map.width, map.height);
     for (const k of map.countries) {
       const p = new Path2D(k.d);
-      if (bg) { if (ccs.has(k.cc)) { x.fillStyle = 'rgba(223,166,73,.38)'; x.fill(p); } continue; }
-      x.fillStyle = ccs.has(k.cc) ? '#f2d9a6' : k.active ? '#fffdf8' : '#efece3'; x.fill(p);
+      if (bg) { if (ccs.has(k.cc)) { x.fillStyle = 'rgba(34,160,75,.08)'; x.fill(p); } continue; }
+      x.fillStyle = ccs.has(k.cc) ? '#dcefd9' : k.active ? '#fffdf8' : '#efece3'; x.fill(p);
       x.strokeStyle = '#cfc8b8'; x.lineWidth = 0.8 / s * 0.9; x.stroke(p);
     }
     for (const city of cities) if (!visited.has(city.id) && !city.inset) { x.fillStyle = 'rgba(20,21,22,.18)'; x.beginPath(); x.arc(city.x, city.y, 2.2, 0, Math.PI * 2); x.fill(); }
     for (const id of ids) {
       const city = byId.get(id); if (city.inset) continue;
-      x.fillStyle = '#dfa649'; x.strokeStyle = '#141516'; x.lineWidth = 1.6;
+      x.fillStyle = '#22a04b'; x.strokeStyle = '#ffffff'; x.lineWidth = 2;
       x.beginPath(); x.arc(city.x, city.y, 6, 0, Math.PI * 2); x.fill(); x.stroke();
     }
     x.restore();

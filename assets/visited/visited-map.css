@@ -132,3 +132,10 @@
 .vc-root.has-bg-image.is-zoomed .vc-country.is-visited{fill:rgba(223,166,73,.32)}
 .vc-root.has-bg-image.is-zoomed .vc-country.is-focus{fill:rgba(255,250,235,.22)}
 .vc-root.has-bg-image.is-zoomed .vc-country.is-visited.is-focus{fill:rgba(223,166,73,.4)}
+/* Orașe vizitate: verde plin (cerut de Alex), țările vizitate doar cu o nuanță verde discretă */
+.vc-root{--vc-visited:#22a04b}
+.vc-dot.is-on,.vc-root.is-zoomed .vc-dot.is-on{fill:var(--vc-visited);stroke:#fff;stroke-width:calc(var(--vc-u,1) * 1.8)}
+.vc-country.is-visited,.vc-root.is-zoomed .vc-country.is-visited:not(.is-focus){fill:#dcefd9}
+.vc-country.is-visited:hover{fill:#cbe6c6}
+.vc-root.has-bg-image .vc-country.is-visited,.vc-root.has-bg-image.is-zoomed .vc-country.is-visited{fill:rgba(34,160,75,.07)}
+.vc-root.has-bg-image.is-zoomed .vc-country.is-visited.is-focus{fill:rgba(34,160,75,.1)}
