@@ -22,4 +22,4 @@ $$);
 
 Reguli: doar abonați la newsletter; oraș căutat de cel puțin 3 zile, în ultimele 90 de zile; cel mult un email la 30 de zile pentru același oraș (`reminded_at`); maximum 6 orașe per email. Linkul deschide site-ul cu promptul de marcare (`?orase-vazute=1`).
 
-Linkul de dezabonare presupune o pagină `dezabonare.html` care apelează `rpc('unsubscribe', {p_token})`; dacă threadul de cont o numește altfel, schimbă URL-ul.
+Linkul de dezabonare duce la `dezabonare.html?t=<unsubscribe_token>`, care cere un clic de confirmare și apelează `rpc('unsubscribe')`.

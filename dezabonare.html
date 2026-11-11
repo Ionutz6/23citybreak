@@ -1,0 +1,29 @@
+<!doctype html><html lang="ro"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Dezabonare · 23CityBreak</title><link rel="icon" type="image/svg+xml" href="/favicon.svg?v=3"><link rel="alternate icon" type="image/png" href="/favicon.png?v=3"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700;800&family=Space+Grotesk:wght@500;700&display=swap&subset=latin,latin-ext" rel="stylesheet"><link rel="stylesheet" href="jurnal.css?v=5">
+<style>.unsub{max-width:560px}.unsub p{font-size:17px;line-height:1.55;color:#454a45}.unsub .button{border:0;cursor:pointer;font:inherit;font-weight:800}.unsub .button[disabled]{opacity:.6;cursor:wait}#unsub-status{min-height:1.5em;font-weight:700}</style>
+</head><body><header><nav aria-label="Navigare principală"><div class="brand-group"><a class="brand" href="index.html" aria-label="23citybreak, pagina principală"><span class="plane-icon" aria-hidden="true">✈︎ </span>23<span>city</span>break</a></div><div class="navlinks"><a href="index.html">Zboruri</a></div></nav></header>
+<main class="unsub"><div class="eyebrow">Newsletter 23ai și 23citybreak</div><h1>Dezabonare</h1>
+<p id="unsub-intro">Confirmă și nu mai primești newsletterul 23ai și 23citybreak, inclusiv emailul lunar despre orașele văzute. Contul tău rămâne activ.</p>
+<p><button type="button" class="button" id="unsub-btn">Confirmă dezabonarea</button></p>
+<p id="unsub-status" role="status" aria-live="polite"></p></main>
+<footer class="site-footer"><div class="footer-inner"><div class="footer-brand"><span class="footer-wordmark"><span>23</span><span class="footer-gold">city</span><span>break</span><span class="footer-gold">.ro</span></span><span>·</span><span>Powered by <a href="https://23ai.ro" target="_blank" rel="noopener noreferrer">23AI Labs</a> @2026</span></div><div>Datele sunt administrate de 23ai.</div></div></footer>
+<script>
+// Dezabonare prin rpc('unsubscribe', {p_token}) — funcție publică (anon), din migrația quizului.
+// Cere un clic: scannerele de linkuri din clienții de email deschid linkul fără să apese butonul.
+(() => {
+  const URL_ = 'https://lsudthnrumslfscpppix.supabase.co/rest/v1/rpc/unsubscribe';
+  const KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxzdWR0aG5ydW1zbGZzY3BwcGl4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQzODY2MDEsImV4cCI6MjEwOTk2MjYwMX0.aw6KKBRKMdkfiAbzkHKUlpP2cuHhN-gF-GiUT5zHq5Y';
+  const token = new URLSearchParams(location.search).get('t') || '';
+  const btn = document.getElementById('unsub-btn'), status = document.getElementById('unsub-status');
+  const valid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(token);
+  if (!valid) { btn.hidden = true; status.textContent = 'Linkul de dezabonare nu este complet. Folosește linkul din ultimul email primit sau scrie-ne la office@23ai.ro.'; return; }
+  btn.addEventListener('click', async () => {
+    btn.disabled = true; status.textContent = 'Se procesează…';
+    try {
+      const res = await fetch(URL_, { method: 'POST', headers: { apikey: KEY, Authorization: 'Bearer ' + KEY, 'Content-Type': 'application/json' }, body: JSON.stringify({ p_token: token }) });
+      const ok = res.ok && (await res.json()) === true;
+      if (ok) { btn.hidden = true; document.getElementById('unsub-intro').hidden = true; status.textContent = 'Gata, te-ai dezabonat. Nu mai primești newsletterul. Te poți abona din nou oricând din contul tău.'; }
+      else { btn.disabled = false; status.textContent = res.ok ? 'Linkul nu mai este valabil sau adresa a fost deja dezabonată.' : 'Nu am putut procesa cererea acum. Încearcă din nou peste câteva minute.'; }
+    } catch { btn.disabled = false; status.textContent = 'Nu am putut contacta serverul. Verifică conexiunea și încearcă din nou.'; }
+  });
+})();
+</script></body></html>

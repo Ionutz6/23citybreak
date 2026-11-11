@@ -33,15 +33,42 @@
   let cityModeThisSearch = null; // alegerea de la căutarea curentă; implicit din profil
   const account = () => (window.Account && typeof window.Account.hasSession === 'function' && window.Account.hasSession()) ? window.Account : null;
 
+  // Cu sesiune, contul (Supabase 23ai) e sursa de adevăr. La prima conectare pe acest browser,
+  // urcăm în cont ce s-a strâns local înainte de login: preferințe (dacă rândul lipsește),
+  // orașe văzute și orașe căutate. localStorage rămâne doar cache.
   async function loadFromAccount() {
     const acc = account();
     if (!acc) return false;
     try {
-      const row = await acc.preferences();
-      if (row) prefs = { ...DEFAULTS, ...pick(row) };
       const sb = await acc.client();
-      const { data, error } = await sb.from('visited_cities').select('city_id');
-      if (!error && Array.isArray(data)) visited = new Set(data.map(r => r.city_id));
+      const session = await acc.session();
+      const uid = session?.user?.id;
+      if (!uid) return false;
+      const syncKey = `23cb-synced-${uid}`;
+      const firstSync = !store.get(syncKey, false);
+      const [{ data: prefRow, error: prefErr }, { data: vis, error: visErr }] = await Promise.all([
+        sb.from('search_preferences').select('departure_airports,budget_max_eur,temp_min_c,temp_max_c,city_mode').maybeSingle(),
+        sb.from('visited_cities').select('city_id'),
+      ]);
+      if (prefErr || visErr) throw prefErr || visErr;
+      const remoteVisited = new Set((vis || []).map(r => r.city_id));
+      if (firstSync) {
+        const localPrefs = store.get(K.prefs, null);
+        const hasLocalPrefs = localPrefs && Object.keys(DEFAULTS).some(k => JSON.stringify(localPrefs[k] ?? DEFAULTS[k]) !== JSON.stringify(DEFAULTS[k]));
+        if (!prefRow && hasLocalPrefs) await sb.from('search_preferences').upsert({ ...DEFAULTS, ...pick(localPrefs) });
+        const localOnly = store.get(K.visited, []).filter(id => /^[a-z0-9-]+_[a-z]{2}$/.test(id) && !remoteVisited.has(id));
+        if (localOnly.length) {
+          const { error } = await sb.from('visited_cities').upsert(localOnly.map(city_id => ({ city_id, source: 'manual' })), { onConflict: 'user_id,city_id', ignoreDuplicates: true });
+          if (!error) localOnly.forEach(id => remoteVisited.add(id));
+        }
+        const recent = Object.entries(searched()).sort((a, b) => b[1].last - a[1].last).slice(0, 20).map(([slug]) => slug);
+        if (recent.length) await sb.rpc('record_search', { p_city_ids: recent });
+        store.set(syncKey, true);
+        prefs = { ...DEFAULTS, ...(prefRow ? pick(prefRow) : hasLocalPrefs ? pick(localPrefs) : {}) };
+      } else {
+        prefs = { ...DEFAULTS, ...(prefRow ? pick(prefRow) : {}) };
+      }
+      visited = remoteVisited;
       store.set(K.prefs, prefs); store.set(K.visited, [...visited]);
       return true;
     } catch (e) { console.warn('Preferințele din cont nu au putut fi citite:', e?.message || e); return false; }
@@ -65,7 +92,7 @@
     store.set(K.visited, [...visited]);
     const acc = account();
     if (acc && slugs.length) {
-      try { const sb = await acc.client(); await sb.from('visited_cities').upsert(slugs.map(city_id => ({ city_id, source }))); }
+      try { const sb = await acc.client(); await sb.from('visited_cities').upsert(slugs.map(city_id => ({ city_id, source })), { onConflict: 'user_id,city_id', ignoreDuplicates: true }); }
       catch (e) { console.warn('Orașele văzute nu au putut fi salvate în cont:', e?.message || e); }
     }
     window.dispatchEvent(new CustomEvent('cb:visited-change', { detail: { added: slugs } }));
