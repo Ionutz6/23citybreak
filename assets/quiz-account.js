@@ -16,8 +16,9 @@
   };
   const hasSession = () => { try { return !!localStorage.getItem(TOKEN_KEY); } catch { return false; } };
 
+  // Un singur client Supabase pe pagină: cel din assets/account.js (window.Account).
   let clientPromise;
-  const client = () => clientPromise ||= import(SDK).then(m => m.createClient(SUPABASE_URL, SUPABASE_KEY, {auth: {flowType: 'implicit', detectSessionInUrl: true, persistSession: true}}));
+  const client = () => clientPromise ||= (window.Account ? window.Account.client() : import(SDK).then(m => m.createClient(SUPABASE_URL, SUPABASE_KEY, {auth: {flowType: 'implicit', detectSessionInUrl: true, persistSession: true}})));
 
   async function save(sb, session, result, newsletter) {
     const user = session.user, meta = user.user_metadata || {};
@@ -155,33 +156,9 @@
     } catch { target.replaceChildren(el('p', null, 'Nu am putut salva scorul acum. Încearcă din nou puțin mai târziu.')); }
   }
 
-  // Header: „Intră” pentru vizitatori, „Contul tău” pentru cine e conectat.
-  const headerBtn = document.getElementById('account-link');
-  function updateHeader() {
-    if (!headerBtn) return;
-    headerBtn.textContent = hasSession() ? 'Contul tău' : 'Intră';
-    headerBtn.hidden = false;
-  }
-  headerBtn?.addEventListener('click', async () => {
-    const quiz = window.Quiz; if (!quiz) return;
-    const section = document.getElementById('city-quiz');
-    const target = el('div', 'quiz-account');
-    const again = el('button', 'quiz-primary', hasSession() ? 'Joacă din nou ↻' : 'Joacă quizul ↗'); again.type = 'button';
-    again.addEventListener('click', () => quiz.start());
-    const actions = el('div', 'quiz-actions'); actions.append(again);
-    quiz.content.replaceChildren(el('span', 'field-kicker', 'CONTUL TĂU'), target, actions);
-    section.scrollIntoView({behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start'});
-    if (!hasSession()) { emailForm(target, null); target.querySelector('input[type=email]')?.focus({preventScroll: true}); return; }
-    target.append(el('p', 'quiz-rank-foot', 'Se încarcă...'));
-    try {
-      const sb = await client();
-      const {data: {session}} = await sb.auth.getSession();
-      if (!session) { updateHeader(); emailForm(target, null); return; }
-      rankPanel(target, await save(sb, session, null, null), session.user.email, sb);
-    } catch { target.replaceChildren(el('p', null, 'Nu am putut încărca contul acum.')); }
-  });
+  // Butonul din header e gestionat de assets/account.js.
+  const updateHeader = () => window.Account?.updateHeader();
 
   window.QuizAccount = {mount};
-  updateHeader();
   resume();
 })();
