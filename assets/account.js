@@ -15,6 +15,7 @@
     ['OTP', 'București Otopeni'], ['BBU', 'București Băneasa'], ['CLJ', 'Cluj-Napoca'], ['IAS', 'Iași'],
     ['TSR', 'Timișoara'], ['SBZ', 'Sibiu'], ['BCM', 'Bacău'], ['SCV', 'Suceava'], ['CND', 'Constanța'],
     ['CRA', 'Craiova'], ['OMR', 'Oradea'], ['TGM', 'Târgu Mureș'],
+    ['VLC', 'Valencia'], ['ALC', 'Alicante'], ['PAR', 'Paris (toate aeroporturile)'], ['MUC', 'München'], ['FRA', 'Frankfurt'],
   ];
   const BUDGETS = [[100, 'până la 100 €'], [150, 'până la 150 €'], [200, 'până la 200 €'], [300, 'până la 300 €'], [500, 'până la 500 €'], [null, 'fără limită']];
   const TEMPS = [
