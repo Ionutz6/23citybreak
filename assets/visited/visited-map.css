@@ -21,7 +21,9 @@
 
 .vc-map{position:relative;background:var(--vc-sea);border:1px solid var(--vc-line);border-radius:18px;overflow:hidden}
 .vc-root [hidden]{display:none!important}
-.vc-map svg{display:block;margin:0 auto;width:min(100%,calc(74vh * 1000 / 860));height:auto;aspect-ratio:1000/860;touch-action:manipulation;user-select:none}
+.vc-map svg{display:block;margin:0 auto;width:min(100%,calc(74vh * 1000 / 860));height:auto;aspect-ratio:1000/860;touch-action:none;user-select:none;-webkit-user-select:none;cursor:grab;outline:none}
+.vc-root.is-dragging .vc-map svg{cursor:grabbing}
+.vc-map svg:focus-visible{box-shadow:inset 0 0 0 3px #bd8c45}
 .vc-mapbar{position:absolute;top:12px;left:12px;right:12px;display:flex;align-items:center;gap:10px;pointer-events:none;z-index:2}
 .vc-mapbar>*{pointer-events:auto}
 .vc-hint{font-size:12px;font-weight:600;color:#555b50;background:rgba(255,255,255,.85);padding:6px 10px;border-radius:99px}
@@ -81,3 +83,44 @@
 }
 @media(prefers-reduced-motion:reduce){.vc-country,.vc-dot{transition:none}}
 .vc-map svg path:focus,.vc-map svg:focus{outline:none}
+
+/* v2: zoom, puncte mari, fișă oraș, panou țară, fundal imagine */
+.vc-hit{fill:transparent;pointer-events:all;cursor:pointer}
+.vc-dot{pointer-events:none}
+.vc-dot.is-on{stroke-width:calc(var(--vc-u,1) * 1.6)}
+.vc-root.is-zoomed .vc-country:not(.is-focus):not(.is-off){fill:#fffdf8}
+.vc-root.is-zoomed .vc-country.is-visited:not(.is-focus){fill:#f2d9a6}
+.vc-country.is-focus{fill:#fff6e3;stroke:#a8946b}
+.vc-labels text{dominant-baseline:auto}
+.vc-zoom{position:absolute;right:12px;top:12px;display:flex;flex-direction:column;gap:6px;z-index:2}
+.vc-zoom .vc-btn{width:40px;height:40px;justify-content:center;padding:0;font-size:20px;line-height:1;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.vc-zoom .vc-btn:last-child{font-size:16px}
+.vc-mapbar{right:64px}
+.vc-zone-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+.vc-zone-head h4{margin:0}
+.vc-zone .vc-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}
+.vc-card{position:relative}
+.vc-card.is-on{border-color:var(--vc-gold);box-shadow:0 0 0 2px var(--vc-gold)}
+.vc-card-open{display:block;padding:0;border:0;background:none;cursor:zoom-in;width:100%}
+.vc-card-open img,.vc-card-open .vc-ph{display:flex;width:100%;aspect-ratio:2/3;object-fit:cover}
+.vc-card-cap{padding:8px 10px;display:flex;flex-direction:column;gap:6px}
+.vc-card-cap strong{font:700 14px var(--font-display,'Space Grotesk',sans-serif)}
+.vc-card-tg{align-self:flex-start;border:1px solid #deded6;background:#fafaf7;border-radius:99px;padding:5px 10px;font:700 12px var(--font-display,'Space Grotesk',sans-serif);cursor:pointer}
+.vc-card.is-on .vc-card-tg{background:var(--vc-gold);border-color:var(--vc-gold)}
+.vc-city{max-width:min(460px,100%)}
+.vc-city-img{width:100%;max-height:62vh;aspect-ratio:2/3;object-fit:contain;border-radius:10px;background:#fff}
+.vc-city-info{display:flex;flex-direction:column}
+.vc-city-info strong{font:700 24px/1.1 var(--font-display,'Space Grotesk',sans-serif);letter-spacing:-.03em}
+.vc-city-info span{color:var(--vc-muted);font-size:14px}
+.vc-root.has-bg-image .vc-country{fill:transparent;stroke:rgba(80,70,50,.25)}
+.vc-root.has-bg-image .vc-country:hover,.vc-root.has-bg-image .vc-country.is-focus{fill:rgba(255,246,227,.35)}
+.vc-root.has-bg-image .vc-country.is-visited{fill:rgba(223,166,73,.28)}
+.vc-root.has-bg-image .vc-country.is-off{fill:transparent;stroke:none}
+.vc-debug path{stroke:#d0021b;stroke-width:calc(var(--vc-u,1) * 2);fill:none}
+.vc-debug text{fill:#d0021b;font:700 calc(var(--vc-u,1) * 12px) var(--font-display,sans-serif)}
+.vc-debug-ctl{position:absolute;left:12px;bottom:12px;background:#fff;padding:6px 10px;border-radius:8px;font-size:12px;font-weight:700;z-index:2;display:flex;gap:8px;align-items:center}
+@media(max-width:700px){.vc-zone .vc-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.vc-zoom .vc-btn{width:44px;height:44px}}
+.vc-map{max-width:calc(74vh * 1000 / 860);margin:0 auto}
+.vc-map svg{width:100%}
+.vc-onboarding .vc-map{max-width:calc(58vh * 1000 / 860)}
+.vc-root.is-zoomed .vc-hint{display:none}
