@@ -19,3 +19,14 @@
 .quiz-recap .mark{font-weight:800;width:14px}.quiz-recap .ok .mark{color:#50875a}.quiz-recap .ko .mark{color:#be7868}.quiz-recap .name{flex:1;font-weight:700;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.quiz-recap .pts{font:700 12px var(--font-display);color:#8a8d85}
 .quiz-card.is-result .quiz-art{background:#f6f2e8;padding:20px}.quiz-card.is-result .quiz-art{align-items:center}.quiz-card.is-result .quiz-art img{width:auto;max-width:100%;height:auto;max-height:560px;border-radius:10px;box-shadow:0 8px 30px rgba(0,0,0,.08)}
 @media(max-width:700px){.quiz-recap{grid-template-columns:1fr}.quiz-card.is-result .quiz-art img{max-height:none}}
+
+/* Faza 2: email + clasament */
+.quiz-account:empty{display:none}.quiz-account{margin-top:18px}
+.quiz-email,.quiz-rank{border:1px solid #ecdcbc;background:#fdf8ee;border-radius:12px;padding:16px 18px}
+.quiz-email-title{display:block;font:700 17px var(--font-display);color:#141516;margin-bottom:4px}.quiz-email p,.quiz-rank p{font-size:14px;color:#555b50;line-height:1.5}
+.quiz-email-row{display:flex;gap:8px;margin-top:12px}.quiz-email-row input{flex:1;min-width:0;border:1px solid #deded6;border-radius:8px;padding:11px 12px;font-size:14px;background:#fff}.quiz-email-row input:focus-visible{outline:3px solid #bd8c45;outline-offset:1px}.quiz-email-row button{padding:11px 15px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap}.quiz-email-row button:disabled{opacity:.6;cursor:default}
+.quiz-consent{display:flex;gap:8px;align-items:flex-start;margin-top:12px;font-size:13px;color:#3d4139;line-height:1.45;cursor:pointer}.quiz-consent input{margin-top:3px;accent-color:#c78b2d;width:16px;height:16px;flex:none}
+.quiz-rank-foot{margin-top:8px;font-size:12px!important;color:#8a8d85!important}.quiz-email-status{font-size:13px!important;color:#833c2d!important;min-height:1em;margin-top:6px}
+.quiz-rank-big{display:block;font:700 clamp(26px,3vw,34px)/1.1 var(--font-display);letter-spacing:-.04em;color:#141516;margin:8px 0 6px}
+.quiz-link{background:none;border:0;padding:0;color:#8a6a33;text-decoration:underline;font-size:12px;cursor:pointer}
+@media(max-width:700px){.quiz-email-row{flex-direction:column}}

@@ -142,7 +142,9 @@
     const again = el('button', 'quiz-next', 'Joacă din nou ↻'); again.type = 'button';
     actions.append(shareBtn, wa, dl, again);
     const hint = el('p', 'quiz-recap-label', 'Pentru Instagram: descarcă imaginea și adaug-o la story sau la o postare.');
-    content.replaceChildren(kicker, big, h, best, actions, hint, recapLabel, list);
+    const account = el('div', 'quiz-account');
+    content.replaceChildren(kicker, big, h, best, account, actions, hint, recapLabel, list);
+    window.QuizAccount?.mount(account, {score, correct});
 
     shareBlob = null;
     image.onload = image.onerror = null;
@@ -197,5 +199,6 @@
     return new Promise((res, rej) => c.toBlob(b => b ? res(b) : rej(new Error('blob')), 'image/png'));
   }
 
+  window.Quiz = {start: startGame, content};
   showStart();
 })();
