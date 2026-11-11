@@ -31,8 +31,10 @@
     }
     const {data, error} = await sb.rpc('my_quiz_rank', {p_quiz: QUIZ});
     if (error) throw error;
-    sb.functions.invoke('quiz-result-email', {body: {quiz: QUIZ}}).catch(() => {});
-    return Array.isArray(data) ? data[0] : data;
+    const rank = Array.isArray(data) ? data[0] : data;
+    // Emailul pleacă doar când scorul trimis acum e cel mai bun, ca să nu primești un mesaj după fiecare joc.
+    if (result && rank && result.score >= rank.best) sb.functions.invoke('quiz-result-email', {body: {quiz: QUIZ}}).catch(() => {});
+    return rank;
   }
 
   function rankPanel(target, rank, email, sb) {

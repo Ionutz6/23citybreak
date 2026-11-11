@@ -1,5 +1,5 @@
 // Trimite rezultatul quizului pe email (Resend). Apelată din browser cu sesiunea jucătorului.
-// Secrete necesare: RESEND_API_KEY, MAIL_FROM (ex. "23ai <quiz@23ai.ro>").
+// Secret necesar: RESEND_API_KEY. Expeditor: office@23ai.ro (domeniu verificat în Resend).
 import { createClient } from "npm:@supabase/supabase-js@2.45.4";
 
 const cors = {
@@ -33,7 +33,7 @@ Deno.serve(async (req) => {
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: { Authorization: `Bearer ${Deno.env.get("RESEND_API_KEY")}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ from: Deno.env.get("MAIL_FROM"), to: user.email, subject: `Rezultatul tău: ${r.best_correct}/10 la Ghicește orașul`, html }),
+    body: JSON.stringify({ from: "23ai <office@23ai.ro>", to: user.email, subject: `Rezultatul tău: ${r.best_correct}/10 la Ghicește orașul`, html }),
   });
   return new Response(res.ok ? "sent" : "mail error", { status: res.ok ? 200 : 502, headers: cors });
 });
