@@ -90,3 +90,10 @@
 .acct-footer{text-align:center;color:#8a8c86;font-size:12px;padding:20px 16px 30px}
 @media(max-width:760px){.acct-grid{grid-template-columns:1fr}.acct-stats{grid-template-columns:1fr 1fr}.acct-stats .acct-stat:last-child{grid-column:1/-1}}
 @media(max-width:600px){.acct-page .header-inner{padding:16px}.acct-page .wordmark{font-size:20px}.acct-page .header-right{gap:12px}.acct-page .header-right a:not(:first-child){display:none}.acct-row{flex-direction:column}.acct-main{padding-top:26px}}
+
+/* Cardul de evenimente din profil (assets/profile-interests.js) */
+.acct-card .acct-group+.acct-group{margin-top:22px}
+.acct-tags[hidden]{display:none}
+.acct-tag{flex-direction:row}
+.acct-check{display:flex;gap:10px;align-items:flex-start;margin-top:22px;font:15px/1.4 var(--font-body);color:var(--acct-ink);cursor:pointer}
+.acct-check input{width:18px;height:18px;margin-top:2px;accent-color:#c78b2d;flex:none}

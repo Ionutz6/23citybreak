@@ -127,7 +127,8 @@
     const grid = el('div', 'acct-grid');
     main.replaceChildren(head, grid);
     const [quiz, news] = await Promise.all([quizCard(sb), newsletterCard(sb, user)]);
-    grid.append(quiz, news, await prefsCard(), visitedCard(sb, user), accountCard(sb, user));
+    const interests = window.ProfileInterests ? await window.ProfileInterests.card(sb).catch(() => null) : null;
+    grid.append(quiz, news, await prefsCard(), ...(interests ? [interests] : []), visitedCard(sb, user), accountCard(sb, user));
   }
 
   async function start() {
