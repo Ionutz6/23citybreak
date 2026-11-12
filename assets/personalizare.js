@@ -202,34 +202,9 @@
     ];
   }
 
-  function renderBar() {
-    const panelHost = $('configurator');
-    if (!panelHost) return;
-    let card = $('pz-profile');
-    if (!card) {
-      card = document.createElement('section');
-      card.id = 'pz-profile';
-      card.className = 'pz-profile';
-      card.setAttribute('aria-labelledby', 'pz-profile-title');
-      panelHost.prepend(card);
-      card.addEventListener('click', onProfileClick);
-    }
-    const acc = account();
-    const panel = $('pz-prefs'), open = !!panel;
-    card.innerHTML = `
-      <div class="pz-profile-head">
-        <div><span class="pz-kicker">PROFILUL MEU</span><h2 id="pz-profile-title">${acc ? 'Căutarea ta, pe gustul tău' : 'Personalizează căutarea'}</h2></div>
-        <button type="button" id="pz-edit" class="pz-btn" aria-expanded="${open}" aria-controls="pz-prefs">${open ? 'Închide' : 'Preferințele mele'}</button>
-      </div>
-      <ul class="pz-summary">${profileSummary().map(s => `
-        <li><button type="button" class="pz-tile" data-pz-edit="${s.k}"><span class="pz-tile-label">${esc(s.label)}</span><strong>${esc(s.value)}</strong>${s.sub ? `<small>${esc(s.sub)}</small>` : ''}</button></li>`).join('')}
-      </ul>
-      <p class="pz-profile-foot">${acc
-        ? `Salvate în contul tău. <a href="cont.html">Profil complet și harta orașelor văzute →</a>`
-        : `Salvate doar în acest browser. <button type="button" class="pz-inline-link" data-pz-login>Fă-ți cont gratuit</button> ca să le ai pe orice dispozitiv și să-ți marchezi pe hartă orașele văzute.`}</p>`;
-    if (panel) card.append(panel);
-    ensureNote();
-  }
+  // „Profilul meu” nu mai apare pe prima pagină (Alex, 2026-11-12: pagina rămâne doar pentru zboruri).
+  // Preferințele se editează în cont.html; aici păstrăm doar nota cu filtrele aplicate.
+  function renderBar() { ensureNote(); }
 
   // Nota „N orașe ascunse” stă lângă butonul de căutare, unde se vede efectul filtrelor din profil.
   function ensureNote() {
@@ -249,7 +224,7 @@
       togglePrefsPanel(tile?.dataset.pzEdit);
     }
   }
-  document.addEventListener('click', e => { if (e.target.closest('[data-pz-open]')) { e.preventDefault(); $('pz-profile')?.scrollIntoView({ behavior: 'smooth', block: 'start' }); if (!$('pz-prefs')) togglePrefsPanel(e.target.closest('[data-pz-open]').dataset.pzOpen); } });
+  document.addEventListener('click', e => { if (e.target.closest('[data-pz-open]')) { e.preventDefault(); location.href = 'cont.html#preferinte'; } });
 
   const GROUP_INDEX = { air: 0, currency: 1, budget: 2, mode: 3 }; // ordinea din Account.prefsForm
   function focusGroup(k) {
@@ -320,7 +295,7 @@
     const sel = typeof selectedCityObj !== 'undefined' ? selectedCityObj : null;
     if (destVal && destVal !== 'any' && visited.has(slugOf(destVal))) parts.push(`ai mai fost în ${sel?.name || cityName(slugOf(destVal))}`);
     const filtered = lastHidden.visited;
-    note.innerHTML = parts.length ? esc(parts.join(' · ')) + (filtered ? ' · <button type="button" class="pz-inline-link" data-pz-open="mode">schimbă în Profilul meu</button>' : '') : '';
+    note.innerHTML = parts.length ? esc(parts.join(' · ')) + (filtered ? ' · <button type="button" class="pz-inline-link" data-pz-open="mode">schimbă în Contul tău</button>' : '') : '';
     note.hidden = !parts.length;
   }
 

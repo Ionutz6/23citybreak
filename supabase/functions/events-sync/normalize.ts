@@ -134,14 +134,26 @@ export function fromFootballData(m: any, competition: string): { row: EventRow |
   };
 }
 
+// Ora locală a orașului (YYYY-MM-DD + HH:MM) → moment UTC, ținând cont de ora de vară.
+export function localToUtc(date: string, time: string, cityId: string): string {
+  const guess = new Date(`${date}T${time}:00Z`);
+  const p = Object.fromEntries(new Intl.DateTimeFormat("en-CA", { timeZone: tzOf(cityId), year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).formatToParts(guess).map((x) => [x.type, x.value]));
+  const shown = new Date(`${p.year}-${p.month}-${p.day}T${p.hour}:${p.minute}:00Z`);
+  return new Date(guess.getTime() - (shown.getTime() - guess.getTime())).toISOString();
+}
+
+const CURATED_KINDS = new Set(["concert", "football", "sport", "festival", "market", "city_festival", "theatre", "comedy", "other"]);
 // deno-lint-ignore no-explicit-any
 export function fromCurated(e: any, knownCities: Set<string>): EventRow | null {
   if (!e?.slug || !e?.title || !e?.starts || !knownCities.has(e.city_id)) return null;
   if (!/^\d{4}-\d{2}-\d{2}$/.test(e.starts) || (e.ends && !/^\d{4}-\d{2}-\d{2}$/.test(e.ends))) return null;
+  // „time” opțional (ora locală, ex. meciuri de rugby): ora exactă, altfel ora se anunță.
+  const time = typeof e.time === "string" && /^\d{2}:\d{2}$/.test(e.time) ? e.time : null;
+  const strs = (v: unknown) => (Array.isArray(v) ? v.filter((x) => typeof x === "string").map((x) => x.slice(0, 80)).slice(0, 4) : []);
   return {
-    id: `cur:${e.slug}`, kind: e.kind ?? "other", title: String(e.title).slice(0, 200), city_id: e.city_id, venue: e.venue ?? null,
-    starts_at: `${e.starts}T09:00:00.000Z`, ends_at: e.ends && e.ends > e.starts ? `${e.ends}T21:00:00.000Z` : null, time_tbc: true,
-    artists: [], teams: [], competition: null, genres: [], price_min_eur: null,
+    id: `cur:${e.slug}`, kind: CURATED_KINDS.has(e.kind) ? e.kind : "other", title: String(e.title).slice(0, 200), city_id: e.city_id, venue: e.venue ?? null,
+    starts_at: time ? localToUtc(e.starts, time, e.city_id) : `${e.starts}T09:00:00.000Z`, ends_at: e.ends && e.ends > e.starts ? `${e.ends}T21:00:00.000Z` : null, time_tbc: !time,
+    artists: strs(e.artists), teams: strs(e.teams), competition: typeof e.competition === "string" ? e.competition.slice(0, 12) : null, genres: [], price_min_eur: null,
     ticket_url: https(e.ticket_url), image_url: https(e.image_url), popularity: Math.max(0, Math.min(100, e.popularity ?? 50)), source: "curated",
   };
 }

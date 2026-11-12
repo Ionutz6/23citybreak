@@ -1,4 +1,4 @@
-// Header comun: butonul de meniu pe mobil și eticheta contului pe paginile fără account.js.
+// Header comun: butonul de meniu pe mobil. Linkul „Contul tău” e același pentru toți (cont.html).
 (() => {
   const header = document.querySelector('.cb-header'); if (!header) return;
   const toggle = header.querySelector('.cb-menu-toggle');

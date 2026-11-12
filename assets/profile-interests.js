@@ -4,8 +4,8 @@
 (() => {
   const el = (tag, cls, text) => { const n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; };
   const MUSIC = [['rock', 'Rock'], ['pop', 'Pop'], ['electronic', 'Electronică'], ['hiphop', 'Hip-hop'], ['metal', 'Metal'], ['indie', 'Indie / alternativ'], ['jazz', 'Jazz / blues'], ['classical', 'Clasică / operă'], ['latin', 'Latino'], ['folk', 'Folk / world']];
-  const SPORTS = [['football', 'Fotbal'], ['basketball', 'Baschet'], ['tennis', 'Tenis'], ['f1', 'Formula 1'], ['motogp', 'MotoGP'], ['running', 'Maratoane']];
-  const COMPETITIONS = [['CL', 'Champions League'], ['PL', 'Premier League'], ['PD', 'La Liga'], ['SA', 'Serie A'], ['BL1', 'Bundesliga'], ['FL1', 'Ligue 1'], ['DED', 'Eredivisie'], ['PPL', 'Primeira Liga']];
+  const SPORTS = [['football', 'Fotbal'], ['basketball', 'Baschet'], ['tennis', 'Tenis'], ['f1', 'Formula 1'], ['motogp', 'MotoGP'], ['rugby', 'Rugby'], ['running', 'Maratoane']];
+  const COMPETITIONS = [['CL', 'Champions League'], ['PL', 'Premier League'], ['PD', 'La Liga'], ['SA', 'Serie A'], ['BL1', 'Bundesliga'], ['FL1', 'Ligue 1'], ['DED', 'Eredivisie'], ['PPL', 'Primeira Liga'], ['6N', 'Six Nations (rugby)']];
   const OTHER = [['festival', 'Festivaluri de muzică'], ['xmas_market', 'Târguri de Crăciun'], ['city_festival', 'Sărbători de oraș'], ['theatre', 'Teatru / operă / balet'], ['comedy', 'Stand-up']];
   const EMPTY = { music_genres: [], sports: [], competitions: [], other_interests: [], favorite_teams: [], favorite_artists: [], event_alerts: false };
   const clean = s => String(s).replace(/\s+/g, ' ').trim().slice(0, 60);
@@ -60,7 +60,7 @@
     const music = chipGroup('Muzică', 'Genurile la care ai merge la un concert.', MUSIC, prefs.music_genres);
     const artists = tagGroup('Artiști sau trupe preferate', 'Scrie un nume și apasă Enter.', 'ex. Coldplay', prefs.favorite_artists, 30);
     const sports = chipGroup('Sport', 'Ce ai vedea pe viu.', SPORTS, prefs.sports);
-    const comps = chipGroup('Competiții de fotbal', null, COMPETITIONS, prefs.competitions);
+    const comps = chipGroup('Competiții', null, COMPETITIONS, prefs.competitions);
     const teams = tagGroup('Echipe preferate', 'Scrie un nume și apasă Enter.', 'ex. Real Madrid', prefs.favorite_teams, 20);
     const other = chipGroup('Alte motive de drum', null, OTHER, prefs.other_interests);
     const alertRow = el('label', 'acct-check');

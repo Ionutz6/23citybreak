@@ -135,3 +135,44 @@ button.pk-day{cursor:pointer}
 .pk-stay-opt .nm{font:800 15px/1.1 'Space Grotesk',system-ui,sans-serif}
 .pk-stay-opt .ds{font-size:12px;color:#5b6470}
 .pk-stay-opt .go{position:absolute;top:10px;right:11px;font-weight:800;color:#2f7d55}
+.pk-row .pr small{display:block;font:700 11px 'Source Sans 3',system-ui,sans-serif;color:#5b6470;text-align:right;letter-spacing:0}
+/* Prețul zborului pe cardurile de eveniment */
+.ev-flight{font-size:12.5px;color:#e2e8f0;margin-top:8px;min-height:16px}
+.ev-flight b{color:#dfa649;font-weight:800}
+/* Pagina Evenimente (evenimente.html) */
+.evp *,.evp *::before,.evp *::after{box-sizing:border-box}
+.evp{background:#f7f5f0;margin:0;font-family:'Source Sans 3',system-ui,sans-serif;color:#0a0b0d}
+.evp-wrap{max-width:1440px;margin:auto;padding:0 6%}
+.evp-hero{background:#111211;color:#fff;padding:46px 0 52px}
+.evp-kicker{font:700 11px 'Space Grotesk',sans-serif;letter-spacing:.16em;color:#dfa649}
+.evp-hero h1{font:700 clamp(30px,4vw,52px)/1.08 'Space Grotesk',sans-serif;letter-spacing:-.04em;margin:14px 0}
+.evp-hero h1 em{color:#dfa649;font-style:normal}
+.evp-hero p{max-width:560px;color:#bdbdb7;font-size:16px;line-height:1.6;margin:0}
+.evp-tabs{display:flex;gap:6px;margin:-26px 0 18px;background:#fff;border-radius:16px;padding:6px;box-shadow:0 8px 24px -8px rgba(10,11,13,.18);width:max-content;max-width:100%;overflow-x:auto}
+.evp-tabs [role=tab]{border:0;background:transparent;border-radius:11px;padding:10px 18px;font:700 15px 'Space Grotesk',sans-serif;color:#384150;cursor:pointer;white-space:nowrap}
+.evp-tabs [role=tab] small{font:700 11px 'Source Sans 3',sans-serif;color:#8a95a6;margin-left:4px}
+.evp-tabs [role=tab][aria-selected=true]{background:#0a0b0d;color:#fff}
+.evp-tabs [role=tab][aria-selected=true] small{color:#dfa649}
+.evp-tabs [role=tab]:focus-visible{outline:3px solid #dfa649;outline-offset:1px}
+.evp-bar{display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px;margin-bottom:12px}
+.evp-toggle{display:inline-flex;align-items:center;gap:8px;font-weight:700;font-size:14px;cursor:pointer}
+.evp-toggle input{width:18px;height:18px;accent-color:#0a0b0d}
+.evp-toggle.off{color:#8a95a6;cursor:default}
+.evp-hint{font-size:13px;color:#7a5414;font-weight:600}
+.evp-comps{margin-bottom:16px}
+.evp-empty{background:#fff;border:1px dashed #d8d2c4;border-radius:16px;padding:28px;text-align:center;color:#5b6470;font-size:15px}
+.evp-tour{background:#111211;color:#fff;border-radius:24px;padding:18px;display:flex;flex-direction:column;gap:12px;min-height:430px;box-shadow:0 4px 20px -2px rgba(10,11,13,.08)}
+.evp-tour-head h3{margin:10px 0 2px;font:700 23px/1.15 'Space Grotesk',sans-serif;letter-spacing:-.02em}
+.evp-tour-head p{margin:0;color:#bdbdb7;font-size:13px}
+.evp-tour-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.evp-tour-row{display:grid;grid-template-columns:1fr auto;grid-template-areas:"d go" "c go" "f go";gap:2px 10px;align-items:center;background:#1d1f1d;border-radius:12px;padding:9px 12px;color:#fff;text-decoration:none;font-size:13px}
+.evp-tour-row:hover{background:#2a2c29}
+.evp-tour-row:focus-visible{outline:3px solid #dfa649;outline-offset:1px}
+.evp-tour-row .d{grid-area:d;font-weight:800;color:#dfa649;white-space:nowrap}
+.evp-tour-row .c{grid-area:c}
+.evp-tour-row .f{grid-area:f;color:#bdbdb7;font-size:12px}
+.evp-tour-row .f b{color:#dfa649}
+.evp-tour-row .go{grid-area:go;color:#dfa649}
+.evp-wk{font-style:normal;font-size:10px;text-transform:uppercase;letter-spacing:.05em;background:#dfa649;color:#0a0b0d;border-radius:99px;padding:1px 6px;margin-left:4px}
+.evp-tour .ev-chip{align-self:flex-start;background:transparent;color:#fff;border-color:#3a3c3a}
+@media(max-width:600px){.evp-wrap{padding:0 16px}.evp-hero{padding:32px 0 44px}.evp-tabs{width:100%}.evp-tabs [role=tab]{flex:1;padding:10px 8px;font-size:14px}}

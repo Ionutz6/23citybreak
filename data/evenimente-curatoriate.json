@@ -1,9 +1,259 @@
 {
-  "_note": "Evenimente anuale introduse manual (festivaluri, târguri, sărbători de oraș). Intră în tabela events prin funcția events-sync, cu id 'cur:<slug>'. Adaugă doar evenimente cu date verificate din sursa oficială (câmpul source_url). Ore în timpul local al orașului, fără fus (funcția le tratează ca oră locală aproximativă, UTC+1).",
+  "_note": "Evenimente anuale introduse manual (festivaluri, târguri, sărbători de oraș). Intră în tabela events prin funcția events-sync, cu id 'cur:<slug>'. Adaugă doar evenimente cu date verificate din sursa oficială (câmpul source_url). Ore în timpul local al orașului, fără fus (funcția le tratează ca oră locală aproximativă, UTC+1). Câmpuri opționale: time (HH:MM, ora locală exactă), teams [gazde, oaspeți], competition (ex. '6N'). Six Nations 2027: meciurile Țării Galilor acasă lipsesc, Cardiff nu e în lista de orașe.",
   "events": [
-    { "slug": "fallas-valencia-2027", "kind": "city_festival", "title": "Las Fallas", "city_id": "valencia_es", "venue": "în tot orașul", "starts": "2027-03-15", "ends": "2027-03-19", "ticket_url": "https://www.visitvalencia.com/en/events-valencia/festivities/the-fallas", "popularity": 85, "date_rule": "fix, 15-19 martie în fiecare an" },
-    { "slug": "st-patricks-dublin-2027", "kind": "city_festival", "title": "St. Patrick's Festival", "city_id": "dublin_ie", "venue": "centrul orașului", "starts": "2027-03-17", "ends": "2027-03-17", "ticket_url": "https://stpatricksfestival.ie/", "popularity": 80, "date_rule": "fix, 17 martie (parada); festivalul ține câteva zile în jur" },
-    { "slug": "kings-day-amsterdam-2027", "kind": "city_festival", "title": "Koningsdag (Ziua Regelui)", "city_id": "amsterdam_nl", "venue": "în tot orașul", "starts": "2027-04-27", "ends": "2027-04-27", "ticket_url": "https://www.iamsterdam.com/en/whats-on/kings-day", "popularity": 85, "date_rule": "fix, 27 aprilie (26 dacă 27 cade duminica)" },
-    { "slug": "oktoberfest-munchen-2027", "kind": "city_festival", "title": "Oktoberfest", "city_id": "munich_de", "venue": "Theresienwiese", "starts": "2027-09-18", "ends": "2027-10-03", "ticket_url": "https://www.oktoberfest.de/en", "popularity": 95, "date_rule": "începe sâmbăta de după 15 septembrie, se termină în prima duminică din octombrie" }
+    {
+      "slug": "fallas-valencia-2027",
+      "kind": "city_festival",
+      "title": "Las Fallas",
+      "city_id": "valencia_es",
+      "venue": "în tot orașul",
+      "starts": "2027-03-15",
+      "ends": "2027-03-19",
+      "ticket_url": "https://www.visitvalencia.com/en/events-valencia/festivities/the-fallas",
+      "popularity": 85,
+      "date_rule": "fix, 15-19 martie în fiecare an"
+    },
+    {
+      "slug": "st-patricks-dublin-2027",
+      "kind": "city_festival",
+      "title": "St. Patrick's Festival",
+      "city_id": "dublin_ie",
+      "venue": "centrul orașului",
+      "starts": "2027-03-17",
+      "ends": "2027-03-17",
+      "ticket_url": "https://stpatricksfestival.ie/",
+      "popularity": 80,
+      "date_rule": "fix, 17 martie (parada); festivalul ține câteva zile în jur"
+    },
+    {
+      "slug": "kings-day-amsterdam-2027",
+      "kind": "city_festival",
+      "title": "Koningsdag (Ziua Regelui)",
+      "city_id": "amsterdam_nl",
+      "venue": "în tot orașul",
+      "starts": "2027-04-27",
+      "ends": "2027-04-27",
+      "ticket_url": "https://www.iamsterdam.com/en/whats-on/kings-day",
+      "popularity": 85,
+      "date_rule": "fix, 27 aprilie (26 dacă 27 cade duminica)"
+    },
+    {
+      "slug": "oktoberfest-munchen-2027",
+      "kind": "city_festival",
+      "title": "Oktoberfest",
+      "city_id": "munich_de",
+      "venue": "Theresienwiese",
+      "starts": "2027-09-18",
+      "ends": "2027-10-03",
+      "ticket_url": "https://www.oktoberfest.de/en",
+      "popularity": 95,
+      "date_rule": "începe sâmbăta de după 15 septembrie, se termină în prima duminică din octombrie"
+    },
+    {
+      "slug": "six-nations-2027-ireland-england",
+      "kind": "sport",
+      "title": "Irlanda – Anglia (rugby)",
+      "city_id": "dublin_ie",
+      "venue": "Aviva Stadium",
+      "starts": "2027-02-05",
+      "time": "20:10",
+      "teams": [
+        "Ireland",
+        "England"
+      ],
+      "competition": "6N",
+      "popularity": 90,
+      "source_url": "https://www.irishrugby.ie/2026/03/09/guinness-mens-six-nations-fixtures-confirmed-for-2027"
+    },
+    {
+      "slug": "six-nations-2027-scotland-italy",
+      "kind": "sport",
+      "title": "Scoția – Italia (rugby)",
+      "city_id": "edinburgh_gb",
+      "venue": "Murrayfield",
+      "starts": "2027-02-06",
+      "time": "14:10",
+      "teams": [
+        "Scotland",
+        "Italy"
+      ],
+      "competition": "6N",
+      "popularity": 70,
+      "source_url": "https://www.irishrugby.ie/2026/03/09/guinness-mens-six-nations-fixtures-confirmed-for-2027"
+    },
+    {
+      "slug": "six-nations-2027-france-wales",
+      "kind": "sport",
+      "title": "Franța – Țara Galilor (rugby)",
+      "city_id": "paris_fr",
+      "starts": "2027-02-06",
+      "time": "17:40",
+      "teams": [
+        "France",
+        "Wales"
+      ],
+      "competition": "6N",
+      "popularity": 75,
+      "source_url": "https://www.irishrugby.ie/2026/03/09/guinness-mens-six-nations-fixtures-confirmed-for-2027"
+    },
+    {
+      "slug": "six-nations-2027-italy-ireland",
+      "kind": "sport",
+      "title": "Italia – Irlanda (rugby)",
+      "city_id": "rome_it",
+      "venue": "Stadio Olimpico",
+      "starts": "2027-02-13",
+      "time": "15:10",
+      "teams": [
+        "Italy",
+        "Ireland"
+      ],
+      "competition": "6N",
+      "popularity": 75,
+      "source_url": "https://www.irishrugby.ie/2026/03/09/guinness-mens-six-nations-fixtures-confirmed-for-2027"
+    },
+    {
+      "slug": "six-nations-2027-scotland-wales",
+      "kind": "sport",
+      "title": "Scoția – Țara Galilor (rugby)",
+      "city_id": "edinburgh_gb",
+      "venue": "Murrayfield",
+      "starts": "2027-02-13",
+      "time": "16:40",
+      "teams": [
+        "Scotland",
+        "Wales"
+      ],
+      "competition": "6N",
+      "popularity": 70,
+      "source_url": "https://www.irishrugby.ie/2026/03/09/guinness-mens-six-nations-fixtures-confirmed-for-2027"
+    },
+    {
+      "slug": "six-nations-2027-england-france",
+      "kind": "sport",
+      "title": "Anglia – Franța (rugby)",
+      "city_id": "london_gb",
+      "venue": "Allianz Stadium Twickenham",
+      "starts": "2027-02-14",
+      "time": "15:10",
+      "teams": [
+        "England",
+        "France"
+      ],
+      "competition": "6N",
+      "popularity": 90,
+      "source_url": "https://www.irishrugby.ie/2026/03/09/guinness-mens-six-nations-fixtures-confirmed-for-2027"
+    },
+    {
+      "slug": "six-nations-2027-england-italy",
+      "kind": "sport",
+      "title": "Anglia – Italia (rugby)",
+      "city_id": "london_gb",
+      "venue": "Allianz Stadium Twickenham",
+      "starts": "2027-02-20",
+      "time": "16:40",
+      "teams": [
+        "England",
+        "Italy"
+      ],
+      "competition": "6N",
+      "popularity": 75,
+      "source_url": "https://www.irishrugby.ie/2026/03/09/guinness-mens-six-nations-fixtures-confirmed-for-2027"
+    },
+    {
+      "slug": "six-nations-2027-france-scotland",
+      "kind": "sport",
+      "title": "Franța – Scoția (rugby)",
+      "city_id": "paris_fr",
+      "starts": "2027-02-21",
+      "time": "16:10",
+      "teams": [
+        "France",
+        "Scotland"
+      ],
+      "competition": "6N",
+      "popularity": 75,
+      "source_url": "https://www.irishrugby.ie/2026/03/09/guinness-mens-six-nations-fixtures-confirmed-for-2027"
+    },
+    {
+      "slug": "six-nations-2027-scotland-ireland",
+      "kind": "sport",
+      "title": "Scoția – Irlanda (rugby)",
+      "city_id": "edinburgh_gb",
+      "venue": "Murrayfield",
+      "starts": "2027-03-05",
+      "time": "20:10",
+      "teams": [
+        "Scotland",
+        "Ireland"
+      ],
+      "competition": "6N",
+      "popularity": 80,
+      "source_url": "https://www.irishrugby.ie/2026/03/09/guinness-mens-six-nations-fixtures-confirmed-for-2027"
+    },
+    {
+      "slug": "six-nations-2027-italy-france",
+      "kind": "sport",
+      "title": "Italia – Franța (rugby)",
+      "city_id": "rome_it",
+      "venue": "Stadio Olimpico",
+      "starts": "2027-03-06",
+      "time": "15:10",
+      "teams": [
+        "Italy",
+        "France"
+      ],
+      "competition": "6N",
+      "popularity": 75,
+      "source_url": "https://www.irishrugby.ie/2026/03/09/guinness-mens-six-nations-fixtures-confirmed-for-2027"
+    },
+    {
+      "slug": "six-nations-2027-italy-wales",
+      "kind": "sport",
+      "title": "Italia – Țara Galilor (rugby)",
+      "city_id": "rome_it",
+      "venue": "Stadio Olimpico",
+      "starts": "2027-03-13",
+      "time": "15:10",
+      "teams": [
+        "Italy",
+        "Wales"
+      ],
+      "competition": "6N",
+      "popularity": 70,
+      "source_url": "https://www.irishrugby.ie/2026/03/09/guinness-mens-six-nations-fixtures-confirmed-for-2027"
+    },
+    {
+      "slug": "six-nations-2027-england-scotland",
+      "kind": "sport",
+      "title": "Anglia – Scoția (rugby)",
+      "city_id": "london_gb",
+      "venue": "Allianz Stadium Twickenham",
+      "starts": "2027-03-13",
+      "time": "16:40",
+      "teams": [
+        "England",
+        "Scotland"
+      ],
+      "competition": "6N",
+      "popularity": 85,
+      "source_url": "https://www.irishrugby.ie/2026/03/09/guinness-mens-six-nations-fixtures-confirmed-for-2027"
+    },
+    {
+      "slug": "six-nations-2027-ireland-france",
+      "kind": "sport",
+      "title": "Irlanda – Franța (rugby)",
+      "city_id": "dublin_ie",
+      "venue": "Aviva Stadium",
+      "starts": "2027-03-13",
+      "time": "20:10",
+      "teams": [
+        "Ireland",
+        "France"
+      ],
+      "competition": "6N",
+      "popularity": 90,
+      "source_url": "https://www.irishrugby.ie/2026/03/09/guinness-mens-six-nations-fixtures-confirmed-for-2027"
+    }
   ]
 }

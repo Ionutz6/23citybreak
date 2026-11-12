@@ -287,14 +287,14 @@
       document.head.appendChild(script);
   })();
 </script>
-  <link rel="stylesheet" href="assets/quiz.css?v=5">
-  <link rel="stylesheet" href="assets/account.css?v=1">
+  <link rel="stylesheet" href="assets/account.css?v=3">
   <link rel="stylesheet" href="assets/personalizare.css?v=4">
-<link rel="stylesheet" href="assets/site-header.css?v=1">
+<link rel="stylesheet" href="assets/site-header.css?v=2">
+<script>/* Quizul s-a mutat pe pagina Orașe vizitate; linkurile vechi (emailuri, cont) ajung acolo. */ if (/^#city-quiz/.test(location.hash)) location.replace('orase-vizitate.html' + location.hash);</script>
 </head>
 <body class="antialiased min-h-screen flex flex-col bg-white text-[#0a0b0d]">
 
-  <header class="cb-header"><div class="cb-header-inner"><a class="cb-wordmark" href="./" aria-label="23citybreak, pagina principală"><span class="cb-plane" aria-hidden="true">✈︎ </span>23<span class="cb-gold">city</span>break</a><nav class="cb-nav" id="cb-nav" aria-label="Navigare principală"><a href="./" aria-current="page">Zboruri</a><a href="./#city-quiz">Ghicește orașul</a><a href="orase-vizitate.html">Orașe vizitate</a><a href="jurnal.html">Jurnal</a></nav><div class="cb-header-actions"><a id="account-link" class="cb-account" href="cont.html">Intră</a><button class="cb-menu-toggle" type="button" aria-controls="cb-nav" aria-expanded="false" aria-label="Deschide meniul"><span></span></button></div></div></header>
+  <header class="cb-header"><div class="cb-header-inner"><a class="cb-wordmark" href="./" aria-label="23citybreak, pagina principală"><span class="cb-plane" aria-hidden="true">✈︎ </span>23<span class="cb-gold">city</span>break</a><nav class="cb-nav" id="cb-nav" aria-label="Navigare principală"><a href="./" aria-current="page">Zboruri</a><a href="evenimente.html">Evenimente</a><a href="orase-vizitate.html">Orașe vizitate</a><a href="jurnal.html">Jurnal</a></nav><div class="cb-header-actions"><a id="account-link" class="cb-account" href="cont.html">Contul tău</a><button class="cb-menu-toggle" type="button" aria-controls="cb-nav" aria-expanded="false" aria-label="Deschide meniul"><span></span></button></div></div></header>
   <main id="top" class="site-main">
     <section class="hero"><div class="hero-copy"><h1 id="hero-headline">Ai numărat podurile din Praga? <em>Descoperă-le la pas.</em></h1><p>Descoperă Europa în weekend. Găsește zboruri pentru o pauză de la rutina zilnică, chiar și fără zile de concediu.</p></div><div class="hero-image" role="button" tabindex="0" aria-label="Alege destinația din fotografie"><div class="hero-image-label"><span>DESTINAȚIE DE WEEKEND</span><strong id="hero-city">Praga · Cehia</strong></div></div></section>
 
@@ -755,12 +755,6 @@
       </div>
     </div>
 
-    <section id="events-home" class="ev-section" aria-label="Evenimente în weekend" hidden></section>
-
-    <section id="city-quiz" class="quiz-section" aria-labelledby="quiz-title" hidden>
-      <div class="quiz-heading"><div><span class="field-kicker">O PAUZĂ DE INSPIRAȚIE</span><h2 id="quiz-title">Ghicești orașul?</h2></div><p>10 orașe, 4 variante, 15 secunde. Cât de bine cunoști Europa?</p></div>
-      <div id="quiz-card" class="quiz-card"><div class="quiz-art"><img id="quiz-image" alt="Ilustrație a unei destinații europene de ghicit" loading="lazy"></div><div id="quiz-content" class="quiz-content"></div></div>
-    </section>
   </main>
 
   <details id="photo-credits" class="photo-credits" hidden><summary>Credite fotografii</summary><ul id="photo-credit-list"></ul></details>
@@ -4168,7 +4162,13 @@
     const hero = document.querySelector('.hero-image');
     const heroCity = document.getElementById('hero-city');
     let displayedHeroCity = 'Praga';
+    // Promo evenimente în carusel (fără dată exactă): un slide din 3, dintre meciurile importante din următoarele 2–13 săptămâni.
+    // Click pe slide duce direct la pachetul evenimentului. Lista vine din assets/events.js (CBEvents.promos).
+    let heroPromos = [], heroPromoIndex = 0, heroSlideCount = 0, displayedHeroEvent = null;
+    const loadHeroPromos = () => window.CBEvents?.promos?.().then(list => { heroPromos = list || []; }).catch(() => {});
+    if (window.CBEvents) loadHeroPromos(); else window.addEventListener('load', loadHeroPromos, {once: true});
     function chooseHeroCity() {
+      if (displayedHeroEvent && window.CBEvents) { location.href = window.CBEvents.packageUrl(displayedHeroEvent); return; }
       const name = normalizeDestQuery(displayedHeroCity);
       const city = ALL_EUROPE_CITIES.find(c => !c.isAll && normalizeDestQuery(c.name) === name) || (name === 'florenta' ? ALL_EUROPE_CITIES.find(c => c.id === 'City:pisa_it') : null);
       if (!city) return;
@@ -4229,6 +4229,29 @@
     fitHeroHeadline();
     async function advanceHero() {
       let shown = false;
+      heroSlideCount++;
+      const heroKicker = hero.querySelector('.hero-image-label span');
+      if (heroPromos.length && heroSlideCount % 3 === 0) {
+        const ev = heroPromos[heroPromoIndex++ % heroPromos.length];
+        const E = window.CBEvents, photo = await E.eventPhoto(ev).catch(() => null);
+        if (photo?.url && await preloadHero(photo.url)) {
+          const city = E.helpers.cityName(ev.city_id), month = E.helpers.monthName(ev);
+          hero.style.backgroundImage = `linear-gradient(90deg,#111211 0%,transparent 24%),linear-gradient(0deg,rgba(0,0,0,.52),transparent 60%),url("${photo.url.replace(/["\\]/g, '')}")`;
+          heroKicker.textContent = ev.kind === 'football' || ev.kind === 'sport' ? 'MECI DE WEEKEND' : 'EVENIMENT DE WEEKEND';
+          heroCity.textContent = `${ev.title} · ${city}`;
+          hero.setAttribute('aria-label', `Vezi pachetul de weekend: ${ev.title}, ${city}`);
+          const heading = document.getElementById('hero-headline');
+          const highlight = document.createElement('em');
+          highlight.textContent = ev.kind === 'football' || ev.kind === 'sport' ? `Prinde meciul în ${month}.` : `Fii acolo în ${month}.`;
+          heading.replaceChildren(document.createTextNode(`${ev.title.replace(/ \(rugby\)$/, '')} la ${city}. `), highlight);
+          fitHeroHeadline();
+          const m = /^Foto: (.+) · ([^·]+)$/.exec(photo.credit || '');
+          if (m && photo.creditUrl) registerPhotoCredit(photo.creditUrl, `${ev.venue || city}`, {source: photo.creditUrl, author: m[1], license: m[2]});
+          displayedHeroEvent = ev;
+          if (!matchMedia('(prefers-reduced-motion: reduce)').matches) setTimeout(advanceHero, 7000);
+          return;
+        }
+      }
       for (let attempts = 0; attempts < 4 && !shown; attempts++) {
         const item = heroImages[heroIndex];
         heroIndex = (heroIndex + 1) % heroImages.length;
@@ -4241,7 +4264,8 @@
         }
         hero.style.backgroundImage = `linear-gradient(90deg,#111211 0%,transparent 24%),linear-gradient(0deg,rgba(0,0,0,.52),transparent 60%),url("${url}")`;
         heroCity.textContent = `${item.name} · ${item.country}`;
-        displayedHeroCity = item.name;
+        heroKicker.textContent = 'DESTINAȚIE DE WEEKEND';
+        displayedHeroCity = item.name; displayedHeroEvent = null;
         hero.setAttribute('aria-label', `Alege ${item.name} ca destinație`);
         const headline = heroHeadlines[item.name] || [`Descoperă ${item.name}.`, 'Alege-ți următorul weekend.'];
         const heading = document.getElementById('hero-headline');
@@ -4255,6 +4279,11 @@
       if (!matchMedia('(prefers-reduced-motion: reduce)').matches || !shown) setTimeout(advanceHero, shown ? 7000 : 15000);
     }
     advanceHero();
+    // ?dest=<id Kiwi> (ex. din quizul de pe Orașe vizitate): preselectează destinația.
+    {
+      const destParam = new URLSearchParams(location.search).get('dest');
+      if (destParam && ALL_EUROPE_CITIES.some(c => c.id === destParam && !c.isAll)) window.addEventListener('load', () => setTimeout(() => selectDestination(destParam), 0), {once: true}); // după init-ul formularului
+    }
     document.getElementById('currency-select').addEventListener('change', async e => {
       const desired = e.target.value;
       if (desired === 'RON') {
@@ -4295,11 +4324,10 @@
 
   </script>
   <script src="assets/option-sliders.js"></script>
-  <script src="assets/quiz.js?v=5"></script>
-  <script src="assets/account.js?v=3"></script>
-  <script src="assets/quiz-account.js?v=3"></script>
-  <script src="assets/personalizare.js?v=6"></script>
-  <script src="assets/events.js?v=3"></script>
-<script src="assets/site-header.js?v=1"></script>
+  <script src="assets/account.js?v=5"></script>
+  <script src="assets/city-coords.js?v=1"></script>
+  <script src="assets/personalizare.js?v=7"></script>
+  <script src="assets/events.js?v=4"></script>
+<script src="assets/site-header.js?v=2"></script>
 </body>
 </html>

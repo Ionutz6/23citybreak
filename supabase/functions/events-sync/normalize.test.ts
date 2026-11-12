@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { cityOfTeam, fitsWeekend, fromCurated, fromFootballData, fromTicketmaster, localParts, parseCityCoords } from "./normalize.ts";
+import { cityOfTeam, fitsWeekend, fromCurated, localToUtc, fromFootballData, fromTicketmaster, localParts, parseCityCoords } from "./normalize.ts";
 
 const vienna = { id: "vienna_at", cc: "at", lat: 48.21, lon: 16.37 };
 const tm = (over: Record<string, unknown> = {}) => ({
@@ -98,4 +98,16 @@ test("lista curatoriată: oraș necunoscut sau dată greșită iese", () => {
   assert.equal(ok.ends_at, "2027-10-03T21:00:00.000Z");
   assert.equal(fromCurated({ slug: "x", title: "X", city_id: "nowhere_xx", starts: "2027-01-01" }, known), null);
   assert.equal(fromCurated({ slug: "x", title: "X", city_id: "munich_de", starts: "1 ian" }, known), null);
+});
+
+test("curatoriate: oră locală, echipe, competiție", () => {
+  const known = new Set(["dublin_ie", "rome_it"]);
+  const r = fromCurated({ slug: "6n", title: "Irlanda – Anglia", kind: "sport", city_id: "dublin_ie", starts: "2027-02-05", time: "20:10", teams: ["Ireland", "England"], competition: "6N" }, known)!;
+  assert.equal(r.starts_at, "2027-02-05T20:10:00.000Z");
+  assert.equal(r.time_tbc, false);
+  assert.deepEqual(r.teams, ["Ireland", "England"]);
+  assert.equal(r.competition, "6N");
+  assert.equal(localToUtc("2027-03-13", "15:10", "rome_it"), "2027-03-13T14:10:00.000Z");
+  assert.equal(localToUtc("2027-07-10", "20:00", "rome_it"), "2027-07-10T18:00:00.000Z");
+  assert.equal(fromCurated({ slug: "y", title: "Y", kind: "hack", city_id: "rome_it", starts: "2027-01-01" }, known)!.kind, "other");
 });
