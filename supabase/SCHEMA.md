@@ -3,12 +3,12 @@
 Proiect: **23ai** (ref `lsudthnrumslfscpppix`, EU Frankfurt). Baza aparține 23ai; 23citybreak doar scrie în ea.
 Clientul din browser: `assets/account.js` expune `window.Account` (vezi mai jos). Nu crea alt client Supabase.
 
-Migrații: `supabase/migrations/20261111_quiz.sql`, `20261111_quiz_cards.sql`, `20261111_profil.sql`, `20261112_event_preferences.sql`.
+Migrații: `supabase/migrations/20261111_quiz.sql`, `20261111_quiz_cards.sql`, `20261111_profil.sql`, `20261112_events.sql`, `20261112_event_preferences.sql`.
 
 ## Reguli comune
 
 - Toate tabelele au **RLS**: un utilizator conectat (`authenticated`) vede și modifică **doar rândurile lui** (`user_id = auth.uid()`).
-- `anon` nu are acces la niciun tabel. Nu există nimic public (profilul e privat).
+- `anon` nu are acces la niciun tabel cu date personale (profilul e privat). Singura excepție: `events`, care e public la citire.
 - `user_id` are default `auth.uid()`, deci la insert din browser nu trebuie trimis.
 - Ștergerea contului (`rpc('delete_my_account')`) șterge în cascadă toate rândurile de mai jos.
 
@@ -101,6 +101,31 @@ window.VisitedCities.mount(container, {client, user, mode: 'onboarding' | 'profi
 ```
 
 Dacă `window.VisitedCities` nu e încărcat, se afișează un placeholder. Scriptul hărții se include în `cont.html` înainte de `assets/account.js`.
+
+### `events` (evenimente la dată fixă: concerte, meciuri, festivaluri)
+
+Cache public, **doar citire** din browser (`anon` și `authenticated`). Scrie doar funcția `supabase/functions/events-sync` (zilnic, service role).
+
+| Coloană | Tip | Note |
+|---|---|---|
+| `id` | text PK | `tm:<id>` Ticketmaster, `fd:<id>` football-data.org, `cur:<slug>` lista curatoriată |
+| `kind` | text | `concert`, `football`, `sport`, `festival`, `market`, `city_festival`, `theatre`, `comedy`, `other` |
+| `title`, `venue` | text | |
+| `city_id` | text | slug Kiwi fără `City:`, ca în `visited_cities` |
+| `starts_at`, `ends_at` | timestamptz | `ends_at` doar la evenimente pe mai multe zile |
+| `time_tbc` | boolean | ora nu e anunțată; afișează doar data |
+| `artists`, `teams`, `genres` | text[] | `teams` = [gazde, oaspeți] |
+| `competition` | text | cod football-data.org (`CL`, `PL`, `PD`, `SA`, `BL1`, `FL1`, `DED`, `PPL`) |
+| `price_min_eur` | numeric | doar dacă sursa dă preț în EUR |
+| `ticket_url`, `image_url` | text | doar `https://`; la fotbal `ticket_url` e `null` (link spre site-ul clubului, de adăugat în UI) |
+| `popularity` | int 0–100 | scor intern de ordonare |
+| `source` | text | `ticketmaster`, `football-data`, `curated` |
+
+```js
+const sb = await Account.client();
+const {data} = await sb.from('events').select('*').eq('city_id', 'vienna_at')
+  .gte('starts_at', '2027-06-11').lte('starts_at', '2027-06-14').order('popularity', {ascending: false});
+```
 
 ### `event_preferences` (ce evenimente îl interesează pe utilizator)
 
