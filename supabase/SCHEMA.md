@@ -147,6 +147,6 @@ După salvare, aceleași valori sunt copiate în `localStorage['23cb-event-prefs
 ## Căutare de evenimente (20261112_events_search.sql)
 
 - `events.search_text`: coloană generată (titlu, sală, artiști, echipe, numele competiției, orașul), normalizată cu `ev_norm` (fără diacritice), index GIN trigram.
-- `search_events(q, city_ids, lim)`: RPC public, fiecare cuvânt trebuie să apară exact sau aproximativ (`word_similarity ≥ 0.5`).
+- `search_events(q, city_ids, lim)`: RPC public, fiecare cuvânt trebuie să apară exact sau aproximativ (`word_similarity ≥ 0.4`).
 - `event_search_cache`: căutările trimise deja la Ticketmaster de funcția `events-search`; fără acces public.
 - `event_alerts`: „Anunță-mă pe email când apare”; fiecare utilizator își vede, adaugă și șterge doar alertele lui; max. 30 active.

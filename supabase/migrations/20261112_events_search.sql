@@ -46,7 +46,7 @@ language sql stable security invoker set search_path = '' as $$
       e.city_id = any(city_ids)
       or not exists (                       -- niciun cuvânt fără potrivire
         select 1 from unnest(w.words) x
-        where not (e.search_text like '%' || x || '%' or (char_length(x) >= 4 and extensions.word_similarity(x, e.search_text) >= 0.5))
+        where not (e.search_text like '%' || x || '%' or (char_length(x) >= 4 and extensions.word_similarity(x, e.search_text) >= 0.4))
       )
     )
   order by (e.search_text like '%' || p.nq || '%') desc,
