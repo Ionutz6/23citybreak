@@ -120,13 +120,11 @@
               <div class="pk-stay-head"><h4 id="pk-stay-h">🛏 Cazare</h4><span>${nights} ${nights === 1 ? 'noapte' : 'nopți'} · ${esc(H.shortDate(trip.out))} → ${esc(H.shortDate(trip.back))}</span></div>
               <div class="pk-stay-opts">
                 <a class="pk-stay-opt" href="${esc(stayUrl())}" target="_blank" rel="noopener noreferrer"><span class="ic" aria-hidden="true">🏨</span><span class="nm">Booking</span><span class="ds">hoteluri și pensiuni</span><span class="go" aria-hidden="true">↗</span></a>
-                <span class="pk-stay-or" aria-hidden="true">sau</span>
                 <a class="pk-stay-opt" href="${esc(airbnbUrl())}" target="_blank" rel="noopener noreferrer"><span class="ic" aria-hidden="true">🏠</span><span class="nm">Airbnb</span><span class="ds">apartamente și case</span><span class="go" aria-hidden="true">↗</span></a>
               </div>
-              <p class="pk-stay-note">Ambele se deschid cu orașul și datele tale, pentru 2 persoane. Prețul îl alegi tu.</p>
             </section>
           </div>
-          <p class="pk-note">Prețul zborului și al cazării îl vezi la furnizor, pentru datele alese. Biletele se cumpără direct de la vânzător; 23citybreak poate primi un comision, fără cost pentru tine.${ev.source === 'football-data' ? ' Football data provided by the Football-Data.org API.' : ''}</p>
+          <p class="pk-note">Biletele de avion, biletele la eveniment și cazarea se cumpără direct de pe site-urile furnizorilor, care stabilesc prețurile, disponibilitatea și condițiile. 23citybreak nu răspunde pentru eventualele diferențe sau erori de pe aceste site-uri și poate primi un comision, fără cost pentru tine.${ev.source === 'football-data' ? ' Football data provided by the Football-Data.org API.' : ''}</p>
         </aside>
       </div>`;
     document.title = `${ev.title} · ${name} · 23citybreak`;
