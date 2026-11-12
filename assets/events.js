@@ -1,7 +1,8 @@
 // Evenimente la dată fixă (concerte, meciuri, festivaluri) legate de weekendurile din căutare.
 //   window.CBEvents.load()               → Promise<eveniment[]> (tabela publică `events`, vezi supabase/SCHEMA.md)
 //   window.CBEvents.decorateCards(grid)  → apelat din renderCardsView(): badge pe cardurile de oraș
-//   secțiunea „Weekenduri cu ceva special” se montează singură în #events-home
+//   window.CBEvents.promos()            → Promise<eveniment[]>: promo pentru caruselul de pe prima pagină
+//   window.CBEvents.cardHtml(e)          → cardul unui eveniment (folosit de evenimente.html, assets/events-page.js)
 // Datele vin din Supabase prin REST, doar citire, fără cont. Dacă tabela e goală sau lipsește, nu apare nimic.
 // Test fără bază de date: ?evenimente-demo=1 încarcă data/evenimente-demo.json (evenimente inventate).
 (() => {
@@ -15,10 +16,7 @@
     concert: ['🎵', 'Concert'], festival: ['🎪', 'Festival'], football: ['⚽', 'Fotbal'], sport: ['🏟', 'Sport'],
     market: ['🎄', 'Târg'], city_festival: ['🎉', 'Sărbătoare de oraș'], theatre: ['🎭', 'Spectacol'], comedy: ['🎤', 'Stand-up'], other: ['✨', 'Eveniment'],
   };
-  const COMPETITIONS = { CL: 'Champions League', PL: 'Premier League', PD: 'La Liga', SA: 'Serie A', BL1: 'Bundesliga', FL1: 'Ligue 1', DED: 'Eredivisie', PPL: 'Primeira Liga' };
-  const FILTERS = [['all', 'Toate'], ['music', '🎵 Concerte'], ['football', '⚽ Fotbal'], ['fest', '🎪 Festivaluri']];
-  const inFilter = (e, f) => f === 'all' || (f === 'music' && (e.kind === 'concert' || e.kind === 'comedy' || e.kind === 'theatre'))
-    || (f === 'football' && (e.kind === 'football' || e.kind === 'sport')) || (f === 'fest' && (e.kind === 'festival' || e.kind === 'city_festival' || e.kind === 'market'));
+  const COMPETITIONS = { '6N': 'Six Nations', CL: 'Champions League', PL: 'Premier League', PD: 'La Liga', SA: 'Serie A', BL1: 'Bundesliga', FL1: 'Ligue 1', DED: 'Eredivisie', PPL: 'Primeira Liga' };
 
   const cities = () => window.CB_EUROPE_CITIES || [];
   const cityOf = slug => cities().find(c => slugOf(c.id) === slug);
@@ -88,9 +86,26 @@
     })().catch(() => null).then(v => { if (!v) stadiumCache.delete(key); return v; }));
     return stadiumCache.get(key);
   }
+  // Alte sporturi (ex. rugby din lista curatoriată): fotografia stadionului după nume (Wikidata → P18 → Commons).
+  const venueCache = new Map();
+  function venuePhoto(venue) {
+    const key = String(venue || '').trim();
+    if (!key) return Promise.resolve(null);
+    if (!venueCache.has(key)) venueCache.set(key, (async () => {
+      const found = await wd({ action: 'wbsearchentities', search: key, language: 'en', type: 'item', limit: '5' });
+      const cand = (found?.search || []).map(x => x.id).filter(id => /^Q\d+$/.test(id));
+      if (!cand.length) return null;
+      const ents = (await wd({ action: 'wbgetentities', ids: cand.join('|'), props: 'claims' }))?.entities || {};
+      const v = cand.map(id => ents[id]).find(e => e?.claims?.P18 && e.claims.P625); // are imagine și coordonate = un loc, nu o echipă
+      const file = v?.claims.P18.find(c => c.rank === 'preferred')?.mainsnak?.datavalue?.value || v?.claims.P18[0]?.mainsnak?.datavalue?.value;
+      return commonsPhoto(file);
+    })().catch(() => null).then(x => { if (!x) venueCache.delete(key); return x; }));
+    return venueCache.get(key);
+  }
   const eventPhoto = async e => {
     if (e.image_url) return { url: e.image_url, credit: 'Imagine: Ticketmaster', creditUrl: e.ticket_url || '' };
     if (e.kind === 'football' && e.teams?.[0]) { const p = await stadiumPhoto(e.teams[0]); if (p) return p; }
+    if (e.kind === 'sport' && e.venue) { const p = await venuePhoto(e.venue); if (p) return p; }
     return cityPhoto(e.city_id);
   };
   const setBg = (node, photo) => { if (node && photo?.url) node.style.backgroundImage = `url("${photo.url.replace(/["\\]/g, '')}")`; };
@@ -128,6 +143,13 @@
     if (isMultiDay(e)) { const en = endDate(e); return s.slice(0, 7) === en.slice(0, 7) ? `${+s.slice(8)}–${+en.slice(8)} ${MON[+s.slice(5, 7) - 1]}` : `${+s.slice(8)} ${MON[+s.slice(5, 7) - 1]} – ${+en.slice(8)} ${MON[+en.slice(5, 7) - 1]}`; }
     return `${longDate(s)}${e.time_tbc ? ', ora se anunță' : `, ${local(e.starts_at, e.city_id).time}`}`;
   };
+  const MONTHS_LONG = ['ianuarie', 'februarie', 'martie', 'aprilie', 'mai', 'iunie', 'iulie', 'august', 'septembrie', 'octombrie', 'noiembrie', 'decembrie'];
+  const monthName = e => MONTHS_LONG[+startDate(e).slice(5, 7) - 1];
+  // Prinde un weekend (vineri, sâmbătă sau duminică); evenimentele pe mai multe zile trec dacă includ o astfel de zi.
+  const isWeekend = e => { for (let d = startDate(e), en = endDate(e), n = 0; d <= en && n < 40; d = isoAdd(d, 1), n++) if ([5, 6, 0].includes(dowOf(d))) return true; return false; };
+  // Tab-urile paginii Evenimente. Festivalurile (Ticketmaster le clasifică la muzică) stau la Muzică.
+  const CATEGORIES = [['sport', 'Sport'], ['music', 'Muzică'], ['other', 'Alte evenimente']];
+  const categoryOf = e => e.kind === 'football' || e.kind === 'sport' ? 'sport' : e.kind === 'concert' || e.kind === 'festival' ? 'music' : 'other';
   const tagLabel = e => {
     const [icon, name] = KINDS[e.kind] || KINDS.other;
     const label = e.kind === 'football' && COMPETITIONS[e.competition] ? COMPETITIONS[e.competition] : name;
@@ -150,7 +172,6 @@
   const byId = async id => (await load()).find(e => e.id === id) || null;
 
   // ---------- Secțiunea de pe pagina principală ----------
-  const PAGE = 8;
   function cardHtml(e) {
     const img = e.image_url || '';
     const wk = mainWeekend(e);
@@ -163,38 +184,20 @@
         <div class="ev-meta">${e.venue ? `${esc(e.venue)} · ` : ''}${esc(whenLabel(e))}</div>
         <div class="ev-meta">📅 ${isMultiDay(e) ? 'weekendul recomandat: ' : ''}${esc(shortDate(wk.fri))} → ${esc(shortDate(wk.sun))}</div>
         <div class="ev-prices">${price}<div class="ev-price-alt">${note}</div></div>
+        <div class="ev-flight" data-flight="${esc(e.id)}" aria-live="polite"></div>
         <a class="ev-btn" href="${esc(packageUrl(e))}">${isMultiDay(e) ? 'Alege zilele →' : 'Vezi pachetul de weekend →'}</a>
       </div></article>`;
   }
 
-  async function mountHome() {
-    const host = document.getElementById('events-home');
-    if (!host) return;
-    const now = new Date().toISOString().slice(0, 10);
-    const all = (await load()).filter(e => endDate(e) >= now);
-    if (!all.length) return;
-    let filter = 'all', shown = PAGE;
-    const render = () => {
-      const list = all.filter(e => inFilter(e, filter));
-      const chips = FILTERS.filter(([f]) => f === 'all' || all.some(e => inFilter(e, f)))
-        .map(([f, label]) => `<button type="button" class="ev-chip${f === filter ? ' on' : ''}" data-filter="${f}" aria-pressed="${f === filter}">${label}</button>`).join('');
-      host.innerHTML = `<div class="ev-head"><div><h2>Weekenduri cu ceva special</h2><p>Concerte, meciuri și festivaluri în orașe unde ajungi cu un zbor de weekend</p></div><div class="ev-filters" role="group" aria-label="Tip de eveniment">${chips}</div></div>
-        <div class="ev-grid">${list.slice(0, shown).map(cardHtml).join('')}</div>
-        ${list.length > shown ? `<div class="ev-more"><button type="button" class="ev-chip" data-more>Arată încă ${Math.min(PAGE, list.length - shown)}</button></div>` : ''}
-        ${all.some(e => e.source === 'football-data') ? '<p class="ev-credit">Football data provided by the Football-Data.org API</p>' : ''}`;
-      host.hidden = false;
-      host.querySelectorAll('.ev-card[data-ev]').forEach(card => {
-        if (card.style.backgroundImage) return;
-        const e = list.find(x => x.id === card.dataset.ev);
-        if (e) eventPhoto(e).then(p => setBg(card, p));
-      });
-    };
-    host.addEventListener('click', ev => {
-      const chip = ev.target.closest('[data-filter]');
-      if (chip) { filter = chip.dataset.filter; shown = PAGE; render(); return; }
-      if (ev.target.closest('[data-more]')) { shown += PAGE; render(); }
-    });
-    render();
+  // Promo pentru caruselul de pe prima pagină: întâi sportul, apoi restul; doar ce începe peste 2–13 săptămâni
+  // (nici mâine, nici peste 8 luni), ordonat după importanță; cel mult un eveniment pe oraș, maxim 5.
+  async function promos() {
+    const from = isoAdd(new Date().toISOString().slice(0, 10), 14), to = isoAdd(from, 78);
+    const list = (await load()).filter(e => startDate(e) >= from && startDate(e) <= to && (e.popularity || 0) >= 60);
+    const rank = e => (categoryOf(e) === 'sport' ? 1000 : 0) + (e.popularity || 0);
+    const seen = new Set();
+    return list.sort((a, b) => rank(b) - rank(a) || a.starts_at.localeCompare(b.starts_at))
+      .filter(e => !seen.has(e.city_id) && seen.add(e.city_id)).slice(0, 5);
   }
 
   // ---------- Badge pe cardurile de oraș din rezultate ----------
@@ -226,6 +229,5 @@
     });
   }
 
-  window.CBEvents = { load, byId, decorateCards, eventPhoto, cityPhoto, stadiumPhoto, setBg, KINDS, COMPETITIONS, helpers: { esc, cityName, cityOf, guideOf, guideImage, local, isoAdd, dowOf, shortDate, longDate, startDate, endDate, isMultiDay, lengthDays, mainWeekend, whenLabel, tagLabel, DOW, DOW_LONG, MON } };
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mountHome); else mountHome();
+  window.CBEvents = { load, byId, promos, cardHtml, packageUrl, decorateCards, eventPhoto, cityPhoto, stadiumPhoto, venuePhoto, setBg, KINDS, COMPETITIONS, CATEGORIES, categoryOf, isWeekend, helpers: { esc, cityName, cityOf, guideOf, guideImage, local, isoAdd, dowOf, shortDate, longDate, startDate, endDate, isMultiDay, lengthDays, mainWeekend, whenLabel, tagLabel, monthName, DOW, DOW_LONG, MON } };
 })();

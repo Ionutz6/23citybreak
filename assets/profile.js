@@ -1,42 +1,51 @@
-// Pagina de profil (cont.html): privată, doar pentru cine e conectat.
-// Login, onboarding pentru conturile noi, cel mai bun scor la quiz și locul în clasament, preferințe, orașe văzute, newsletter, ștergere cont.
+// Pagina „Contul tău” (cont.html), aceeași adresă pentru toți:
+//  - neconectat: salut multilingv, de ce merită un cont și loginul (Google, dacă e activ în Supabase, sau link pe email);
+//  - conectat: salut, cât de complet e profilul, newsletter, preferințe, interese pentru evenimente, link spre orașele
+//    vizitate (harta și quizul stau doar pe orase-vizitate.html), ștergerea contului.
 (() => {
   const A = window.Account;
   const main = document.getElementById('profile');
-  const QUIZ = 'ghiceste-orasul', MIN_PLAYERS_FOR_PCT = 100;
   const el = (tag, cls, text) => { const n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; };
-  const fmt = n => Number(n).toLocaleString('ro-RO');
   const card = (kicker, title) => { const c = el('section', 'acct-card'); c.append(el('span', 'acct-kicker', kicker)); if (title) c.append(el('h2', null, title)); return c; };
 
-  function loggedOut(expired) {
-    const box = el('section', 'acct-card acct-card-narrow');
-    if (expired) box.append(el('p', 'acct-status', 'Linkul nu mai e valabil (expiră după o oră și merge o singură dată). Cere unul nou mai jos.'));
-    box.append(A.loginForm().form);
-    main.replaceChildren(box);
-    box.querySelector('input[type=email]')?.focus();
+  // Salutul se rotește prin 12 limbi europene, câte una la ~2,6 secunde, începând cu româna.
+  // Cititoarele de ecran aud doar „Salut!”; cu „reduce motion” rămâne fix.
+  const HELLOS = [['ro', 'Salut!', 'română'], ['en', 'Hello!', 'engleză'], ['de', 'Hallo!', 'germană'], ['fr', 'Bonjour !', 'franceză'], ['es', '¡Hola!', 'spaniolă'], ['it', 'Ciao!', 'italiană'],
+    ['pt', 'Olá!', 'portugheză'], ['hu', 'Szia!', 'maghiară'], ['pl', 'Cześć!', 'poloneză'], ['cs', 'Ahoj!', 'cehă'], ['el', 'Γεια σου!', 'greacă'], ['nl', 'Hoi!', 'neerlandeză']];
+  let helloTimer;
+  function greeting() {
+    const h = el('h1', 'acct-hello-word'); h.setAttribute('aria-label', 'Salut!');
+    const word = el('span', 'acct-hello-text', HELLOS[0][1]); word.lang = 'ro'; word.setAttribute('aria-hidden', 'true');
+    const lang = el('small', 'acct-hello-lang', 'în română'); lang.setAttribute('aria-hidden', 'true');
+    h.append(word, lang);
+    clearInterval(helloTimer);
+    if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      let i = 0;
+      helloTimer = setInterval(() => {
+        if (!h.isConnected) { clearInterval(helloTimer); return; }
+        h.classList.add('is-out');
+        setTimeout(() => { i = (i + 1) % HELLOS.length; const [code, txt, name] = HELLOS[i]; word.textContent = txt; word.lang = code; lang.textContent = `în ${name}`; h.classList.remove('is-out'); }, 320);
+      }, 2600);
+    }
+    return h;
   }
 
-  async function quizCard(sb) {
-    const c = card('GHICEȘTE ORAȘUL', 'Cel mai bun scor');
-    const body = el('div', 'acct-quiz'); c.append(body);
-    body.append(el('p', 'acct-note', 'Se încarcă...'));
-    try {
-      const {data, error} = await sb.rpc('my_quiz_rank', {p_quiz: QUIZ});
-      if (error) throw error;
-      const r = Array.isArray(data) ? data[0] : data;
-      if (!r || !r.players) {
-        body.replaceChildren(el('p', null, 'Încă nu ai jucat quizul. 10 ilustrații, ghicești orașul, intri în clasamentul Europa.'));
-        const a = el('a', 'acct-primary', 'Joacă quizul ↗'); a.href = 'index.html#city-quiz';
-        body.append(a); return c;
-      }
-      const stats = el('div', 'acct-stats');
-      const stat = (big, small) => { const s = el('div', 'acct-stat'); s.append(el('strong', null, big), el('span', null, small)); return s; };
-      const place = r.players >= MIN_PLAYERS_FOR_PCT ? `Top ${r.top_pct}%` : `Locul ${fmt(r.rank)}`;
-      stats.append(stat(fmt(r.best), 'puncte'), stat(`${r.best_correct}/10`, 'răspunsuri corecte'), stat(place, `din ${fmt(r.players)} ${r.players === 1 ? 'jucător' : 'jucători'} în Europa`));
-      const a = el('a', 'acct-secondary', 'Joacă din nou ↻'); a.href = 'index.html#city-quiz';
-      body.replaceChildren(stats, a);
-    } catch { body.replaceChildren(el('p', 'acct-status', 'Nu am putut încărca scorul acum.')); }
-    return c;
+  function loggedOut(expired) {
+    const head = el('div', 'acct-hello acct-pitch-head');
+    head.append(el('span', 'acct-kicker', 'CONTUL TĂU'), greeting(),
+      el('p', 'acct-lead', 'Fă-ți un cont gratuit și 23citybreak începe să caute pentru tine: zboruri din aeroportul tău, în bugetul tău, și evenimentele care chiar te interesează, cu weekendul pus cap la cap.'));
+    const perks = el('ul', 'acct-perks');
+    for (const [icon, title, text] of [
+      ['✈︎', 'Zborurile tale, primele', 'Aeroportul de plecare, bugetul și vremea preferată se aplică singure la fiecare căutare, pe orice dispozitiv.'],
+      ['⚽', 'Evenimente pe gustul tău', 'Spune-ne ce echipe, artiști și festivaluri urmărești. Când apare ceva într-un weekend, ai pachetul gata făcut: bilet, zbor, cazare.'],
+      ['✉︎', 'Noutăți doar despre ce te interesează', 'Zboruri ieftine de weekend și evenimentele tale, pe email, doar dacă bifezi newsletterul. Te dezabonezi dintr-un click.'],
+      ['🗺', 'Europa văzută prin ochii tăi', 'Bifezi orașele în care ai fost, îți salvezi scorul la quiz și descarci itinerariile în PDF.'],
+    ]) { const li = el('li'); li.append(el('span', 'acct-perk-ico', icon)); const t = el('div'); t.append(el('strong', null, title), el('p', null, text)); li.append(t); perks.append(li); }
+    const box = el('section', 'acct-card acct-auth');
+    if (expired) box.append(el('p', 'acct-status', 'Linkul nu mai e valabil (expiră după o oră și merge o singură dată). Cere unul nou mai jos.'));
+    box.append(A.loginForm({ title: 'Intră sau fă-ți cont', intro: 'Fără parolă. Dacă nu ai cont, îl creăm acum. E gratuit și îl poți șterge oricând.' }).form);
+    const grid = el('div', 'acct-pitch'); grid.append(perks, box);
+    main.replaceChildren(head, grid);
   }
 
   async function prefsCard() {
@@ -56,11 +65,34 @@
     return c;
   }
 
-  function visitedCard(sb, user) {
-    const c = card('ORAȘE VĂZUTE', 'Harta ta de city break-uri');
-    const box = el('div', 'acct-visited'); c.append(box);
-    A.mountVisited(box, sb, user, 'profile');
+  function visitedCard() {
+    const c = card('ORAȘE VIZITATE', 'Europa văzută prin ochii tăi');
+    c.append(el('p', 'acct-intro', 'Harta orașelor în care ai fost, imaginea de share și scorul tău la „Ghicește orașul” sunt pe pagina Orașe vizitate.'));
+    const actions = el('div', 'acct-actions');
+    const a1 = el('a', 'acct-primary', 'Vezi orașele tale →'); a1.href = 'orase-vizitate.html';
+    const a2 = el('a', 'acct-secondary', 'Joacă quizul'); a2.href = 'orase-vizitate.html#city-quiz';
+    actions.append(a1, a2); c.append(actions);
     return c;
+  }
+
+  // Cât de complet e profilul: 4 lucruri care schimbă ce îi arătăm userului.
+  function completeness(prefs) {
+    let ev = null; try { ev = JSON.parse(localStorage.getItem('23cb-event-prefs')); } catch {}
+    const hasEv = !!ev && ['music_genres', 'sports', 'competitions', 'other_interests', 'favorite_teams', 'favorite_artists'].some(k => ev[k]?.length);
+    const items = [
+      ['De unde pleci', !!prefs.departure_airports?.length, '#preferinte'],
+      ['Bugetul pentru zbor', prefs.budget_max_eur != null, '#preferinte'],
+      ['Vremea preferată', prefs.temp_min_c != null || prefs.temp_max_c != null, '#preferinte'],
+      ['Ce evenimente urmărești', hasEv, '#interese'],
+    ];
+    const done = items.filter(x => x[1]).length;
+    const box = el('div', 'acct-complete');
+    const bar = el('div', 'acct-meter'); bar.setAttribute('role', 'progressbar'); bar.setAttribute('aria-valuemin', '0'); bar.setAttribute('aria-valuemax', String(items.length)); bar.setAttribute('aria-valuenow', String(done)); bar.setAttribute('aria-label', 'Profil completat');
+    const fill = el('span'); fill.style.width = `${(done / items.length) * 100}%`; bar.append(fill);
+    const list = el('ul', 'acct-check');
+    for (const [label, ok, href] of items) { const li = el('li', ok ? 'ok' : null); const a = el('a', null, `${ok ? '✓' : '○'} ${label}`); a.href = href; li.append(a); list.append(li); }
+    box.append(el('strong', null, done === items.length ? 'Profil complet. Mulțumim!' : `Profil completat: ${done} din ${items.length}`), bar, list);
+    return box;
   }
 
   async function newsletterCard(sb, user) {
@@ -122,13 +154,18 @@
     const {data: {session}} = await sb.auth.getSession();
     if (!session) { loggedOut(); return; }
     const user = session.user;
+    const prefs = await A.preferences().catch(() => ({}));
     const head = el('div', 'acct-hello');
-    head.append(el('span', 'acct-kicker', 'CONTUL TĂU'), el('h1', null, 'Salut!'), el('p', 'acct-intro', user.email));
+    head.append(el('span', 'acct-kicker', 'CONTUL TĂU'), greeting(), el('p', 'acct-intro', user.email),
+      el('p', 'acct-lead', 'Cu cât îți completezi profilul mai exact, cu atât 23citybreak lucrează mai mult pentru tine. Zborurile din aeroportul tău și din bugetul tău apar primele, vremea pe care o preferi filtrează destinațiile, iar meciurile, concertele și festivalurile pe care le urmărești vin cu pachetul de weekend gata făcut. Durează două minute și le schimbi oricând.'),
+      completeness(prefs));
     const grid = el('div', 'acct-grid');
     main.replaceChildren(head, grid);
-    const [quiz, news] = await Promise.all([quizCard(sb), newsletterCard(sb, user)]);
+    const news = await newsletterCard(sb, user);
     const interests = window.ProfileInterests ? await window.ProfileInterests.card(sb).catch(() => null) : null;
-    grid.append(quiz, news, await prefsCard(), ...(interests ? [interests] : []), visitedCard(sb, user), accountCard(sb, user));
+    if (interests) interests.id = 'interese';
+    grid.append(news, await prefsCard(), ...(interests ? [interests] : []), visitedCard(), accountCard(sb, user));
+    if (location.hash.length > 1) document.getElementById(decodeURIComponent(location.hash.slice(1)))?.scrollIntoView({ block: 'start' });
   }
 
   async function start() {

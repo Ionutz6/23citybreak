@@ -75,6 +75,66 @@
     return !!data?.newsletter;
   }
 
+  // ---------- Login cu Google ----------
+  // Butonul apare doar dacă providerul Google e activ în Supabase (Authentication → Providers → Google),
+  // citit din /auth/v1/settings. Până îl activezi, loginul rămâne doar cu magic link.
+  let googleOn;
+  const googleEnabled = () => googleOn ||= fetch(`${SUPABASE_URL}/auth/v1/settings`, {headers: {apikey: SUPABASE_KEY}, signal: AbortSignal.timeout(8000)})
+    .then(r => r.ok ? r.json() : null).then(j => !!j?.external?.google).catch(() => false);
+  async function signInWithGoogle({redirect = PROFILE_URL, newsletter = false, source = '23citybreak-cont'} = {}) {
+    store.set(LOGIN_PENDING, {newsletter, source, at: Date.now()});
+    const sb = await client();
+    const {error} = await sb.auth.signInWithOAuth({provider: 'google', options: {redirectTo: new URL(redirect, location.href).href}});
+    if (error) throw error;
+  }
+  function googleButton(opts, getNewsletter) {
+    const wrap = el('div', 'acct-google-wrap'); wrap.hidden = true;
+    const b = el('button', 'acct-google'); b.type = 'button';
+    b.innerHTML = '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="m6.3 14.7 6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg><span>Continuă cu Google</span>';
+    const status = el('p', 'acct-status'); status.setAttribute('role', 'status');
+    b.addEventListener('click', async () => {
+      b.disabled = true;
+      try { await signInWithGoogle({...opts, newsletter: !!getNewsletter?.()}); }
+      catch { b.disabled = false; status.textContent = 'Loginul cu Google nu merge acum. Folosește linkul pe email.'; }
+    });
+    wrap.append(b, status, el('div', 'acct-or', 'sau cu emailul'));
+    googleEnabled().then(on => { wrap.hidden = !on; });
+    return wrap;
+  }
+
+  // ---------- Google One Tap ----------
+  // Fereastra Google „Continuă ca …” pentru vizitatorii neconectați: după 5 secunde pe pagină, cel mult o dată la 7 zile,
+  // nu pe pagina de cont (acolo e butonul) și nu blochează pagina. Merge doar după ce pui Client ID-ul OAuth de mai jos
+  // (același ca în Supabase → Authentication → Providers → Google). Pașii: supabase/GOOGLE-LOGIN.md
+  const GOOGLE_CLIENT_ID = ''; // ex. '1234567890-abc.apps.googleusercontent.com'
+  const ONE_TAP_KEY = '23cb-onetap', ONE_TAP_EVERY_DAYS = 7;
+  async function oneTap() {
+    if (!GOOGLE_CLIENT_ID || hasSession() || onProfilePage() || /access_token=/.test(location.hash)) return;
+    const last = store.get(ONE_TAP_KEY);
+    if (last?.at && Date.now() - last.at < ONE_TAP_EVERY_DAYS * 864e5) return;
+    if (!(await googleEnabled())) return;
+    await new Promise((res, rej) => { const sc = document.createElement('script'); sc.src = 'https://accounts.google.com/gsi/client'; sc.async = true; sc.onload = res; sc.onerror = rej; document.head.append(sc); });
+    // Nonce: Google primește hash-ul SHA-256, Supabase verifică valoarea brută.
+    const raw = btoa(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(24))));
+    const hashed = [...new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(raw)))].map(b => b.toString(16).padStart(2, '0')).join('');
+    window.google.accounts.id.initialize({
+      client_id: GOOGLE_CLIENT_ID, nonce: hashed, context: 'signin', ux_mode: 'popup',
+      cancel_on_tap_outside: true, itp_support: true, use_fedcm_for_prompt: true,
+      callback: async ({credential}) => {
+        try {
+          const sb = await client();
+          const {data, error} = await sb.auth.signInWithIdToken({provider: 'google', token: credential, nonce: raw});
+          if (error) throw error;
+          await saveSubscriber(sb, data.user, null, '23citybreak-onetap').catch(() => {});
+          updateHeader(); emit();
+          if (await needsOnboarding().catch(() => false)) location.href = PROFILE_URL;
+        } catch (err) { console.warn('Google One Tap:', err?.message || err); }
+      },
+    });
+    store.set(ONE_TAP_KEY, {at: Date.now()}); // apărut o dată: următoarea peste 7 zile, oricum ar fi închis
+    window.google.accounts.id.prompt();
+  }
+
   // ---------- Fereastra de login ----------
   let dialog;
   function loginForm({title, intro, source = '23citybreak-cont', redirect = PROFILE_URL, onSent} = {}) {
@@ -90,7 +150,7 @@
     label.append(box, el('span', null, CONSENT));
     const note = el('p', 'acct-note', 'Fără bifă nu primești newsletter. Datele sunt păstrate de 23ai și le poți șterge oricând din cont.');
     const status = el('p', 'acct-status'); status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
-    form.append(row, label, note, status);
+    form.append(googleButton({redirect, source}, () => box.checked), row, label, note, status);
     form.addEventListener('submit', async e => {
       e.preventDefault();
       const email = input.value.trim();
@@ -127,17 +187,13 @@
   }
 
   // ---------- Header ----------
+  // „Contul tău” pentru toți: cine nu e conectat ajunge pe aceeași pagină, cu prezentarea contului și loginul.
   function updateHeader() {
     const btn = document.getElementById('account-link'); if (!btn) return;
-    btn.textContent = hasSession() ? 'Contul tău' : 'Intră';
+    btn.textContent = 'Contul tău';
+    btn.classList.toggle('is-signed-in', hasSession());
     btn.hidden = false;
   }
-  document.addEventListener('click', e => {
-    const btn = e.target.closest?.('#account-link'); if (!btn) return;
-    e.preventDefault();
-    if (hasSession()) { if (!onProfilePage()) location.href = PROFILE_URL; }
-    else openLogin();
-  });
 
   // ---------- Întoarcerea din linkul de login ----------
   // Salvează alegerea de newsletter făcută la login și pornește onboardingul dacă e cont nou.
@@ -208,7 +264,7 @@
     const tempKey = (TEMPS.find(t => t[3] === state.temp_min_c && t[4] === state.temp_max_c) || TEMPS[3])[0];
     const g3 = single('Ce vreme îți place la destinație?', null, TEMPS.map(([k, label, sub, min, max]) => ({k, label, sub, min, max})),
       it => it.k === tempKey, it => { state.temp_min_c = it.min; state.temp_max_c = it.max; });
-    const g4 = single('Ce orașe să-ți arătăm?', 'Se aplică la toate căutările. Schimbi oricând din Profilul meu.', [{v: 'new', label: 'Doar orașe noi', sub: 'pe care nu le-am văzut'}, {v: 'any', label: 'Oricare', sub: 'inclusiv cele văzute'}],
+    const g4 = single('Ce orașe să-ți arătăm?', 'Se aplică la toate căutările. Schimbi oricând din Contul tău.', [{v: 'new', label: 'Doar orașe noi', sub: 'pe care nu le-am văzut'}, {v: 'any', label: 'Oricare', sub: 'inclusiv cele văzute'}],
       it => it.v === state.city_mode, it => { state.city_mode = it.v; });
 
     node.append(g1, g5, g2, g3, g4);
@@ -309,7 +365,7 @@
   }
 
   window.Account = {
-    client, session, hasSession, preferences, savePrefs, openLogin, loginForm, prefsForm, saveSubscriber, isSubscribed,
+    client, session, hasSession, preferences, savePrefs, openLogin, loginForm, signInWithGoogle, googleEnabled, prefsForm, saveSubscriber, isSubscribed,
     afterLogin, needsOnboarding, runOnboarding, mountVisited, updateHeader, CONSENT,
   };
 
@@ -318,6 +374,7 @@
     setTimeout(() => { maybeBanner(); }, BANNER_DELAY_MS);
     // Cont creat din altă parte (ex. quiz) și onboarding neparcurs: o invitație discretă spre profil, o dată pe sesiune.
     setTimeout(onboardingNudge, 4000);
+    setTimeout(() => { oneTap().catch(() => {}); }, 5000);
   }
 
   async function onboardingNudge() {
