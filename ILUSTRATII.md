@@ -59,6 +59,7 @@ Se adaugă numele obiectivelor direct pe hărțile existente, în stilul aprobat
 - München
 - Rotterdam
 - Torino
+- Liverpool
 
 Harta originală pentru Praga avea deja etichete. Toate ilustrațiile existente din `assets/guides-prague-style/` au fost verificate și actualizate.
 
@@ -69,3 +70,5 @@ Nu modifica funcționalitatea de căutare a zborurilor în cadrul acestei activi
 Rotterdam: originalul fără etichete este `ilustratii-orase/rotterdam_nl.webp`, iar versiunea pentru ghid este `assets/guides-prague-style/rotterdam.webp`.
 
 Torino: originalul fără etichete este `ilustratii-orase/turin_it.webp`, iar versiunea pentru ghid este `assets/guides-prague-style/torino.webp`.
+
+Liverpool: originalul fără etichete este `ilustratii-orase/liverpool_gb.webp`, iar versiunea pentru ghid este `assets/guides-prague-style/liverpool.webp`.
