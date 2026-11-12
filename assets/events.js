@@ -150,10 +150,25 @@
   // Tab-urile paginii Evenimente. Festivalurile (Ticketmaster le clasifică la muzică) stau la Muzică.
   const CATEGORIES = [['sport', 'Sport'], ['music', 'Muzică'], ['other', 'Alte evenimente']];
   const categoryOf = e => e.kind === 'football' || e.kind === 'sport' ? 'sport' : e.kind === 'concert' || e.kind === 'festival' ? 'music' : 'other';
+  // Sportul unui eveniment (fotbal din football-data; rugby, baschet etc. din lista curatoriată sau Ticketmaster).
+  const SPORTS = { football: ['⚽', 'Fotbal'], rugby: ['🏉', 'Rugby'], basketball: ['🏀', 'Baschet'], tennis: ['🎾', 'Tenis'], f1: ['🏎️', 'Formula 1'], motogp: ['🏍️', 'MotoGP'], running: ['🏃', 'Maratoane'], other: ['🏟️', 'Sport'] };
+  const sportOf = e => {
+    if (e.kind === 'football') return 'football';
+    const t = `${(e.genres || []).join(' ')} ${e.title} ${e.competition || ''}`;
+    if (e.competition === '6N' || /rugby/i.test(t)) return 'rugby';
+    if (/basket/i.test(t)) return 'basketball';
+    if (/tenis|tennis/i.test(t)) return 'tennis';
+    if (/moto ?gp/i.test(t)) return 'motogp';
+    if (/formula ?1|\bf1\b|grand prix/i.test(t)) return 'f1';
+    if (/marat|marathon|running/i.test(t)) return 'running';
+    return 'other';
+  };
+  // Eticheta cardului: la sport numele sportului și liga („⚽ Fotbal · Serie A”, „🏉 Rugby · Six Nations”).
   const tagLabel = e => {
-    const [icon, name] = KINDS[e.kind] || KINDS.other;
-    const label = e.kind === 'football' && COMPETITIONS[e.competition] ? COMPETITIONS[e.competition] : name;
-    return `${icon} ${label}${isMultiDay(e) ? ` · ${lengthDays(e)} zile` : ''}`;
+    const isSport = e.kind === 'football' || e.kind === 'sport';
+    const [icon, name] = isSport ? SPORTS[sportOf(e)] : KINDS[e.kind] || KINDS.other;
+    const comp = isSport && COMPETITIONS[e.competition] ? ` · ${COMPETITIONS[e.competition]}` : '';
+    return `${icon} ${name}${comp}${isMultiDay(e) ? ` · ${lengthDays(e)} zile` : ''}`;
   };
   const packageUrl = e => `weekend.html?e=${encodeURIComponent(e.id)}${DEMO ? '&evenimente-demo=1' : ''}`;
 
@@ -176,7 +191,7 @@
     const img = e.image_url || '';
     const wk = mainWeekend(e);
     const price = e.price_min_eur ? `<div><div class="ev-price">${Math.round(e.price_min_eur)} €</div><div class="ev-price-sub">bilet, de la</div></div>` : '<div></div>';
-    const note = e.kind === 'football' ? 'bilete pe<br>site-ul clubului' : e.kind === 'market' || e.kind === 'city_festival' ? 'intrare<br>liberă' : '';
+    const note = e.kind === 'football' ? 'bilete pe site-ul clubului' : e.kind === 'market' || e.kind === 'city_festival' ? 'intrare liberă' : '';
     return `<article class="ev-card" data-ev="${esc(e.id)}"${img ? ` style="background-image:url('${esc(img)}')"` : ''}>
       <div class="ev-top"><span class="ev-tag">${esc(tagLabel(e))}</span></div>
       <div class="ev-body">
@@ -229,5 +244,5 @@
     });
   }
 
-  window.CBEvents = { load, byId, promos, cardHtml, packageUrl, decorateCards, eventPhoto, cityPhoto, stadiumPhoto, venuePhoto, setBg, KINDS, COMPETITIONS, CATEGORIES, categoryOf, isWeekend, helpers: { esc, cityName, cityOf, guideOf, guideImage, local, isoAdd, dowOf, shortDate, longDate, startDate, endDate, isMultiDay, lengthDays, mainWeekend, whenLabel, tagLabel, monthName, DOW, DOW_LONG, MON } };
+  window.CBEvents = { load, byId, promos, cardHtml, packageUrl, decorateCards, eventPhoto, cityPhoto, stadiumPhoto, venuePhoto, setBg, KINDS, COMPETITIONS, CATEGORIES, SPORTS, categoryOf, sportOf, isWeekend, helpers: { esc, cityName, cityOf, guideOf, guideImage, local, isoAdd, dowOf, shortDate, longDate, startDate, endDate, isMultiDay, lengthDays, mainWeekend, whenLabel, tagLabel, monthName, DOW, DOW_LONG, MON } };
 })();

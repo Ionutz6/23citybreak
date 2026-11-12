@@ -22,17 +22,8 @@
   // ---------- Sporturi ----------
   const SPORTS = [['football', 'Fotbal', '⚽'], ['rugby', 'Rugby', '🏉'], ['basketball', 'Baschet', '🏀'], ['tennis', 'Tenis', '🎾'],
     ['f1', 'Formula 1', '🏎️'], ['motogp', 'MotoGP', '🏍️'], ['running', 'Maratoane', '🏃'], ['other', 'Alte sporturi', '🏟️']];
-  const sportOf = e => {
-    if (e.kind === 'football') return 'football';
-    const t = `${(e.genres || []).join(' ')} ${e.title} ${e.competition || ''}`;
-    if (e.competition === '6N' || /rugby/i.test(t)) return 'rugby';
-    if (/basket/i.test(t)) return 'basketball';
-    if (/tenis|tennis/i.test(t)) return 'tennis';
-    if (/moto ?gp/i.test(t)) return 'motogp';
-    if (/formula ?1|\bf1\b|grand prix/i.test(t)) return 'f1';
-    if (/marat|marathon|running|semimarat/i.test(t)) return 'running';
-    return 'other';
-  };
+  const sportOf = E.sportOf;
+
   // Cu interese salvate în profil: pastila „Pentru tine” e prima și e aleasă implicit; altfel „Toate”.
   const hasMine = mySports.length > 0 || myComps.length > 0;
   const isMine = e => mySports.includes(sportOf(e)) || (e.competition && myComps.includes(e.competition));
@@ -124,7 +115,7 @@
         <span class="c">${g.key.startsWith('a:') ? `<b>${esc(H.cityName(e.city_id))}</b>${e.venue ? ` · ${esc(e.venue)}` : ''}${e.price_min_eur ? ` · bilet de la ${Math.round(e.price_min_eur)} €` : ''}` : `<b>${esc(e.title.replace(/ \(rugby\)$/, ''))}</b> · ${esc(H.cityName(e.city_id))}`}</span>
         <span class="f" data-flight="${esc(e.id)}"></span><span class="go" aria-hidden="true">→</span></a></li>`).join('');
     return `<article class="evp-tour" data-ev="${esc(first.id)}">
-      <div class="evp-tour-head"><span class="ev-tag">${g.key.startsWith('c:') ? '🏆 Turneu' : '🎤 Turneu european'}</span>
+      <div class="evp-tour-head"><span class="ev-tag">${g.key.startsWith('c:') ? `${E.SPORTS[sportOf(first)].join(' ')} · Turneu` : '🎤 Turneu european'}</span>
         <h3>${esc(name)}</h3><p>${g.items.length} ${g.items.length === 1 ? 'dată' : 'date'} în ${cities} ${cities === 1 ? 'oraș' : 'orașe'}${state.weekend ? ', doar în weekend' : ''}</p></div>
       <ol class="evp-tour-list">${rows}</ol>
       ${g.items.length > 5 ? `<button type="button" class="evp-more-dates" data-tour="${esc(g.key)}" aria-expanded="${open}">${open ? 'Mai puține date' : `Toate cele ${g.items.length} date`}</button>` : ''}
