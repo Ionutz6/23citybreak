@@ -111,9 +111,7 @@
 .acct-perk-ico{flex:none;width:40px;height:40px;border-radius:12px;background:#111211;color:var(--acct-gold);display:grid;place-items:center;font-size:18px}
 .acct-auth{position:sticky;top:20px}
 .acct-google-wrap[hidden]{display:none}
-.acct-google{width:100%;display:flex;align-items:center;justify-content:center;gap:10px;height:46px;border:1.5px solid #d6d9de;border-radius:12px;background:#fff;color:#1f1f1f;font:700 15px var(--font-body);cursor:pointer;margin-top:14px}
-.acct-google:hover{border-color:#9aa0a6}
-.acct-google:focus-visible{outline:3px solid var(--acct-gold);outline-offset:2px}
+.acct-google{display:flex;justify-content:center;min-height:44px;margin-top:14px}
 .acct-or{display:flex;align-items:center;gap:10px;color:var(--acct-muted);font-size:12px;margin:14px 0 4px}
 .acct-or::before,.acct-or::after{content:"";flex:1;height:1px;background:var(--acct-line)}
 .acct-complete{margin-top:18px;max-width:680px;background:var(--acct-card);border:1px solid var(--acct-line);border-radius:16px;padding:16px 18px}

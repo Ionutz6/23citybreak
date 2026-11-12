@@ -1,8 +1,9 @@
 # Login cu Google (buton + fereastra One Tap)
 
-Codul e gata: butonul „Continuă cu Google” apare automat în Contul tău și în ferestrele de login imediat ce
-providerul Google e activ în Supabase. Fereastra One Tap („Continuă ca …”) pornește după ce pui Client ID-ul în
-`assets/account.js` (`GOOGLE_CLIENT_ID`).
+Butonul „Continuă cu Google” și fereastra One Tap („Continuă ca …”) folosesc Google Identity Services direct pe
+23citybreak.ro: Google scrie „Conectează-te la 23citybreak.ro”, fără să treacă prin pagina proiectului Supabase
+(nu se folosește redirectul OAuth, deci adresa `lsud….supabase.co` nu apare). Pornesc amândouă când
+`GOOGLE_CLIENT_ID` din `assets/account.js` e completat și providerul Google e activ în Supabase.
 
 ## 1. Google Cloud: clientul OAuth (≈10 minute)
 
@@ -24,14 +25,15 @@ providerul Google e activ în Supabase. Fereastra One Tap („Continuă ca …�
 2. **Client IDs**: Client ID-ul de mai sus. **Client Secret**: secretul. Save.
 3. **Authentication → URL Configuration**: lista de Redirect URLs trebuie să conțină deja `https://23citybreak.ro/**`.
 
-După pasul 2, butonul „Continuă cu Google” apare singur pe site (fără deploy).
-
-## 3. One Tap
+## 3. Client ID-ul în site
 
 În `assets/account.js` pune Client ID-ul (nu secretul!) în `const GOOGLE_CLIENT_ID = '…';` și publică.
-Fereastra apare vizitatorilor neconectați după 5 secunde, cel mult o dată la 7 zile, nu și pe pagina de cont.
-Login-ul se face cu `supabase.auth.signInWithIdToken` (cu nonce), deci contul e același ca la magic link
-dacă emailul e același.
+- Butonul apare în Contul tău și în ferestrele de login (PDF, quiz, newsletter).
+- One Tap apare vizitatorilor neconectați după 5 secunde, cel mult o dată la 7 zile, nu și pe pagina de cont.
+- Login-ul se face cu `supabase.auth.signInWithIdToken` (cu nonce), deci contul e același ca la magic link
+  dacă emailul e același.
+- „Authorized JavaScript origins” (pasul 1) e obligatoriu: fără `https://23citybreak.ro` acolo, butonul nu se afișează.
+- Authorized domains (Branding, jos): `23citybreak.ro` și `supabase.co`.
 
 ## Ce nu se schimbă
 
