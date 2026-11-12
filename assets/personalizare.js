@@ -30,7 +30,6 @@
   // ---------- Sursa preferințelor ----------
   let prefs = { ...DEFAULTS, ...store.get(K.prefs, {}) };
   let visited = new Set(store.get(K.visited, []));
-  let cityModeThisSearch = null; // alegerea de la căutarea curentă; implicit din profil
   const account = () => (window.Account && typeof window.Account.hasSession === 'function' && window.Account.hasSession()) ? window.Account : null;
 
   // Cu sesiune, contul (Supabase 23ai) e sursa de adevăr. La prima conectare pe acest browser,
@@ -158,103 +157,109 @@
     renderOriginChips((prefs.departure_airports || []).map(s => String(s).toUpperCase()));
   });
 
-  // ---------- Bara „oraș nou sau oricare” + temperatură ----------
-  const TEMP_PRESETS = [
-    { v: '', label: 'Oricare' },
-    { v: '-30,10', label: 'Rece (sub 10°C)' },
-    { v: '10,20', label: 'Răcoare (10–20°C)' },
-    { v: '18,27', label: 'Plăcut (18–27°C)' },
-    { v: '25,45', label: 'Cald (peste 25°C)' },
-  ];
-  let tempRange = null; // [min, max] pentru căutarea curentă
+  // ---------- „Profilul meu” pe prima pagină ----------
+  // Rezumatul preferințelor (plecare, buget, ce orașe, vreme) deasupra căutării + editorul lor.
+  // Tipul de oraș și temperatura nu se mai aleg la fiecare căutare: vin din profil și se aplică la toate căutările.
   const profileRange = () => (prefs.temp_min_c != null || prefs.temp_max_c != null) ? [prefs.temp_min_c ?? -30, prefs.temp_max_c ?? 45] : null;
   const fmtRange = r => r[0] <= -30 ? `sub ${r[1]}°C` : r[1] >= 45 ? `peste ${r[0]}°C` : `${r[0]}–${r[1]}°C`;
+  const TEMP_NAMES = { '-30,15': 'Răcoare', '15,25': 'Plăcut', '25,45': 'Cald' };
+  const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
+
+  function profileSummary() {
+    const favs = (prefs.departure_airports || []).map(s => String(s).toUpperCase());
+    const r = profileRange();
+    return [
+      { k: 'air', label: 'Plecare', value: favs.length ? favs.join(', ') : 'alegi la căutare' },
+      { k: 'budget', label: 'Buget / persoană', value: prefs.budget_max_eur == null ? 'fără limită' : `până la ${prefs.budget_max_eur} €` },
+      { k: 'mode', label: 'Ce orașe', value: prefs.city_mode === 'new' ? 'doar orașe noi' : 'oricare', sub: visited.size ? plural(visited.size, 'oraș văzut', 'orașe văzute') : 'niciun oraș marcat ca văzut' },
+      { k: 'temp', label: 'Vremea la destinație', value: r ? `${TEMP_NAMES[r.join(',')] ? TEMP_NAMES[r.join(',')] + ' · ' : ''}${fmtRange(r)}` : 'oricum', sub: r ? 'max. zilnică' : '' },
+    ];
+  }
 
   function renderBar() {
+    const panelHost = $('configurator');
+    if (!panelHost) return;
+    let card = $('pz-profile');
+    if (!card) {
+      card = document.createElement('section');
+      card.id = 'pz-profile';
+      card.className = 'pz-profile';
+      card.setAttribute('aria-labelledby', 'pz-profile-title');
+      panelHost.prepend(card);
+      card.addEventListener('click', onProfileClick);
+    }
+    const acc = account();
+    const panel = $('pz-prefs'), open = !!panel;
+    card.innerHTML = `
+      <div class="pz-profile-head">
+        <div><span class="pz-kicker">PROFILUL MEU</span><h2 id="pz-profile-title">${acc ? 'Căutarea ta, pe gustul tău' : 'Personalizează căutarea'}</h2></div>
+        <button type="button" id="pz-edit" class="pz-btn" aria-expanded="${open}" aria-controls="pz-prefs">${open ? 'Închide' : 'Preferințele mele'}</button>
+      </div>
+      <ul class="pz-summary">${profileSummary().map(s => `
+        <li><button type="button" class="pz-tile" data-pz-edit="${s.k}"><span class="pz-tile-label">${esc(s.label)}</span><strong>${esc(s.value)}</strong>${s.sub ? `<small>${esc(s.sub)}</small>` : ''}</button></li>`).join('')}
+      </ul>
+      <p class="pz-profile-foot">${acc
+        ? `Salvate în contul tău. <a href="cont.html">Profil complet și harta orașelor văzute →</a>`
+        : `Salvate doar în acest browser. <button type="button" class="pz-inline-link" data-pz-login>Fă-ți cont gratuit</button> ca să le ai pe orice dispozitiv și să-ți marchezi pe hartă orașele văzute.`}</p>`;
+    if (panel) card.append(panel);
+    ensureNote();
+  }
+
+  // Nota „N orașe ascunse” stă lângă butonul de căutare, unde se vede efectul filtrelor din profil.
+  function ensureNote() {
+    if ($('pz-note')) return;
     const actions = document.querySelector('#configurator .search-actions');
     if (!actions) return;
-    let bar = $('pz-bar');
-    if (!bar) {
-      bar = document.createElement('div');
-      bar.id = 'pz-bar';
-      bar.className = 'pz-bar';
-      actions.parentNode.insertBefore(bar, actions);
-      bar.addEventListener('change', onBarChange);
-      bar.addEventListener('click', e => { if (e.target.closest('#pz-edit')) togglePrefsPanel(); });
+    const note = document.createElement('p');
+    note.id = 'pz-note'; note.className = 'pz-note'; note.hidden = true;
+    actions.parentNode.insertBefore(note, actions);
+  }
+
+  function onProfileClick(e) {
+    if (e.target.closest('[data-pz-login]')) { window.Account?.openLogin?.(); return; }
+    const tile = e.target.closest('[data-pz-edit]');
+    if (e.target.closest('#pz-edit') || tile) {
+      if (tile && $('pz-prefs')) { focusGroup(tile.dataset.pzEdit); return; }
+      togglePrefsPanel(tile?.dataset.pzEdit);
     }
-    const mode = cityModeThisSearch || prefs.city_mode || 'any';
-    const pr = profileRange();
-    if (tempRange === null) tempRange = pr;
-    const cur = tempRange ? tempRange.join(',') : '';
-    const presets = [...TEMP_PRESETS];
-    if (pr && !presets.some(p => p.v === pr.join(','))) presets.splice(1, 0, { v: pr.join(','), label: `Din profil (${fmtRange(pr)})` });
-    if (tempRange && !presets.some(p => p.v === cur)) presets.splice(1, 0, { v: cur, label: fmtRange(tempRange) });
-    bar.innerHTML = `
-      <div class="pz-group" role="radiogroup" aria-label="Ce orașe cauți">
-        <span class="pz-label">Ce orașe?</span>
-        <label class="pz-seg"><input type="radio" name="pz-mode" value="new" ${mode === 'new' ? 'checked' : ''}><span>Doar orașe noi</span></label>
-        <label class="pz-seg"><input type="radio" name="pz-mode" value="any" ${mode !== 'new' ? 'checked' : ''}><span>Oricare</span></label>
-        <small class="pz-hint">${visited.size ? `${visited.size} ${visited.size === 1 ? 'oraș văzut' : 'orașe văzute'}` : 'niciun oraș marcat ca văzut'}</small>
-      </div>
-      <div class="pz-group">
-        <label class="pz-label" for="pz-temp">Temperatura la destinație</label>
-        <select id="pz-temp">${presets.map(p => `<option value="${p.v}" ${p.v === cur ? 'selected' : ''}>${esc(p.label)}</option>`).join('')}</select>
-        <small class="pz-hint">max. zilnică, prognoză Open-Meteo sau media ultimilor 2 ani</small>
-      </div>
-      <button type="button" id="pz-edit" class="pz-link" aria-expanded="${!!$('pz-prefs')}">Preferințele mele</button>
-      <p id="pz-note" class="pz-note" hidden></p>`;
+  }
+  document.addEventListener('click', e => { if (e.target.closest('[data-pz-open]')) { e.preventDefault(); $('pz-profile')?.scrollIntoView({ behavior: 'smooth', block: 'start' }); if (!$('pz-prefs')) togglePrefsPanel(e.target.closest('[data-pz-open]').dataset.pzOpen); } });
+
+  const GROUP_INDEX = { air: 0, budget: 1, temp: 2, mode: 3 };
+  function focusGroup(k) {
+    const g = $('pz-prefs')?.querySelectorAll('.acct-group, fieldset')[GROUP_INDEX[k] ?? 0];
+    g?.querySelector('button, input, select')?.focus({ preventScroll: true });
+    g?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
 
-  function onBarChange(e) {
-    if (e.target.name === 'pz-mode') cityModeThisSearch = e.target.value;
-    if (e.target.id === 'pz-temp') tempRange = e.target.value ? e.target.value.split(',').map(Number) : false;
-    rerender();
-  }
-
-  // Editor simplu de preferințe (fără cont: localStorage; cu cont: și în search_preferences).
-  function togglePrefsPanel() {
+  // Editorul: același formular ca în pagina de cont (Account.prefsForm), salvat local și în cont, dacă există sesiune.
+  function togglePrefsPanel(focusKey) {
     const open = $('pz-prefs');
-    if (open) { open.remove(); $('pz-edit')?.setAttribute('aria-expanded', 'false'); return; }
-    const origin = $('f-origin');
-    const favs = (prefs.departure_airports || []).map(s => String(s).toUpperCase());
-    const budgets = [...$('f-max-price').options].map(o => o.value);
-    const budgetOpt = prefs.budget_max_eur == null ? '' : (budgets.map(Number).filter(n => n !== 999).sort((x, y) => x - y).find(n => n >= prefs.budget_max_eur) ?? 999).toString();
+    if (open) { open.remove(); renderBar(); return; }
     const panel = document.createElement('div');
     panel.id = 'pz-prefs';
     panel.className = 'pz-prefs';
-    panel.innerHTML = `
-      <fieldset><legend>Aeroporturi de plecare favorite</legend>
-        ${[...origin.options].map(o => `<label><input type="checkbox" name="pz-air" value="${esc(o.dataset.iata)}" ${favs.includes(o.dataset.iata) ? 'checked' : ''}> ${esc(o.dataset.label || o.textContent)}</label>`).join('')}
-      </fieldset>
-      <label>Buget maxim / persoană
-        <select name="pz-budget"><option value="">Fără preferință</option>${budgets.map(v => `<option value="${v}" ${v === budgetOpt ? 'selected' : ''}>${v === '999' ? 'Oricât' : `Până la ${v} €`}</option>`).join('')}</select>
-      </label>
-      <div class="pz-temp-range"><span>Temperatura dorită (°C)</span>
-        <input type="number" name="pz-tmin" min="-30" max="45" placeholder="min" value="${prefs.temp_min_c ?? ''}">
-        <input type="number" name="pz-tmax" min="-30" max="45" placeholder="max" value="${prefs.temp_max_c ?? ''}">
-      </div>
-      <label>Implicit caut
-        <select name="pz-mode-def"><option value="any" ${prefs.city_mode !== 'new' ? 'selected' : ''}>orice oraș</option><option value="new" ${prefs.city_mode === 'new' ? 'selected' : ''}>doar orașe noi</option></select>
-      </label>
-      <div class="pz-actions"><button type="button" class="pz-btn" id="pz-save">Salvează</button><small>${account() ? 'Se salvează în contul tău.' : 'Se salvează în acest browser. Cu un cont, le găsești pe orice dispozitiv.'}</small></div>`;
-    $('pz-bar').insertAdjacentElement('afterend', panel);
-    $('pz-edit').setAttribute('aria-expanded', 'true');
-    panel.querySelector('#pz-save').addEventListener('click', async () => {
-      const f = n => panel.querySelector(`[name="${n}"]`);
-      const num = v => v === '' ? null : Math.max(-30, Math.min(45, Math.round(Number(v))));
-      let tmin = num(f('pz-tmin').value), tmax = num(f('pz-tmax').value);
-      if (tmin != null && tmax != null && tmin > tmax) [tmin, tmax] = [tmax, tmin];
-      const b = f('pz-budget').value;
+    const form = window.Account?.prefsForm ? window.Account.prefsForm({ ...prefs }) : null;
+    if (!form) return;
+    const actions = document.createElement('div');
+    actions.className = 'pz-actions';
+    actions.innerHTML = `<button type="button" class="pz-btn" id="pz-save">Salvează</button><button type="button" class="pz-inline-link" id="pz-cancel">Renunță</button><small>${account() ? 'Se salvează în contul tău și se aplică la toate căutările.' : 'Se salvează în acest browser și se aplică la toate căutările.'}</small>`;
+    panel.append(form.node, actions);
+    $('pz-profile').append(panel);
+    renderBar();
+    focusGroup(focusKey);
+    actions.querySelector('#pz-cancel').addEventListener('click', () => { panel.remove(); renderBar(); });
+    actions.querySelector('#pz-save').addEventListener('click', async () => {
+      const v = form.read();
       searchedOnce = false; // aplică imediat noile valori în formular
       budgetTouched = false;
-      cityModeThisSearch = null; tempRange = null;
-      await savePrefs({
-        departure_airports: [...panel.querySelectorAll('[name="pz-air"]:checked')].map(i => i.value),
-        budget_max_eur: b === '' || b === '999' ? null : Number(b),
-        temp_min_c: tmin, temp_max_c: tmax,
-        city_mode: f('pz-mode-def').value,
-      });
       panel.remove();
+      await savePrefs({
+        departure_airports: v.departure_airports,
+        budget_max_eur: v.budget_max_eur,
+        temp_min_c: v.temp_min_c, temp_max_c: v.temp_max_c,
+        city_mode: v.city_mode === 'new' ? 'new' : 'any',
+      });
       if (typeof renderCrossEngineBar === 'function') renderCrossEngineBar();
     });
   }
@@ -269,8 +274,8 @@
 
   let lastHidden = { visited: 0, temp: 0 };
   function filterRows(rows, weekends, destVal) {
-    const mode = cityModeThisSearch || prefs.city_mode || 'any';
-    const range = tempRange || null;
+    const mode = prefs.city_mode || 'any';
+    const range = profileRange();
     let hiddenVisited = 0, hiddenTemp = 0;
     let out = rows;
     if (mode === 'new' && destVal === 'any' && visited.size) {
@@ -314,7 +319,8 @@
     const sel = typeof selectedCityObj !== 'undefined' ? selectedCityObj : null;
     if (destVal && destVal !== 'any' && visited.has(slugOf(destVal))) parts.push(`ai mai fost în ${sel?.name || cityName(slugOf(destVal))}`);
     if (weatherPending) parts.push('verificăm temperaturile…');
-    note.textContent = parts.length ? parts.join(' · ') : '';
+    const filtered = lastHidden.visited || lastHidden.temp;
+    note.innerHTML = parts.length ? esc(parts.join(' · ')) + (filtered ? ' · <button type="button" class="pz-inline-link" data-pz-open="mode">schimbă în Profilul meu</button>' : '') : '';
     note.hidden = !parts.length;
   }
 
