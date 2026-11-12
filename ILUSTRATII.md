@@ -58,6 +58,7 @@ Se adaugă numele obiectivelor direct pe hărțile existente, în stilul aprobat
 - Málaga
 - München
 - Rotterdam
+- Torino
 
 Harta originală pentru Praga avea deja etichete. Toate ilustrațiile existente din `assets/guides-prague-style/` au fost verificate și actualizate.
 
@@ -66,3 +67,5 @@ Ilustrațiile fără etichete sunt păstrate în istoricul Git: pentru Roma și 
 Nu modifica funcționalitatea de căutare a zborurilor în cadrul acestei activități.
 
 Rotterdam: originalul fără etichete este `ilustratii-orase/rotterdam_nl.webp`, iar versiunea pentru ghid este `assets/guides-prague-style/rotterdam.webp`.
+
+Torino: originalul fără etichete este `ilustratii-orase/turin_it.webp`, iar versiunea pentru ghid este `assets/guides-prague-style/torino.webp`.
