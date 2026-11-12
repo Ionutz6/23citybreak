@@ -65,6 +65,13 @@
   // ---------- Randare ----------
   const illu = H.guideImage(slug);
   let photo = null; // imaginea evenimentului sau fotografia orașului; se încarcă în paralel cu prima randare
+  let wx = null; // vremea tipică în luna evenimentului (assets/event-weather.js), orientativ
+  const wxRow = () => {
+    if (!wx) return '';
+    const ico = wx.hi >= 22 ? '☀️' : wx.hi >= 12 ? '⛅' : wx.hi >= 5 ? '🌥️' : '❄️';
+    const rain = wx.wet == null ? '' : ` · ploaie în ~${wx.wet} ${wx.wet === 1 ? 'zi' : 'zile'} din 10`;
+    return `<div class="pk-row pk-wx"><div class="l"><div class="pk-ico">${ico}</div><div><div class="t">Vremea în ${esc(wx.month)} <span class="pk-tag">orientativ</span></div><div class="s">ziua ~${wx.hi}°C · noaptea ~${wx.lo}°C${rain}</div><div class="s pk-wx-src">Media lunii în ultimii ${wx.years} ${wx.years === 1 ? 'an' : 'ani'}, nu e prognoză. Date: <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">Open-Meteo.com</a></div></div></div></div>`;
+  };
   function render() {
     const nights = Math.round((new Date(trip.back) - new Date(trip.out)) / 864e5);
     const custom = trip.mode === 'custom';
@@ -101,6 +108,7 @@
           <div class="pk-row"><div class="l"><div class="pk-ico">${icon}</div><div><div class="t">Bilet la eveniment</div><div class="s">${ev.price_min_eur ? 'de la' : ev.kind === 'football' ? 'se vinde de club' : ev.kind === 'city_festival' || ev.kind === 'market' ? 'intrare liberă' : 'preț la vânzător'}</div></div></div>${ev.price_min_eur ? `<div class="pr">${Math.round(ev.price_min_eur)} €</div>` : ''}</div>
           <div class="pk-row"><div class="l"><div class="pk-ico">✈︎</div><div><div class="t">Zbor ${esc(origin)} ⇄ ${esc(iata || name)}</div><div class="s">${esc(H.shortDate(trip.out))} → ${esc(H.shortDate(trip.back))}</div></div></div></div>
           <div class="pk-row"><div class="l"><div class="pk-ico">🛏</div><div><div class="t">Cazare, ${nights} ${nights === 1 ? 'noapte' : 'nopți'}</div><div class="s">${ev.venue ? 'aproape de ' + esc(ev.venue) : esc(name)}</div></div></div></div>
+          ${wxRow()}
           <div class="pk-stack">
             <a class="pk-btn dark" href="${esc(ticketUrl)}" target="_blank" rel="noopener noreferrer">${icon} ${esc(ticketLabel)} ↗</a>
             <a class="pk-btn gold" href="${esc(flightUrl())}" target="_blank" rel="noopener noreferrer">✈︎ Cumpără bilet de avion ↗</a>
@@ -140,6 +148,7 @@
   });
   render();
   // La meciuri, stadionul găsit pe Wikidata completează locul (football-data nu îl dă): apare în antet, hartă și cazare.
+  window.CBWeather?.typical(slug, name, s).then(w => { if (w) { wx = w; render(); } });
   E.eventPhoto(ev).then(p => { if (p) { photo = p; if (!ev.venue && p.venue) ev.venue = p.venue; render(); } });
   window.addEventListener('account:change', render);
   // Întoarcere din linkul de login cerut pentru PDF.

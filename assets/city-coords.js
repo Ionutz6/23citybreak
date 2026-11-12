@@ -1,5 +1,5 @@
-// Coordonate aproximative (centrul orașului / aeroportul principal) pentru prognoza Open-Meteo.
-// Precizia de ~0,1° ajunge pentru temperatură. Orașele lipsă se geocodează la cerere (cache local).
+// Coordonate aproximative (centrul orașului) pentru vremea orientativă de pe paginile de pachet
+// (assets/event-weather.js, Open-Meteo). Orașele lipsă se geocodează la cerere.
 window.CB_CITY_COORDS = {
   "City:london_gb": [51.51, -0.13], "City:manchester_gb": [53.48, -2.24], "City:liverpool_gb": [53.41, -2.98],
   "City:edinburgh_gb": [55.95, -3.19], "City:birmingham_gb": [52.49, -1.89], "City:bristol_gb": [51.45, -2.59],

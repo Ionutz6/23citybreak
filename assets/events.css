@@ -117,3 +117,8 @@ button.pk-day{cursor:pointer}
   .pk-illu img{max-height:22cm;width:auto;max-width:100%}
   a{color:#000}
 }
+/* Vremea orientativă în pachet (assets/event-weather.js) */
+.pk-tag{display:inline-block;margin-left:4px;padding:1px 7px;border-radius:999px;background:#fff4dc;border:1px solid #ecd8b0;color:#79511b;font-size:10.5px;font-weight:700;letter-spacing:.02em;vertical-align:1px}
+.pk-wx .l{align-items:flex-start}
+.pk-wx-src{font-size:11px;margin-top:2px}
+.pk-wx-src a{color:inherit}
