@@ -33,8 +33,11 @@
 .pk{font-family:'Source Sans 3',system-ui,sans-serif;color:#0a0b0d;margin:0;background:#fff}
 .pk h1,.pk h2,.pk h3{font-family:'Space Grotesk',system-ui,sans-serif;letter-spacing:-.02em}
 .pk-wrap{max-width:1240px;margin:auto;padding:0 6%}
-.pk-hero{background:#111211 center/cover;color:#fff;position:relative}
-.pk-hero::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(10,11,13,.93) 0%,rgba(10,11,13,.74) 55%,rgba(10,11,13,.3) 100%)}
+.pk-hero{background:#111211 center/cover no-repeat;color:#fff;position:relative;min-height:300px;display:flex;align-items:flex-end}
+.pk-hero .pk-wrap{width:100%}
+.pk-credit{position:absolute;right:12px;bottom:8px;z-index:2;font-size:11px;color:rgba(255,255,255,.75)!important;text-decoration:none;max-width:60%;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pk-credit:hover{color:#fff!important;text-decoration:underline}
+.pk-hero::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(10,11,13,.85) 0%,rgba(10,11,13,.55) 55%,rgba(10,11,13,.15) 100%),linear-gradient(0deg,rgba(10,11,13,.6) 0%,transparent 60%)}
 .pk-hero .pk-wrap{position:relative;z-index:1;padding-top:44px;padding-bottom:44px}
 .pk-crumb{color:#cbd5e1;font-size:13px}
 .pk-crumb a{color:#dfa649}
@@ -97,6 +100,7 @@ button.pk-day{cursor:pointer}
 .pk-print-only{display:none}
 @media print{
   .cb-header,.site-footer,.pk-side,.pk-box,.pk-pdf,.pk-crumb,.acct-banner,dialog{display:none!important}
+  .pk-credit{display:none!important}
   .pk-print-only{display:block;margin:6px 0 0;font-size:13px;color:#333}
   .pk-hero{background:none!important;color:#000}
   .pk-hero::after{display:none}

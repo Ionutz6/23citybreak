@@ -68,8 +68,10 @@ export function fromTicketmaster(ev: any, city: City, rank: number): EventRow | 
   const attractions: string[] = (ev._embedded?.attractions ?? []).map((a: { name?: string }) => a.name).filter(Boolean);
   const price = (ev.priceRanges ?? []).filter((p: { currency?: string; min?: number }) => p.currency === "EUR" && typeof p.min === "number" && p.min > 0)
     .map((p: { min: number }) => p.min).sort((a: number, b: number) => a - b)[0] ?? null;
-  const img = (ev.images ?? []).filter((i: { ratio?: string; width?: number }) => i.ratio === "16_9" && (i.width ?? 0) >= 600)
-    .sort((a: { width: number }, b: { width: number }) => a.width - b.width)[0]?.url;
+  // Cea mai mare imagine 16:9 (pentru bannerul paginii de pachet). La sport nu luăm imagini: materialele oficiale
+  // ale echipelor și ligilor nu sunt licențiate implicit (FAQ Ticketmaster, „official artist/team/rightsholder creative”).
+  const img = kind === "football" || kind === "sport" ? null : (ev.images ?? []).filter((i: { ratio?: string; width?: number }) => i.ratio === "16_9" && (i.width ?? 0) >= 600)
+    .sort((a: { width: number }, b: { width: number }) => b.width - a.width)[0]?.url;
   // start.dateTime e UTC; fără oră folosim amiaza locală ca să nu sară ziua la conversii.
   const startsAt = !noTime && start.dateTime ? new Date(start.dateTime).toISOString() : `${start.localDate}T11:00:00.000Z`;
   return {

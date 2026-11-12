@@ -8,7 +8,7 @@ const tm = (over: Record<string, unknown> = {}) => ({
   dates: { start: { localDate: "2027-06-12", localTime: "20:00:00", dateTime: "2027-06-12T18:00:00Z" }, status: { code: "onsale" } },
   classifications: [{ primary: true, segment: { name: "Music" }, genre: { name: "Rock" } }],
   priceRanges: [{ currency: "EUR", min: 115, max: 300 }],
-  images: [{ ratio: "16_9", width: 1024, url: "https://s1.ticketm.net/a.jpg" }, { ratio: "3_2", width: 640, url: "https://s1.ticketm.net/b.jpg" }],
+  images: [{ ratio: "16_9", width: 1024, url: "https://s1.ticketm.net/a.jpg" }, { ratio: "16_9", width: 2048, url: "https://s1.ticketm.net/big.jpg" }, { ratio: "3_2", width: 3000, url: "https://s1.ticketm.net/b.jpg" }],
   _embedded: { venues: [{ name: "Ernst-Happel-Stadion" }], attractions: [{ name: "Trupă Test" }] },
   ...over,
 });
@@ -37,7 +37,7 @@ test("Ticketmaster: concert de sâmbătă", () => {
   assert.equal(r.city_id, "vienna_at");
   assert.equal(r.starts_at, "2027-06-12T18:00:00.000Z");
   assert.equal(r.price_min_eur, 115);
-  assert.equal(r.image_url, "https://s1.ticketm.net/a.jpg");
+  assert.equal(r.image_url, "https://s1.ticketm.net/big.jpg");
   assert.deepEqual(r.genres, ["Rock"]);
   assert.equal(r.time_tbc, false);
 });
@@ -55,6 +55,12 @@ test("Ticketmaster: preț în altă monedă nu e convertit, link http respins", 
   const r = fromTicketmaster(tm({ priceRanges: [{ currency: "GBP", min: 50 }], url: "http://x.test/e" }), vienna, 0)!;
   assert.equal(r.price_min_eur, null);
   assert.equal(r.ticket_url, null);
+});
+
+test("Ticketmaster: la sport nu se iau imagini (materiale oficiale ale echipelor)", () => {
+  const r = fromTicketmaster(tm({ classifications: [{ primary: true, segment: { name: "Sports" }, genre: { name: "Basketball" } }] }), vienna, 0)!;
+  assert.equal(r.kind, "sport");
+  assert.equal(r.image_url, null);
 });
 
 test("cityOfTeam: potrivire pe cuvinte, fără diacritice", () => {

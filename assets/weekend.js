@@ -64,16 +64,17 @@
 
   // ---------- Randare ----------
   const illu = H.guideImage(slug);
+  let photo = null; // imaginea evenimentului sau fotografia orașului; se încarcă în paralel cu prima randare
   function render() {
     const nights = Math.round((new Date(trip.back) - new Date(trip.out)) / 864e5);
     const custom = trip.mode === 'custom';
     root.innerHTML = `
-      <section class="pk-hero"${illu || ev.image_url ? ` style="background-image:url('${esc(illu || ev.image_url)}')"` : ''}><div class="pk-wrap">
+      <section class="pk-hero"><div class="pk-wrap">
         <div class="pk-crumb"><a href="./#events-home">Evenimente</a> / ${esc(kindName)} / ${esc(name)}</div>
         <h1>${multi ? esc(ev.title) + ' · ' + esc(name) : `Weekend la ${esc(name)}: ${esc(ev.title)}`}</h1>
         <p class="pk-sub">${icon} ${ev.venue ? esc(ev.venue) + ' · ' : ''}${esc(H.whenLabel(ev))}</p>
         <p class="pk-print-only">Zbor ${esc(origin)} ⇄ ${esc(iata || name)}: ${esc(H.shortDate(trip.out))} → ${esc(H.shortDate(trip.back))} · 23citybreak.ro</p>
-      </div></section>
+      </div>${photo?.credit ? (photo.creditUrl ? `<a class="pk-credit" href="${esc(photo.creditUrl)}" target="_blank" rel="noopener noreferrer">${esc(photo.credit)}</a>` : `<span class="pk-credit">${esc(photo.credit)}</span>`) : ''}</section>
       <div class="pk-wrap pk-grid">
         <div>
           <div class="pk-box">
@@ -110,6 +111,7 @@
         </aside>
       </div>`;
     document.title = `${ev.title} · ${name} · 23citybreak`;
+    E.setBg(root.querySelector('.pk-hero'), photo);
   }
 
   // Itinerarul ca PDF: doar cu cont. Fără cont deschidem loginul; linkul din email revine aici cu ?pdf=1.
@@ -137,6 +139,7 @@
     render(); root.querySelector(`[data-day="${d}"]`)?.focus();
   });
   render();
+  E.eventPhoto(ev).then(p => { if (p) { photo = p; render(); } });
   window.addEventListener('account:change', render);
   // Întoarcere din linkul de login cerut pentru PDF.
   if (new URLSearchParams(location.search).has('pdf') && window.Account) {
