@@ -57,9 +57,12 @@ Se adaugă numele obiectivelor direct pe hărțile existente, în stilul aprobat
 - Catania
 - Málaga
 - München
+- Rotterdam
 
 Harta originală pentru Praga avea deja etichete. Toate ilustrațiile existente din `assets/guides-prague-style/` au fost verificate și actualizate.
 
 Ilustrațiile fără etichete sunt păstrate în istoricul Git: pentru Roma și Barcelona folosește fișierul de la commitul `14f016a`, iar pentru Paris, Londra, Lisabona, Berlin și Bruxelles de la `508e691`. Pentru Budapesta, Atena, Veneția, Amsterdam, Viena, Milano, Madrid, Bologna, Lyon, Porto, Varșovia, Copenhaga, Edinburgh, Bruges, Köln, Dublin, Cracovia, Stockholm, Chișinău, Bratislava, Sofia, Oslo, Bari, Napoli, Sevilla, Istanbul, Dubrovnik, Palermo, Pisa, Florența, Valencia, Nisa, Marsilia, Glasgow, Helsinki, Riga, Tallinn, Vilnius, Ljubljana, Split, Salonic, Zürich, Belgrad, Bordeaux, Catania, Málaga și München se pot folosi originalele de la `48efdd5`. Copii locale sunt în `/workspace/guide-batch/original-illustrations` când acel director este disponibil. Păstrează imaginile originale pentru quiz.
 
 Nu modifica funcționalitatea de căutare a zborurilor în cadrul acestei activități.
+
+Rotterdam: originalul fără etichete este `ilustratii-orase/rotterdam_nl.webp`, iar versiunea pentru ghid este `assets/guides-prague-style/rotterdam.webp`.
