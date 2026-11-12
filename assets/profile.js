@@ -36,7 +36,7 @@
       el('p', 'acct-lead', 'Fă-ți un cont gratuit și 23citybreak începe să caute pentru tine: zboruri din aeroportul tău, în bugetul tău, și evenimentele care chiar te interesează, cu weekendul pus cap la cap.'));
     const perks = el('ul', 'acct-perks');
     for (const [icon, title, text] of [
-      ['✈︎', 'Zborurile tale, primele', 'Aeroportul de plecare, bugetul și vremea preferată se aplică singure la fiecare căutare, pe orice dispozitiv.'],
+      ['✈︎', 'Zborurile tale, primele', 'Aeroportul de plecare, bugetul și moneda se aplică singure la fiecare căutare, pe orice dispozitiv.'],
       ['⚽', 'Evenimente pe gustul tău', 'Spune-ne ce echipe, artiști și festivaluri urmărești. Când apare ceva într-un weekend, ai pachetul gata făcut: bilet, zbor, cazare.'],
       ['✉︎', 'Noutăți doar despre ce te interesează', 'Zboruri ieftine de weekend și evenimentele tale, pe email, doar dacă bifezi newsletterul. Te dezabonezi dintr-un click.'],
       ['🗺', 'Europa văzută prin ochii tăi', 'Bifezi orașele în care ai fost, îți salvezi scorul la quiz și descarci itinerariile în PDF.'],
