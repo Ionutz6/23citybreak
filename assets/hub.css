@@ -24,3 +24,5 @@
 .quiz-been{border:1px solid #e5e2d9;border-radius:8px;background:#fff;font:700 12px var(--font-display);padding:0 10px;cursor:pointer;color:#555b50;white-space:nowrap}
 .quiz-been:hover{border-color:#22a04b}.quiz-been.is-on{background:#e6f4ea;border-color:#22a04b;color:#16692f}
 @media(max-width:800px){.hub-stats{grid-template-columns:1fr}.hub-login{flex-direction:column;align-items:stretch}.hub-login .hub-btn{justify-content:center}}
+/* Textul de sub titlu ocupă toată lățimea conținutului (preferința lui Alex, valabilă pe toate paginile). */
+.hub-hero .intro,.hub-section>.hub-lead{max-width:none}
