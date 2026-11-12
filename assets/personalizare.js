@@ -1,8 +1,9 @@
-// Căutare personalizată (faza C): preferințe, filtru „oraș nou sau oricare”, temperatură la destinație
-// (Open-Meteo) și reminder lunar pentru orașele căutate dar nemarcate ca văzute.
+// Căutare personalizată (faza C): preferințe, filtru „oraș nou sau oricare” și reminder lunar
+// pentru orașele căutate dar nemarcate ca văzute. (Filtrul de temperatură a fost scos pe 2026-11-12;
+// vremea orientativă apare acum doar pe paginile de pachet, vezi assets/event-weather.js.)
 //
 // Interfața publică: window.CBPersonal
-//   prefs()            → { departure_airports:[IATA], budget_max_eur, temp_min_c, temp_max_c, city_mode, currency:'EUR'|'RON' }
+//   prefs()            → { departure_airports:[IATA], budget_max_eur, city_mode, currency:'EUR'|'RON' }
 //   visited()          → Set de sluguri Kiwi fără „City:” (ex. prague_cz)
 //   savePrefs(patch)   → salvează local (și în cont, dacă există sesiune)
 //   markVisited(slugs, source)
@@ -14,8 +15,11 @@
 // altfel localStorage. Schema e cea din supabase/SCHEMA.md (branchul cont-profil).
 // Nu face nicio cerere suplimentară la Kiwi.
 (() => {
-  const K = { prefs: '23cb-prefs', visited: '23cb-visited', searched: '23cb-searched', reminder: '23cb-visited-reminder', wx: '23cb-weather-v1', geo: '23cb-geo-v1' };
-  const DEFAULTS = { departure_airports: [], budget_max_eur: null, temp_min_c: null, temp_max_c: null, city_mode: 'any', currency: 'EUR' };
+  const K = { prefs: '23cb-prefs', visited: '23cb-visited', searched: '23cb-searched', reminder: '23cb-visited-reminder' };
+  // Cache-urile vechi de temperatură (Open-Meteo) nu mai sunt folosite.
+  try { localStorage.removeItem('23cb-weather-v1'); localStorage.removeItem('23cb-geo-v1'); } catch {}
+  // temp_min_c / temp_max_c rămân în tabela search_preferences (date vechi), dar nu mai sunt citite sau scrise.
+  const DEFAULTS = { departure_airports: [], budget_max_eur: null, city_mode: 'any', currency: 'EUR' };
   const DAY = 864e5, REMIND_EVERY = 30 * DAY, MIN_AGE = 3 * DAY;
   const store = {
     get: (k, d) => { try { const v = JSON.parse(localStorage.getItem(k)); return v ?? d; } catch { return d; } },
@@ -28,7 +32,8 @@
   const cityName = slug => cities().find(c => slugOf(c.id) === slug)?.name || slug.split('_')[0].replace(/-/g, ' ');
 
   // ---------- Sursa preferințelor ----------
-  let prefs = { ...DEFAULTS, ...store.get(K.prefs, {}) };
+  const pick = r => Object.fromEntries(Object.keys(DEFAULTS).filter(k => k in r).map(k => [k, r[k]]));
+  let prefs = { ...DEFAULTS, ...pick(store.get(K.prefs, {}) || {}) };
   let visited = new Set(store.get(K.visited, []));
   const account = () => (window.Account && typeof window.Account.hasSession === 'function' && window.Account.hasSession()) ? window.Account : null;
 
@@ -75,7 +80,6 @@
       return true;
     } catch (e) { console.warn('Preferințele din cont nu au putut fi citite:', e?.message || e); return false; }
   }
-  const pick = r => Object.fromEntries(Object.keys(DEFAULTS).filter(k => k in r).map(k => [k, r[k]]));
   const missingCurrencyCol = e => !!e && /currency/i.test(`${e.message || ''} ${e.details || ''}`) && /column|schema/i.test(e.message || '');
   async function upsertPrefs(sb, row) {
     let res = await sb.from('search_preferences').upsert(row);
@@ -185,21 +189,16 @@
   });
 
   // ---------- „Profilul meu” pe prima pagină ----------
-  // Rezumatul preferințelor (plecare, buget, ce orașe, vreme) deasupra căutării + editorul lor.
-  // Tipul de oraș și temperatura nu se mai aleg la fiecare căutare: vin din profil și se aplică la toate căutările.
-  const profileRange = () => (prefs.temp_min_c != null || prefs.temp_max_c != null) ? [prefs.temp_min_c ?? -30, prefs.temp_max_c ?? 45] : null;
-  const fmtRange = r => r[0] <= -30 ? `sub ${r[1]}°C` : r[1] >= 45 ? `peste ${r[0]}°C` : `${r[0]}–${r[1]}°C`;
-  const TEMP_NAMES = { '-30,15': 'Răcoare', '15,25': 'Plăcut', '25,45': 'Cald' };
+  // Rezumatul preferințelor (plecare, buget, ce orașe) deasupra căutării + editorul lor.
+  // Tipul de oraș nu se mai alege la fiecare căutare: vine din profil și se aplică la toate căutările.
   const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
 
   function profileSummary() {
     const favs = (prefs.departure_airports || []).map(s => String(s).toUpperCase());
-    const r = profileRange();
     return [
       { k: 'air', label: 'Plecare', value: favs.length ? favs.join(', ') : 'alegi la căutare' },
       { k: 'budget', label: 'Buget / persoană', value: prefs.budget_max_eur == null ? 'fără limită' : prefs.currency === 'RON' ? `până la ~${new Intl.NumberFormat('ro-RO').format(Math.round(prefs.budget_max_eur * 5 / 50) * 50)} RON` : `până la ${prefs.budget_max_eur} €`, sub: prefs.currency === 'RON' ? 'prețuri în lei (curs BCE)' : 'prețuri în euro' },
       { k: 'mode', label: 'Ce orașe', value: prefs.city_mode === 'new' ? 'doar orașe noi' : 'oricare', sub: visited.size ? plural(visited.size, 'oraș văzut', 'orașe văzute') : 'niciun oraș marcat ca văzut' },
-      { k: 'temp', label: 'Vremea la destinație', value: r ? `${TEMP_NAMES[r.join(',')] ? TEMP_NAMES[r.join(',')] + ' · ' : ''}${fmtRange(r)}` : 'oricum', sub: r ? 'max. zilnică' : '' },
     ];
   }
 
@@ -252,7 +251,7 @@
   }
   document.addEventListener('click', e => { if (e.target.closest('[data-pz-open]')) { e.preventDefault(); $('pz-profile')?.scrollIntoView({ behavior: 'smooth', block: 'start' }); if (!$('pz-prefs')) togglePrefsPanel(e.target.closest('[data-pz-open]').dataset.pzOpen); } });
 
-  const GROUP_INDEX = { air: 0, currency: 1, budget: 2, temp: 3, mode: 4 }; // ordinea din Account.prefsForm
+  const GROUP_INDEX = { air: 0, currency: 1, budget: 2, mode: 3 }; // ordinea din Account.prefsForm
   function focusGroup(k) {
     const g = $('pz-prefs')?.querySelectorAll('.acct-group, fieldset')[GROUP_INDEX[k] ?? 0];
     g?.querySelector('button, input, select')?.focus({ preventScroll: true });
@@ -285,7 +284,6 @@
       await savePrefs({
         departure_airports: v.departure_airports,
         budget_max_eur: v.budget_max_eur,
-        temp_min_c: v.temp_min_c, temp_max_c: v.temp_max_c,
         city_mode: v.city_mode === 'new' ? 'new' : 'any',
         currency: v.currency === 'RON' ? 'RON' : 'EUR',
       });
@@ -301,40 +299,15 @@
     return c ? slugOf(c.id) : '';
   };
 
-  let lastHidden = { visited: 0, temp: 0 };
+  let lastHidden = { visited: 0 };
   function filterRows(rows, weekends, destVal) {
     const mode = prefs.city_mode || 'any';
-    const range = profileRange();
-    let hiddenVisited = 0, hiddenTemp = 0;
+    let hiddenVisited = 0;
     let out = rows;
     if (mode === 'new' && destVal === 'any' && visited.size) {
       out = out.filter(r => { const v = visited.has(rowSlug(r)); if (v) hiddenVisited++; return !v; });
     }
-    if (range) {
-      const missing = [];
-      out = out.map(r => {
-        const slug = rowSlug(r);
-        const cells = {};
-        let changed = false;
-        for (const [wkId, cell] of Object.entries(r.cellsMap || {})) {
-          const wk = weekends.find(w => w.id === wkId);
-          const t = wk ? weatherFor(slug, r, wk, missing) : null;
-          if (t && (t.value < range[0] || t.value > range[1])) { changed = true; continue; }
-          cells[wkId] = cell;
-        }
-        if (!changed) return r;
-        if (!Object.keys(cells).length) { hiddenTemp++; return null; }
-        return { ...r, cellsMap: cells };
-      }).filter(Boolean);
-      if (missing.length) queueWeather(missing);
-    } else if (out.length) {
-      // Fără filtru, cerem totuși temperaturile pentru afișarea pe carduri.
-      const missing = [];
-      out.forEach(r => Object.keys(r.cellsMap || {}).forEach(wkId => { const wk = weekends.find(w => w.id === wkId); if (wk) weatherFor(rowSlug(r), r, wk, missing); }));
-      if (missing.length) queueWeather(missing);
-    }
-    lastHidden = { visited: hiddenVisited, temp: hiddenTemp };
-    lastWeekends = weekends;
+    lastHidden = { visited: hiddenVisited };
     showNote(destVal);
     return out;
   }
@@ -344,149 +317,18 @@
     if (!note) return;
     const parts = [];
     if (lastHidden.visited) parts.push(`${lastHidden.visited} ${lastHidden.visited === 1 ? 'oraș deja văzut ascuns' : 'orașe deja văzute ascunse'}`);
-    if (lastHidden.temp) parts.push(`${lastHidden.temp} ${lastHidden.temp === 1 ? 'oraș ascuns' : 'orașe ascunse'} după temperatură`);
     const sel = typeof selectedCityObj !== 'undefined' ? selectedCityObj : null;
     if (destVal && destVal !== 'any' && visited.has(slugOf(destVal))) parts.push(`ai mai fost în ${sel?.name || cityName(slugOf(destVal))}`);
-    if (weatherPending) parts.push('verificăm temperaturile…');
-    const filtered = lastHidden.visited || lastHidden.temp;
+    const filtered = lastHidden.visited;
     note.innerHTML = parts.length ? esc(parts.join(' · ')) + (filtered ? ' · <button type="button" class="pz-inline-link" data-pz-open="mode">schimbă în Profilul meu</button>' : '') : '';
     note.hidden = !parts.length;
   }
 
-  // ---------- Temperatură (Open-Meteo) ----------
-  let wx = store.get(K.wx, {});
-  let geo = store.get(K.geo, {});
-  let weatherPending = false, lastWeekends = [];
-  const isoAdd = (iso, d) => { const t = new Date(iso + 'T12:00:00Z'); t.setUTCDate(t.getUTCDate() + d); return t.toISOString().slice(0, 10); };
-  const shiftYears = (iso, y) => `${Number(iso.slice(0, 4)) - y}${iso.slice(4)}`.replace(/-02-29$/, '-02-28');
-  const todayIso = () => new Date().toISOString().slice(0, 10);
-  const tripDays = wk => {
-    const d = typeof getTripDates === 'function' ? getTripDates(wk) : { dateOut: wk.fri, dateIn: wk.sun };
-    const days = [];
-    for (let x = d.dateOut; x <= d.dateIn && days.length < 12; x = isoAdd(x, 1)) days.push(x);
-    return days;
-  };
-  const coordsFor = (slug, row) => {
-    const c = window.CB_CITY_COORDS?.[`City:${slug}`] || geo[slug];
-    if (c) return c;
-    if (row?.city && !(slug in geo)) geocodeQueue.set(slug, row.city);
-    return null;
-  };
-
-  // Returnează {value, source} din cache sau adaugă cererea în `missing`.
-  function weatherFor(slug, row, wk, missing) {
-    if (!slug) return null;
-    const days = tripDays(wk);
-    const key = `${slug}|${days[0]}|${days[days.length - 1]}`;
-    const hit = wx[key];
-    if (hit && hit.exp > Date.now()) return hit;
-    const ll = coordsFor(slug, row);
-    if (ll) missing.push({ key, slug, ll, days });
-    return null;
-  }
-
-  const geocodeQueue = new Map();
-  let queued = new Map(), timer = null;
-  function queueWeather(items) {
-    items.forEach(i => queued.set(i.key, i));
-    if (!timer) timer = setTimeout(flushWeather, 150);
-    weatherPending = true;
-  }
-
-  async function geocodeMissing() {
-    const jobs = [...geocodeQueue].slice(0, 8);
-    geocodeQueue.clear();
-    await Promise.all(jobs.map(async ([slug, name]) => {
-      try {
-        const cc = slug.split('_')[1]?.toUpperCase();
-        const q = String(name).split(/[\/(]/)[0].trim();
-        const res = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(q)}&count=5&language=ro`, { signal: AbortSignal.timeout(8000) });
-        const json = await res.json();
-        const m = (json.results || []).find(r => !cc || r.country_code === cc) || null;
-        geo[slug] = m ? [Math.round(m.latitude * 100) / 100, Math.round(m.longitude * 100) / 100] : null;
-      } catch { /* încercăm din nou la următoarea vizită */ }
-    }));
-    store.set(K.geo, geo);
-  }
-
-  async function flushWeather() {
-    timer = null;
-    if (geocodeQueue.size) await geocodeMissing();
-    const items = [...queued.values()];
-    queued = new Map();
-    if (!items.length) { weatherPending = false; rerender(); return; }
-    const today = todayIso(), forecastEnd = isoAdd(today, 15), archiveEnd = isoAdd(today, -6);
-    const fc = items.filter(i => i.days[i.days.length - 1] <= forecastEnd && i.days[0] >= today);
-    const cl = items.filter(i => !fc.includes(i));
-    try {
-      await Promise.all([fetchForecast(fc, today, forecastEnd), fetchClimate(cl, archiveEnd)]);
-    } catch (e) { console.warn('Open-Meteo nu a răspuns:', e?.message || e); }
-    store.set(K.wx, pruneWx(wx));
-    weatherPending = queued.size > 0;
-    rerender();
-  }
-
-  const byLocation = items => {
-    const m = new Map();
-    items.forEach(i => { const k = i.ll.join(','); if (!m.has(k)) m.set(k, { ll: i.ll, items: [] }); m.get(k).items.push(i); });
-    return [...m.values()];
-  };
-  const chunks = (arr, n) => Array.from({ length: Math.ceil(arr.length / n) }, (_, i) => arr.slice(i * n, i * n + n));
-  async function multiFetch(base, locs, start, end) {
-    const url = `${base}?latitude=${locs.map(l => l.ll[0]).join(',')}&longitude=${locs.map(l => l.ll[1]).join(',')}&start_date=${start}&end_date=${end}&daily=temperature_2m_max&timezone=auto`;
-    const res = await fetch(url, { signal: AbortSignal.timeout(15000) });
-    if (!res.ok) throw new Error(`Open-Meteo HTTP ${res.status}`);
-    const json = await res.json();
-    return Array.isArray(json) ? json : [json];
-  }
-  const avg = a => a.length ? a.reduce((s, x) => s + x, 0) / a.length : null;
-
-  async function fetchForecast(items, start, end) {
-    if (!items.length) return;
-    for (const group of chunks(byLocation(items), 40)) {
-      const data = await multiFetch('https://api.open-meteo.com/v1/forecast', group, start, end);
-      group.forEach((loc, idx) => {
-        const d = data[idx]?.daily; if (!d) return;
-        const map = Object.fromEntries(d.time.map((t, i) => [t, d.temperature_2m_max[i]]));
-        loc.items.forEach(it => {
-          const v = avg(it.days.map(x => map[x]).filter(Number.isFinite));
-          if (v != null) wx[it.key] = { value: Math.round(v), source: 'prognoză', exp: Date.now() + 6 * 3600e3 };
-        });
-      });
-    }
-  }
-
-  // Pentru weekendurile de peste 16 zile: media temperaturii maxime în aceleași zile din ultimii 2 ani.
-  async function fetchClimate(items, archiveEnd) {
-    if (!items.length) return;
-    const wanted = items.flatMap(i => i.days.flatMap(d => [shiftYears(d, 1), shiftYears(d, 2)])).filter(d => d <= archiveEnd).sort();
-    if (!wanted.length) return;
-    const start = wanted[0], end = wanted[wanted.length - 1];
-    for (const group of chunks(byLocation(items), 25)) {
-      const data = await multiFetch('https://archive-api.open-meteo.com/v1/archive', group, start, end);
-      group.forEach((loc, idx) => {
-        const d = data[idx]?.daily; if (!d) return;
-        const map = Object.fromEntries(d.time.map((t, i) => [t, d.temperature_2m_max[i]]));
-        loc.items.forEach(it => {
-          const v = avg(it.days.flatMap(x => [map[shiftYears(x, 1)], map[shiftYears(x, 2)]]).filter(Number.isFinite));
-          if (v != null) wx[it.key] = { value: Math.round(v), source: 'media ultimilor 2 ani', exp: Date.now() + 30 * DAY };
-        });
-      });
-    }
-  }
-  const pruneWx = o => Object.fromEntries(Object.entries(o).filter(([, v]) => v.exp > Date.now()).slice(-3000));
-
-  // ---------- Carduri: temperatură + „văzut” ----------
+  // ---------- Carduri: „văzut” ----------
   function decorateCards(grid) {
     grid.querySelectorAll('[data-city-id]').forEach(card => {
       const slug = slugOf(card.dataset.cityId);
-      const wk = lastWeekends.find(w => w.id === card.dataset.wkId);
       const bits = [];
-      if (wk && slug) {
-        const days = tripDays(wk);
-        const t = wx[`${slug}|${days[0]}|${days[days.length - 1]}`];
-        if (t) bits.push(`<span class="pz-badge" title="Temperatura maximă, ${esc(t.source)}">${t.value >= 20 ? '☀' : t.value >= 10 ? '⛅' : '❄'} ~${t.value}°C</span>`);
-      }
       if (slug && visited.has(slug)) bits.push('<span class="pz-badge pz-seen">✓ Văzut</span>');
       card.querySelector('.pz-badges')?.remove();
       if (!bits.length) return;

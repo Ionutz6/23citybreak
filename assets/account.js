@@ -21,11 +21,9 @@
   // Bugetul se salvează mereu în EUR; în RON afișăm o valoare orientativă (≈5 lei/€, rotunjit la 50), ca în căutare.
   const budgetLabel = (v, cur) => v == null ? 'fără limită' : cur === 'RON' ? `până la ~${new Intl.NumberFormat('ro-RO').format(Math.round(v * 5 / 50) * 50)} RON` : `până la ${v} €`;
   const CURRENCIES = [['EUR', 'Euro (€)'], ['RON', 'Lei (RON)']];
-  const TEMPS = [
-    ['cool', 'Răcoare', 'sub 15°C', null, 15], ['mild', 'Plăcut', '15–25°C', 15, 25],
-    ['warm', 'Cald', 'peste 25°C', 25, null], ['any', 'Oricum', 'nu contează', null, null],
-  ];
-  const DEFAULT_PREFS = {departure_airports: [], budget_max_eur: null, temp_min_c: null, temp_max_c: null, city_mode: 'any', currency: 'EUR'};
+  // temp_min_c / temp_max_c (vremea dorită) au fost scoase din preferințe pe 2026-11-12: coloanele rămân
+  // în search_preferences pentru datele vechi, dar nu le mai citim și nu le mai scriem (upsert fără ele le lasă neatinse).
+  const DEFAULT_PREFS = {departure_airports: [], budget_max_eur: null, city_mode: 'any', currency: 'EUR'};
   const pickPrefs = r => Object.fromEntries(Object.keys(DEFAULT_PREFS).filter(k => r && k in r && r[k] !== undefined).map(k => [k, r[k]]));
   // Coloana currency vine dintr-o migrare separată (20261112_moneda.sql). Până e rulată, salvăm fără ea.
   const missingCurrencyCol = e => !!e && /currency/i.test(`${e.message || ''} ${e.details || ''}`) && /column|schema/i.test(e.message || '');
@@ -205,13 +203,10 @@
     const relabelBudgets = () => [...g2.querySelectorAll('.acct-chip > span')].forEach((s, i) => { s.textContent = budgetLabel(BUDGETS[i], state.currency); });
     const g5 = single('În ce monedă vezi prețurile?', 'Kiwi dă prețurile în EUR; în RON le convertim cu cursul BCE al zilei.', CURRENCIES.map(([v, label]) => ({v, label})),
       it => it.v === state.currency, it => { state.currency = it.v; relabelBudgets(); });
-    const tempKey = (TEMPS.find(t => t[3] === state.temp_min_c && t[4] === state.temp_max_c) || TEMPS[3])[0];
-    const g3 = single('Ce vreme îți place la destinație?', null, TEMPS.map(([k, label, sub, min, max]) => ({k, label, sub, min, max})),
-      it => it.k === tempKey, it => { state.temp_min_c = it.min; state.temp_max_c = it.max; });
     const g4 = single('Ce orașe să-ți arătăm?', 'Se aplică la toate căutările. Schimbi oricând din Profilul meu.', [{v: 'new', label: 'Doar orașe noi', sub: 'pe care nu le-am văzut'}, {v: 'any', label: 'Oricare', sub: 'inclusiv cele văzute'}],
       it => it.v === state.city_mode, it => { state.city_mode = it.v; });
 
-    node.append(g1, g5, g2, g3, g4);
+    node.append(g1, g5, g2, g4);
     return {node, read: () => ({...state})};
   }
 
@@ -326,7 +321,7 @@
     if (!(await needsOnboarding().catch(() => false))) return;
     const bar = el('aside', 'acct-banner'); bar.setAttribute('aria-label', 'Configurează-ți contul');
     const text = el('div', 'acct-banner-text');
-    text.append(el('strong', null, 'Spune-ne cum îți place să călătorești'), el('span', null, 'Aeroporturi, buget, vreme și orașele deja văzute. Durează un minut.'));
+    text.append(el('strong', null, 'Spune-ne cum îți place să călătorești'), el('span', null, 'Aeroporturi, buget și orașele deja văzute. Durează un minut.'));
     const go = el('a', 'acct-primary', 'Configurează contul →'); go.href = PROFILE_URL;
     const close = el('button', 'acct-close', '×'); close.type = 'button'; close.setAttribute('aria-label', 'Închide');
     close.addEventListener('click', () => bar.remove());
