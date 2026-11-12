@@ -190,7 +190,7 @@
     const tempKey = (TEMPS.find(t => t[3] === state.temp_min_c && t[4] === state.temp_max_c) || TEMPS[3])[0];
     const g3 = single('Ce vreme îți place la destinație?', null, TEMPS.map(([k, label, sub, min, max]) => ({k, label, sub, min, max})),
       it => it.k === tempKey, it => { state.temp_min_c = it.min; state.temp_max_c = it.max; });
-    const g4 = single('Ce orașe să-ți arătăm?', 'Poți schimba la fiecare căutare.', [{v: 'new', label: 'Doar orașe noi', sub: 'pe care nu le-am văzut'}, {v: 'any', label: 'Oricare', sub: 'inclusiv cele văzute'}],
+    const g4 = single('Ce orașe să-ți arătăm?', 'Se aplică la toate căutările. Schimbi oricând din Profilul meu.', [{v: 'new', label: 'Doar orașe noi', sub: 'pe care nu le-am văzut'}, {v: 'any', label: 'Oricare', sub: 'inclusiv cele văzute'}],
       it => it.v === state.city_mode, it => { state.city_mode = it.v; });
 
     node.append(g1, g2, g3, g4);
