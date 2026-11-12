@@ -75,14 +75,13 @@
     return c;
   }
 
-  // Cât de complet e profilul: 4 lucruri care schimbă ce îi arătăm userului.
+  // Cât de complet e profilul: 3 lucruri care schimbă ce îi arătăm userului.
   function completeness(prefs) {
     let ev = null; try { ev = JSON.parse(localStorage.getItem('23cb-event-prefs')); } catch {}
     const hasEv = !!ev && ['music_genres', 'sports', 'competitions', 'other_interests', 'favorite_teams', 'favorite_artists'].some(k => ev[k]?.length);
     const items = [
       ['De unde pleci', !!prefs.departure_airports?.length, '#preferinte'],
       ['Bugetul pentru zbor', prefs.budget_max_eur != null, '#preferinte'],
-      ['Vremea preferată', prefs.temp_min_c != null || prefs.temp_max_c != null, '#preferinte'],
       ['Ce evenimente urmărești', hasEv, '#interese'],
     ];
     const done = items.filter(x => x[1]).length;
@@ -157,7 +156,7 @@
     const prefs = await A.preferences().catch(() => ({}));
     const head = el('div', 'acct-hello');
     head.append(el('span', 'acct-kicker', 'CONTUL TĂU'), greeting(), el('p', 'acct-intro', user.email),
-      el('p', 'acct-lead', 'Cu cât îți completezi profilul mai exact, cu atât 23citybreak lucrează mai mult pentru tine. Zborurile din aeroportul tău și din bugetul tău apar primele, vremea pe care o preferi filtrează destinațiile, iar meciurile, concertele și festivalurile pe care le urmărești vin cu pachetul de weekend gata făcut. Durează două minute și le schimbi oricând.'),
+      el('p', 'acct-lead', 'Cu cât îți completezi profilul mai exact, cu atât 23citybreak lucrează mai mult pentru tine. Zborurile din aeroportul tău și din bugetul tău apar primele, iar meciurile, concertele și festivalurile pe care le urmărești vin cu pachetul de weekend gata făcut. Durează două minute și le schimbi oricând.'),
       completeness(prefs));
     const grid = el('div', 'acct-grid');
     main.replaceChildren(head, grid);

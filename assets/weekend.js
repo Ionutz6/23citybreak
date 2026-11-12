@@ -35,7 +35,11 @@
   const sky = d => d.slice(2).replace(/-/g, '');
   const flightUrl = () => iata ? `https://www.kiwi.com/deep?${new URLSearchParams({ from: origin, to: iata, departure: trip.out, return: trip.back, adults: '1', currency: 'EUR', lang: 'ro' })}` : 'https://www.kiwi.com/ro/';
   const skyUrl = () => iata ? `https://www.skyscanner.ro/transport/flights/${origin.toLowerCase()}/${iata.toLowerCase()}/${sky(trip.out)}/${sky(trip.back)}/?adultsv2=1&cabinclass=economy` : '';
-  const stayUrl = () => `https://www.booking.com/searchresults.html?${new URLSearchParams({ ss: `${ev.venue ? `${ev.venue}, ` : ''}${name}`, checkin: trip.out, checkout: trip.back, group_adults: '2', no_rooms: '1' })}`;
+  // Cazarea: căutare pe oraș (nu pe sala evenimentului), cu datele alese. Numele englezesc din slug-ul Kiwi
+  // (ex. vienna_at → „Vienna”) e recunoscut sigur și de Booking, și de Airbnb.
+  const stayCity = String(slug).split('_')[0].replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+  const stayUrl = () => `https://www.booking.com/searchresults.html?${new URLSearchParams({ ss: stayCity, checkin: trip.out, checkout: trip.back, group_adults: '2', no_rooms: '1' })}`;
+  const airbnbUrl = () => `https://www.airbnb.com/s/${encodeURIComponent(stayCity)}/homes?${new URLSearchParams({ checkin: trip.out, checkout: trip.back, adults: '2' })}`;
   const ticketUrl = ev.ticket_url || `https://www.google.com/search?${new URLSearchParams({ q: ev.kind === 'football' && ev.teams?.[0] ? `${ev.teams[0]} official tickets` : `${ev.title} ${name} tickets` })}`;
   const ticketLabel = ev.ticket_url ? (ev.kind === 'city_festival' || ev.kind === 'market' ? 'Vezi programul oficial' : 'Cumpără bilet la eveniment') : (ev.kind === 'football' ? 'Caută bilete pe site-ul clubului' : 'Caută bilete la eveniment');
   const mapsPlace = q => `https://www.google.com/maps/search/?${new URLSearchParams({ api: '1', query: q })}`;
@@ -78,6 +82,13 @@
     });
   }
   let photo = null; // imaginea evenimentului sau fotografia orașului; se încarcă în paralel cu prima randare
+  let wx = null; // vremea tipică în luna evenimentului (assets/event-weather.js), orientativ
+  const wxRow = () => {
+    if (!wx) return '';
+    const ico = wx.hi >= 22 ? '☀️' : wx.hi >= 12 ? '⛅' : wx.hi >= 5 ? '🌥️' : '❄️';
+    const rain = wx.wet == null ? '' : ` · ploaie în ~${wx.wet} ${wx.wet === 1 ? 'zi' : 'zile'} din 10`;
+    return `<div class="pk-row pk-wx"><div class="l"><div class="pk-ico">${ico}</div><div><div class="t">Vremea în ${esc(wx.month)} <span class="pk-tag">orientativ</span></div><div class="s">ziua ~${wx.hi}°C · noaptea ~${wx.lo}°C${rain}</div><div class="s pk-wx-src">Media lunii în ultimii ${wx.years} ${wx.years === 1 ? 'an' : 'ani'}, nu e prognoză. Date: <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">Open-Meteo.com</a></div></div></div></div>`;
+  };
   function render(refetch = true) {
     if (refetch) loadFlight();
     const nights = Math.round((new Date(trip.back) - new Date(trip.out)) / 864e5);
@@ -114,14 +125,20 @@
           <h3>Pachetul tău</h3>
           <div class="pk-row"><div class="l"><div class="pk-ico">${icon}</div><div><div class="t">Bilet la eveniment</div><div class="s">${ev.price_min_eur ? 'de la' : ev.kind === 'football' ? 'preț pe site-ul clubului' : ev.kind === 'city_festival' || ev.kind === 'market' ? 'intrare liberă' : 'preț la vânzător'}</div></div></div>${ev.price_min_eur ? `<div class="pr">${Math.round(ev.price_min_eur)} €</div>` : ''}</div>
           <div class="pk-row"><div class="l"><div class="pk-ico">✈︎</div><div><div class="t">Zbor ${esc(origin)} ⇄ ${esc(iata || name)}</div><div class="s">${esc(H.shortDate(trip.out))} → ${esc(H.shortDate(trip.back))}${flightSub()}</div></div></div>${flight?.eur ? `<div class="pr"><small>de la</small> ${flight.eur} €</div>` : ''}</div>
-          <div class="pk-row"><div class="l"><div class="pk-ico">🛏</div><div><div class="t">Cazare, ${nights} ${nights === 1 ? 'noapte' : 'nopți'}</div><div class="s">${ev.venue ? 'aproape de ' + esc(ev.venue) : esc(name)}</div></div></div></div>
+          ${wxRow()}
           <div class="pk-stack">
             <a class="pk-btn dark" href="${esc(ticketUrl)}" target="_blank" rel="noopener noreferrer">${icon} ${esc(ticketLabel)} ↗</a>
             <a class="pk-btn gold" href="${esc(flightUrl())}" target="_blank" rel="noopener noreferrer">✈︎ Cumpără bilet de avion ↗</a>
             ${skyUrl() ? `<div class="pk-alt"><a href="${esc(skyUrl())}" target="_blank" rel="noopener noreferrer">sau compară prețul pe Skyscanner</a></div>` : ''}
-            <a class="pk-btn line" href="${esc(stayUrl())}" target="_blank" rel="noopener noreferrer">🛏 Caută cazare ↗</a>
+            <section class="pk-stay" aria-labelledby="pk-stay-h">
+              <div class="pk-stay-head"><h4 id="pk-stay-h">🛏 Cazare</h4><span>${nights} ${nights === 1 ? 'noapte' : 'nopți'} · ${esc(H.shortDate(trip.out))} → ${esc(H.shortDate(trip.back))}</span></div>
+              <div class="pk-stay-opts">
+                <a class="pk-stay-opt" href="${esc(stayUrl())}" target="_blank" rel="noopener noreferrer"><span class="ic" aria-hidden="true">🏨</span><span class="nm">Booking</span><span class="ds">hoteluri și pensiuni</span><span class="go" aria-hidden="true">↗</span></a>
+                <a class="pk-stay-opt" href="${esc(airbnbUrl())}" target="_blank" rel="noopener noreferrer"><span class="ic" aria-hidden="true">🏠</span><span class="nm">Airbnb</span><span class="ds">apartamente și case</span><span class="go" aria-hidden="true">↗</span></a>
+              </div>
+            </section>
           </div>
-          <p class="pk-note">Prețul zborului e cel mai mic găsit acum pe Kiwi și se poate schimba; prețul cazării îl vezi la furnizor. Biletele se cumpără direct de la vânzător; 23citybreak poate primi un comision, fără cost pentru tine.${ev.source === 'football-data' ? ' Football data provided by the Football-Data.org API.' : ''}</p>
+          <p class="pk-note">Prețul zborului e cel mai mic găsit acum pe Kiwi și se poate schimba. Biletele de avion, biletele la eveniment și cazarea se cumpără direct de pe site-urile furnizorilor, care stabilesc prețurile, disponibilitatea și condițiile. 23citybreak nu răspunde pentru eventualele diferențe sau erori de pe aceste site-uri și poate primi un comision, fără cost pentru tine.${ev.source === 'football-data' ? ' Football data provided by the Football-Data.org API.' : ''}</p>
         </aside>
       </div>`;
     document.title = `${ev.title} · ${name} · 23citybreak`;
@@ -154,6 +171,7 @@
   });
   render();
   // La meciuri, stadionul găsit pe Wikidata completează locul (football-data nu îl dă): apare în antet, hartă și cazare.
+  window.CBWeather?.typical(slug, name, s).then(w => { if (w) { wx = w; render(); } });
   E.eventPhoto(ev).then(p => { if (p) { photo = p; if (!ev.venue && p.venue) ev.venue = p.venue; render(); } });
   window.addEventListener('account:change', render);
   // Întoarcere din linkul de login cerut pentru PDF.

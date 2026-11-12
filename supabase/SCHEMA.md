@@ -30,7 +30,7 @@ Migrații: `supabase/migrations/20261111_quiz.sql`, `20261111_quiz_cards.sql`, `
 | `user_id` | uuid PK → auth.users | |
 | `departure_airports` | text[] ≤ 10 | coduri IATA, ex. `{OTP,CLJ}` (aceleași ca `data-iata` din `#f-origin`) |
 | `budget_max_eur` | int 20–5000 | buget maxim dus-întors per persoană, EUR; `null` = fără limită |
-| `temp_min_c`, `temp_max_c` | int −30…45 | interval de temperatură dorit la destinație; `null` = oricare |
+| `temp_min_c`, `temp_max_c` | int −30…45 | **nefolosite din 2026-11-12** (filtrul de temperatură a fost scos). Coloanele rămân pentru datele vechi; site-ul nu le mai citește și nu le mai scrie. |
 | `city_mode` | `'new'` \| `'any'` | default pentru întrebarea „oraș nou sau oricare?” la căutare |
 | `currency` | `'EUR'` \| `'RON'`, default `'EUR'` | moneda în care se afișează prețurile; conversia o face pagina (curs BCE). Migrare: `20261112_moneda.sql` |
 | `updated_at` | timestamptz | |
