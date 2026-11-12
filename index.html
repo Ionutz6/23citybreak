@@ -1220,6 +1220,9 @@
     let similarResultPeriods = null;
     let lastEmptyWasSimilar = false;
     let searchState = "idle";
+    // Rezumatul ultimei căutări „Toată Europa”; mesajul de succes se scrie în renderMatrix()
+    // din orașele afișate efectiv (după filtre), nu din toate rândurile găsite.
+    let discoverySummary = null;
     let hasEverSearched = false;
     let selectedCityObj = null;
 
@@ -1509,6 +1512,13 @@
       STN: { cityRo: "Londra", airport: "Stansted", group: "Londra" },
       LGW: { cityRo: "Londra", airport: "Gatwick", group: "Londra" },
       LHR: { cityRo: "Londra", airport: "Heathrow", group: "Londra" },
+      LCY: { cityRo: "Londra", airport: "London City", group: "Londra" },
+      SEN: { cityRo: "Londra", airport: "Southend", group: "Londra" },
+      ARN: { cityRo: "Stockholm", airport: "Arlanda", group: "Stockholm" },
+      NYO: { cityRo: "Stockholm", airport: "Skavsta", group: "Stockholm" },
+      BMA: { cityRo: "Stockholm", airport: "Bromma", group: "Stockholm" },
+      OSL: { cityRo: "Oslo", airport: "Gardermoen", group: "Oslo" },
+      TRF: { cityRo: "Oslo", airport: "Torp", group: "Oslo" },
       WAW: { cityRo: "Varșovia", airport: "Chopin", group: "Varșovia" },
       WMI: { cityRo: "Varșovia", airport: "Modlin", group: "Varșovia" },
       TSF: { cityRo: "Veneția", airport: "Treviso", group: "Veneția" },
@@ -1564,6 +1574,22 @@
         if (code && (!best.has(code) || c.perPaxEur < best.get(code))) best.set(code, c.perPaxEur);
       });
       return [...best.entries()].sort((a, b) => a[1] - b[1]).map(([iata, minPrice]) => ({ iata, name: airportLabel(iata), minPrice }));
+    }
+
+    // Orașe unice (aceeași cheie ca la carduri: CIA + FCO = Roma).
+    function countUniqueCities(rows) {
+      return new Set((rows || []).map(r => destinationRowKey(r.iata || r.code, r.cityGroup || r.city))).size;
+    }
+
+    function renderDiscoverySummary(shownRows) {
+      if (!discoverySummary || searchState !== "success") return;
+      const shown = countUniqueCities(shownRows);
+      const hidden = Math.max(0, discoverySummary.total - shown);
+      const cityWord = n => n === 1 ? "1 oraș" : `${n} orașe`;
+      const hiddenNote = hidden ? ` (${hidden === 1 ? "încă 1 oraș ascuns" : `încă ${hidden} orașe ascunse`} de filtre)` : "";
+      const text = `${discoverySummary.failed ? "S-au găsit" : "Căutare finalizată! S-au găsit"} zboruri în ${cityWord(shown)} din Europa${hiddenNote}.${discoverySummary.failed ? " Unele weekenduri nu au putut fi verificate acum." : ""}`;
+      const el = document.getElementById("search-status-text");
+      if (el) el.textContent = text;
     }
 
     function sortRowsByCityGroup(rows) {
@@ -3129,6 +3155,7 @@
       // Keep Cards View updated synchronously
       const cardRows = similarResultPeriods ? filteredRows.flatMap(row => activeWks.filter(wk => row.cellsMap[wk.id]).map(wk => ({...row, cellsMap: {[wk.id]: row.cellsMap[wk.id]}}))) : filteredRows;
       renderCardsView(cardRows, activeWks, maxBudget);
+      renderDiscoverySummary(filteredRows);
 
       // Group consecutive weekend columns by departure month.
       const monthNames = ["ianuarie", "februarie", "martie", "aprilie", "mai", "iunie", "iulie", "august", "septembrie", "octombrie", "noiembrie", "decembrie"];
@@ -3527,6 +3554,7 @@
       }
 
       hasEverSearched = true;
+      discoverySummary = null;
 
       const cityName = selectedCityObj?.name || "destinație";
       const originSelect = document.getElementById("f-origin");
@@ -3753,6 +3781,7 @@
       const holdBags = Array(adults).fill(bagType === "hold" ? 1 : 0);
 
       hasEverSearched = true;
+      discoverySummary = null;
       currentRows = [];
       renderMatrix();
       updateSearchStatus(`Căutăm zboruri prin Kiwi...`, 0, "loading");
@@ -4162,7 +4191,8 @@
         currentRows = sortRowsByCityGroup([...cityRowsMap.values()]);
 
         if (totalFound > 0) {
-          updateSearchStatus(`✅ ${failedRequests ? "S-au găsit" : "Căutare finalizată! S-au găsit"} zboruri în ${currentRows.length} orașe din Europa.${failedRequests ? " Unele weekenduri nu au putut fi verificate acum." : ""}`, 100, "success");
+          discoverySummary = { total: countUniqueCities(currentRows), failed: failedRequests > 0 };
+          updateSearchStatus(`✅ ${failedRequests ? "S-au găsit" : "Căutare finalizată! S-au găsit"} zboruri în ${discoverySummary.total} orașe din Europa.${failedRequests ? " Unele weekenduri nu au putut fi verificate acum." : ""}`, 100, "success");
         } else if (failedRequests) {
           updateSearchStatus(discoveryRefused ? PROVIDER_LIMIT_MESSAGE : `Nu putem confirma disponibilitatea: ${failedRequests} weekenduri nu au putut fi verificate. Încearcă din nou.`, 100, "error");
         } else {
