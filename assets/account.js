@@ -17,12 +17,23 @@
     ['CRA', 'Craiova'], ['OMR', 'Oradea'], ['TGM', 'Târgu Mureș'],
     ['VLC', 'Valencia'], ['ALC', 'Alicante'], ['PAR', 'Paris (toate aeroporturile)'], ['MUC', 'München'], ['FRA', 'Frankfurt'],
   ];
-  const BUDGETS = [[100, 'până la 100 €'], [150, 'până la 150 €'], [200, 'până la 200 €'], [300, 'până la 300 €'], [500, 'până la 500 €'], [null, 'fără limită']];
+  const BUDGETS = [100, 150, 200, 300, 500, null];
+  // Bugetul se salvează mereu în EUR; în RON afișăm o valoare orientativă (≈5 lei/€, rotunjit la 50), ca în căutare.
+  const budgetLabel = (v, cur) => v == null ? 'fără limită' : cur === 'RON' ? `până la ~${new Intl.NumberFormat('ro-RO').format(Math.round(v * 5 / 50) * 50)} RON` : `până la ${v} €`;
+  const CURRENCIES = [['EUR', 'Euro (€)'], ['RON', 'Lei (RON)']];
   const TEMPS = [
     ['cool', 'Răcoare', 'sub 15°C', null, 15], ['mild', 'Plăcut', '15–25°C', 15, 25],
     ['warm', 'Cald', 'peste 25°C', 25, null], ['any', 'Oricum', 'nu contează', null, null],
   ];
-  const DEFAULT_PREFS = {departure_airports: [], budget_max_eur: null, temp_min_c: null, temp_max_c: null, city_mode: 'any'};
+  const DEFAULT_PREFS = {departure_airports: [], budget_max_eur: null, temp_min_c: null, temp_max_c: null, city_mode: 'any', currency: 'EUR'};
+  const pickPrefs = r => Object.fromEntries(Object.keys(DEFAULT_PREFS).filter(k => r && k in r && r[k] !== undefined).map(k => [k, r[k]]));
+  // Coloana currency vine dintr-o migrare separată (20261112_moneda.sql). Până e rulată, salvăm fără ea.
+  const missingCurrencyCol = e => !!e && /currency/i.test(`${e.message || ''} ${e.details || ''}`) && /column|schema/i.test(e.message || '');
+  async function upsertPrefs(sb, prefs) {
+    let res = await sb.from('search_preferences').upsert(prefs);
+    if (missingCurrencyCol(res.error)) { const {currency, ...rest} = prefs; res = await sb.from('search_preferences').upsert(rest); }
+    return res;
+  }
 
   const el = (tag, cls, text) => { const n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; };
   const store = {
@@ -45,8 +56,10 @@
   async function preferences() {
     const s = await session(); if (!s) return {...DEFAULT_PREFS};
     const sb = await client();
-    const {data} = await sb.from('search_preferences').select('departure_airports,budget_max_eur,temp_min_c,temp_max_c,city_mode').maybeSingle();
-    return {...DEFAULT_PREFS, ...(data || {})};
+    const {data} = await sb.from('search_preferences').select('*').maybeSingle();
+    // Fără coloana currency în bază, păstrăm alegerea locală (aceeași cheie ca assets/personalizare.js).
+    const local = store.get('23cb-prefs');
+    return {...DEFAULT_PREFS, ...(data && !('currency' in data) && local?.currency ? {currency: local.currency} : {}), ...pickPrefs(data)};
   }
 
   // Abonarea: rândul din subscribers. Bifa de consimțământ + confirmarea prin magic link = double opt-in.
@@ -185,22 +198,29 @@
       }
       g.append(wrap); return g;
     };
-    const g2 = single('Bugetul pentru zbor', 'Dus-întors, de persoană.', BUDGETS.map(([v, label]) => ({v, label})),
+    if (!['EUR', 'RON'].includes(state.currency)) state.currency = 'EUR';
+    const budgetItems = BUDGETS.map(v => ({v, label: budgetLabel(v, state.currency)}));
+    const g2 = single('Bugetul pentru zbor', 'Dus-întors, de persoană.', budgetItems,
       it => it.v === state.budget_max_eur, it => { state.budget_max_eur = it.v; });
+    const relabelBudgets = () => [...g2.querySelectorAll('.acct-chip > span')].forEach((s, i) => { s.textContent = budgetLabel(BUDGETS[i], state.currency); });
+    const g5 = single('În ce monedă vezi prețurile?', 'Kiwi dă prețurile în EUR; în RON le convertim cu cursul BCE al zilei.', CURRENCIES.map(([v, label]) => ({v, label})),
+      it => it.v === state.currency, it => { state.currency = it.v; relabelBudgets(); });
     const tempKey = (TEMPS.find(t => t[3] === state.temp_min_c && t[4] === state.temp_max_c) || TEMPS[3])[0];
     const g3 = single('Ce vreme îți place la destinație?', null, TEMPS.map(([k, label, sub, min, max]) => ({k, label, sub, min, max})),
       it => it.k === tempKey, it => { state.temp_min_c = it.min; state.temp_max_c = it.max; });
     const g4 = single('Ce orașe să-ți arătăm?', 'Se aplică la toate căutările. Schimbi oricând din Profilul meu.', [{v: 'new', label: 'Doar orașe noi', sub: 'pe care nu le-am văzut'}, {v: 'any', label: 'Oricare', sub: 'inclusiv cele văzute'}],
       it => it.v === state.city_mode, it => { state.city_mode = it.v; });
 
-    node.append(g1, g2, g3, g4);
+    node.append(g1, g5, g2, g3, g4);
     return {node, read: () => ({...state})};
   }
 
   async function savePrefs(prefs) {
     const sb = await client();
-    const {error} = await sb.from('search_preferences').upsert(prefs);
+    const {error} = await upsertPrefs(sb, pickPrefs(prefs));
     if (error) throw error;
+    // Și local, ca pagina de căutare să aplice moneda imediat, chiar înainte să citească din cont.
+    if (prefs.currency) store.set('23cb-prefs', {...(store.get('23cb-prefs') || {}), currency: prefs.currency});
     emit();
   }
   async function markOnboarded() {
