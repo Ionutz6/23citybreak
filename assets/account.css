@@ -72,7 +72,7 @@
 .acct-page .header-right{display:flex;align-items:center;gap:28px;font-size:13px}
 .acct-page .header-right a{color:#fff;border-bottom:1px solid var(--acct-gold);padding-bottom:5px;font-weight:700;text-decoration:none}
 .acct-page .header-account{background:var(--acct-gold);color:#15130f;border:0;border-radius:99px;padding:6px 13px;font:700 12px var(--font-body);cursor:pointer;line-height:1.2}
-.acct-main{flex:1;width:100%;max-width:1100px;margin:0 auto;padding:40px 16px 70px}
+.acct-main{flex:1;width:100%;max-width:1440px;margin:0 auto;padding:40px 6% 70px;box-sizing:border-box}
 .acct-hello h1{font:700 clamp(34px,4vw,52px)/1.05 var(--font-display);letter-spacing:-.055em;margin:8px 0 2px}
 .acct-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin-top:28px}
 .acct-card{background:var(--acct-card);border:1px solid var(--acct-line);border-radius:18px;padding:clamp(20px,3vw,32px);min-width:0}
@@ -89,7 +89,7 @@
 .acct-confirm p{flex-basis:100%;margin:0;font-size:14px;color:#6b2b1d}
 .acct-footer{text-align:center;color:#8a8c86;font-size:12px;padding:20px 16px 30px}
 @media(max-width:760px){.acct-grid{grid-template-columns:1fr}.acct-stats{grid-template-columns:1fr 1fr}.acct-stats .acct-stat:last-child{grid-column:1/-1}}
-@media(max-width:600px){.acct-page .header-inner{padding:16px}.acct-page .wordmark{font-size:20px}.acct-page .header-right{gap:12px}.acct-page .header-right a:not(:first-child){display:none}.acct-row{flex-direction:column}.acct-main{padding-top:26px}}
+@media(max-width:600px){.acct-main{padding-left:16px;padding-right:16px}.acct-page .header-inner{padding:16px}.acct-page .wordmark{font-size:20px}.acct-page .header-right{gap:12px}.acct-page .header-right a:not(:first-child){display:none}.acct-row{flex-direction:column}.acct-main{padding-top:26px}}
 
 /* Cardul de evenimente din profil (assets/profile-interests.js) */
 .acct-card .acct-group+.acct-group{margin-top:22px}
@@ -102,7 +102,7 @@
 .acct-hello-word{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;min-height:1.1em;transition:opacity .3s,transform .3s}
 .acct-hello-word.is-out{opacity:0;transform:translateY(6px)}
 .acct-hello-lang{font:700 12px var(--font-body);letter-spacing:.08em;text-transform:uppercase;color:var(--acct-gold)}
-.acct-lead{max-width:680px;font-size:17px;line-height:1.6;color:#3c3f3a;margin:12px 0 0}
+.acct-lead{font-size:17px;line-height:1.6;color:#3c3f3a;margin:12px 0 0}
 .acct-pitch{display:grid;grid-template-columns:1.1fr .9fr;gap:28px;align-items:start;margin-top:30px}
 .acct-perks{list-style:none;margin:0;padding:0;display:grid;gap:14px}
 .acct-perks li{display:flex;gap:14px;background:var(--acct-card);border:1px solid var(--acct-line);border-radius:16px;padding:16px 18px}
@@ -114,7 +114,7 @@
 .acct-google{display:flex;justify-content:center;min-height:44px;margin-top:14px}
 .acct-or{display:flex;align-items:center;gap:10px;color:var(--acct-muted);font-size:12px;margin:14px 0 4px}
 .acct-or::before,.acct-or::after{content:"";flex:1;height:1px;background:var(--acct-line)}
-.acct-complete{margin-top:18px;max-width:680px;background:var(--acct-card);border:1px solid var(--acct-line);border-radius:16px;padding:16px 18px}
+.acct-complete{margin-top:18px;background:var(--acct-card);border:1px solid var(--acct-line);border-radius:16px;padding:16px 18px}
 .acct-complete>strong{font:700 15px var(--font-display)}
 .acct-meter{height:8px;border-radius:99px;background:#eee7d8;margin:10px 0 12px;overflow:hidden}
 .acct-meter span{display:block;height:100%;background:var(--acct-gold);border-radius:inherit}
@@ -125,3 +125,29 @@
 @media(max-width:860px){.acct-pitch{grid-template-columns:1fr}.acct-auth{position:static;order:-1}}
 @media(prefers-reduced-motion:reduce){.acct-hello-word{transition:none}}
 .acct-google-wrap .acct-status:empty{display:none}
+/* Capitolul „Utilizator” din Contul tău: identitate, newsletter, acțiuni de cont */
+.acct-user{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1.3fr) auto;align-items:center;gap:16px 28px;margin-top:22px;background:#111211;color:#fff;border-radius:18px;padding:18px 22px}
+.acct-user .acct-kicker{color:var(--acct-gold)}
+.acct-user-who{display:flex;align-items:center;gap:14px;min-width:0}
+.acct-user-who>div{display:flex;flex-direction:column;gap:2px;min-width:0}
+.acct-avatar{flex:none;width:46px;height:46px;border-radius:50%;display:grid;place-items:center;background:var(--acct-gold);color:#15130f;font:700 20px var(--font-display)}
+.acct-user-email{font:700 17px var(--font-display);letter-spacing:-.02em;overflow-wrap:anywhere}
+.acct-user-who small{color:#a9aba4;font-size:13px}
+.acct-user-nl{min-width:0}
+.acct-user .acct-note{color:#8f918a;margin-top:6px}
+.acct-user .acct-status{color:#cfd0c9;font-size:13px;display:block;margin-top:4px}
+.acct-user-acts{display:flex;flex-direction:column;align-items:flex-end;gap:2px}
+.acct-user .acct-link{color:#d6d7d0}
+.acct-user .acct-danger{color:#f0a493}
+.acct-user .acct-confirm{grid-column:1/-1;background:#1e1f1d;border-radius:12px;padding:14px 16px}
+.acct-user .acct-confirm p{margin:0 0 10px;color:#e4e4de;font-size:14px}
+.acct-switch{display:inline-flex;align-items:center;gap:10px;font-weight:700;font-size:15px;cursor:pointer;user-select:none}
+.acct-switch input{position:absolute;opacity:0;width:1px;height:1px}
+.acct-track{position:relative;flex:none;width:42px;height:24px;border-radius:99px;background:#4a4c48;transition:background .15s}
+.acct-track::after{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:transform .15s}
+.acct-switch input:checked+.acct-track{background:var(--acct-gold)}
+.acct-switch input:checked+.acct-track::after{transform:translateX(18px);background:#15130f}
+.acct-switch input:focus-visible+.acct-track{outline:3px solid var(--acct-gold);outline-offset:2px}
+.acct-switch input:disabled+.acct-track{opacity:.6}
+@media(max-width:860px){.acct-user{grid-template-columns:1fr}.acct-user-acts{flex-direction:row;align-items:center;gap:18px}}
+@media(prefers-reduced-motion:reduce){.acct-track,.acct-track::after{transition:none}}

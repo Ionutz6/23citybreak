@@ -1,17 +1,49 @@
-// Pagina Evenimente (evenimente.html): tab-uri Sport / Muzică / Alte evenimente, turnee grupate într-un card,
-// filtrele „Doar weekenduri” (activ implicit) și „Doar în bugetul meu” (bugetul de zbor din profil).
-// Prețul zborului vine live de la Kiwi (assets/flight-price.js), doar pentru cardurile care se văd.
+// Pagina Evenimente (evenimente.html): 3 categorii (Sport / Muzică / Alte evenimente) ca dale mari, sporturile
+// împărțite pe sport (întâi cele din profil), ligile ca filtru secundar, comutatoarele „Doar weekenduri” (activ
+// implicit) și „Doar în bugetul meu”. Turneele sunt grupate într-un card.
+// Prețul zborului vine live de la Kiwi (assets/flight-price.js). Fiecare card are o singură stare de preț:
+//   ok      → „Zbor OTP dus-întors de la 63 €”
+//   none    → Kiwi a răspuns, dar nu există zbor în weekendul acela
+//   pending → îl căutăm acum
+//   unknown → nu l-am putut cere (limita Kiwi pe pagină sau pauză după un refuz): rândul de preț rămâne gol.
+// Cu „Doar în bugetul meu” se afișează numai evenimentele cu preț găsit ≤ buget; restul sunt numărate, nu afișate.
 (async () => {
   const root = document.getElementById('evp-root');
   const E = window.CBEvents, H = E.helpers, esc = H.esc, FP = window.CBFlightPrice;
   const PAGE = 12;
-  const prefs = (() => { try { return JSON.parse(localStorage.getItem('23cb-prefs')) || {}; } catch { return {}; } })();
+  const readLS = k => { try { return JSON.parse(localStorage.getItem(k)) || {}; } catch { return {}; } };
+  const prefs = readLS('23cb-prefs'), interests = readLS('23cb-event-prefs');
   const budget = Number(prefs.budget_max_eur) > 0 ? Number(prefs.budget_max_eur) : null;
+  const mySports = Array.isArray(interests.sports) ? interests.sports : [];
+  const myComps = Array.isArray(interests.competitions) ? interests.competitions : [];
   const origin = FP.origin();
   const params = new URLSearchParams(location.search);
+
+  // ---------- Sporturi ----------
+  const SPORTS = [['football', 'Fotbal', '⚽'], ['rugby', 'Rugby', '🏉'], ['basketball', 'Baschet', '🏀'], ['tennis', 'Tenis', '🎾'],
+    ['f1', 'Formula 1', '🏎️'], ['motogp', 'MotoGP', '🏍️'], ['running', 'Maratoane', '🏃'], ['other', 'Alte sporturi', '🏟️']];
+  const sportOf = e => {
+    if (e.kind === 'football') return 'football';
+    const t = `${(e.genres || []).join(' ')} ${e.title} ${e.competition || ''}`;
+    if (e.competition === '6N' || /rugby/i.test(t)) return 'rugby';
+    if (/basket/i.test(t)) return 'basketball';
+    if (/tenis|tennis/i.test(t)) return 'tennis';
+    if (/moto ?gp/i.test(t)) return 'motogp';
+    if (/formula ?1|\bf1\b|grand prix/i.test(t)) return 'f1';
+    if (/marat|marathon|running|semimarat/i.test(t)) return 'running';
+    return 'other';
+  };
+  // Cu interese salvate în profil: pastila „Pentru tine” e prima și e aleasă implicit; altfel „Toate”.
+  const hasMine = mySports.length > 0 || myComps.length > 0;
+  const isMine = e => mySports.includes(sportOf(e)) || (e.competition && myComps.includes(e.competition));
+  const sportOrder = hasMine ? [...SPORTS.filter(s => mySports.includes(s[0])), ...SPORTS.filter(s => !mySports.includes(s[0]))] : SPORTS;
+
+  const CAT_META = { sport: ['🏟️', 'Meciuri și curse'], music: ['🎤', 'Concerte și festivaluri'], other: ['🎭', 'Târguri, spectacole, sărbători'] };
+  const tabParam = params.get('tab');
   const state = {
-    tab: E.CATEGORIES.some(([k]) => k === params.get('tab')) ? params.get('tab') : 'sport',
-    weekend: params.get('weekend') !== '0', inBudget: false, comp: 'all', shown: PAGE, open: new Set(),
+    tab: E.CATEGORIES.some(([k]) => k === tabParam) ? tabParam : 'sport',
+    sport: hasMine ? 'mine' : 'all', comp: 'all',
+    weekend: params.get('weekend') !== '0', inBudget: false, shown: PAGE, open: new Set(),
   };
 
   const today = new Date().toISOString().slice(0, 10);
@@ -19,32 +51,47 @@
 
   // ---------- Prețul zborului ----------
   const tripOf = e => { const w = H.mainWeekend(e); return { origin, dest: `City:${e.city_id}`, out: w.fri, back: w.sun }; };
-  const priceOf = e => FP.cached(tripOf(e));
-  const overBudget = e => { const p = priceOf(e); return !!(budget && p?.eur && p.eur > budget); };
-  const flightHtml = p => !p ? '' : p.eur ? `✈︎ zbor ${esc(origin)} de la <b>${p.eur} €</b>/pers.${p.direct ? ' · direct' : p.stops ? ` · ${p.stops} escală` : ''}` : '✈︎ fără zboruri găsite pentru weekendul ăsta';
+  const pending = new Set();
+  const priceState = e => {
+    const p = FP.cached(tripOf(e));
+    if (p) return p.eur ? { s: 'ok', ...p } : { s: 'none' };
+    return pending.has(e.id) ? { s: 'pending' } : { s: 'unknown' };
+  };
+  const inBudget = e => { const p = priceState(e); return p.s === 'ok' && p.eur <= budget; };
+  const priceHtml = e => {
+    const p = priceState(e);
+    if (p.s === 'ok') return `<span class="evp-price ok${budget && p.eur > budget ? ' over' : ''}">✈︎ Zbor ${esc(origin)} dus-întors de la <b>${p.eur} €</b>${p.direct ? ' · direct' : p.stops ? ` · ${p.stops} escală` : ''}</span>`;
+    if (p.s === 'none') return `<span class="evp-price none">✈︎ Niciun zbor din ${esc(origin)} în weekendul ăsta</span>`;
+    if (p.s === 'pending') return '<span class="evp-price wait">✈︎ Caut zborul…</span>';
+    return '';
+  };
+  let rerender = 0;
+  const later = () => { clearTimeout(rerender); rerender = setTimeout(render, 150); };
+  const tried = new Set(); // cerute o dată fără răspuns (limită/pauză): nu le mai cerem la fiecare randare
+  function ask(e) {
+    if (pending.has(e.id) || tried.has(e.id) || FP.cached(tripOf(e)) || FP.paused()) return;
+    pending.add(e.id); tried.add(e.id);
+    FP.get(tripOf(e)).then(() => {
+      pending.delete(e.id);
+      if (state.inBudget && budget) later();
+      else root.querySelectorAll(`[data-flight="${CSS.escape(e.id)}"]`).forEach(slot => { slot.innerHTML = priceHtml(e); });
+    });
+  }
+  // Fără filtrul de buget cerem prețul doar când cardul ajunge pe ecran, ca să nu consumăm limita Kiwi degeaba.
+  const io = new IntersectionObserver(entries => entries.forEach(en => {
+    if (!en.isIntersecting) return;
+    io.unobserve(en.target);
+    const e = all.find(x => x.id === en.target.dataset.flight); if (e) { ask(e); en.target.innerHTML = priceHtml(e); }
+  }), { rootMargin: '200px' });
   function fillPrices() {
     root.querySelectorAll('[data-flight]').forEach(slot => {
       const e = all.find(x => x.id === slot.dataset.flight); if (!e) return;
-      const hit = priceOf(e);
-      if (hit) { slot.innerHTML = flightHtml(hit); return; }
-      if (FP.paused()) { slot.textContent = '✈︎ prețul zborului: vezi în pachet'; return; }
-      if (!slot.dataset.asked) io.observe(slot);
+      slot.innerHTML = priceHtml(e);
+      if (priceState(e).s === 'unknown') io.observe(slot);
     });
   }
-  // Cerem prețul doar când cardul ajunge pe ecran, ca să nu consumăm limita Kiwi pe carduri nevăzute.
-  const io = new IntersectionObserver(entries => entries.forEach(en => {
-    if (!en.isIntersecting) return;
-    const slot = en.target; io.unobserve(slot); slot.dataset.asked = '1';
-    const e = all.find(x => x.id === slot.dataset.flight); if (!e) return;
-    slot.textContent = '✈︎ caut prețul zborului…';
-    FP.get(tripOf(e)).then(p => {
-      slot.innerHTML = p ? flightHtml(p) : '✈︎ prețul zborului: vezi în pachet';
-      if (state.inBudget && overBudget(e)) render(); // a ieșit din buget: dispare din listă
-    });
-  }), { rootMargin: '200px' });
 
   // ---------- Grupare pe turnee ----------
-  // Turneu = același artist în mai multe orașe, sau aceeași competiție din lista curatoriată (ex. Six Nations).
   const groupKey = e => e.kind === 'concert' && e.artists?.[0] ? `a:${e.artists[0].toLowerCase()}` : e.source === 'curated' && e.competition ? `c:${e.competition}` : null;
   function build(list) {
     const groups = new Map(), out = [];
@@ -57,11 +104,16 @@
     return out.map(x => (x.items && x.items.length === 1 ? { e: x.items[0] } : x));
   }
 
-  const visible = () => all.filter(e => E.categoryOf(e) === state.tab)
-    .filter(e => !state.weekend || E.isWeekend(e))
-    .filter(e => state.comp === 'all' || (e.competition || e.kind) === state.comp)
-    .filter(e => !state.inBudget || !overBudget(e));
+  // ---------- Filtre ----------
+  const inTab = () => all.filter(e => E.categoryOf(e) === state.tab).filter(e => !state.weekend || E.isWeekend(e));
+  const bySport = (list, s = state.sport) => state.tab !== 'sport' || s === 'all' ? list : s === 'mine' ? list.filter(isMine) : list.filter(e => sportOf(e) === s);
+  // Cheia de competiție: liga, iar la sport fără ligă (ex. baschet din Ticketmaster) sportul însuși.
+  const compKey = e => e.competition || (state.tab === 'sport' ? `s:${sportOf(e)}` : e.kind);
+  const byComp = list => state.comp === 'all' ? list : list.filter(e => compKey(e) === state.comp);
+  const base = () => byComp(bySport(inTab()));
+  const visible = () => (state.inBudget && budget ? base().filter(inBudget) : base());
 
+  // ---------- Markup ----------
   function tourHtml(g) {
     const first = g.items[0], open = state.open.has(g.key);
     const name = g.key.startsWith('c:') ? (E.COMPETITIONS[first.competition] || first.competition) : first.artists[0];
@@ -75,54 +127,98 @@
       <div class="evp-tour-head"><span class="ev-tag">${g.key.startsWith('c:') ? '🏆 Turneu' : '🎤 Turneu european'}</span>
         <h3>${esc(name)}</h3><p>${g.items.length} ${g.items.length === 1 ? 'dată' : 'date'} în ${cities} ${cities === 1 ? 'oraș' : 'orașe'}${state.weekend ? ', doar în weekend' : ''}</p></div>
       <ol class="evp-tour-list">${rows}</ol>
-      ${g.items.length > 5 ? `<button type="button" class="ev-chip" data-tour="${esc(g.key)}" aria-expanded="${open}">${open ? 'Mai puține date' : `Toate cele ${g.items.length} date`}</button>` : ''}
+      ${g.items.length > 5 ? `<button type="button" class="evp-more-dates" data-tour="${esc(g.key)}" aria-expanded="${open}">${open ? 'Mai puține date' : `Toate cele ${g.items.length} date`}</button>` : ''}
     </article>`;
   }
 
+  const n = (k, one, many) => `${k} ${k === 1 ? one : many}`;
+  function catsHtml() {
+    return `<div class="evp-cats" role="tablist" aria-label="Tip de eveniment">${E.CATEGORIES.map(([k, label]) => {
+      const c = all.filter(e => E.categoryOf(e) === k && (!state.weekend || E.isWeekend(e))).length;
+      const [icon, sub] = CAT_META[k];
+      return `<button type="button" role="tab" class="evp-cat" id="tab-${k}" aria-selected="${k === state.tab}" aria-controls="evp-panel" data-tab="${k}" tabindex="${k === state.tab ? 0 : -1}">
+        <span class="evp-cat-icon" aria-hidden="true">${icon}</span>
+        <span class="evp-cat-txt"><b>${label}</b><small>${sub}</small></span>
+        <span class="evp-cat-n">${c || '—'}</span></button>`;
+    }).join('')}</div>`;
+  }
+  function sportsHtml() {
+    if (state.tab !== 'sport') return '';
+    const list = inTab();
+    const pill = (k, label, icon, count, extra = '') => `<button type="button" class="evp-pill${state.sport === k ? ' on' : ''}${count ? '' : ' empty'}" data-sport="${k}" aria-pressed="${state.sport === k}"${count || state.sport === k ? '' : ' disabled'}>${icon ? `<span aria-hidden="true">${icon}</span>` : ''}${esc(label)}<small>${count}</small>${extra}</button>`;
+    const pills = [
+      hasMine ? pill('mine', 'Pentru tine', '★', list.filter(isMine).length) : '',
+      pill('all', 'Toate sporturile', '', list.length),
+      ...sportOrder.filter(([k]) => mySports.includes(k) || state.sport === k || list.some(e => sportOf(e) === k)).map(([k, label, icon]) => pill(k, label, icon, list.filter(e => sportOf(e) === k).length, mySports.includes(k) ? '<i class="evp-mine" title="Din profilul tău">★</i>' : '')),
+    ].join('');
+    const note = hasMine ? 'Sporturile marcate cu ★ sunt cele din profilul tău.' : '<a href="cont.html#interese">Alege-ți sporturile în Contul tău</a> și le punem primele.';
+    return `<div class="evp-row"><span class="evp-row-label">Sport</span><div class="evp-pills" role="group" aria-label="Sport">${pills}</div></div><p class="evp-note">${note}</p>`;
+  }
+  function compsHtml() {
+    const list = bySport(inTab());
+    const comps = [...new Set(list.map(compKey))];
+    if (comps.length < 2) return '';
+    const label = c => E.COMPETITIONS[c] || (c.startsWith('s:') ? (SPORTS.find(x => x[0] === c.slice(2)) || SPORTS.at(-1))[1] : (E.KINDS[c] || E.KINDS.other)[1]);
+    comps.sort((a, b) => (myComps.includes(b) - myComps.includes(a)) || label(a).localeCompare(label(b)));
+    return `<div class="evp-row"><span class="evp-row-label">${state.tab === 'sport' ? 'Competiție' : 'Tip'}</span><div class="evp-chips" role="group" aria-label="Competiție">${[['all', 'Toate'], ...comps.map(c => [c, label(c)])].map(([c, l]) => `<button type="button" class="evp-chip${c === state.comp ? ' on' : ''}" data-comp="${esc(c)}" aria-pressed="${c === state.comp}">${myComps.includes(c) ? '★ ' : ''}${esc(l)}</button>`).join('')}</div></div>`;
+  }
+  const sw = (opt, label, on, disabled = false) => `<label class="evp-switch${disabled ? ' off' : ''}"><input type="checkbox" role="switch" data-opt="${opt}"${on ? ' checked' : ''}${disabled ? ' disabled' : ''}><span class="evp-track" aria-hidden="true"></span><span>${label}</span></label>`;
+  function budgetStatus() {
+    if (!state.inBudget || !budget) return '';
+    const b = base(), over = b.filter(e => priceState(e).s === 'ok' && !inBudget(e)).length;
+    const none = b.filter(e => priceState(e).s === 'none').length, wait = b.filter(e => priceState(e).s === 'pending').length;
+    const unknown = b.filter(e => priceState(e).s === 'unknown').length;
+    const parts = [over && n(over, 'peste buget', 'peste buget'), none && n(none, 'fără zbor', 'fără zbor'), unknown && n(unknown, 'fără preț verificat încă', 'fără preț verificat încă')].filter(Boolean);
+    return `<p class="evp-status">${wait ? `<span class="evp-spin" aria-hidden="true"></span>Verific prețul zborului pentru ${n(wait, 'eveniment', 'evenimente')}… ` : ''}${parts.length ? `Ascunse: ${parts.join(' · ')}.` : ''}</p>`;
+  }
+
   function render() {
-    const list = visible(), items = build(list);
-    const inTab = all.filter(e => E.categoryOf(e) === state.tab);
-    const comps = [...new Set(inTab.map(e => e.competition || e.kind))];
-    const compLabel = c => E.COMPETITIONS[c] || (E.KINDS[c] || E.KINDS.other)[1];
-    const hidden = all.filter(e => E.categoryOf(e) === state.tab && (!state.weekend || E.isWeekend(e)) && overBudget(e)).length;
-    const tabCount = k => all.filter(e => E.categoryOf(e) === k && (!state.weekend || E.isWeekend(e))).length;
+    // Cu filtrul de buget cerem din start prețurile candidaților (cei mai apropiați întâi), în limita Kiwi pe pagină.
+    if (state.inBudget && budget) base().filter(e => priceState(e).s === 'unknown').slice(0, 24).forEach(ask);
+    const items = build(visible());
+    const focused = document.activeElement?.closest?.('[data-tab]')?.dataset.tab;
     root.innerHTML = `
-      <div class="evp-tabs" role="tablist" aria-label="Tip de eveniment">${E.CATEGORIES.map(([k, label]) => `<button type="button" role="tab" id="tab-${k}" aria-selected="${k === state.tab}" aria-controls="evp-panel" data-tab="${k}">${label} <small>${tabCount(k)}</small></button>`).join('')}</div>
-      <div class="evp-bar">
-        <label class="evp-toggle"><input type="checkbox" data-opt="weekend"${state.weekend ? ' checked' : ''}><span>Doar weekenduri</span></label>
-        <label class="evp-toggle${budget ? '' : ' off'}"><input type="checkbox" data-opt="inBudget"${state.inBudget ? ' checked' : ''}${budget ? '' : ' disabled'}><span>Doar în bugetul meu${budget ? ` (zbor ≤ ${budget} €)` : ''}</span></label>
-        ${budget ? '' : '<a class="evp-hint" href="cont.html#preferinte">Setează-ți bugetul în Contul tău →</a>'}
-        ${state.inBudget && hidden ? `<span class="evp-hint">${hidden} ${hidden === 1 ? 'ascuns' : 'ascunse'}, peste buget</span>` : ''}
+      ${catsHtml()}
+      <div class="evp-panel-top">
+        ${sportsHtml()}
+        ${compsHtml()}
+        <div class="evp-switches">
+          ${sw('weekend', 'Doar weekenduri', state.weekend)}
+          ${sw('inBudget', budget ? `Doar în bugetul meu <small>zbor ≤ ${budget} €</small>` : 'Doar în bugetul meu', state.inBudget, !budget)}
+          ${budget ? '' : '<a class="evp-note" href="cont.html#preferinte">Setează-ți bugetul în Contul tău →</a>'}
+        </div>
+        ${budgetStatus()}
       </div>
-      ${comps.length > 1 ? `<div class="ev-filters evp-comps" role="group" aria-label="Competiție">${[['all', 'Toate'], ...comps.map(c => [c, compLabel(c)])].map(([c, l]) => `<button type="button" class="ev-chip${c === state.comp ? ' on' : ''}" data-comp="${esc(c)}" aria-pressed="${c === state.comp}">${esc(l)}</button>`).join('')}</div>` : ''}
       <div id="evp-panel" role="tabpanel" aria-labelledby="tab-${state.tab}">
         ${items.length ? `<div class="ev-grid">${items.slice(0, state.shown).map(x => (x.items ? tourHtml(x) : E.cardHtml(x.e))).join('')}</div>` : `<p class="evp-empty">${emptyText()}</p>`}
-        ${items.length > state.shown ? `<div class="ev-more"><button type="button" class="ev-chip" data-more>Arată încă ${Math.min(PAGE, items.length - state.shown)}</button></div>` : ''}
+        ${items.length > state.shown ? `<div class="ev-more"><button type="button" class="evp-more-btn" data-more>Arată încă ${Math.min(PAGE, items.length - state.shown)}</button></div>` : ''}
       </div>
       ${all.some(e => e.source === 'football-data') && state.tab === 'sport' ? '<p class="ev-credit">Football data provided by the Football-Data.org API</p>' : ''}
       <p class="ev-credit">Prețul zborului e cel mai mic găsit acum pe Kiwi, dus-întors de persoană, din ${esc(origin)}, pentru weekendul evenimentului (vineri → duminică). Se schimbă des; verifică-l în pachet.</p>`;
     root.querySelectorAll('.ev-card[data-ev]').forEach(card => {
-      if (card.style.backgroundImage) return;
       const e = all.find(x => x.id === card.dataset.ev);
       if (e) E.eventPhoto(e).then(p => E.setBg(card, p));
     });
     fillPrices();
+    if (focused) root.querySelector(`[data-tab="${focused}"]`)?.focus();
   }
   function emptyText() {
-    if (state.tab === 'music' && !all.some(e => E.categoryOf(e) === 'music')) return 'Concertele apar aici imediat ce conectăm Ticketmaster. Până atunci, vezi meciurile din tab-ul Sport.';
-    if (state.weekend) return 'Nu avem evenimente în weekend aici. Debifează „Doar weekenduri” ca să vezi și datele din timpul săptămânii.';
-    if (state.inBudget) return 'Nimic în bugetul tău deocamdată. Debifează „Doar în bugetul meu” ca să vezi tot.';
+    if (state.tab === 'music' && !all.some(e => E.categoryOf(e) === 'music')) return 'Concertele apar aici imediat ce conectăm Ticketmaster. Până atunci, vezi meciurile din Sport.';
+    if (state.inBudget && budget) return pending.size ? 'Caut prețurile zborurilor…' : 'Nimic în bugetul tău deocamdată. Oprește „Doar în bugetul meu” ca să vezi tot.';
+    if (state.sport === 'mine') return 'Nimic din sporturile tale în perioada asta. Alege „Toate sporturile”.';
+    if (state.weekend) return 'Nu avem evenimente în weekend aici. Oprește „Doar weekenduri” ca să vezi și datele din timpul săptămânii.';
     return 'Nu avem încă evenimente în această categorie.';
   }
 
   root.addEventListener('click', ev => {
     const t = ev.target.closest('[data-tab]');
     if (t) { state.tab = t.dataset.tab; state.comp = 'all'; state.shown = PAGE; const u = new URL(location.href); u.searchParams.set('tab', state.tab); history.replaceState(null, '', u); render(); root.querySelector(`[data-tab="${state.tab}"]`)?.focus(); return; }
+    const s = ev.target.closest('[data-sport]'); if (s) { state.sport = s.dataset.sport; state.comp = 'all'; state.shown = PAGE; render(); return; }
     const c = ev.target.closest('[data-comp]'); if (c) { state.comp = c.dataset.comp; state.shown = PAGE; render(); return; }
     const g = ev.target.closest('[data-tour]'); if (g) { const k = g.dataset.tour; state.open.has(k) ? state.open.delete(k) : state.open.add(k); render(); return; }
     if (ev.target.closest('[data-more]')) { state.shown += PAGE; render(); }
   });
-  root.addEventListener('keydown', ev => { // săgeți stânga/dreapta între tab-uri
+  root.addEventListener('keydown', ev => { // săgeți stânga/dreapta între categorii
     if (!ev.target.matches('[role=tab]') || !['ArrowLeft', 'ArrowRight'].includes(ev.key)) return;
     const keys = E.CATEGORIES.map(([k]) => k), i = keys.indexOf(state.tab);
     root.querySelector(`[data-tab="${keys[(i + (ev.key === 'ArrowRight' ? 1 : keys.length - 1)) % keys.length]}"]`)?.click();
