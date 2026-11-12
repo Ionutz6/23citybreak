@@ -35,6 +35,7 @@
     const rank = Array.isArray(data) ? data[0] : data;
     // Emailul pleacă doar când scorul trimis acum e cel mai bun, ca să nu primești un mesaj după fiecare joc.
     if (result && rank && result.score >= rank.best) sendResultEmail(sb, user, result).catch(() => {});
+    window.dispatchEvent(new CustomEvent('quiz:rank', {detail: rank || null}));
     return rank;
   }
 
@@ -129,6 +130,8 @@
     const fromLink = /access_token=|error_description=/.test(location.hash);
     const pending = store.get(PENDING);
     if (!fromLink && !(pending && hasSession())) return;
+    // Pe orase-vizitate.html loginul poate veni și din butonul „Salvează-ți harta”: acela nu e treaba quizului.
+    if (fromLink && !pending && document.getElementById('hub-login')) return;
     const quiz = window.Quiz; if (!quiz) return;
     const section = document.getElementById('city-quiz');
     const content = quiz.content;
