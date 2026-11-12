@@ -30,6 +30,19 @@
   // Bannerul unui eveniment: imaginea evenimentului de la Ticketmaster (hotlink, cum o dă API-ul), altfel fotografia
   // orașului de pe Wikimedia Commons, aceeași sursă ca pe cardurile de oraș din căutare (cu autor și licență).
   const photoCache = new Map();
+  const getJson = async url => { const r = await fetch(url, { signal: AbortSignal.timeout(10000) }); return r.ok ? r.json() : null; };
+  // Fișier Commons → URL lățime 1600 + credit (autor · licență); null dacă lipsește autorul sau licența.
+  async function commonsPhoto(file) {
+    if (!file) return null;
+    const q = new URLSearchParams({ action: 'query', titles: `File:${file}`, prop: 'imageinfo', iiprop: 'url|extmetadata', iiurlwidth: '1600', format: 'json', origin: '*' });
+    const info = Object.values((await getJson(`https://commons.wikimedia.org/w/api.php?${q}`))?.query?.pages || {})[0]?.imageinfo?.[0];
+    const meta = info?.extmetadata;
+    const text = h => new DOMParser().parseFromString(h || '', 'text/html').body.textContent.trim();
+    const author = text(meta?.Artist?.value), license = text(meta?.LicenseShortName?.value);
+    const url = info?.thumburl || info?.url;
+    if (!url || !author || !license || !/^https:\/\/(upload|thumb)\.wikimedia\.org\//.test(url) || !/^https:\/\/commons\.wikimedia\.org\//.test(info.descriptionurl || '')) return null;
+    return { url, credit: `Foto: ${author} · ${license}`, creditUrl: info.descriptionurl };
+  }
   function cityPhoto(slug) {
     if (!photoCache.has(slug)) photoCache.set(slug, (async () => {
       const m = /^([a-z0-9-]+)_[a-z]{2}$/.exec(slug || ''); if (!m) return null;
@@ -40,21 +53,46 @@
       const thumb = new URL(art.thumbnail?.source || art.originalimage.source);
       if (thumb.protocol !== 'https:' || !['upload.wikimedia.org', 'thumb.wikimedia.org'].includes(thumb.hostname) || !thumb.pathname.startsWith('/wikipedia/commons/')) return null;
       const parts = thumb.pathname.split('/');
-      const file = decodeURIComponent(thumb.pathname.includes('/thumb/') ? parts[parts.length - 2] : parts[parts.length - 1]);
-      const q = new URLSearchParams({ action: 'query', titles: `File:${file}`, prop: 'imageinfo', iiprop: 'url|extmetadata', iiurlwidth: '1600', format: 'json', origin: '*' });
-      const ir = await fetch(`https://commons.wikimedia.org/w/api.php?${q}`, { signal: AbortSignal.timeout(10000) });
-      if (!ir.ok) return null;
-      const info = Object.values((await ir.json()).query?.pages || {})[0]?.imageinfo?.[0];
-      const meta = info?.extmetadata;
-      const text = h => new DOMParser().parseFromString(h || '', 'text/html').body.textContent.trim();
-      const author = text(meta?.Artist?.value), license = text(meta?.LicenseShortName?.value);
-      const url = info?.thumburl || info?.url;
-      if (!url || !author || !license || !/^https:\/\/commons\.wikimedia\.org\//.test(info.descriptionurl || '')) return null;
-      return { url, credit: `Foto: ${author} · ${license}`, creditUrl: info.descriptionurl };
+      return commonsPhoto(decodeURIComponent(thumb.pathname.includes('/thumb/') ? parts[parts.length - 2] : parts[parts.length - 1]));
     })().catch(() => null).then(v => { if (!v) photoCache.delete(slug); return v; }));
     return photoCache.get(slug);
   }
-  const eventPhoto = async e => (e.image_url ? { url: e.image_url, credit: 'Imagine: Ticketmaster', creditUrl: e.ticket_url || '' } : await cityPhoto(e.city_id));
+  // Meciuri: fotografia stadionului echipei gazdă (Wikidata: club → P115 „home venue” → P18 imagine → Commons).
+  // Fără stemă sau poze de agenție; dacă nu găsim nimic, rămâne fotografia orașului.
+  const WD = 'https://www.wikidata.org/w/api.php';
+  const wd = params => getJson(`${WD}?${new URLSearchParams({ format: 'json', origin: '*', ...params })}`);
+  const ids = (claims, p) => (claims?.[p] || []).map(c => c.mainsnak?.datavalue?.value?.id).filter(Boolean);
+  // Club de fotbal: „sport” (P641) = fotbal (Q2736) sau „instanță a” (P31) = club de fotbal (Q476028); exclude baschet/handbal.
+  const isFootball = c => ids(c, 'P641').includes('Q2736') || ids(c, 'P31').includes('Q476028');
+  function currentVenue(claims) {
+    const st = (claims?.P115 || []).filter(c => c.rank !== 'deprecated' && c.mainsnak?.datavalue?.value?.id);
+    const open = st.filter(c => !c.qualifiers?.P582);
+    return (st.find(c => c.rank === 'preferred') || open[open.length - 1] || st[st.length - 1])?.mainsnak.datavalue.value.id || null;
+  }
+  const stadiumCache = new Map();
+  function stadiumPhoto(team) {
+    const key = String(team || '').trim();
+    if (!key) return Promise.resolve(null);
+    if (!stadiumCache.has(key)) stadiumCache.set(key, (async () => {
+      const found = await wd({ action: 'wbsearchentities', search: key, language: 'en', type: 'item', limit: '7' });
+      const cand = (found?.search || []).map(x => x.id).filter(id => /^Q\d+$/.test(id));
+      if (!cand.length) return null;
+      const ents = (await wd({ action: 'wbgetentities', ids: cand.join('|'), props: 'claims' }))?.entities || {};
+      const club = cand.map(id => ents[id]).find(e => e?.claims && isFootball(e.claims) && currentVenue(e.claims));
+      const venueId = club && currentVenue(club.claims);
+      if (!venueId) return null;
+      const v = (await wd({ action: 'wbgetentities', ids: venueId, props: 'claims|labels', languages: 'en' }))?.entities?.[venueId];
+      const file = v?.claims?.P18?.find(c => c.rank === 'preferred')?.mainsnak?.datavalue?.value || v?.claims?.P18?.[0]?.mainsnak?.datavalue?.value;
+      const photo = await commonsPhoto(file);
+      return photo && { ...photo, venue: v.labels?.en?.value || null };
+    })().catch(() => null).then(v => { if (!v) stadiumCache.delete(key); return v; }));
+    return stadiumCache.get(key);
+  }
+  const eventPhoto = async e => {
+    if (e.image_url) return { url: e.image_url, credit: 'Imagine: Ticketmaster', creditUrl: e.ticket_url || '' };
+    if (e.kind === 'football' && e.teams?.[0]) { const p = await stadiumPhoto(e.teams[0]); if (p) return p; }
+    return cityPhoto(e.city_id);
+  };
   const setBg = (node, photo) => { if (node && photo?.url) node.style.backgroundImage = `url("${photo.url.replace(/["\\]/g, '')}")`; };
 
   // ---------- Date ----------
@@ -148,7 +186,7 @@
       host.querySelectorAll('.ev-card[data-ev]').forEach(card => {
         if (card.style.backgroundImage) return;
         const e = list.find(x => x.id === card.dataset.ev);
-        if (e) cityPhoto(e.city_id).then(p => setBg(card, p));
+        if (e) eventPhoto(e).then(p => setBg(card, p));
       });
     };
     host.addEventListener('click', ev => {
@@ -188,6 +226,6 @@
     });
   }
 
-  window.CBEvents = { load, byId, decorateCards, eventPhoto, cityPhoto, setBg, KINDS, COMPETITIONS, helpers: { esc, cityName, cityOf, guideOf, guideImage, local, isoAdd, dowOf, shortDate, longDate, startDate, endDate, isMultiDay, lengthDays, mainWeekend, whenLabel, tagLabel, DOW, DOW_LONG, MON } };
+  window.CBEvents = { load, byId, decorateCards, eventPhoto, cityPhoto, stadiumPhoto, setBg, KINDS, COMPETITIONS, helpers: { esc, cityName, cityOf, guideOf, guideImage, local, isoAdd, dowOf, shortDate, longDate, startDate, endDate, isMultiDay, lengthDays, mainWeekend, whenLabel, tagLabel, DOW, DOW_LONG, MON } };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mountHome); else mountHome();
 })();

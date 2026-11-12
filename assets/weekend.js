@@ -139,7 +139,8 @@
     render(); root.querySelector(`[data-day="${d}"]`)?.focus();
   });
   render();
-  E.eventPhoto(ev).then(p => { if (p) { photo = p; render(); } });
+  // La meciuri, stadionul găsit pe Wikidata completează locul (football-data nu îl dă): apare în antet, hartă și cazare.
+  E.eventPhoto(ev).then(p => { if (p) { photo = p; if (!ev.venue && p.venue) ev.venue = p.venue; render(); } });
   window.addEventListener('account:change', render);
   // Întoarcere din linkul de login cerut pentru PDF.
   if (new URLSearchParams(location.search).has('pdf') && window.Account) {
