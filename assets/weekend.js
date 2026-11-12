@@ -111,13 +111,20 @@
           <h3>Pachetul tău</h3>
           <div class="pk-row"><div class="l"><div class="pk-ico">${icon}</div><div><div class="t">Bilet la eveniment</div><div class="s">${ev.price_min_eur ? 'de la' : ev.kind === 'football' ? 'se vinde de club' : ev.kind === 'city_festival' || ev.kind === 'market' ? 'intrare liberă' : 'preț la vânzător'}</div></div></div>${ev.price_min_eur ? `<div class="pr">${Math.round(ev.price_min_eur)} €</div>` : ''}</div>
           <div class="pk-row"><div class="l"><div class="pk-ico">✈︎</div><div><div class="t">Zbor ${esc(origin)} ⇄ ${esc(iata || name)}</div><div class="s">${esc(H.shortDate(trip.out))} → ${esc(H.shortDate(trip.back))}</div></div></div></div>
-          <div class="pk-row"><div class="l"><div class="pk-ico">🛏</div><div><div class="t">Cazare, ${nights} ${nights === 1 ? 'noapte' : 'nopți'}</div><div class="s">${esc(name)}, la alegere</div></div></div></div>
           ${wxRow()}
           <div class="pk-stack">
             <a class="pk-btn dark" href="${esc(ticketUrl)}" target="_blank" rel="noopener noreferrer">${icon} ${esc(ticketLabel)} ↗</a>
             <a class="pk-btn gold" href="${esc(flightUrl())}" target="_blank" rel="noopener noreferrer">✈︎ Cumpără bilet de avion ↗</a>
             ${skyUrl() ? `<div class="pk-alt"><a href="${esc(skyUrl())}" target="_blank" rel="noopener noreferrer">sau compară prețul pe Skyscanner</a></div>` : ''}
-            <div class="pk-stay"><a class="pk-btn line" href="${esc(stayUrl())}" target="_blank" rel="noopener noreferrer">🛏 Booking ↗</a><a class="pk-btn line" href="${esc(airbnbUrl())}" target="_blank" rel="noopener noreferrer">🏠 Airbnb ↗</a></div>
+            <section class="pk-stay" aria-labelledby="pk-stay-h">
+              <div class="pk-stay-head"><h4 id="pk-stay-h">🛏 Cazare</h4><span>${nights} ${nights === 1 ? 'noapte' : 'nopți'} · ${esc(H.shortDate(trip.out))} → ${esc(H.shortDate(trip.back))}</span></div>
+              <div class="pk-stay-opts">
+                <a class="pk-stay-opt" href="${esc(stayUrl())}" target="_blank" rel="noopener noreferrer"><span class="ic" aria-hidden="true">🏨</span><span class="nm">Booking</span><span class="ds">hoteluri și pensiuni</span><span class="go" aria-hidden="true">↗</span></a>
+                <span class="pk-stay-or" aria-hidden="true">sau</span>
+                <a class="pk-stay-opt" href="${esc(airbnbUrl())}" target="_blank" rel="noopener noreferrer"><span class="ic" aria-hidden="true">🏠</span><span class="nm">Airbnb</span><span class="ds">apartamente și case</span><span class="go" aria-hidden="true">↗</span></a>
+              </div>
+              <p class="pk-stay-note">Ambele se deschid cu orașul și datele tale, pentru 2 persoane. Prețul îl alegi tu.</p>
+            </section>
           </div>
           <p class="pk-note">Prețul zborului și al cazării îl vezi la furnizor, pentru datele alese. Biletele se cumpără direct de la vânzător; 23citybreak poate primi un comision, fără cost pentru tine.${ev.source === 'football-data' ? ' Football data provided by the Football-Data.org API.' : ''}</p>
         </aside>

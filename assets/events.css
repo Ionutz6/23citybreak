@@ -122,4 +122,18 @@ button.pk-day{cursor:pointer}
 .pk-wx .l{align-items:flex-start}
 .pk-wx-src{font-size:11px;margin-top:2px}
 .pk-wx-src a{color:inherit}
-.pk-stay{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+/* Cazare: două opțiuni clar separate (Booking / Airbnb) */
+.pk-stay{margin-top:6px;padding:14px;border-radius:14px;border:1px solid #b9dcc6;background:radial-gradient(circle at 1px 1px,rgba(47,125,85,.13) 1px,transparent 1.5px) 0 0/14px 14px,linear-gradient(160deg,#e9f6ee,#f6fbf7)}
+.pk-stay-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.pk-stay-head h4{margin:0;font:700 17px/1.1 'Space Grotesk',system-ui,sans-serif;color:#143d2a}
+.pk-stay-head span{font-size:12px;font-weight:600;color:#3f6b54}
+.pk-stay-opts{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.pk-stay-opt{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:12px 12px 11px;border-radius:12px;background:#fff;border:1.5px solid #cfe5d7;box-shadow:0 1px 0 rgba(20,61,42,.06);color:#0a0b0d;text-decoration:none;transition:border-color .15s,transform .15s,box-shadow .15s}
+.pk-stay-opt:hover{border-color:#2f7d55;transform:translateY(-1px);box-shadow:0 6px 16px -8px rgba(20,61,42,.35)}
+.pk-stay-opt:focus-visible{outline:3px solid #2f7d55;outline-offset:2px}
+.pk-stay-opt .ic{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:#e9f6ee;font-size:17px;margin-bottom:4px}
+.pk-stay-opt .nm{font:800 15px/1.1 'Space Grotesk',system-ui,sans-serif}
+.pk-stay-opt .ds{font-size:12px;color:#5b6470}
+.pk-stay-opt .go{position:absolute;top:10px;right:11px;font-weight:800;color:#2f7d55}
+.pk-stay-or{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:1;padding:2px 6px;border-radius:999px;background:#143d2a;color:#fff;font-size:10px;font-weight:800;letter-spacing:.04em;text-transform:uppercase}
+.pk-stay-note{margin:10px 0 0;font-size:11.5px;color:#3f6b54}
