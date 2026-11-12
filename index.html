@@ -290,6 +290,7 @@
   <link rel="stylesheet" href="assets/account.css?v=6">
   <link rel="stylesheet" href="assets/personalizare.css?v=4">
 <link rel="stylesheet" href="assets/site-header.css?v=2">
+<link rel="stylesheet" href="assets/search-steps.css?v=1">
 <script>/* Quizul s-a mutat pe pagina Orașe vizitate; linkurile vechi (emailuri, cont) ajung acolo. */ if (/^#city-quiz/.test(location.hash)) location.replace('orase-vizitate.html' + location.hash);</script>
 </head>
 <body class="antialiased min-h-screen flex flex-col bg-white text-[#0a0b0d]">
@@ -381,7 +382,7 @@
           </select>
         </div>
 
-        <div class="duration-field"><label for="quick-duration">Durata zborului / sens</label><select id="quick-duration" onchange="document.getElementById('f-max-dur').value=this.value"><option value="120">Maxim 2 ore</option><option value="180" selected>Maxim 3 ore</option><option value="240">Maxim 4 ore</option><option value="360">Maxim 6 ore</option></select></div>
+        <div class="duration-field"><label for="quick-duration">Durata zborului / sens</label><select id="quick-duration" onchange="document.getElementById('f-max-dur').value=this.value"><option value="120">Maxim 2 ore</option><option value="180" selected>Maxim 3 ore</option><option value="240">Maxim 4 ore</option><option value="300">Maxim 5 ore</option><option value="360">Maxim 6 ore</option></select></div>
         <!-- 4. Buget maxim (Default 150 €) -->
         <div class="lg:col-span-3 bg-[#fdfaf3] p-3 rounded-2xl border border-[#ecd8b0] shadow-2xs hover:border-[#dfa649] transition">
           <label class="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#0a0b0d] mb-1.5 font-display">
@@ -513,6 +514,7 @@
                 <option value="120">Maximum 2 ore / sens</option>
                 <option value="180" selected>Maximum 3 ore / sens</option>
                 <option value="240">Maximum 4 ore / sens</option>
+                <option value="300">Maximum 5 ore / sens</option>
                 <option value="360">Maximum 6 ore / sens</option>
               </select>
             </div>
