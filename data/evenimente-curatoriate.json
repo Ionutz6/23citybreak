@@ -1,0 +1,9 @@
+{
+  "_note": "Evenimente anuale introduse manual (festivaluri, târguri, sărbători de oraș). Intră în tabela events prin funcția events-sync, cu id 'cur:<slug>'. Adaugă doar evenimente cu date verificate din sursa oficială (câmpul source_url). Ore în timpul local al orașului, fără fus (funcția le tratează ca oră locală aproximativă, UTC+1).",
+  "events": [
+    { "slug": "fallas-valencia-2027", "kind": "city_festival", "title": "Las Fallas", "city_id": "valencia_es", "venue": "în tot orașul", "starts": "2027-03-15", "ends": "2027-03-19", "ticket_url": "https://www.visitvalencia.com/en/events-valencia/festivities/the-fallas", "popularity": 85, "date_rule": "fix, 15-19 martie în fiecare an" },
+    { "slug": "st-patricks-dublin-2027", "kind": "city_festival", "title": "St. Patrick's Festival", "city_id": "dublin_ie", "venue": "centrul orașului", "starts": "2027-03-17", "ends": "2027-03-17", "ticket_url": "https://stpatricksfestival.ie/", "popularity": 80, "date_rule": "fix, 17 martie (parada); festivalul ține câteva zile în jur" },
+    { "slug": "kings-day-amsterdam-2027", "kind": "city_festival", "title": "Koningsdag (Ziua Regelui)", "city_id": "amsterdam_nl", "venue": "în tot orașul", "starts": "2027-04-27", "ends": "2027-04-27", "ticket_url": "https://www.iamsterdam.com/en/whats-on/kings-day", "popularity": 85, "date_rule": "fix, 27 aprilie (26 dacă 27 cade duminica)" },
+    { "slug": "oktoberfest-munchen-2027", "kind": "city_festival", "title": "Oktoberfest", "city_id": "munich_de", "venue": "Theresienwiese", "starts": "2027-09-18", "ends": "2027-10-03", "ticket_url": "https://www.oktoberfest.de/en", "popularity": 95, "date_rule": "începe sâmbăta de după 15 septembrie, se termină în prima duminică din octombrie" }
+  ]
+}
