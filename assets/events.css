@@ -90,3 +90,26 @@ button.pk-day{cursor:pointer}
 .pk-empty{max-width:640px;margin:60px auto;padding:0 6%;text-align:center}
 @media(max-width:900px){.pk-illu-grid{grid-template-columns:1fr}.pk-grid{grid-template-columns:1fr}.pk-hero h1{font-size:30px}.pk-side{position:static;order:-1}.pk-wrap{padding:0 16px}}
 .pk .footer-inner{box-sizing:border-box;max-width:100%;flex-wrap:wrap}
+.pk-stops{margin:4px 0 6px;padding-left:22px;font-size:15px;line-height:1.6}
+.pk-stops a,.pk-event a{color:#0a0b0d;text-decoration:underline;text-decoration-color:#dfa649;text-underline-offset:3px}
+.pk-pdf{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:26px 0 0;padding:16px;border:1.5px dashed #f0caa3;border-radius:16px;background:#fffaf0}
+.pk-pdf .pk-btn{cursor:pointer}
+.pk-print-only{display:none}
+@media print{
+  .cb-header,.site-footer,.pk-side,.pk-box,.pk-pdf,.pk-crumb,.acct-banner,dialog{display:none!important}
+  .pk-print-only{display:block;margin:6px 0 0;font-size:13px;color:#333}
+  .pk-hero{background:none!important;color:#000}
+  .pk-hero::after{display:none}
+  .pk-hero .pk-wrap{padding:0 0 10px}
+  .pk-hero h1{font-size:26px;color:#000}
+  .pk-sub{color:#333}
+  .pk-wrap{padding:0;max-width:none}
+  .pk-grid{display:block;margin:0}
+  .pk-dayh{font-size:17px;margin:16px 0 2px;break-after:avoid}
+  .pk-story{font-size:13px}
+  .pk-event,.pk-stops{break-inside:avoid}
+  .pk-illu{break-before:page;margin:0}
+  .pk-illu-grid{grid-template-columns:1fr 1fr}
+  .pk-illu img{max-height:22cm;width:auto;max-width:100%}
+  a{color:#000}
+}

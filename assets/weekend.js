@@ -12,6 +12,7 @@
   }
   const slug = ev.city_id, city = H.cityOf(slug), name = H.cityName(slug), guide = H.guideOf(slug);
   const s = H.startDate(ev), en = H.endDate(ev), multi = H.isMultiDay(ev);
+  const hasAccount = () => !!(window.Account && window.Account.hasSession());
   const [icon, kindName] = E.KINDS[ev.kind] || E.KINDS.other;
   const cap = t => t.replace(/^./, c => c.toUpperCase());
 
@@ -35,11 +36,12 @@
   const stayUrl = () => `https://www.booking.com/searchresults.html?${new URLSearchParams({ ss: `${ev.venue ? `${ev.venue}, ` : ''}${name}`, checkin: trip.out, checkout: trip.back, group_adults: '2', no_rooms: '1' })}`;
   const ticketUrl = ev.ticket_url || `https://www.google.com/search?${new URLSearchParams({ q: ev.kind === 'football' && ev.teams?.[0] ? `${ev.teams[0]} official tickets` : `${ev.title} ${name} tickets` })}`;
   const ticketLabel = ev.ticket_url ? (ev.kind === 'city_festival' || ev.kind === 'market' ? 'Vezi programul oficial' : 'Cumpără bilet la eveniment') : (ev.kind === 'football' ? 'Caută bilete pe site-ul clubului' : 'Caută bilete la eveniment');
+  const mapsPlace = q => `https://www.google.com/maps/search/?${new URLSearchParams({ api: '1', query: q })}`;
   const mapsDir = stops => { const p = new URLSearchParams({ api: '1', origin: stops[0], destination: stops[stops.length - 1], travelmode: 'walking' }); if (stops.length > 2) p.set('waypoints', stops.slice(1, -1).join('|')); return `https://www.google.com/maps/dir/?${p}`; };
 
   // ---------- Itinerar ----------
   const eventTime = ev.time_tbc ? '' : H.local(ev.starts_at, slug).time;
-  const eventBlock = d => `<div class="pk-event"><div class="t">${multi ? 'Zi de eveniment' : eventTime ? `Ora ${esc(eventTime)}` : 'Ora se anunță'}</div><div class="w">${icon} ${esc(ev.title)}</div><div class="s">${ev.venue ? esc(ev.venue) : esc(name)}${multi ? ` · ${esc(H.whenLabel(ev))}` : ''}</div></div>`;
+  const eventBlock = d => `<div class="pk-event"><div class="t">${multi ? 'Zi de eveniment' : eventTime ? `Ora ${esc(eventTime)}` : 'Ora se anunță'}</div><div class="w">${icon} ${esc(ev.title)}</div><div class="s">${ev.venue ? `<a href="${esc(mapsPlace(`${ev.venue}, ${name}`))}" target="_blank" rel="noopener noreferrer">${esc(ev.venue)}</a>` : esc(name)}${multi ? ` · ${esc(H.whenLabel(ev))}` : ''}</div></div>`;
   function itinerary() {
     const days = []; for (let d = trip.out; d <= trip.back; d = H.isoAdd(d, 1)) days.push(d);
     // Traseele din ghid se pun pe zilele pline (fără ziua sosirii), întâi pe cele fără eveniment de zi întreagă.
@@ -52,7 +54,7 @@
       const head = first ? 'sosire' : last ? (route ? 'ultimul traseu, apoi plecare' : 'plecare') : evDay && !multi ? (!eventTime ? 'orașul și evenimentul' : eventTime < '15:00' ? 'evenimentul, apoi orașul' : 'orașul ziua, evenimentul seara') : evDay ? 'zi de eveniment' : 'la pas prin oraș';
       const body = [];
       if (first && !evDay) body.push(`<p class="pk-story">Seara sosirii: cazare și o primă plimbare prin centru.</p>`);
-      if (route) body.push(`<p class="pk-story">${morningOnly ? 'Dimineața, înainte de eveniment: ' : ''}${esc(route.story)}</p><a class="pk-maplink" href="${esc(mapsDir(route.stops))}" target="_blank" rel="noopener noreferrer">Deschide traseul în Google Maps ↗</a>`);
+      if (route) body.push(`<p class="pk-story">${morningOnly ? 'Dimineața, înainte de eveniment: ' : ''}${esc(route.story)}</p><ol class="pk-stops">${route.stops.map(st => `<li><a href="${esc(mapsPlace(st))}" target="_blank" rel="noopener noreferrer">${esc(st.split(',')[0])}</a></li>`).join('')}</ol><a class="pk-maplink" href="${esc(mapsDir(route.stops))}" target="_blank" rel="noopener noreferrer">Deschide tot traseul în Google Maps ↗</a>`);
       if (evDay) body.push(eventBlock(d));
       if (!body.length) body.push(`<p class="pk-story">${last ? 'Dimineață liberă, apoi drumul spre aeroport.' : 'Zi liberă: reia obiectivele preferate de pe hartă sau odihnește-te.'}</p>`);
       return `<h2 class="pk-dayh">${esc(cap(H.longDate(d)))} · ${head}</h2>${body.join('')}`;
@@ -69,6 +71,7 @@
         <div class="pk-crumb"><a href="./#events-home">Evenimente</a> / ${esc(kindName)} / ${esc(name)}</div>
         <h1>${multi ? esc(ev.title) + ' · ' + esc(name) : `Weekend la ${esc(name)}: ${esc(ev.title)}`}</h1>
         <p class="pk-sub">${icon} ${ev.venue ? esc(ev.venue) + ' · ' : ''}${esc(H.whenLabel(ev))}</p>
+        <p class="pk-print-only">Zbor ${esc(origin)} ⇄ ${esc(iata || name)}: ${esc(H.shortDate(trip.out))} → ${esc(H.shortDate(trip.back))} · 23citybreak.ro</p>
       </div></section>
       <div class="pk-wrap pk-grid">
         <div>
@@ -86,6 +89,7 @@
             <p class="pk-note">${custom ? 'Apasă pe prima și pe ultima zi a șederii. ' : ''}Zbor ${esc(H.shortDate(trip.out))} → ${esc(H.shortDate(trip.back))}, ${nights} ${nights === 1 ? 'noapte' : 'nopți'}.${multi ? ' Zilele cu contur punctat sunt zilele evenimentului.' : ''}</p>
           </div>
           ${guide ? itinerary() : `<h2 class="pk-dayh">${esc(cap(H.whenLabel(ev)))}</h2>${eventBlock(s)}<p class="pk-note">Pentru ${esc(name)} nu avem încă un ghid ilustrat, așa că pachetul nu include un itinerar pe zile.</p>`}
+          ${guide ? `<div class="pk-pdf"><button type="button" class="pk-btn line" data-pdf>⬇ Descarcă itinerarul (PDF)</button><span class="pk-note" style="margin:0">${hasAccount() ? 'În fereastra care se deschide alege „Salvează ca PDF”.' : 'Gratuit, cu un cont 23citybreak.'}</span></div>` : ''}
           ${guide ? `<section class="pk-illu"><h2>${esc(guide.city || name)} pe hartă</h2><p class="pk-note" style="margin:0">Toate obiectivele din itinerar sunt desenate pe ilustrație.</p>
             <div class="pk-illu-grid"><a href="${esc(illu)}" target="_blank" rel="noopener noreferrer"><img src="${esc(illu)}" alt="Hartă ilustrată cu obiectivele din ${esc(guide.city || name)}" loading="lazy"></a>
             <ol class="pk-legend">${guide.legend.map(([n, t, dsc]) => `<li><span class="n">${esc(n)}</span><span><strong>${esc(t)}</strong><br>${esc(dsc)}</span></li>`).join('')}</ol></div></section>` : ''}
@@ -107,8 +111,15 @@
     document.title = `${ev.title} · ${name} · 23citybreak`;
   }
 
+  // Itinerarul ca PDF: doar cu cont. Fără cont deschidem loginul; linkul din email revine aici cu ?pdf=1.
+  function downloadPdf() {
+    if (hasAccount()) { window.print(); return; }
+    const back = new URL(location.href); back.searchParams.set('pdf', '1'); back.hash = '';
+    window.Account?.openLogin({ title: 'Descarcă itinerarul', intro: 'Itinerarul în PDF e gratuit pentru cei cu cont. Fără parolă: îți trimitem un link pe email și revii direct aici.', source: 'itinerar-pdf', redirect: back.href });
+  }
   let pick = null; // prima zi apăsată în modul „Aleg eu zilele”
   root.addEventListener('click', e => {
+    if (e.target.closest('[data-pdf]')) { downloadPdf(); return; }
     const m = e.target.closest('[data-mode]');
     if (m) {
       const def = modes.find(x => x.key === m.dataset.mode);
@@ -122,4 +133,9 @@
     render(); root.querySelector(`[data-day="${d}"]`)?.focus();
   });
   render();
+  window.addEventListener('account:change', render);
+  // Întoarcere din linkul de login cerut pentru PDF.
+  if (new URLSearchParams(location.search).has('pdf') && window.Account) {
+    try { await window.Account.afterLogin(); if (await window.Account.session()) { render(); setTimeout(() => window.print(), 600); } } catch {}
+  }
 })();
