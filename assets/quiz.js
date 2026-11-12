@@ -1,4 +1,7 @@
 (() => {
+  // Rulează pe orase-vizitate.html (hub-ul). Datele vin din assets/europe-cities.js și assets/illustrated-guides.js.
+  const illustratedGuides = window.CB_ILLUSTRATED_GUIDES, ALL_EUROPE_CITIES = window.CB_EUROPE_CITIES;
+  if (!illustratedGuides || !ALL_EUROPE_CITIES) return;
   // Ordered against the original, unlabelled map assets saved for the quiz.
   const slugs = 'edinburgh,budapesta,bruxelles,chisinau,viena,lyon,porto,bologna,paris,milano,venetia,copenhaga,madrid,barcelona,atena,roma,pisa-florenta,napoli,amsterdam,nisa,londra,istanbul,lisabona,varsovia,berlin,dublin,valencia,sevilla,cracovia,malaga,munchen,bari,split,stockholm,dubrovnik,palermo,salonic,zurich,catania,bratislava,tallinn,oslo,marsilia,bordeaux,riga,sofia,helsinki,bruges,belgrad,vilnius,ljubljana,glasgow,koln-bonn'.split(',');
   const questions = slugs.map((slug, i) => {
@@ -14,7 +17,7 @@
   section.hidden = false;
 
   const ROUNDS = 10, SECONDS = 15, BASE = 100, MAX_BONUS = 50, MAX_SCORE = ROUNDS * (BASE + MAX_BONUS);
-  const SITE = 'https://23citybreak.ro/#city-quiz', BEST_KEY = '23cb-quiz-best';
+  const SITE = 'https://23citybreak.ro/orase-vizitate.html#city-quiz', BEST_KEY = '23cb-quiz-best';
   const $ = id => document.getElementById(id);
   const card = $('quiz-card'), image = $('quiz-image'), content = $('quiz-content');
   const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -28,6 +31,8 @@
   let game, timerId, shareBlob;
 
   function goToFlights(cityId) {
+    // Pe prima pagină (vechiul loc al quizului) selectăm direct; altfel deschidem căutarea cu orașul ales.
+    if (typeof selectDestination !== 'function' || !$('configurator')) { location.href = `./?dest=${encodeURIComponent(cityId)}#configurator`; return; }
     selectDestination(cityId);
     $('configurator').scrollIntoView({behavior: reduceMotion ? 'auto' : 'smooth'});
     $('dest-search-input').focus({preventScroll: true});
@@ -129,9 +134,17 @@
       const b = el('button', null); b.type = 'button'; b.title = `Caută zboruri spre ${r.q.name}`;
       b.append(el('span', 'mark', r.ok ? '✓' : '✗'), el('span', 'name', r.q.name), el('span', 'pts', r.ok ? `+${r.points}` : '0'));
       b.addEventListener('click', () => goToFlights(r.q.id));
-      li.append(b); list.append(li);
+      li.append(b);
+      const hub = window.Hub, vid = r.q.id.replace(/^City:/, '');
+      if (hub?.canMark(vid)) {
+        const mark = el('button', 'quiz-been'); mark.type = 'button';
+        const paint = () => { const on = hub.isVisited(vid); mark.textContent = on ? '✓ Am fost' : '+ Am fost'; mark.classList.toggle('is-on', on); mark.setAttribute('aria-pressed', String(on)); mark.setAttribute('aria-label', `${on ? 'Scoate' : 'Marchează'} ${r.q.name} ca oraș vizitat`); };
+        mark.addEventListener('click', () => { hub.toggle(vid); paint(); });
+        paint(); li.classList.add('has-been'); li.append(mark);
+      }
+      list.append(li);
     });
-    const recapLabel = el('p', 'quiz-recap-label', 'Apasă pe un oraș ca să cauți zboruri de weekend.');
+    const recapLabel = el('p', 'quiz-recap-label', window.Hub ? 'Apasă pe un oraș ca să cauți zboruri de weekend. Ai fost deja acolo? Bifează „Am fost” și apare pe harta ta.' : 'Apasă pe un oraș ca să cauți zboruri de weekend.');
 
     const text = `Am ghicit ${correct}/10 orașe și am făcut ${fmt(score)} puncte la quizul „Ghicește orașul” de pe 23citybreak.ro. Tu câte recunoști?`;
     const actions = el('div', 'quiz-actions quiz-share');
@@ -145,6 +158,7 @@
     const account = el('div', 'quiz-account');
     content.replaceChildren(kicker, big, h, best, account, actions, hint, recapLabel, list);
     window.QuizAccount?.mount(account, {score, correct, cards: results.map(r => ({image: r.q.image, ok: r.ok}))});
+    window.dispatchEvent(new CustomEvent('quiz:finished', {detail: {score, correct}}));
 
     shareBlob = null;
     image.onload = image.onerror = null;
