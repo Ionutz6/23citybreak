@@ -3,7 +3,7 @@
 Proiect: **23ai** (ref `lsudthnrumslfscpppix`, EU Frankfurt). Baza aparține 23ai; 23citybreak doar scrie în ea.
 Clientul din browser: `assets/account.js` expune `window.Account` (vezi mai jos). Nu crea alt client Supabase.
 
-Migrații: `supabase/migrations/20261111_quiz.sql`, `20261111_quiz_cards.sql`, `20261111_profil.sql`.
+Migrații: `supabase/migrations/20261111_quiz.sql`, `20261111_quiz_cards.sql`, `20261111_profil.sql`, `20261112_event_preferences.sql`.
 
 ## Reguli comune
 
@@ -101,3 +101,20 @@ window.VisitedCities.mount(container, {client, user, mode: 'onboarding' | 'profi
 ```
 
 Dacă `window.VisitedCities` nu e încărcat, se afișează un placeholder. Scriptul hărții se include în `cont.html` înainte de `assets/account.js`.
+
+### `event_preferences` (ce evenimente îl interesează pe utilizator)
+
+Un rând per cont, privat (RLS ca la `search_preferences`). Rândul **poate lipsi**. Editat din cardul „Ce te aduce într-un oraș?” din profil (`assets/profile-interests.js`).
+
+| Coloană | Tip | Note |
+|---|---|---|
+| `user_id` | uuid PK → auth.users | |
+| `music_genres` | text[] | `rock`, `pop`, `electronic`, `hiphop`, `metal`, `indie`, `jazz`, `classical`, `latin`, `folk` |
+| `sports` | text[] | `football`, `basketball`, `tennis`, `f1`, `motogp`, `running` |
+| `competitions` | text[] | coduri football-data.org: `CL`, `PL`, `PD`, `SA`, `BL1`, `FL1`, `DED`, `PPL` (ca `events.competition`) |
+| `other_interests` | text[] | `festival`, `xmas_market`, `city_festival`, `theatre`, `comedy` |
+| `favorite_teams`, `favorite_artists` | text[] | nume introduse liber, cel mult 20 / 30 |
+| `event_alerts` | boolean | acord pentru emailuri cu evenimentele favorite; default `false` |
+| `updated_at` | timestamptz | prin trigger |
+
+După salvare, aceleași valori sunt copiate în `localStorage['23cb-event-prefs']`, pentru filtrarea evenimentelor fără o cerere în plus.
