@@ -1,0 +1,48 @@
+/* Pașii 1-2-3 de pe pagina principală (slidere, aliniere, culori pas 3) */
+
+/* Fără chenarul alb din jurul pașilor: casetele se aliniază cu imaginea din header */
+#configurator.search-panel{background:transparent;border:0;border-radius:0;box-shadow:none;padding:18px 0 0}
+#configurator.search-panel > .journey-step:first-of-type{margin-top:0}
+
+/* Pasul 2: Călători, Durata zborului și Buget pe aceeași linie */
+.option-fields{grid-template-columns:repeat(3,minmax(0,1fr))}
+.option-fields > .space-y-3{grid-column:1/-1}
+.option-fields > div{display:flex;flex-direction:column}
+.option-fields .duration-field > label{font-family:var(--font-display);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#0a0b0d;margin-bottom:6px}
+.option-fields .space-y-3 label{color:#1e3a5f}
+
+/* Slidere (albastru) */
+.option-fields .option-slider{width:100%;height:24px;margin:2px 0 0;accent-color:#0075ff;cursor:pointer}
+.option-fields .option-slider:focus-visible{outline:3px solid #0075ff;outline-offset:3px}
+.option-fields .slider-value{font-family:var(--font-display);font-weight:700;font-size:14px;color:#161713;min-height:1.5em}
+.option-fields .slider-ends{display:flex;justify-content:space-between;gap:12px;margin-top:2px;font-size:11px;font-weight:600;line-height:1.2;color:#7b8494}
+.option-fields .slider-ends span{padding:2px 7px;border-radius:999px;background:#f1f4f8;white-space:nowrap}
+.option-fields .currency-row{margin-top:10px}
+.option-fields .space-y-3 .grid{column-gap:clamp(16px,3vw,40px)}
+.option-fields .space-y-3 .grid > div{min-width:0}
+
+/* Pasul 3: nuanță deschisă de bleumarin în loc de gălbui */
+.period-section{background:#e8edf5;border-color:#cdd6e4}
+.period-section .period-choice{border-color:#d5dce8}
+.period-section .period-choice.active{background:#f4f7fc;border-color:#2f5a8f;box-shadow:inset 0 0 0 1px #2f5a8f}
+.period-section .rounded-xl.border-\[\#eee5d4\]{background:#fff;border-color:#d5dce8}
+.period-section .text-\[\#8a5d14\]{color:#27446b}
+.period-section .calendar-range-choice:hover{border-color:#2f5a8f;background:#eef3fb;color:#1e3a5f}
+.period-section .calendar-month{border-color:#d5dce8}
+.period-section .calendar-day.available{background:#f1f5fb;border-color:#a9bcd6;color:#1e2a3b}
+.period-section .calendar-day.available:hover{background:#dde7f4}
+.period-section .calendar-day.available.selected{background:#1e3a5f;border-color:#1e3a5f;color:#fff}
+.period-section .calendar-day.available.today:not(.selected){background:#f1f5fb}
+.period-section .calendar-day.holiday:not(.selected){box-shadow:inset 0 -3px #9b2c4b}
+.period-section .calendar-day:focus-visible{outline-color:#2f5a8f}
+.period-section .calendar-holidays{color:#8a2944}
+.period-section .calendar-legend i{background:#f1f5fb;border-color:#a9bcd6}
+.period-section .calendar-legend .selected{background:#1e3a5f;border-color:#1e3a5f}
+.period-section .calendar-legend .holiday{box-shadow:inset 0 -3px #9b2c4b}
+.mobile-month-nav button{border-color:#cdd6e4;background:#f4f7fc;color:#1e3a5f}
+
+@media(max-width:600px){
+  #configurator.search-panel{padding:14px 0 0;border-radius:0}
+  .option-fields{grid-template-columns:1fr}
+  .option-fields > .space-y-3{grid-column:auto}
+}
