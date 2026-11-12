@@ -22,8 +22,9 @@
     ? [{ key: 'weekend', label: 'Weekendul recomandat', out: wk.fri, back: wk.sun }, { key: 'full', label: 'Tot evenimentul', out: H.isoAdd(s, -1), back: H.isoAdd(en, 1) }]
     : [{ key: 'weekend', label: 'Weekend (vin–dum)', out: wk.fri, back: wk.sun }, { key: 'long', label: 'Prelungit (joi–lun)', out: H.isoAdd(wk.fri, -1), back: H.isoAdd(wk.sun, 1) }];
   let trip = { out: modes[0].out, back: modes[0].back, mode: modes[0].key };
-  const stripFrom = [...modes.map(m => m.out), H.isoAdd(s, -1)].sort()[0];
-  const stripTo = [modes[0].back, modes[1].back, H.isoAdd(en, 1)].sort().pop();
+  // Banda de zile: la evenimentele de o zi lăsăm câte o zi în plus la capete (mie–mar), pentru alegerea manuală.
+  const stripFrom = H.isoAdd([...modes.map(m => m.out), H.isoAdd(s, -1)].sort()[0], multi ? 0 : -1);
+  const stripTo = H.isoAdd([modes[0].back, modes[1].back, H.isoAdd(en, 1)].sort().pop(), multi ? 0 : 1);
   const strip = []; for (let d = stripFrom; d <= stripTo && strip.length < 21; d = H.isoAdd(d, 1)) strip.push(d);
   const isEventDay = d => d >= s && d <= en;
 
@@ -65,7 +66,7 @@
   const illu = H.guideImage(slug);
   function render() {
     const nights = Math.round((new Date(trip.back) - new Date(trip.out)) / 864e5);
-    const custom = multi && trip.mode === 'custom';
+    const custom = trip.mode === 'custom';
     root.innerHTML = `
       <section class="pk-hero"${illu || ev.image_url ? ` style="background-image:url('${esc(illu || ev.image_url)}')"` : ''}><div class="pk-wrap">
         <div class="pk-crumb"><a href="./#events-home">Evenimente</a> / ${esc(kindName)} / ${esc(name)}</div>
@@ -79,7 +80,7 @@
             <h3>Câte zile stai?</h3>
             <div class="pk-seg" role="group" aria-label="Durata șederii">
               ${modes.map(m => `<button type="button" data-mode="${m.key}" aria-pressed="${trip.mode === m.key}">${esc(m.label)}</button>`).join('')}
-              ${multi ? `<button type="button" data-mode="custom" aria-pressed="${custom}">Aleg eu zilele</button>` : ''}
+              <button type="button" data-mode="custom" aria-pressed="${custom}">Aleg eu zilele</button>
             </div>
             <div class="pk-days">${strip.map(d => {
               const on = d >= trip.out && d <= trip.back, cls = `pk-day${on ? ' on' : ''}${isEventDay(d) ? ' event' : ''}`;
@@ -130,6 +131,9 @@
     if (!d) return;
     if (!pick) { pick = d; trip = { out: d, back: H.isoAdd(d, 1) > stripTo ? d : H.isoAdd(d, 1), mode: 'custom' }; }
     else { const [a, b] = [pick, d].sort(); trip = { out: a, back: a === b ? H.isoAdd(a, 1) : b, mode: 'custom' }; pick = null; }
+    // Șederea trebuie să prindă evenimentul: dacă zilele alese îl ocolesc, o întindem până la el.
+    if (trip.back < s) trip.back = s;
+    if (trip.out > en) trip.out = en;
     render(); root.querySelector(`[data-day="${d}"]`)?.focus();
   });
   render();
