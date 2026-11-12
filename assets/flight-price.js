@@ -2,18 +2,19 @@
 // (același API ca motorul de căutare de pe prima pagină).
 //   window.CBFlightPrice.get({ origin:'OTP', dest:'City:dublin_ie', out:'2027-02-05', back:'2027-02-07' })
 //     → Promise<{ eur, direct, stops, at } | null>   eur = cel mai mic preț / persoană, preferând zborurile directe
-// Kiwi blochează IP-ul după prea multe cereri, așa că: cache 6 ore în localStorage, cel mult 2 cereri simultan,
-// cel mult 24 de cereri pe încărcare de pagină și, la primul refuz, nicio cerere timp de 30 de minute.
+// Kiwi blochează IP-ul după prea multe cereri, așa că: cache 6 ore în localStorage, cel mult 2 cereri simultan și
+// cel mult 24 de cereri pe încărcare de pagină. Pauza de 30 de minute după un refuz și bugetul de cereri pe oră
+// sunt comune cu prima pagină și stau în assets/kiwi-client.js (încărcat înaintea acestui fișier).
 (() => {
-  const API = 'https://api.skypicker.com/umbrella/v2/graphql';
-  const TTL = 6 * 36e5, MAX_PER_PAGE = 24, PAUSE_KEY = '23cb-kiwi-pause', CACHE_KEY = '23cb-flight-prices';
+  const K = window.CBKiwi;
+  const TTL = 6 * 36e5, MAX_PER_PAGE = 24, CACHE_KEY = '23cb-flight-prices';
   const QUERY = `query SearchReturn($search: SearchReturnInput, $filter: ItinerariesFilterInput, $options: ItinerariesOptionsInput) {
     returnItineraries(search: $search, filter: $filter, options: $options) { ... on Itineraries { itineraries { ... on ItineraryReturn {
       priceEur { amount } outbound { sectorSegments { segment { code } } } inbound { sectorSegments { segment { code } } } } } } } }`;
   const read = () => { try { return JSON.parse(localStorage.getItem(CACHE_KEY)) || {}; } catch { return {}; } };
   const write = c => { try { const now = Date.now(); for (const k in c) if (now - c[k].at > TTL) delete c[k]; localStorage.setItem(CACHE_KEY, JSON.stringify(c)); } catch {} };
-  const paused = () => { try { return Date.now() < +(localStorage.getItem(PAUSE_KEY) || 0); } catch { return false; } };
-  const pause = () => { try { localStorage.setItem(PAUSE_KEY, String(Date.now() + 30 * 6e4)); } catch {} };
+  // Fără prețuri noi cât ține pauza după un refuz sau când bugetul de cereri pe oră e consumat.
+  const paused = () => K.paused() || K.budgetLeft() <= 0;
 
   let sent = 0, active = 0;
   const queue = [], inflight = new Map();
@@ -25,8 +26,8 @@
     sent++;
     let res;
     try {
-      res = await fetch(API, {
-        method: 'POST', signal: AbortSignal.timeout(30000), headers: { 'Content-Type': 'application/json' },
+      res = await K.fetch({
+        signal: AbortSignal.timeout(30000),
         body: JSON.stringify({ query: QUERY, variables: {
           search: { passengers: { adults: 1, adultsHandBags: [0], adultsHoldBags: [0] }, cabinClass: { cabinClass: 'ECONOMY' },
             itinerary: { source: { ids: [`Station:airport:${origin}`] }, destination: { ids: [dest] },
@@ -34,8 +35,7 @@
           filter: { allowChangeInboundSource: false, allowChangeInboundDestination: false, transportTypes: ['FLIGHT'] },
           options: { partner: 'skypicker', sortBy: 'PRICE' } } }),
       });
-    } catch (e) { if (e?.name === 'TypeError') pause(); return null; } // refuz Kiwi = 403 fără CORS → TypeError
-    if (res.status === 403 || res.status === 429) { pause(); return null; }
+    } catch { return null; } // refuzul Kiwi (403 fără CORS → TypeError) pornește pauza în kiwi-client.js
     if (!res.ok) return null;
     const list = (await res.json().catch(() => null))?.data?.returnItineraries?.itineraries || [];
     const legs = it => Math.max((it.outbound?.sectorSegments || []).length, (it.inbound?.sectorSegments || []).length);
