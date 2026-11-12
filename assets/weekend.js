@@ -34,7 +34,11 @@
   const sky = d => d.slice(2).replace(/-/g, '');
   const flightUrl = () => iata ? `https://www.kiwi.com/deep?${new URLSearchParams({ from: origin, to: iata, departure: trip.out, return: trip.back, adults: '1', currency: 'EUR', lang: 'ro' })}` : 'https://www.kiwi.com/ro/';
   const skyUrl = () => iata ? `https://www.skyscanner.ro/transport/flights/${origin.toLowerCase()}/${iata.toLowerCase()}/${sky(trip.out)}/${sky(trip.back)}/?adultsv2=1&cabinclass=economy` : '';
-  const stayUrl = () => `https://www.booking.com/searchresults.html?${new URLSearchParams({ ss: `${ev.venue ? `${ev.venue}, ` : ''}${name}`, checkin: trip.out, checkout: trip.back, group_adults: '2', no_rooms: '1' })}`;
+  // Cazarea: căutare pe oraș (nu pe sala evenimentului), cu datele alese. Numele englezesc din slug-ul Kiwi
+  // (ex. vienna_at → „Vienna”) e recunoscut sigur și de Booking, și de Airbnb.
+  const stayCity = String(slug).split('_')[0].replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+  const stayUrl = () => `https://www.booking.com/searchresults.html?${new URLSearchParams({ ss: stayCity, checkin: trip.out, checkout: trip.back, group_adults: '2', no_rooms: '1' })}`;
+  const airbnbUrl = () => `https://www.airbnb.com/s/${encodeURIComponent(stayCity)}/homes?${new URLSearchParams({ checkin: trip.out, checkout: trip.back, adults: '2' })}`;
   const ticketUrl = ev.ticket_url || `https://www.google.com/search?${new URLSearchParams({ q: ev.kind === 'football' && ev.teams?.[0] ? `${ev.teams[0]} official tickets` : `${ev.title} ${name} tickets` })}`;
   const ticketLabel = ev.ticket_url ? (ev.kind === 'city_festival' || ev.kind === 'market' ? 'Vezi programul oficial' : 'Cumpără bilet la eveniment') : (ev.kind === 'football' ? 'Caută bilete pe site-ul clubului' : 'Caută bilete la eveniment');
   const mapsPlace = q => `https://www.google.com/maps/search/?${new URLSearchParams({ api: '1', query: q })}`;
@@ -107,13 +111,13 @@
           <h3>Pachetul tău</h3>
           <div class="pk-row"><div class="l"><div class="pk-ico">${icon}</div><div><div class="t">Bilet la eveniment</div><div class="s">${ev.price_min_eur ? 'de la' : ev.kind === 'football' ? 'se vinde de club' : ev.kind === 'city_festival' || ev.kind === 'market' ? 'intrare liberă' : 'preț la vânzător'}</div></div></div>${ev.price_min_eur ? `<div class="pr">${Math.round(ev.price_min_eur)} €</div>` : ''}</div>
           <div class="pk-row"><div class="l"><div class="pk-ico">✈︎</div><div><div class="t">Zbor ${esc(origin)} ⇄ ${esc(iata || name)}</div><div class="s">${esc(H.shortDate(trip.out))} → ${esc(H.shortDate(trip.back))}</div></div></div></div>
-          <div class="pk-row"><div class="l"><div class="pk-ico">🛏</div><div><div class="t">Cazare, ${nights} ${nights === 1 ? 'noapte' : 'nopți'}</div><div class="s">${ev.venue ? 'aproape de ' + esc(ev.venue) : esc(name)}</div></div></div></div>
+          <div class="pk-row"><div class="l"><div class="pk-ico">🛏</div><div><div class="t">Cazare, ${nights} ${nights === 1 ? 'noapte' : 'nopți'}</div><div class="s">${esc(name)}, la alegere</div></div></div></div>
           ${wxRow()}
           <div class="pk-stack">
             <a class="pk-btn dark" href="${esc(ticketUrl)}" target="_blank" rel="noopener noreferrer">${icon} ${esc(ticketLabel)} ↗</a>
             <a class="pk-btn gold" href="${esc(flightUrl())}" target="_blank" rel="noopener noreferrer">✈︎ Cumpără bilet de avion ↗</a>
             ${skyUrl() ? `<div class="pk-alt"><a href="${esc(skyUrl())}" target="_blank" rel="noopener noreferrer">sau compară prețul pe Skyscanner</a></div>` : ''}
-            <a class="pk-btn line" href="${esc(stayUrl())}" target="_blank" rel="noopener noreferrer">🛏 Caută cazare ↗</a>
+            <div class="pk-stay"><a class="pk-btn line" href="${esc(stayUrl())}" target="_blank" rel="noopener noreferrer">🛏 Booking ↗</a><a class="pk-btn line" href="${esc(airbnbUrl())}" target="_blank" rel="noopener noreferrer">🏠 Airbnb ↗</a></div>
           </div>
           <p class="pk-note">Prețul zborului și al cazării îl vezi la furnizor, pentru datele alese. Biletele se cumpără direct de la vânzător; 23citybreak poate primi un comision, fără cost pentru tine.${ev.source === 'football-data' ? ' Football data provided by the Football-Data.org API.' : ''}</p>
         </aside>

@@ -122,3 +122,4 @@ button.pk-day{cursor:pointer}
 .pk-wx .l{align-items:flex-start}
 .pk-wx-src{font-size:11px;margin-top:2px}
 .pk-wx-src a{color:inherit}
+.pk-stay{display:grid;grid-template-columns:1fr 1fr;gap:8px}
