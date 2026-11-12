@@ -78,7 +78,7 @@
   // Google arată „Conectează-te la 23citybreak.ro”, iar tokenul ajunge în Supabase prin signInWithIdToken.
   // Nu folosim redirectul signInWithOAuth, care ar fi arătat adresa proiectului Supabase pe ecranul Google.
   // Totul pornește doar cu GOOGLE_CLIENT_ID completat și providerul Google activ în Supabase. Pași: supabase/GOOGLE-LOGIN.md
-  const GOOGLE_CLIENT_ID = ''; // ex. '1234567890-abc.apps.googleusercontent.com' (Client ID, nu secretul)
+  const GOOGLE_CLIENT_ID = '1054030259570-d3bvs73smp3gb3lb8nq3kqnp8744f2ev.apps.googleusercontent.com'; // Client ID public (nu secretul)
   const ONE_TAP_KEY = '23cb-onetap', ONE_TAP_EVERY_DAYS = 7;
   let googleOn;
   const googleEnabled = () => googleOn ||= (!GOOGLE_CLIENT_ID ? Promise.resolve(false) : fetch(`${SUPABASE_URL}/auth/v1/settings`, {headers: {apikey: SUPABASE_KEY}, signal: AbortSignal.timeout(8000)})
