@@ -195,12 +195,13 @@
     return `<article class="ev-card" data-ev="${esc(e.id)}"${img ? ` style="background-image:url('${esc(img)}')"` : ''}>
       <div class="ev-top"><span class="ev-tag">${esc(tagLabel(e))}</span></div>
       <div class="ev-body">
-        <h3>${esc(e.title)} · ${esc(cityName(e.city_id))}</h3>
+        <h3>${esc(e.title.replace(/ \(rugby\)$/, ''))}</h3>
         <div class="ev-meta">${e.venue ? `${esc(e.venue)} · ` : ''}${esc(whenLabel(e))}</div>
         <div class="ev-meta">📅 ${isMultiDay(e) ? 'weekendul recomandat: ' : ''}${esc(shortDate(wk.fri))} → ${esc(shortDate(wk.sun))}</div>
         <div class="ev-prices">${price}<div class="ev-price-alt">${note}</div></div>
         <div class="ev-flight" data-flight="${esc(e.id)}" aria-live="polite"></div>
-        <a class="ev-btn" href="${esc(packageUrl(e))}">${isMultiDay(e) ? 'Alege zilele →' : 'Vezi pachetul de weekend →'}</a>
+        <div class="ev-foot"><span class="ev-where"><b>${cityOf(e.city_id)?.flag ? `<i aria-hidden="true">${cityOf(e.city_id).flag}</i> ` : '📍 '}${esc(cityName(e.city_id))}</b>${cityOf(e.city_id)?.country ? `<small>${esc(cityOf(e.city_id).country)}</small>` : ''}</span>
+          <a class="ev-btn" href="${esc(packageUrl(e))}">${isMultiDay(e) ? 'Alege zilele →' : 'Vezi pachetul →'}</a></div>
       </div></article>`;
   }
 
