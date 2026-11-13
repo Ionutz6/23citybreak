@@ -1,18 +1,35 @@
-(() => {
+(async () => {
   // Rulează pe orase-vizitate.html (hub-ul). Datele vin din assets/europe-cities.js și assets/illustrated-guides.js.
   const illustratedGuides = window.CB_ILLUSTRATED_GUIDES, ALL_EUROPE_CITIES = window.CB_EUROPE_CITIES;
   if (!illustratedGuides || !ALL_EUROPE_CITIES) return;
   // Ordered against the original, unlabelled map assets saved for the quiz.
   const slugs = 'edinburgh,budapesta,bruxelles,chisinau,viena,lyon,porto,bologna,paris,milano,venetia,copenhaga,madrid,barcelona,atena,roma,pisa-florenta,napoli,amsterdam,nisa,londra,istanbul,lisabona,varsovia,berlin,dublin,valencia,sevilla,cracovia,malaga,munchen,bari,split,stockholm,dubrovnik,palermo,salonic,zurich,catania,bratislava,tallinn,oslo,marsilia,bordeaux,riga,sofia,helsinki,bruges,belgrad,vilnius,ljubljana,glasgow,koln-bonn,stuttgart,frankfurt,bremen,bilbao,dortmund,leeds,toulouse,strasbourg,lille,birmingham,genova,leipzig,eindhoven,newcastle,cagliari'.split(',');
-  // Primele 68 rămân în ordinea fixă (imaginea lor vine după poziție). Orice alt ghid cu quizImage intră automat, la coadă.
-  const extra = Object.values(illustratedGuides).filter(g => g.quizImage && g.image && !slugs.includes(g.image)).map(g => g.image);
+  // Primele 68 rămân în ordinea fixă (imaginea lor vine după poziție). Orice alt ghid intră automat, la coadă, dacă are imaginea FĂRĂ etichete în ilustratii-orase/<id>.webp
+  // (id = id-ul orașului fără prefixul „City:”; varianta de 800 px e în ilustratii-orase/800/). Imaginile cu obiective (assets/guides*) nu se folosesc niciodată: ar da răspunsul.
+  const cityKey = id => id.replace(/^City:/, '');
+  const safeKey = k => /^[A-Za-z0-9_-]+$/.test(k);
+  const unlabelled = p => typeof p === 'string' && p.startsWith('ilustratii-') && !p.includes('..') && !/guides/i.test(p);
+  const candidates = (id, guide) => {
+    const k = cityKey(id), list = [];
+    if (unlabelled(guide.quizImage)) {
+      list.push(guide.quizImage.replace(/^ilustratii-orase\/(?!800\/)/, 'ilustratii-orase/800/'), guide.quizImage);
+    }
+    if (safeKey(k)) list.push(`ilustratii-orase/800/${k}.webp`, `ilustratii-orase/${k}.webp`);
+    return [...new Set(list)];
+  };
+  const probe = src => new Promise(res => { const i = new Image(); const t = setTimeout(() => res(false), 8000); i.onload = () => { clearTimeout(t); res(true); }; i.onerror = () => { clearTimeout(t); res(false); }; i.src = src; });
+  const firstExisting = async list => { for (const src of list) if (await probe(src)) return src; return null; };
+  const entries = Object.entries(illustratedGuides);
+  const extraEntries = entries.filter(([id, g]) => g.image && !slugs.includes(g.image) && ALL_EUROPE_CITIES.some(c => c.id === id));
+  const extraImages = new Map(await Promise.all(extraEntries.map(async ([id, g]) => [g.image, await firstExisting(candidates(id, g))])));
+  const extra = extraEntries.map(([, g]) => g.image).filter(slug => extraImages.get(slug));
   const questions = [...slugs, ...extra].map((slug, i) => {
-    const entry = Object.entries(illustratedGuides).find(([, guide]) => guide.image === slug);
+    const entry = entries.find(([, guide]) => guide.image === slug);
     if (!entry) return null;
     const [id, guide] = entry;
     const city = ALL_EUROPE_CITIES.find(c => c.id === id);
     if (!city) return null;
-    return {id, guide, name: slug === 'pisa-florenta' ? 'Pisa și Florența' : slug === 'koln-bonn' ? 'Köln' : city.name, image: guide.quizImage || `ilustratii-quiz/800/ilustratie-${String(i+1).padStart(3,'0')}.webp`};
+    return {id, guide, name: slug === 'pisa-florenta' ? 'Pisa și Florența' : slug === 'koln-bonn' ? 'Köln' : city.name, image: extraImages.get(slug) || `ilustratii-quiz/800/ilustratie-${String(i+1).padStart(3,'0')}.webp`};
   }).filter(Boolean);
   const section = document.getElementById('city-quiz');
   if (questions.length < 10) return;
