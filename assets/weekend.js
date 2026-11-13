@@ -69,6 +69,8 @@
 
   // ---------- Randare ----------
   const illu = H.guideImage(slug);
+  // Variantă de 800 px (tools/ilustratii-webp.py) pentru ecrane mici; linkul deschide ilustrația întreagă.
+  const illuSmall = illu.replace(/([^/]+\.webp)$/, '800/$1');
   // Prețul zborului pentru zilele alese: o cerere Kiwi din browser, cu cache (assets/flight-price.js).
   let flight = null, flightState = 'idle', flightKey = '';
   const flightSub = () => flightState === 'loading' ? ' · caut prețul…' : flight?.eur ? `<br>${flight.direct ? 'direct' : `${flight.stops} ${flight.stops === 1 ? 'escală' : 'escale'}`}, de persoană, găsit acum pe Kiwi` : flightState === 'none' ? '<br>nu am găsit zboruri în zilele astea' : flightState === 'na' ? '<br>prețul îl vezi la Kiwi' : '';
@@ -118,7 +120,7 @@
           ${guide ? itinerary() : `<h2 class="pk-dayh">${esc(cap(H.whenLabel(ev)))}</h2>${eventBlock(s)}<p class="pk-note">Pentru ${esc(name)} nu avem încă un ghid ilustrat, așa că pachetul nu include un itinerar pe zile.</p>`}
           ${guide ? `<div class="pk-pdf"><button type="button" class="pk-btn line" data-pdf>⬇ Descarcă itinerarul (PDF)</button><span class="pk-note" style="margin:0">${hasAccount() ? 'În fereastra care se deschide alege „Salvează ca PDF”.' : 'Gratuit, cu un cont 23citybreak.'}</span></div>` : ''}
           ${guide ? `<section class="pk-illu"><h2>${esc(guide.city || name)} pe hartă</h2><p class="pk-note" style="margin:0">Toate obiectivele din itinerar sunt desenate pe ilustrație.</p>
-            <div class="pk-illu-grid"><a href="${esc(illu)}" target="_blank" rel="noopener noreferrer"><img src="${esc(illu)}" alt="Hartă ilustrată cu obiectivele din ${esc(guide.city || name)}" loading="lazy"></a>
+            <div class="pk-illu-grid"><a href="${esc(illu)}" target="_blank" rel="noopener noreferrer"><img src="${esc(illuSmall)}" srcset="${esc(illuSmall)} 800w, ${esc(illu)} 1086w" sizes="(max-width: 900px) 100vw, 600px" alt="Hartă ilustrată cu obiectivele din ${esc(guide.city || name)}" loading="lazy"></a>
             <ol class="pk-legend">${guide.legend.map(([n, t, dsc]) => `<li><span class="n">${esc(n)}</span><span><strong>${esc(t)}</strong><br>${esc(dsc)}</span></li>`).join('')}</ol></div></section>` : ''}
         </div>
         <aside class="pk-box pk-side">
