@@ -4,7 +4,9 @@
   if (!illustratedGuides || !ALL_EUROPE_CITIES) return;
   // Ordered against the original, unlabelled map assets saved for the quiz.
   const slugs = 'edinburgh,budapesta,bruxelles,chisinau,viena,lyon,porto,bologna,paris,milano,venetia,copenhaga,madrid,barcelona,atena,roma,pisa-florenta,napoli,amsterdam,nisa,londra,istanbul,lisabona,varsovia,berlin,dublin,valencia,sevilla,cracovia,malaga,munchen,bari,split,stockholm,dubrovnik,palermo,salonic,zurich,catania,bratislava,tallinn,oslo,marsilia,bordeaux,riga,sofia,helsinki,bruges,belgrad,vilnius,ljubljana,glasgow,koln-bonn,stuttgart,frankfurt,bremen,bilbao,dortmund,leeds,toulouse,strasbourg,lille,birmingham,genova,leipzig,eindhoven,newcastle,cagliari'.split(',');
-  const questions = slugs.map((slug, i) => {
+  // Primele 68 rămân în ordinea fixă (imaginea lor vine după poziție). Orice alt ghid cu quizImage intră automat, la coadă.
+  const extra = Object.values(illustratedGuides).filter(g => g.quizImage && g.image && !slugs.includes(g.image)).map(g => g.image);
+  const questions = [...slugs, ...extra].map((slug, i) => {
     const entry = Object.entries(illustratedGuides).find(([, guide]) => guide.image === slug);
     if (!entry) return null;
     const [id, guide] = entry;
