@@ -3271,8 +3271,25 @@
     }
     // Only a failure of the network call itself counts as a refusal; a TypeError thrown
     // later, while processing a valid answer, must not be reported as a provider limit.
+    // Răspunsurile căutării curente rămân în memorie (doar cât stă pagina deschisă). Schimbarea bugetului, duratei,
+    // orelor de sosire, escalelor sau a numărului de adulți refiltrează aceste răspunsuri fără cereri noi.
+    // Butonul „Caută” șterge tot și cere prețuri proaspete. Cheia = corpul cererii, deci o cerere diferită
+    // (alt oraș, alte date, alte ore de plecare) nu poate primi niciodată răspunsul alteia.
+    const heldSearch = { map: new Map(), reuse: false, rerun: null };
+    let refiltering = false;
+    const HELD_MAX = 120;
     async function flightFetch(url, options) {
-      try { return await window.CBKiwi.fetch({ body: options.body, signal: options.signal }); }
+      if (heldSearch.reuse && heldSearch.map.has(options.body)) {
+        return new Response(heldSearch.map.get(options.body), { status: 200, headers: { "Content-Type": "application/json" } });
+      }
+      try {
+        const response = await window.CBKiwi.fetch({ body: options.body, signal: options.signal });
+        if (!response.ok) return response;
+        const text = await response.text();
+        heldSearch.map.set(options.body, text);
+        if (heldSearch.map.size > HELD_MAX) heldSearch.map.delete(heldSearch.map.keys().next().value);
+        return new Response(text, { status: 200, headers: { "Content-Type": "application/json" } });
+      }
       catch (error) {
         console.warn("Cerere către furnizorul de zboruri eșuată:", error?.name, error?.message);
         throw error;
@@ -3321,8 +3338,8 @@
       const originIata = originSelect?.selectedOptions?.[0]?.dataset?.iata || "OTP";
       const adults = parseInt(document.getElementById("f-adults").value, 10) || 2;
       const bagType = "small";
-      const handBags = Array(adults).fill(bagType === "cabin" ? 1 : 0);
-      const holdBags = Array(adults).fill(bagType === "hold" ? 1 : 0);
+      const handBags = [bagType === "cabin" ? 1 : 0]; // cererile Kiwi sunt mereu pentru 1 adult; totalul grupului se calculează în pagină
+      const holdBags = [bagType === "hold" ? 1 : 0];
       const maxDurMin = Number(document.getElementById("f-max-dur").value);
       const maxStops = Infinity;
       const selectedBudget = Number(document.getElementById("f-max-price").value);
@@ -3376,7 +3393,7 @@
                   query: QUERY_RETURN,
                   variables: {
                     search: {
-                      passengers: { adults: adults, adultsHandBags: handBags, adultsHoldBags: holdBags },
+                      passengers: { adults: 1, adultsHandBags: handBags, adultsHoldBags: holdBags },
                       cabinClass: { cabinClass: "ECONOMY" },
                       itinerary: {
                         source: { ids: [originCityId] },
@@ -3396,7 +3413,7 @@
                 const inbound = it.inbound?.sectorSegments || [];
                 return out.length > 0 && inbound.length > 0 && out.length - 1 <= maxStops && inbound.length - 1 <= maxStops &&
                   it.outbound.duration <= maxDurMin * 60 && it.inbound.duration <= maxDurMin * 60 &&
-                  Number(it.priceEur?.amount) / adults <= maxPrice &&
+                  Number(it.priceEur?.amount) <= maxPrice &&
                   withinArrivalLimit(out.at(-1)?.segment?.destination?.localTime, tripDates.dateOut, outLimit) &&
                   withinArrivalLimit(inbound.at(-1)?.segment?.destination?.localTime, tripDates.dateIn, inLimit);
               });
@@ -3410,8 +3427,8 @@
               const inLast = inSegs[inSegs.length - 1]?.segment;
               if (!outFirst || !outLast || !inFirst || !inLast) return null;
 
-              const totalEur = parseFloat(top.priceEur?.amount) || 9999;
-              const perPaxEur = totalEur / adults;
+              const perPaxEur = parseFloat(top.priceEur?.amount) || 9999;
+              const totalEur = perPaxEur * adults;
               const outCarrier = outFirst.carrier?.code || "";
               const inCarrier = inFirst.carrier?.code || "";
               const same = (outCarrier === inCarrier);
@@ -3534,8 +3551,8 @@
         return;
       }
 
-      const handBags = Array(adults).fill(bagType === "cabin" ? 1 : 0);
-      const holdBags = Array(adults).fill(bagType === "hold" ? 1 : 0);
+      const handBags = [bagType === "cabin" ? 1 : 0]; // cererile Kiwi sunt mereu pentru 1 adult; totalul grupului se calculează în pagină
+      const holdBags = [bagType === "hold" ? 1 : 0];
 
       hasEverSearched = true;
       revealResultsSection();
@@ -3610,7 +3627,7 @@
                   query: QUERY_RETURN,
                   variables: {
                     search: {
-                      passengers: { adults: adults, adultsHandBags: handBags, adultsHoldBags: holdBags },
+                      passengers: { adults: 1, adultsHandBags: handBags, adultsHoldBags: holdBags },
                       cabinClass: { cabinClass: "ECONOMY" },
                       itinerary: {
                         source: { ids: [originCityId] },
@@ -3700,8 +3717,8 @@
                 const inArrTime = inLast.destination.localTime.slice(11, 16);
                 if (!withinArrivalLimit(inLast.destination.localTime, tripDates.dateIn, inArrLimit)) continue;
 
-                const totalEur = parseFloat(it.priceEur?.amount) || 9999;
-                const perPaxEur = totalEur / adults;
+                const perPaxEur = parseFloat(it.priceEur?.amount) || 9999;
+                const totalEur = perPaxEur * adults;
                 if (perPaxEur > maxPrice1Pax) continue;
 
                 const outCarrier = outFirst.carrier?.code || "";
@@ -3815,7 +3832,7 @@
                 query: QUERY_ONEWAY,
                 variables: {
                   search: {
-                    passengers: { adults: adults, adultsHandBags: handBags, adultsHoldBags: holdBags },
+                    passengers: { adults: 1, adultsHandBags: handBags, adultsHoldBags: holdBags },
                     cabinClass: { cabinClass: "ECONOMY" },
                     itinerary: {
                       source: { ids: [originCityId] },
@@ -3854,7 +3871,7 @@
                 query: QUERY_RETURN,
                 variables: {
                   search: {
-                    passengers: { adults: adults, adultsHandBags: handBags, adultsHoldBags: holdBags },
+                    passengers: { adults: 1, adultsHandBags: handBags, adultsHoldBags: holdBags },
                     cabinClass: { cabinClass: "ECONOMY" },
                     itinerary: {
                       source: { ids: [originCityId] },
@@ -3903,8 +3920,8 @@
               const inArrTime = inLast.destination.localTime.slice(11, 16);
               if (!withinArrivalLimit(inLast.destination.localTime, tripDates.dateIn, inArrLimit)) continue;
 
-              const totalEur = parseFloat(it.priceEur?.amount) || 9999;
-              const perPaxEur = totalEur / adults;
+              const perPaxEur = parseFloat(it.priceEur?.amount) || 9999;
+              const totalEur = perPaxEur * adults;
 
               if (perPaxEur > maxPrice1Pax) continue;
 
@@ -4010,15 +4027,33 @@
     }
     const performLiveSearch = runLiveSearch;
     const performYearScan = scanEntireYearForDestination;
-    runLiveSearch = () => withSearchLock(() => performLiveSearch(false));
-    function runSimilarSearch() { return withSearchLock(() => performLiveSearch(true)); }
+    // Căutare nouă (butoanele): șterge răspunsurile păstrate și cere prețuri proaspete.
+    // Căutarea își fixează destinația la început (resolveTypedDestination → invalidateSearchResults), deci
+    // „rerun” se memorează abia după ce căutarea a rulat.
+    async function freshSearch(run) {
+      heldSearch.map.clear(); heldSearch.reuse = false; heldSearch.rerun = null;
+      let ran = false;
+      await withSearchLock(async () => { ran = true; await run(); });
+      if (ran) heldSearch.rerun = run;
+    }
+    // Refiltrare după schimbarea unui filtru: aceeași căutare, din răspunsurile păstrate, fără cereri noi pentru ele.
+    // Nu blochează panoul (ca să nu se piardă focusul de pe câmpul schimbat) și nu derulează pagina.
+    async function refilterFromHeld() {
+      if (searchInProgress || !heldSearch.rerun || !heldSearch.map.size) return false;
+      searchInProgress = true; refiltering = true; heldSearch.reuse = true;
+      try { await heldSearch.rerun(); }
+      finally { searchInProgress = false; refiltering = false; heldSearch.reuse = false; }
+      return true;
+    }
+    runLiveSearch = () => freshSearch(() => performLiveSearch(false));
+    function runSimilarSearch() { return freshSearch(() => performLiveSearch(true)); }
     function expandSearchFilters() {
       const searchSimilar = lastEmptyWasSimilar;
       for (const [id, value] of Object.entries({ 'f-max-price': '999', 'f-max-dur': '360', 'quick-duration': '360', 'f-fri-dep': '06:00', 'f-out-arr': '02:00', 'f-sun-dep': '12:00', 'f-in-arr': '02:00' })) document.getElementById(id).value = value;
       renderCrossEngineBar();
-      return withSearchLock(() => performLiveSearch(searchSimilar));
+      return freshSearch(() => performLiveSearch(searchSimilar));
     }
-    scanEntireYearForDestination = () => withSearchLock(performYearScan);
+    scanEntireYearForDestination = () => freshSearch(performYearScan);
 
     // Secțiunea de rezultate stă ascunsă până la prima căutare; la pornire derulăm la ea.
     function revealResultsSection() {
@@ -4027,9 +4062,10 @@
       section.hidden = false;
       // Derulăm la rândul „Caută zboruri”, ca indicatorul de progres de lângă buton să rămână vizibil deasupra rezultatelor.
       const anchor = document.querySelector('.search-actions') || section;
-      requestAnimationFrame(() => anchor.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+      if (!refiltering) requestAnimationFrame(() => anchor.scrollIntoView({ behavior: 'smooth', block: 'start' }));
     }
     function invalidateSearchResults() {
+      heldSearch.map.clear(); heldSearch.rerun = null;
       const resultsSection = document.getElementById('results-section');
       if (resultsSection) resultsSection.hidden = true;
       currentRows = [];
@@ -4043,8 +4079,11 @@
 
     }
     document.getElementById('f-origin').addEventListener('change', refreshWeekendsForOrigin);
+    // Filtrele care nu intră în cererea către Kiwi: schimbarea lor refiltrează rezultatele deja primite.
+    const LOCAL_FILTERS = new Set(['f-adults', 'f-bags', 'f-max-dur', 'quick-duration', 'f-stops', 'f-max-price', 'f-out-arr', 'f-in-arr', 'f-domestic']);
     for (const id of ['f-origin', 'f-adults', 'f-bags', 'f-max-dur', 'quick-duration', 'f-stops', 'f-max-price', 'f-fri-dep', 'f-sun-dep', 'f-out-arr', 'f-in-arr', 'f-domestic']) {
-      document.getElementById(id).addEventListener('change', () => {
+      document.getElementById(id).addEventListener('change', async () => {
+        if (LOCAL_FILTERS.has(id) && await refilterFromHeld()) { renderCrossEngineBar(); return; }
         invalidateSearchResults();
         renderCrossEngineBar();
         renderMatrix();
