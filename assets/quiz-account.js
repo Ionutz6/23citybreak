@@ -24,8 +24,10 @@
     const user = session.user, meta = user.user_metadata || {};
     const wantsNews = newsletter ?? !!meta.newsletter;
     const row = {user_id: user.id, email: user.email, source: '23citybreak-quiz'};
-    if (wantsNews) await sb.from('subscribers').upsert({...row, newsletter: true, consent_text: meta.consent_text || CONSENT, consent_at: new Date().toISOString(), unsubscribed_at: null});
-    else await sb.from('subscribers').upsert(row, {ignoreDuplicates: true});
+    const sub = wantsNews
+      ? await sb.from('subscribers').upsert({...row, newsletter: true, consent_text: meta.consent_text || CONSENT, consent_at: new Date().toISOString(), unsubscribed_at: null})
+      : await sb.from('subscribers').upsert(row, {ignoreDuplicates: true});
+    if (sub && sub.error) throw sub.error;
     if (result) {
       const {error} = await sb.from('quiz_scores').insert({quiz: QUIZ, score: result.score, correct: result.correct});
       if (error) throw error;
