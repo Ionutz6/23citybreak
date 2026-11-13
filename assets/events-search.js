@@ -153,7 +153,7 @@
   }
   function alertHtml() {
     const s = alertState;
-    if (s?.q === norm(q) && s.state === 'ok') return `<p class="evs-alert-ok" role="status">🔔 Gata. Îți scriem${s.email ? ` pe <b>${esc(s.email)}</b>` : ''} când apare „${esc(s.label)}”.</p>`;
+    if (s?.q === norm(q) && s.state === 'ok') return `<p class="evs-alert-ok" role="status">🔔 Gata. Îți scriem${s.email ? ` pe <b>${esc(s.email)}</b>` : ''} când apare „${esc(s.label)}”, o singură dată. Alerta o vezi și o poți șterge în Contul tău.</p>`;
     if (s?.q === norm(q) && s.state === 'err') return `<p class="evs-alert-err" role="status">${esc(s.msg)}</p>`;
     const busy = s?.q === norm(q) && s.state === 'busy';
     const logged = window.Account?.hasSession?.();
