@@ -92,3 +92,5 @@ Leeds: originalul fără etichete este `ilustratii-orase/leeds_gb.webp`, iar ver
 Toulouse: originalul fără etichete este `ilustratii-orase/toulouse_fr.webp`, iar versiunea pentru ghid este `assets/guides-prague-style/toulouse.webp`.
 
 Strasbourg: originalul fără etichete este `ilustratii-orase/strasbourg_fr.webp`, iar versiunea pentru ghid este `assets/guides-prague-style/strasbourg.webp`.
+
+Lille: originalul fără etichete este `ilustratii-orase/lille_fr.webp`, iar versiunea pentru ghid este `assets/guides-prague-style/lille.webp`.
