@@ -197,19 +197,21 @@
   function cardHtml(e) {
     const img = e.image_url || '';
     const wk = mainWeekend(e);
-    const price = e.price_min_eur ? `<div><div class="ev-price">${Math.round(e.price_min_eur)} €</div><div class="ev-price-sub">bilet, de la</div></div>` : '<div></div>';
-    const note = e.kind === 'football' ? 'bilete pe site-ul clubului' : e.kind === 'market' || e.kind === 'city_festival' ? 'intrare liberă' : '';
+    const price = e.price_min_eur ? `<div><div class="ev-price">${Math.round(e.price_min_eur)} €</div><div class="ev-price-sub">bilet, de la</div></div>` : '';
+    const note = e.kind === 'market' || e.kind === 'city_festival' ? 'intrare liberă' : '';
+    const c = cityOf(e.city_id), act = isMultiDay(e) ? 'Alege zilele' : 'Vezi pachetul';
+    // Tot chenarul negru e link spre pachet; săgeata rotundă e doar semnul vizual că se apasă.
     return `<article class="ev-card" data-ev="${esc(e.id)}"${img ? ` style="background-image:url('${esc(img)}')"` : ''}>
       <div class="ev-top"><span class="ev-tag">${esc(tagLabel(e))}</span></div>
-      <div class="ev-body">
+      <a class="ev-body" href="${esc(packageUrl(e))}" aria-label="${esc(`${act}: ${e.title.replace(/ \(rugby\)$/, '')}, ${cityName(e.city_id)}`)}">
+        <span class="ev-go" aria-hidden="true">→</span>
+        <span class="ev-where">${c?.flag ? `<i aria-hidden="true">${c.flag}</i> ` : '📍 '}${esc(cityName(e.city_id))}${c?.country ? ` · ${esc(c.country)}` : ''}</span>
         <h3>${esc(e.title.replace(/ \(rugby\)$/, ''))}</h3>
         <div class="ev-meta">${e.venue ? `${esc(e.venue)} · ` : ''}${esc(whenLabel(e))}</div>
         <div class="ev-meta">📅 ${isMultiDay(e) ? 'weekendul recomandat: ' : ''}${esc(shortDate(wk.fri))} → ${esc(shortDate(wk.sun))}</div>
-        <div class="ev-prices">${price}<div class="ev-price-alt">${note}</div></div>
+        ${price || note ? `<div class="ev-prices">${price}<div class="ev-price-alt">${note}</div></div>` : ''}
         <div class="ev-flight" data-flight="${esc(e.id)}" aria-live="polite"></div>
-        <div class="ev-foot"><span class="ev-where"><b>${cityOf(e.city_id)?.flag ? `<i aria-hidden="true">${cityOf(e.city_id).flag}</i> ` : '📍 '}${esc(cityName(e.city_id))}</b>${cityOf(e.city_id)?.country ? `<small>${esc(cityOf(e.city_id).country)}</small>` : ''}</span>
-          <a class="ev-btn" href="${esc(packageUrl(e))}">${isMultiDay(e) ? 'Alege zilele →' : 'Vezi pachetul →'}</a></div>
-      </div></article>`;
+      </a></article>`;
   }
 
   // Promo pentru caruselul de pe prima pagină: întâi sportul, apoi restul; doar ce începe peste 2–13 săptămâni
