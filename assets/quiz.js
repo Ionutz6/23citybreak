@@ -194,6 +194,20 @@
       download();
     });
     dl.addEventListener('click', download);
+    const waNote = el('p', 'quiz-recap-label'); waNote.setAttribute('role', 'status');
+    actions.after(waNote);
+    /* WhatsApp: pe mobil foaia de distribuire cu fișier; pe desktop imaginea merge în clipboard (Ctrl+V în chat), altfel se descarcă */
+    wa.addEventListener('click', async e => {
+      const file = shareBlob && new File([shareBlob], filename, {type: 'image/png'});
+      if (!file) return;
+      e.preventDefault();
+      if (navigator.canShare?.({files: [file]})) { try { await navigator.share({files: [file], text: `${text} ${SITE}`}); } catch {} return; }
+      window.open(wa.href, '_blank', 'noopener');
+      let copied = false;
+      try { await navigator.clipboard.write([new ClipboardItem({'image/png': shareBlob})]); copied = true; } catch {}
+      if (copied) waNote.textContent = 'Imaginea e copiată. În WhatsApp, apasă Ctrl+V în conversație, apoi Trimite.';
+      else { download(); waNote.textContent = 'Am descărcat imaginea. În WhatsApp, atașeaz-o (agrafa) din Descărcări.'; }
+    });
     again.addEventListener('click', () => { startGame(); content.querySelector('button')?.focus({preventScroll: true}); });
   }
 

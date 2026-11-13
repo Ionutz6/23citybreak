@@ -461,6 +461,22 @@
       const native = el('button', 'vc-btn vc-primary', 'Distribuie ↗'); native.type = 'button';
       const wa = el('a', 'vc-btn vc-wa', 'WhatsApp'); wa.href = `https://wa.me/?text=${encodeURIComponent(text + ' ' + SITE)}`; wa.target = '_blank'; wa.rel = 'noopener';
       const dl = el('a', 'vc-btn', 'Descarcă imaginea'); dl.href = url; dl.download = filename;
+      const note = el('p', 'vc-share-note'); note.setAttribute('role', 'status');
+      /* WhatsApp: pe mobil foaia de distribuire cu fișier; pe desktop imaginea merge în clipboard (Ctrl+V în chat), altfel se descarcă */
+      wa.addEventListener('click', async e => {
+        const file = new File([blob], filename, {type: 'image/png'});
+        if (navigator.canShare?.({files: [file]})) {
+          e.preventDefault();
+          try { await navigator.share({files: [file], text: `${text} ${SITE}`}); } catch {}
+          return;
+        }
+        e.preventDefault();
+        window.open(wa.href, '_blank', 'noopener');
+        let copied = false;
+        try { await navigator.clipboard.write([new ClipboardItem({'image/png': blob})]); copied = true; } catch {}
+        if (copied) note.textContent = 'Imaginea e copiată. În WhatsApp, apasă Ctrl+V în conversație, apoi Trimite.';
+        else { const a = document.createElement('a'); a.href = url; a.download = filename; document.body.append(a); a.click(); a.remove(); note.textContent = 'Am descărcat imaginea. În WhatsApp, atașeaz-o (agrafa) din Descărcări.'; }
+      });
       const close = el('button', 'vc-btn', 'Închide'); close.type = 'button';
       if (!navigator.share) native.hidden = true;
       native.addEventListener('click', async () => {
@@ -471,7 +487,7 @@
       close.addEventListener('click', shut);
       dlg.addEventListener('click', e => { if (e.target === dlg) shut(); });
       dlg.addEventListener('keydown', e => { if (e.key === 'Escape') shut(); });
-      acts.append(native, wa, dl, close); box.append(img, acts); dlg.append(box);
+      acts.append(native, wa, dl, close); box.append(img, acts, note); dlg.append(box);
       document.body.append(dlg); (native.hidden ? dl : native).focus();
     }
 
