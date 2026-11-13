@@ -1,7 +1,7 @@
 // Pagina „Contul tău” (cont.html), aceeași adresă pentru toți:
 //  - neconectat: salut multilingv, de ce merită un cont și loginul (Google, dacă e activ în Supabase, sau link pe email);
-//  - conectat: salut, cât de complet e profilul, newsletter, preferințe, interese pentru evenimente, link spre orașele
-//    vizitate (harta și quizul stau doar pe orase-vizitate.html), ștergerea contului.
+//  - conectat: salut, cât de complet e profilul, capitolul „Utilizator” (email, bifa de newsletter, ieșire, ștergere),
+//    preferințe și interese pentru evenimente. Orașele vizitate, harta și quizul stau doar pe orase-vizitate.html.
 (() => {
   const A = window.Account;
   const main = document.getElementById('profile');
@@ -65,16 +65,6 @@
     return c;
   }
 
-  function visitedCard() {
-    const c = card('ORAȘE VIZITATE', 'Europa văzută prin ochii tăi');
-    c.append(el('p', 'acct-intro', 'Harta orașelor în care ai fost, imaginea de share și scorul tău la „Ghicește orașul” sunt pe pagina Orașe vizitate.'));
-    const actions = el('div', 'acct-actions');
-    const a1 = el('a', 'acct-primary', 'Vezi orașele tale →'); a1.href = 'orase-vizitate.html';
-    const a2 = el('a', 'acct-secondary', 'Joacă quizul'); a2.href = 'orase-vizitate.html#city-quiz';
-    actions.append(a1, a2); c.append(actions);
-    return c;
-  }
-
   // Cât de complet e profilul: 3 lucruri care schimbă ce îi arătăm userului.
   function completeness(prefs) {
     let ev = null; try { ev = JSON.parse(localStorage.getItem('23cb-event-prefs')); } catch {}
@@ -94,44 +84,45 @@
     return box;
   }
 
-  async function newsletterCard(sb, user) {
-    const c = card('NEWSLETTER');
-    const body = el('div'); c.append(body);
-    const render = async () => {
-      const on = await A.isSubscribed().catch(() => false);
-      const btn = el('button', on ? 'acct-secondary' : 'acct-primary', on ? 'Dezabonează-mă' : 'Abonează-mă'); btn.type = 'button';
-      const status = el('span', 'acct-status'); status.setAttribute('role', 'status');
-      btn.addEventListener('click', async () => {
-        btn.disabled = true;
-        try { await A.saveSubscriber(sb, user, !on, '23citybreak-cont'); await render(); }
-        catch { btn.disabled = false; status.textContent = 'Nu a mers acum. Încearcă din nou.'; }
-      });
-      const actions = el('div', 'acct-actions'); actions.append(btn, status);
-      body.replaceChildren(
-        el('h2', null, on ? 'Ești abonat la newsletter' : 'Nu ești abonat la newsletter'),
-        el('p', 'acct-intro', on ? 'Primești pe email zborurile ieftine de weekend și noutățile 23ai. Te poți dezabona oricând.' : 'Zboruri ieftine de weekend din România, o dată pe săptămână. Fără spam.'),
-        ...(on ? [] : [el('p', 'acct-note', `Apăsând „Abonează-mă”: ${A.CONSENT}`)]),
-        actions,
-      );
-      if (!on) c.classList.add('acct-card-highlight'); else c.classList.remove('acct-card-highlight');
-    };
-    await render();
-    return c;
-  }
+  // Capitolul „Utilizator”: cine e conectat, bifa de newsletter și acțiunile de cont (ieșire, ștergere), într-un singur loc.
+  async function userCard(sb, user) {
+    const c = el('section', 'acct-user'); c.id = 'utilizator'; c.setAttribute('aria-label', 'Utilizator');
+    const who = el('div', 'acct-user-who');
+    const avatar = el('span', 'acct-avatar', (user.email || '?')[0].toUpperCase()); avatar.setAttribute('aria-hidden', 'true');
+    const via = (user.app_metadata?.providers || [user.app_metadata?.provider]).includes('google') ? 'Conectat cu Google' : 'Conectat cu link pe email';
+    const id = el('div'); id.append(el('span', 'acct-kicker', 'UTILIZATOR'), el('strong', 'acct-user-email', user.email), el('small', null, via));
+    who.append(avatar, id);
 
-  function accountCard(sb, user) {
-    const c = card('CONT', null);
-    c.append(el('p', null, `Conectat ca ${user.email}`));
-    const out = el('button', 'acct-secondary', 'Ieși din cont'); out.type = 'button';
+    // Newsletter: o bifă. Abonarea cere consimțământul afișat sub ea; dezabonarea e imediată.
+    const nl = el('div', 'acct-user-nl');
+    const lab = el('label', 'acct-switch');
+    const box = el('input'); box.type = 'checkbox'; box.setAttribute('role', 'switch');
+    lab.append(box, el('span', 'acct-track'), el('span', null, 'Newsletter cu zboruri ieftine de weekend'));
+    const consent = el('p', 'acct-note', `Bifând: ${A.CONSENT}`);
+    const nlStatus = el('span', 'acct-status'); nlStatus.setAttribute('role', 'status');
+    nl.append(lab, consent, nlStatus);
+    const sync = on => { box.checked = on; consent.hidden = on; nlStatus.textContent = on ? 'Abonat ✓ Te dezabonezi oricând debifând.' : ''; };
+    sync(await A.isSubscribed().catch(() => false));
+    box.addEventListener('change', async () => {
+      const want = box.checked; box.disabled = true; nlStatus.textContent = 'Se salvează...';
+      try { await A.saveSubscriber(sb, user, want, '23citybreak-cont'); sync(want); }
+      catch { sync(!want); nlStatus.textContent = 'Nu a mers acum. Încearcă din nou.'; }
+      box.disabled = false;
+    });
+
+    const acts = el('div', 'acct-user-acts');
+    const out = el('button', 'acct-link', 'Ieși din cont'); out.type = 'button';
     out.addEventListener('click', async () => { await sb.auth.signOut(); A.updateHeader(); loggedOut(); });
     const del = el('button', 'acct-link acct-danger', 'Șterge contul și datele'); del.type = 'button';
+    acts.append(out, del);
+
     const confirmBox = el('div', 'acct-confirm'); confirmBox.hidden = true;
     const yes = el('button', 'acct-danger-btn', 'Da, șterge definitiv'); yes.type = 'button';
     const no = el('button', 'acct-link', 'Renunț'); no.type = 'button';
     const status = el('span', 'acct-status'); status.setAttribute('role', 'status');
-    confirmBox.append(el('p', null, 'Se șterg contul, scorurile, preferințele, orașele văzute și abonarea la newsletter, pentru 23citybreak și 23ai. Nu se poate anula.'), yes, no, status);
+    confirmBox.append(el('p', null, 'Se șterg contul, scorurile, preferințele, orașele vizitate și abonarea la newsletter, pentru 23citybreak și 23ai. Nu se poate anula.'), yes, no, status);
     del.addEventListener('click', () => { confirmBox.hidden = false; yes.focus(); });
-    no.addEventListener('click', () => { confirmBox.hidden = true; });
+    no.addEventListener('click', () => { confirmBox.hidden = true; del.focus(); });
     yes.addEventListener('click', async () => {
       yes.disabled = true; status.textContent = 'Se șterge...';
       try {
@@ -143,8 +134,7 @@
         main.firstChild.append(el('h2', null, 'Contul a fost șters'), el('p', null, 'Toate datele tale au fost șterse. Mulțumim că ai folosit 23citybreak.'));
       } catch { yes.disabled = false; status.textContent = 'Nu am putut șterge contul acum. Scrie-ne la office@23ai.ro.'; }
     });
-    const actions = el('div', 'acct-actions'); actions.append(out, del);
-    c.append(actions, confirmBox);
+    c.append(who, nl, acts, confirmBox);
     return c;
   }
 
@@ -155,15 +145,14 @@
     const user = session.user;
     const prefs = await A.preferences().catch(() => ({}));
     const head = el('div', 'acct-hello');
-    head.append(el('span', 'acct-kicker', 'CONTUL TĂU'), greeting(), el('p', 'acct-intro', user.email),
+    head.append(el('span', 'acct-kicker', 'CONTUL TĂU'), greeting(),
       el('p', 'acct-lead', 'Cu cât îți completezi profilul mai exact, cu atât 23citybreak lucrează mai mult pentru tine. Zborurile din aeroportul tău și din bugetul tău apar primele, iar meciurile, concertele și festivalurile pe care le urmărești vin cu pachetul de weekend gata făcut. Durează două minute și le schimbi oricând.'),
       completeness(prefs));
     const grid = el('div', 'acct-grid');
-    main.replaceChildren(head, grid);
-    const news = await newsletterCard(sb, user);
+    main.replaceChildren(head, await userCard(sb, user), grid);
     const interests = window.ProfileInterests ? await window.ProfileInterests.card(sb).catch(() => null) : null;
     if (interests) interests.id = 'interese';
-    grid.append(news, await prefsCard(), ...(interests ? [interests] : []), visitedCard(), accountCard(sb, user));
+    grid.append(await prefsCard(), ...(interests ? [interests] : []));
     if (location.hash.length > 1) document.getElementById(decodeURIComponent(location.hash.slice(1)))?.scrollIntoView({ block: 'start' });
   }
 
