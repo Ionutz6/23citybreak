@@ -3342,6 +3342,23 @@
       currentRows = [];
       renderMatrix();
 
+      // Rândul orașului cu weekendurile găsite până acum (apelat după fiecare val și la final).
+      function publishYearRow() {
+        if (!allFound.length) return;
+        const cellsMap = {};
+        [...allFound].sort((a, b) => a.perPaxEur - b.perPaxEur).forEach(item => { cellsMap[item.wk.id] = item; });
+        const first = [...allFound].sort((a, b) => a.perPaxEur - b.perPaxEur)[0];
+        const targetIata = selectedCityObj?.iata || first.outRoute.split("→")[1].trim();
+        const disp = resolveDestinationDisplay(targetIata, cityName);
+        currentRows = currentRows.filter(r => r.cityId !== destVal && r.code !== targetIata.toLowerCase());
+        currentRows.unshift({
+          city: disp.city, airportName: disp.airport, cityGroup: disp.group,
+          sub: `${targetIata} · ${first.airlineLabel}`,
+          code: targetIata.toLowerCase(), iata: targetIata, cityId: destVal, skyTo: targetIata.toLowerCase(), cellsMap
+        });
+        renderMatrix();
+      }
+
       try {
         for (let b = 0; b < yearWeekends.length; b += batchSize) {
           const batch = yearWeekends.slice(b, b + batchSize);
@@ -3431,6 +3448,7 @@
 
           const batchResults = await Promise.all(batchPromises);
           allFound.push(...batchResults.filter(Boolean));
+          publishYearRow(); // rezultatele apar după fiecare val, nu abia la sfârșit
           if (scanRefused) break;
         }
 
@@ -3449,27 +3467,7 @@
         allFound.slice(0, 6).forEach(item => selectedWkIds.add(item.wk.id));
         renderWeekendSelectorUI();
 
-        const cellsMap = {};
-        allFound.forEach(item => {
-          cellsMap[item.wk.id] = item;
-        });
-
-        const targetIata = selectedCityObj?.iata || allFound[0].outRoute.split("→")[1].trim();
-        const disp = resolveDestinationDisplay(targetIata, cityName);
-        const newRow = {
-          city: disp.city,
-          airportName: disp.airport,
-          cityGroup: disp.group,
-          sub: `${targetIata} · ${allFound[0].airlineLabel}`,
-          code: targetIata.toLowerCase(),
-          iata: targetIata,
-          cityId: destVal,
-          skyTo: targetIata.toLowerCase(),
-          cellsMap: cellsMap
-        };
-
-        currentRows = currentRows.filter(r => r.cityId !== destVal && r.code !== targetIata.toLowerCase());
-        currentRows.unshift(newRow);
+        publishYearRow();
 
         updateSearchStatus(`✅ ${failedRequests ? "Dintre weekendurile verificate, cel" : "Scanare anuală finalizată! Cel"} mai ieftin weekend către ${cityName} este ${allFound[0].wk.label} la ${Math.round(allFound[0].perPaxEur)} €/pers.${failedRequests ? " Unele weekenduri nu au putut fi verificate acum." : ""}`, 100, "success");
         renderMatrix();
@@ -3562,6 +3560,45 @@
           ] : [{ id: destVal, iata: null }];
           const jobs = activeWks.flatMap(wk => searchAirports.map(airport => ({ wk, airport })));
           updateSearchStatus(`Căutăm zboruri pentru ${cityName} (0/${jobs.length})...`, 0, "loading");
+          // Rezultatele apar pe măsură ce sosesc răspunsurile (cel mult o dată la 300 ms), nu abia la sfârșit.
+          const targetCellsMap = {};
+          let targetCityTitle = cityName;
+          let targetCode = destIata.toLowerCase();
+          let targetAirline = "Companie aeriană";
+          let totalFound = 0;
+          const collected = [];
+          let fallbackUsed = false;
+          // Rândul destinației cu weekendurile găsite până acum (apelat pe parcurs și la final).
+          function publishTargetRow() {
+            const disp = resolveDestinationDisplay(targetCode, targetCityTitle);
+            const newRow = {
+              city: disp.city,
+              airportName: disp.airport,
+              cityGroup: disp.group,
+              sub: `${targetCode.toUpperCase()} · ${targetAirline}${fallbackUsed ? " (1 escală)" : ""}`,
+              code: targetCode,
+              iata: targetCode.toUpperCase(),
+              cityId: destVal,
+              skyTo: targetCode,
+              cellsMap: targetCellsMap
+            };
+
+            currentRows = currentRows.filter(r => r.cityId !== destVal && (isBruges || r.code !== targetCode));
+            if (isBruges && totalFound > 0) {
+              currentRows.push({ city: "Bruges", cityGroup: "Bruges", sub: "transfer spre Bruges separat", code: targetCode, iata: targetCode.toUpperCase(), cityId: destVal, skyTo: targetCode, cellsMap: targetCellsMap });
+            } else if (!isBruges && totalFound > 0) {
+              currentRows.unshift(newRow);
+            }
+          }
+          let lastPartial = 0;
+          function showPartial() {
+            if (isBruges || Date.now() - lastPartial < 300) return;
+            lastPartial = Date.now();
+            for (const key of Object.keys(targetCellsMap)) delete targetCellsMap[key];
+            totalFound = 0;
+            processItineraries(maxStops, maxDurMin, collected);
+            if (totalFound > 0) { publishTargetRow(); renderMatrix(); }
+          }
           const queryJob = async ({ wk, airport }) => {
             const tripDates = getTripDates(wk);
             try {
@@ -3601,7 +3638,9 @@
                   await new Promise(resolve => setTimeout(resolve, 1500 + Math.random() * 1500));
                 }
               }
-              return { wk, airport, itins: json?.data?.returnItineraries?.itineraries || [] };
+              const result = { wk, airport, itins: json?.data?.returnItineraries?.itineraries || [] };
+              collected.push(result);
+              return result;
             } catch (e) {
               failedRequests++;
               if (isProviderRefusal(e)) { providerRefused = true; noteProviderRefusal(e); }
@@ -3610,6 +3649,7 @@
             } finally {
               completedRequests++;
               updateSearchStatus(`Căutăm zboruri pentru ${cityName} (${completedRequests}/${jobs.length})...`, Math.floor(completedRequests / jobs.length * 95), "loading");
+              showPartial();
             }
           };
 
@@ -3628,14 +3668,8 @@
           }
           updateSearchStatus("Procesăm cele mai bune tarife...", 98, "loading");
 
-          const targetCellsMap = {};
-          let targetCityTitle = cityName;
-          let targetCode = destIata.toLowerCase();
-          let targetAirline = "Companie aeriană";
-          let totalFound = 0;
-
-          function processItineraries(allowStops, allowDurMin) {
-            results.forEach(({ wk, airport, itins }) => {
+          function processItineraries(allowStops, allowDurMin, list = results) {
+            list.forEach(({ wk, airport, itins }) => {
               const tripDates = getTripDates(wk);
               for (const it of itins) {
                 const outSegs = it.outbound?.sectorSegments || [];
@@ -3708,27 +3742,7 @@
 
           processItineraries(maxStops, maxDurMin);
 
-          let fallbackUsed = false;
-
-          const disp = resolveDestinationDisplay(targetCode, targetCityTitle);
-          const newRow = {
-            city: disp.city,
-            airportName: disp.airport,
-            cityGroup: disp.group,
-            sub: `${targetCode.toUpperCase()} · ${targetAirline}${fallbackUsed ? " (1 escală)" : ""}`,
-            code: targetCode,
-            iata: targetCode.toUpperCase(),
-            cityId: destVal,
-            skyTo: targetCode,
-            cellsMap: targetCellsMap
-          };
-
-          currentRows = currentRows.filter(r => r.cityId !== destVal && (isBruges || r.code !== targetCode));
-          if (isBruges && totalFound > 0) {
-            currentRows.push({ city: "Bruges", cityGroup: "Bruges", sub: "transfer spre Bruges separat", code: targetCode, iata: targetCode.toUpperCase(), cityId: destVal, skyTo: targetCode, cellsMap: targetCellsMap });
-          } else if (!isBruges && totalFound > 0) {
-            currentRows.unshift(newRow);
-          }
+          publishTargetRow();
           if (searchSimilar && totalFound > 0) {
             similarResultPeriods = activeWks.filter(wk => currentRows.some(row => row.cellsMap[wk.id]));
             document.getElementById('similar-results-note').hidden = false;
@@ -3944,6 +3958,8 @@
             console.warn("Eroare la căutarea weekendului", wk.label, wkErr);
             if (isProviderRefusal(wkErr)) { discoveryRefused = true; noteProviderRefusal(wkErr); break; }
           } finally {
+            // Orașele găsite până acum apar după fiecare weekend verificat.
+            if (totalFound > 0) { currentRows = sortRowsByCityGroup([...cityRowsMap.values()]); renderMatrix(); }
             updateSearchStatus(`Weekenduri verificate: ${i + 1}/${activeWks.length}`, Math.floor((i + 1) / activeWks.length * 95), "loading");
           }
         }
