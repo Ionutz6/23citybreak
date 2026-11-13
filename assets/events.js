@@ -178,10 +178,17 @@
     try {
       if (DEMO) return (await (await fetch('data/evenimente-demo.json')).json()).events;
       const since = new Date(Date.now() - 864e5).toISOString();
-      const q = new URLSearchParams({ select: '*', or: `(starts_at.gte.${since},ends_at.gte.${since})`, order: 'popularity.desc,starts_at.asc', limit: '400' });
-      const res = await fetch(`${SUPABASE_URL}/rest/v1/events?${q}`, { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` } });
-      if (!res.ok) return [];
-      return await res.json();
+      // Pagini de câte 1000 (maximul pe cerere al API-ului), ca lista să nu se taie când cresc sursele de evenimente.
+      const rows = [], PAGE_SIZE = 1000;
+      for (let offset = 0; offset < 5 * PAGE_SIZE; offset += PAGE_SIZE) {
+        const q = new URLSearchParams({ select: '*', or: `(starts_at.gte.${since},ends_at.gte.${since})`, order: 'popularity.desc,starts_at.asc,id.asc', limit: String(PAGE_SIZE), offset: String(offset) });
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/events?${q}`, { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` } });
+        if (!res.ok) break;
+        const page = await res.json();
+        rows.push(...page);
+        if (page.length < PAGE_SIZE) break;
+      }
+      return rows;
     } catch { return []; }
   })();
   const byId = async id => (await load()).find(e => e.id === id) || null;

@@ -765,6 +765,7 @@
 
   <script src="assets/europe-cities.js?v=1"></script>
   <script src="assets/illustrated-guides.js?v=1"></script>
+  <script src="assets/kiwi-client.js?v=1"></script>
   <script>
     // Romanian public holidays (Labour Code, art. 139). Movable dates use Orthodox Easter.
     function romanianPublicHolidays(year) {
@@ -1879,13 +1880,11 @@
 
       // Resolve additional European cities through the current provider GraphQL API.
       clearTimeout(liveSearchTimeout);
-      if (q && q.length >= 2 && Date.now() >= providerCautionUntil) {
+      if (q && q.length >= 2 && !window.CBKiwi.paused()) {
         clearTimeout(liveSearchTimeout);
         liveSearchTimeout = setTimeout(async () => {
           try {
-            const res = await fetch('https://api.skypicker.com/umbrella/v2/graphql', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
+            const res = await window.CBKiwi.fetch({
               signal: AbortSignal.timeout(15000),
               body: JSON.stringify({
                 query: `query Places($search: PlacesSearchInput) {
@@ -3261,25 +3260,33 @@
     // Kiwi refuses an IP after a burst of requests (HTTP 403 without CORS headers, so the
     // browser reports a TypeError). Retrying only extends the block, so a refusal stops the search.
     const PROVIDER_LIMIT_MESSAGE = "Furnizorul de zboruri limitează temporar căutările de pe rețeaua ta. Mai încearcă peste aproximativ 30 de minute.";
-    let providerCautionUntil = 0;
+    // Evidența refuzului și bugetul de cereri pe oră stau în assets/kiwi-client.js (localStorage), comune
+    // cu pagina Evenimente și cu pachetele, și rămân valabile după reîncărcarea paginii.
+    const providerCautionUntil = () => window.CBKiwi.pausedUntil();
+    let stoppedByBudget = false;
+    function providerLimitMessage() {
+      if (!stoppedByBudget) return PROVIDER_LIMIT_MESSAGE;
+      const minutes = window.CBKiwi.minutesToBudget();
+      return `Ai făcut multe căutări în ultima oră. Ca să nu îți blocheze furnizorul de zboruri rețeaua, mai încearcă peste aproximativ ${minutes} ${minutes === 1 ? "minut" : minutes < 20 ? "minute" : "de minute"}.`;
+    }
     // Only a failure of the network call itself counts as a refusal; a TypeError thrown
     // later, while processing a valid answer, must not be reported as a provider limit.
     async function flightFetch(url, options) {
-      try { return await fetch(url, options); }
+      try { return await window.CBKiwi.fetch({ body: options.body, signal: options.signal }); }
       catch (error) {
-        if (error?.name === "TypeError" && navigator.onLine !== false) error.providerRefusal = true;
         console.warn("Cerere către furnizorul de zboruri eșuată:", error?.name, error?.message);
         throw error;
       }
     }
     function isProviderRefusal(error) {
-      return error?.providerRefusal === true || error?.status === 403 || error?.status === 429;
+      return error?.providerRefusal === true || error?.budgetExceeded === true || error?.status === 403 || error?.status === 429;
     }
     function isRetryableFlightError(error) {
       return error?.name === "TimeoutError" || error?.name === "AbortError" || error?.status >= 500;
     }
-    function noteProviderRefusal() {
-      providerCautionUntil = Date.now() + 30 * 60 * 1000;
+    // Pauza propriu-zisă o pornește kiwi-client.js; aici reținem doar ce mesaj arătăm.
+    function noteProviderRefusal(error) {
+      stoppedByBudget = error?.budgetExceeded === true;
     }
 
     async function readFlightResponse(response) {
@@ -3328,7 +3335,7 @@
       updateSearchStatus(`Scanăm 52 de weekenduri pentru ${cityName}...`, 5, "loading");
 
       const yearWeekends = ALL_WEEKENDS.slice(0, 52);
-      const batchSize = 13;
+      const batchSize = window.CBKiwi.CONCURRENCY;
       const allFound = [];
       let failedRequests = 0;
       let scanRefused = false;
@@ -3417,7 +3424,7 @@
               };
             } catch (e) {
               failedRequests++;
-              if (isProviderRefusal(e)) { scanRefused = true; noteProviderRefusal(); }
+              if (isProviderRefusal(e)) { scanRefused = true; noteProviderRefusal(e); }
               return null;
             }
           });
@@ -3428,7 +3435,7 @@
         }
 
         if (failedRequests && allFound.length === 0) {
-          updateSearchStatus(scanRefused ? PROVIDER_LIMIT_MESSAGE : `Scanarea nu a putut fi finalizată (${failedRequests} cereri eșuate). Încearcă din nou.`, 100, "error");
+          updateSearchStatus(scanRefused ? providerLimitMessage() : `Scanarea nu a putut fi finalizată (${failedRequests} cereri eșuate). Încearcă din nou.`, 100, "error");
           return;
         }
         if (allFound.length === 0) {
@@ -3597,7 +3604,7 @@
               return { wk, airport, itins: json?.data?.returnItineraries?.itineraries || [] };
             } catch (e) {
               failedRequests++;
-              if (isProviderRefusal(e)) { providerRefused = true; noteProviderRefusal(); }
+              if (isProviderRefusal(e)) { providerRefused = true; noteProviderRefusal(e); }
               if (failedRequests === 1) console.warn("Serviciul de zboruri nu a răspuns:", e?.message || "eroare de rețea");
               return { wk, airport, itins: [], failed: true };
             } finally {
@@ -3606,14 +3613,14 @@
             }
           };
 
-          // After a recent refusal, probe with one request before sending a full wave of 40.
-          const probeFirst = Date.now() < providerCautionUntil && jobs.length > 1;
+          // After a recent refusal, probe with one request before sending a full wave.
+          const probeFirst = Date.now() < providerCautionUntil() && jobs.length > 1;
           const firstResults = probeFirst ? [await queryJob(jobs[0])] : [];
           const remainingJobs = probeFirst ? (providerRefused ? [] : jobs.slice(1)) : jobs;
-          const results = [...firstResults, ...await mapWithConcurrency(remainingJobs, 40, queryJob, () => providerRefused || (completedRequests >= 40 && failedRequests === completedRequests))].filter(Boolean);
+          const results = [...firstResults, ...await mapWithConcurrency(remainingJobs, window.CBKiwi.CONCURRENCY, queryJob, () => providerRefused || (completedRequests >= window.CBKiwi.CONCURRENCY && failedRequests === completedRequests))].filter(Boolean);
           const incompleteSearch = failedRequests > 0 || completedRequests < jobs.length;
           if (completedRequests === failedRequests) {
-            updateSearchStatus(providerRefused ? PROVIDER_LIMIT_MESSAGE : `Serviciul de zboruri nu a răspuns la cererile verificate (${failedRequests} eșuate). Nu putem spune dacă există zboruri. Încearcă din nou.`, 100, "error");
+            updateSearchStatus(providerRefused ? providerLimitMessage() : `Serviciul de zboruri nu a răspuns la cererile verificate (${failedRequests} eșuate). Nu putem spune dacă există zboruri. Încearcă din nou.`, 100, "error");
             lastEmptyWasSimilar = searchSimilar;
             document.getElementById('similar-search-button').hidden = providerRefused;
             document.getElementById('expand-search-button').hidden = providerRefused;
@@ -3731,7 +3738,7 @@
             const category = searchSimilar ? 'perioade asemănătoare' : 'weekenduri';
             updateSearchStatus(`✅ S-au găsit zboruri în ${Object.keys(targetCellsMap).length} ${category} pentru ${cityName}. Unele perioade nu au putut fi verificate acum.`, 100, "success");
           } else if (incompleteSearch) {
-            updateSearchStatus(providerRefused ? PROVIDER_LIMIT_MESSAGE : `Nu putem confirma disponibilitatea: unele perioade nu au putut fi verificate. Încearcă din nou.`, 100, "error");
+            updateSearchStatus(providerRefused ? providerLimitMessage() : `Nu putem confirma disponibilitatea: unele perioade nu au putut fi verificate. Încearcă din nou.`, 100, "error");
             lastEmptyWasSimilar = searchSimilar;
             document.getElementById('similar-search-button').hidden = providerRefused;
             document.getElementById('expand-search-button').hidden = providerRefused;
@@ -3935,7 +3942,7 @@
           } catch (wkErr) {
             failedRequests++;
             console.warn("Eroare la căutarea weekendului", wk.label, wkErr);
-            if (isProviderRefusal(wkErr)) { discoveryRefused = true; noteProviderRefusal(); break; }
+            if (isProviderRefusal(wkErr)) { discoveryRefused = true; noteProviderRefusal(wkErr); break; }
           } finally {
             updateSearchStatus(`Weekenduri verificate: ${i + 1}/${activeWks.length}`, Math.floor((i + 1) / activeWks.length * 95), "loading");
           }
@@ -3947,7 +3954,7 @@
           discoverySummary = { total: countUniqueCities(currentRows), failed: failedRequests > 0 };
           updateSearchStatus(`✅ ${failedRequests ? "S-au găsit" : "Căutare finalizată! S-au găsit"} zboruri în ${discoverySummary.total} orașe din Europa.${failedRequests ? " Unele weekenduri nu au putut fi verificate acum." : ""}`, 100, "success");
         } else if (failedRequests) {
-          updateSearchStatus(discoveryRefused ? PROVIDER_LIMIT_MESSAGE : `Nu putem confirma disponibilitatea: ${failedRequests} weekenduri nu au putut fi verificate. Încearcă din nou.`, 100, "error");
+          updateSearchStatus(discoveryRefused ? providerLimitMessage() : `Nu putem confirma disponibilitatea: ${failedRequests} weekenduri nu au putut fi verificate. Încearcă din nou.`, 100, "error");
         } else {
           updateSearchStatus(`Nu s-au găsit zboruri în filtrele alese. Poți extinde filtrele la maximum.`, 100, "empty");
           lastEmptyWasSimilar = false;
@@ -4343,7 +4350,7 @@
   <script src="assets/account.js?v=5"></script>
   <script src="assets/city-coords.js?v=1"></script>
   <script src="assets/personalizare.js?v=7"></script>
-  <script src="assets/events.js?v=7"></script>
+  <script src="assets/events.js?v=8"></script>
 <script src="assets/site-header.js?v=2"></script>
 </body>
 </html>
