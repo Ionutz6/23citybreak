@@ -102,3 +102,5 @@ Genova: originalul fără etichete este `ilustratii-orase/genoa_it.webp`, iar ve
 Leipzig: originalul fără etichete este `ilustratii-orase/leipzig_de.webp`, iar versiunea pentru ghid este `assets/guides-prague-style/leipzig.webp`.
 
 Eindhoven: originalul fără etichete este `ilustratii-orase/eindhoven_nl.webp`, iar versiunea pentru ghid este `assets/guides-prague-style/eindhoven.webp`.
+
+Newcastle: originalul fără etichete este `ilustratii-orase/newcastle_gb.webp`, iar versiunea pentru ghid este `assets/guides-prague-style/newcastle.webp`.
