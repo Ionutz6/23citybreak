@@ -140,6 +140,43 @@
     for (let d = s; d <= en; d = isoAdd(d, 1)) if (dowOf(d) === 6) return weekendOf(d);
     return weekendOf(s);
   };
+  // Regula orei: zborul de dus aterizează cu cel puțin 4 h înainte de start (altfel venim cu o zi mai devreme, dacă ar trebui
+  // să aterizăm înainte de 08:00), iar cel de întors pleacă la cel puțin 3 h după final (meci 2 h, restul 3 h); dacă asta
+  // cade după 22:30, plecăm a doua zi. Festivalurile pe mai multe zile și evenimentele fără oră anunțată rămân pe zilele standard.
+  const hm = t => +t.slice(0, 2) * 60 + +t.slice(3, 5);
+  const fmtT = m => `${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`;
+  const timing = e => {
+    if (e.time_tbc || isMultiDay(e)) return null;
+    const s = startDate(e), st = hm(local(e.starts_at, e.city_id).time);
+    const arrMin = st - 240, dep = st + (e.kind === 'football' ? 120 : 180) + 180;
+    const depDate = isoAdd(s, Math.floor(dep / 1440)), depT = dep % 1440;
+    return { s, arrMin, depT, outNeeded: arrMin < 480 ? isoAdd(s, -1) : s, backNeeded: depT >= 1350 ? isoAdd(depDate, 1) : depDate };
+  };
+  // Ce impune ora evenimentului pentru zilele alese: aterizare până la / decolare după (doar în ziua evenimentului),
+  // plus semnalele „ajungi prea târziu” / „pleci prea devreme”.
+  const flightRules = (e, out, back) => {
+    const tm = timing(e);
+    if (!tm) return { arriveBy: null, departAfter: null, outIssue: false, backIssue: false, tbc: !!e.time_tbc && !isMultiDay(e) };
+    return {
+      arriveBy: out === tm.s && tm.outNeeded === tm.s ? fmtT(tm.arrMin) : null,
+      departAfter: back === tm.s && tm.backNeeded === tm.s ? fmtT(tm.depT) : null,
+      outIssue: out > tm.outNeeded, backIssue: back < tm.backNeeded, tbc: false,
+    };
+  };
+  // Zilele recomandate de zbor (vineri–duminică, mutate după oră) și regulile lor.
+  const tripPlan = e => {
+    const wk = mainWeekend(e), tm = timing(e);
+    let out = wk.fri, back = wk.sun;
+    if (tm) {
+      const dw = dowOf(tm.s);
+      if (dw >= 1 && dw <= 4) { out = tm.outNeeded; back = tm.backNeeded; }
+      else {
+        if (out > tm.outNeeded) out = tm.outNeeded;
+        if (back < tm.backNeeded) { back = tm.backNeeded; out = [tm.outNeeded, [wk.fri, isoAdd(back, -2)].sort().pop()].sort()[0]; }
+      }
+    }
+    return { out, back, ...flightRules(e, out, back) };
+  };
   const whenLabel = e => {
     const s = startDate(e);
     if (isMultiDay(e)) { const en = endDate(e); return s.slice(0, 7) === en.slice(0, 7) ? `${+s.slice(8)}–${+en.slice(8)} ${MON[+s.slice(5, 7) - 1]}` : `${+s.slice(8)} ${MON[+s.slice(5, 7) - 1]} – ${+en.slice(8)} ${MON[+en.slice(5, 7) - 1]}`; }
@@ -256,5 +293,5 @@
     });
   }
 
-  window.CBEvents = { api: { url: SUPABASE_URL, key: SUPABASE_KEY }, load, byId, promos, cardHtml, packageUrl, decorateCards, eventPhoto, cityPhoto, stadiumPhoto, venuePhoto, setBg, KINDS, COMPETITIONS, CATEGORIES, SPORTS, categoryOf, sportOf, isWeekend, helpers: { rangeLabel, esc, cityName, cityOf, guideOf, guideImage, local, isoAdd, dowOf, shortDate, longDate, startDate, endDate, isMultiDay, lengthDays, mainWeekend, whenLabel, tagLabel, monthName, DOW, DOW_LONG, MON } };
+  window.CBEvents = { api: { url: SUPABASE_URL, key: SUPABASE_KEY }, load, byId, promos, cardHtml, packageUrl, decorateCards, eventPhoto, cityPhoto, stadiumPhoto, venuePhoto, setBg, KINDS, COMPETITIONS, CATEGORIES, SPORTS, categoryOf, sportOf, isWeekend, helpers: { rangeLabel, esc, cityName, cityOf, guideOf, guideImage, local, isoAdd, dowOf, shortDate, longDate, startDate, endDate, isMultiDay, lengthDays, mainWeekend, tripPlan, flightRules, whenLabel, tagLabel, monthName, DOW, DOW_LONG, MON } };
 })();

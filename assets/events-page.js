@@ -43,19 +43,19 @@
   const all = (await E.load()).filter(e => H.endDate(e) >= today).sort((a, b) => a.starts_at.localeCompare(b.starts_at));
 
   // ---------- Prețul zborului ----------
-  const tripOf = e => { const w = H.mainWeekend(e); return { origin, dest: `City:${e.city_id}`, out: w.fri, back: w.sun }; };
-  const tripLabel = e => { const w = H.mainWeekend(e); return H.rangeLabel(w.fri, w.sun); };
+  const tripOf = e => { const w = H.tripPlan(e); return { origin, dest: `City:${e.city_id}`, out: w.out, back: w.back, arriveBy: w.arriveBy, departAfter: w.departAfter }; };
+  const tripLabel = e => { const w = H.tripPlan(e); return H.rangeLabel(w.out, w.back); };
   const pending = new Set();
   const priceState = e => {
     const p = FP.cached(tripOf(e));
-    if (p) return p.eur ? { s: 'ok', ...p } : { s: 'none' };
+    if (p) return p.eur ? { s: 'ok', ...p } : { s: 'none', timing: p.timing };
     return pending.has(e.id) ? { s: 'pending' } : { s: 'unknown' };
   };
   const inBudget = e => { const p = priceState(e); return p.s === 'ok' && p.eur <= budget; };
   const priceHtml = e => {
     const p = priceState(e);
     if (p.s === 'ok') return `<span class="evp-price ok${budget && p.eur > budget ? ' over' : ''}">✈︎ ${esc(tripLabel(e))} din ${esc(origin)}: de la <b>${p.eur} €</b>${p.direct ? ' · direct' : p.stops ? ` · ${p.stops} escală` : ''}</span>`;
-    if (p.s === 'none') return `<span class="evp-price none">✈︎ Niciun zbor din ${esc(origin)} în weekendul ăsta</span>`;
+    if (p.s === 'none') return `<span class="evp-price none">✈︎ ${p.timing ? `Niciun zbor din ${esc(origin)} care să se potrivească cu ora evenimentului` : `Niciun zbor din ${esc(origin)} în weekendul ăsta`}</span>`;
     if (p.s === 'pending') return '<span class="evp-price wait">✈︎ Caut zborul…</span>';
     return '';
   };
