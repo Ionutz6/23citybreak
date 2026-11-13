@@ -21,7 +21,7 @@
 .ev-where i{font-style:normal;font-size:13px;letter-spacing:0}
 .ev-go{position:absolute;right:16px;top:-22px;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:#dfa649;color:#0a0b0d;font:800 20px 'Space Grotesk',system-ui,sans-serif;box-shadow:0 6px 16px rgba(0,0,0,.4);transition:transform .15s,background .15s}
 .ev-body:hover .ev-go{background:#c98f33;transform:translateX(2px)}
-.ev-body h3{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.ev-body h3{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;min-height:3.54em}
 /* Data și ora: culoare rece și discretă, ca titlul să rămână cel mai important. */
 .ev-body .ev-meta{color:#9db4cc;font-weight:600;margin-top:8px}
 .ev-meta{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
