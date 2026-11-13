@@ -16,7 +16,8 @@
   if (questions.length < 10) return;
   section.hidden = false;
 
-  const ROUNDS = 10, SECONDS = 15, BASE = 100, MAX_BONUS = 50, MAX_SCORE = ROUNDS * (BASE + MAX_BONUS);
+  // BONUS_SECONDS rămâne 15: bonusul scade la fel ca înainte, deci scorurile rămân comparabile cu recordurile vechi.
+  const ROUNDS = 10, SECONDS = 20, BONUS_SECONDS = 15, BASE = 100, MAX_BONUS = 50, MAX_SCORE = ROUNDS * (BASE + MAX_BONUS);
   const SITE = 'https://23citybreak.ro/orase-vizitate.html#city-quiz', BEST_KEY = '23cb-quiz-best';
   const $ = id => document.getElementById(id);
   const card = $('quiz-card'), image = $('quiz-image'), content = $('quiz-content');
@@ -45,7 +46,7 @@
     const best = readBest();
     const kicker = el('span', 'field-kicker', 'MICUL QUIZ DE WEEKEND');
     const h = el('h3', null, '10 orașe. Câte recunoști?');
-    const p = el('p', null, `Ai ${SECONDS} secunde pentru fiecare ilustrație. Primești ${BASE} de puncte pentru fiecare răspuns corect și până la ${MAX_BONUS} bonus dacă răspunzi repede.`);
+    const p = el('p', null, `Ai ${SECONDS} de secunde pentru fiecare ilustrație. Primești ${BASE} de puncte pentru fiecare răspuns corect și până la ${MAX_BONUS} bonus dacă răspunzi repede (bonusul scade în primele ${BONUS_SECONDS} secunde).`);
     const start = el('button', 'quiz-primary quiz-start', 'Începe quizul ↗'); start.type = 'button';
     start.addEventListener('click', startGame);
     content.replaceChildren(kicker, h, p);
@@ -79,7 +80,7 @@
       if (done) return; done = true; cancelAnimationFrame(timerId);
       const elapsed = started ? (performance.now() - started) / 1000 : SECONDS;
       const ok = choice === q;
-      const bonus = ok ? Math.round(MAX_BONUS * Math.max(0, SECONDS - elapsed) / SECONDS) : 0;
+      const bonus = ok ? Math.round(MAX_BONUS * Math.max(0, BONUS_SECONDS - elapsed) / BONUS_SECONDS) : 0;
       const points = ok ? BASE + bonus : 0;
       game.score += points; if (ok) game.correct++;
       game.results.push({q, ok, points});
