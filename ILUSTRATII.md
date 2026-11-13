@@ -80,3 +80,5 @@ Manchester: originalul fără etichete este `ilustratii-orase/manchester_gb.webp
 Stuttgart: originalul fără etichete este `ilustratii-orase/stuttgart_de.webp`, iar versiunea pentru ghid este `assets/guides-prague-style/stuttgart.webp`.
 
 Bremen: original `ilustratii-orase/bremen_de.webp`; ghid `assets/guides-prague-style/bremen.webp`.
+
+Frankfurt: originalul fără etichete este `ilustratii-orase/frankfurt_de.webp`, iar versiunea pentru ghid este `assets/guides-prague-style/frankfurt.webp`.
