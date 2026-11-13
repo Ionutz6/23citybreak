@@ -5,6 +5,7 @@
   const root = document.getElementById('pk-root');
   const E = window.CBEvents, H = E.helpers, esc = H.esc;
   const id = new URLSearchParams(location.search).get('e');
+  await window.Account?.syncPrefsToLocal?.(); // aeroportul de plecare din cont, înainte de linkuri și prețul zborului
   const ev = id ? await E.byId(id) : null;
   if (!ev) {
     root.innerHTML = '<div class="pk-empty"><h1>Nu am găsit acest eveniment</h1><p>Poate s-a încheiat sau linkul nu mai e valabil.</p><p><a class="pk-btn gold" href="./">Vezi zborurile de weekend</a></p></div>';
