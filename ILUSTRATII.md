@@ -61,6 +61,7 @@ Se adaugă numele obiectivelor direct pe hărțile existente, în stilul aprobat
 - Torino
 - Liverpool
 - Manchester
+- Stuttgart
 
 Harta originală pentru Praga avea deja etichete. Toate ilustrațiile existente din `assets/guides-prague-style/` au fost verificate și actualizate.
 
@@ -75,3 +76,5 @@ Torino: originalul fără etichete este `ilustratii-orase/turin_it.webp`, iar ve
 Liverpool: originalul fără etichete este `ilustratii-orase/liverpool_gb.webp`, iar versiunea pentru ghid este `assets/guides-prague-style/liverpool.webp`.
 
 Manchester: originalul fără etichete este `ilustratii-orase/manchester_gb.webp`, iar versiunea pentru ghid este `assets/guides-prague-style/manchester.webp`.
+
+Stuttgart: originalul fără etichete este `ilustratii-orase/stuttgart_de.webp`, iar versiunea pentru ghid este `assets/guides-prague-style/stuttgart.webp`.
