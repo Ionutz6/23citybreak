@@ -61,11 +61,16 @@
   }
 
   // Abonarea: rândul din subscribers. Bifa de consimțământ + confirmarea prin magic link = double opt-in.
+  // Întoarce rezultatul doar dacă serverul a confirmat salvarea; la eroare aruncă, ca UI-ul să nu afișeze o stare nesalvată.
   async function saveSubscriber(sb, user, newsletter, source) {
     const row = {user_id: user.id, email: user.email, source};
-    if (newsletter === true) return sb.from('subscribers').upsert({...row, newsletter: true, consent_text: CONSENT, consent_at: new Date().toISOString(), unsubscribed_at: null});
-    if (newsletter === false) return sb.from('subscribers').upsert({...row, newsletter: false, unsubscribed_at: new Date().toISOString()});
-    return sb.from('subscribers').upsert(row, {ignoreDuplicates: true});
+    let q;
+    if (newsletter === true) q = sb.from('subscribers').upsert({...row, newsletter: true, consent_text: CONSENT, consent_at: new Date().toISOString(), unsubscribed_at: null});
+    else if (newsletter === false) q = sb.from('subscribers').upsert({...row, newsletter: false, unsubscribed_at: new Date().toISOString()});
+    else q = sb.from('subscribers').upsert(row, {ignoreDuplicates: true});
+    const res = await q;
+    if (res && res.error) throw res.error;
+    return res;
   }
   async function isSubscribed() {
     const s = await session(); if (!s) return false;
