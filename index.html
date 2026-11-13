@@ -2397,7 +2397,7 @@
       const pVal = formatMoney(currentMode === 1 ? cell.perPaxEur : cell.totalEur);
       const pUnit = currentMode === 1 ? "/ pers." : "total grup";
 
-      qbTitle.innerHTML = `<span>✈️</span> <span>${row.city} · Weekend ${wk ? wk.label : ''} · <span class="text-[#8a5d14] font-black">${pVal} ${pUnit}</span></span>`;
+      qbTitle.innerHTML = `<span>✈️</span> <span>${escapeHtml(row.city)} · Weekend ${escapeHtml(wk ? wk.label : '')} · <span class="text-[#8a5d14] font-black">${pVal} ${pUnit}</span></span>`;
       qbSub.textContent = `Tur: ${cell.outRoute} (${cell.outTime}) | Retur: ${cell.inRoute} (${cell.inTime}) · ${cell.airlineLabel}`;
 
 
@@ -2618,7 +2618,7 @@
       container.innerHTML = `
         <a href="${links.googleFlightsUrl}" target="_blank" rel="noopener noreferrer"
            class="px-3 py-1.5 rounded-xl bg-white hover:bg-[#fce8bd] text-[#0a0b0d] border border-[#dce1e7] hover:border-[#dfa649] transition shadow-2xs flex items-center gap-1">
-          <span>✈️</span> Google Flights (${cityName}) ↗
+          <span>✈️</span> Google Flights (${escapeHtml(cityName)}) ↗
         </a>
         <a href="${links.skyscannerUrl}" target="_blank" rel="noopener noreferrer"
            class="px-3 py-1.5 rounded-xl bg-white hover:bg-[#fce8bd] text-[#0a0b0d] border border-[#dce1e7] hover:border-[#dfa649] transition shadow-2xs flex items-center gap-1">
@@ -2680,6 +2680,19 @@
     }
 
     // Render Destination Cards Grid (View 1)
+    // Card/matrix buttons carry their data in data-* attributes (no inline JS), so
+    // names with apostrophes or markup from external APIs can never break out of the HTML.
+    document.addEventListener("click", (ev) => {
+      const btn = ev.target.closest && ev.target.closest("[data-action]");
+      if (!btn) return;
+      const d = btn.dataset;
+      if (d.action === "city-guide") {
+        openCityGuideModal(d.cityKey, d.cityName, d.iata, d.guideCityId);
+      } else if (d.action === "share-whatsapp") {
+        shareTripWhatsApp(d.cityName, d.dates, d.price, d.flightInfo, d.bookUrl);
+      }
+    });
+
     function renderCardsView(filteredRows, activeWks, maxBudget) {
       const cardsGrid = document.getElementById("cards-grid");
       if (!cardsGrid) return;
@@ -2751,7 +2764,7 @@
                style="background-color:#202b34; min-height: 340px;">
             
             <div class="p-4 z-10">
-              <button type="button" onclick="openCityGuideModal('${cityKey}', '${r.city}', '${r.iata || r.code}', '${r.cityId || ''}')"
+              <button type="button" data-action="city-guide" data-city-key="${escapeHtml(cityKey)}" data-city-name="${escapeHtml(r.city)}" data-iata="${escapeHtml(r.iata || r.code)}" data-guide-city-id="${escapeHtml(r.cityId || '')}"
                       class="w-full bg-black/60 hover:bg-black text-[#dfa649] hover:text-white border border-[#dfa649]/40 text-xs font-bold px-4 py-2 rounded-lg transition cursor-pointer font-display">
                 Ghid turistic →
               </button>
@@ -2761,11 +2774,11 @@
             <div class="p-5 z-10 space-y-3">
               <div>
                 <h3 class="font-display text-xl sm:text-2xl font-black text-white tracking-tight flex items-center gap-2 flex-wrap drop-shadow-md">
-                  <span>${r.city}</span>
+                  <span>${escapeHtml(r.city)}</span>
                 </h3>
                 ${airportNote}
                 <div class="text-xs text-[#cbd5e1] font-medium font-body flex items-center gap-1.5 mt-0.5">
-                  <span>📅</span> <span>${datesLabel}</span>
+                  <span>📅</span> <span>${escapeHtml(datesLabel)}</span>
                 </div>
               </div>
 
@@ -2773,14 +2786,14 @@
               <div class="bg-black/50 border border-white/10 rounded-xl p-2.5 text-xs text-slate-200 space-y-1 backdrop-blur-sm font-body">
                 <div class="flex items-center justify-between">
                   <span class="text-[#dfa649] font-bold">🛫 Tur:</span>
-                  <span>${flightTimeOut}</span>
+                  <span>${escapeHtml(flightTimeOut)}</span>
                 </div>
                 <div class="flex items-center justify-between">
                   <span class="text-[#dfa649] font-bold">🛬 Retur:</span>
-                  <span>${flightTimeIn}</span>
+                  <span>${escapeHtml(flightTimeIn)}</span>
                 </div>
                 <div class="text-[11px] text-slate-300 border-t border-white/10 pt-1 flex items-center justify-between">
-                  <span>${airline}</span>
+                  <span>${escapeHtml(airline)}</span>
                   <span class="text-emerald-400 font-bold">${bestCell ? (bestCell.stops > 0 ? `${bestCell.stops} esc.` : "Direct") : "—"}</span>
                 </div>
               </div>
@@ -2792,16 +2805,16 @@
                   <div class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">${priceSub}</div>
                 </div>
                 <div class="ml-auto flex flex-wrap items-center gap-1.5" style="justify-content:flex-end">
-                  <button onclick="shareTripWhatsApp('${r.city}', '${datesLabel}', '${bestCell ? bestCell.perPaxEur : 0}', '${flightTimeOut} / ${flightTimeIn}', '${bookUrl}')"
+                  <button type="button" data-action="share-whatsapp" data-city-name="${escapeHtml(r.city)}" data-dates="${escapeHtml(datesLabel)}" data-price="${bestCell ? Number(bestCell.perPaxEur) || 0 : 0}" data-flight-info="${escapeHtml(flightTimeOut + ' / ' + flightTimeIn)}" data-book-url="${escapeHtml(bookUrl)}"
                           title="Trimite pe WhatsApp"
                           class="whatsapp-share bg-emerald-700 hover:bg-emerald-600 text-white h-10 box-border px-3 py-0 rounded-xl transition cursor-pointer shadow-xs font-display flex items-center justify-center gap-1.5 font-bold text-xs whitespace-nowrap" aria-label="Trimite oferta pe WhatsApp">
                     <svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.65 15.02L2 22l5.13-1.34A10 10 0 1 0 12 2zm0 18a7.94 7.94 0 0 1-4.05-1.1l-.29-.17-3.04.79.81-2.96-.19-.3A8 8 0 1 1 12 20zm4.4-5.96c-.24-.12-1.42-.7-1.64-.78-.22-.08-.38-.12-.54.12-.16.24-.62.78-.76.94-.14.16-.28.18-.52.06-.24-.12-1.02-.38-1.94-1.2-.72-.64-1.2-1.42-1.34-1.66-.14-.24-.02-.37.11-.49.11-.11.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.54-1.3-.74-1.78-.2-.46-.4-.4-.54-.41h-.46c-.16 0-.42.06-.64.3-.22.24-.84.82-.84 2s.86 2.32.98 2.48c.12.16 1.7 2.6 4.12 3.64.58.25 1.04.4 1.4.51.59.19 1.13.16 1.56.1.48-.07 1.42-.58 1.62-1.14.2-.56.2-1.04.14-1.14-.06-.1-.22-.16-.46-.28z"/></svg><span>WhatsApp</span>
                   </button>
-                  <a href="${bookUrl}" target="_blank" rel="noopener noreferrer"
+                  <a href="${escapeHtml(bookUrl)}" target="_blank" rel="noopener noreferrer"
                      class="bg-[#dfa649] hover:bg-[#c98f33] active:bg-[#b57f2a] text-[#0a0b0d] font-black text-xs h-10 box-border px-3.5 py-0 rounded-xl transition shadow-xs font-display flex items-center justify-center whitespace-nowrap">
                     <span>Verifică oferta</span>
                   </a>
-                  ${cardKiwiUrl ? `<a href="${cardKiwiUrl}" target="_blank" rel="noopener noreferrer" title="Deschide oferta pe Kiwi.com"
+                  ${cardKiwiUrl ? `<a href="${escapeHtml(cardKiwiUrl)}" target="_blank" rel="noopener noreferrer" title="Deschide oferta pe Kiwi.com"
                      style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.35);color:#fff" class="font-bold text-xs h-10 box-border px-3 py-0 rounded-xl transition font-display flex items-center justify-center whitespace-nowrap">Kiwi</a>` : ""}
                 </div>
               </div>
@@ -3006,15 +3019,15 @@
         const cityKey = (r.code || r.iata || r.city).toLowerCase();
         tdLabel.innerHTML = `
           <div class="font-bold text-sm sm:text-base text-[#0a0b0d] leading-snug font-display flex items-center gap-1.5 flex-wrap">
-            <span>${r.city}</span>
+            <span>${escapeHtml(r.city)}</span>
             ${airportBadge}
-            <button onclick="openCityGuideModal('${cityKey}', '${r.city}', '${r.iata || r.code}', '${r.cityId || ''}')"
+            <button type="button" data-action="city-guide" data-city-key="${escapeHtml(cityKey)}" data-city-name="${escapeHtml(r.city)}" data-iata="${escapeHtml(r.iata || r.code)}" data-guide-city-id="${escapeHtml(r.cityId || '')}"
                     title="Vezi Vremea & Ghidul de 48h"
                     class="text-xs hover:scale-125 transition cursor-pointer opacity-70 hover:opacity-100" style="border:none;background:none;">
               ☀️
             </button>
           </div>
-          <div class="text-xs text-[#64748b] font-semibold mt-0.5 leading-tight font-body">${rowSub}</div>
+          <div class="text-xs text-[#64748b] font-semibold mt-0.5 leading-tight font-body">${escapeHtml(rowSub)}</div>
         `;
         tr.appendChild(tdLabel);
 
@@ -3050,7 +3063,7 @@
             a.className += cellAirport ? " flex-col gap-0.5" : "";
             a.innerHTML = `
               <span class="font-black text-sm sm:text-base md:text-lg leading-none whitespace-nowrap">${displayPrice}</span>
-              ${cellAirport ? `<span class="text-[9px] font-bold opacity-70 leading-none">${cellAirport}</span>` : ""}
+              ${cellAirport ? `<span class="text-[9px] font-bold opacity-70 leading-none">${escapeHtml(cellAirport)}</span>` : ""}
             `;
             a.addEventListener("mouseenter", () => showQuickBuy(r, wk.id));
             td.appendChild(a);

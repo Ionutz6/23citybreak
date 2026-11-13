@@ -92,3 +92,17 @@ Leeds: originalul fără etichete este `ilustratii-orase/leeds_gb.webp`, iar ver
 Toulouse: originalul fără etichete este `ilustratii-orase/toulouse_fr.webp`, iar versiunea pentru ghid este `assets/guides-prague-style/toulouse.webp`.
 
 Strasbourg: originalul fără etichete este `ilustratii-orase/strasbourg_fr.webp`, iar versiunea pentru ghid este `assets/guides-prague-style/strasbourg.webp`.
+
+Lille: originalul fără etichete este `ilustratii-orase/lille_fr.webp`, iar versiunea pentru ghid este `assets/guides-prague-style/lille.webp`.
+
+Birmingham: originalul fără etichete este `ilustratii-orase/birmingham_gb.webp`, iar versiunea pentru ghid este `assets/guides-prague-style/birmingham.webp`.
+
+Genova: originalul fără etichete este `ilustratii-orase/genoa_it.webp`, iar versiunea pentru ghid este `assets/guides-prague-style/genova.webp`.
+
+Leipzig: originalul fără etichete este `ilustratii-orase/leipzig_de.webp`, iar versiunea pentru ghid este `assets/guides-prague-style/leipzig.webp`.
+
+Eindhoven: originalul fără etichete este `ilustratii-orase/eindhoven_nl.webp`, iar versiunea pentru ghid este `assets/guides-prague-style/eindhoven.webp`.
+
+Newcastle: originalul fără etichete este `ilustratii-orase/newcastle_gb.webp`, iar versiunea pentru ghid este `assets/guides-prague-style/newcastle.webp`.
+
+Cagliari: originalul fără etichete este `ilustratii-orase/cagliari_it.webp`, iar versiunea pentru ghid este `assets/guides-prague-style/cagliari.webp`.
