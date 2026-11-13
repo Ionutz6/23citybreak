@@ -90,3 +90,5 @@ Dortmund: originalul fără etichete este `ilustratii-orase/dortmund_de.webp`, i
 Leeds: originalul fără etichete este `ilustratii-orase/leeds_gb.webp`, iar versiunea pentru ghid este `assets/guides-prague-style/leeds.webp`.
 
 Toulouse: originalul fără etichete este `ilustratii-orase/toulouse_fr.webp`, iar versiunea pentru ghid este `assets/guides-prague-style/toulouse.webp`.
+
+Strasbourg: originalul fără etichete este `ilustratii-orase/strasbourg_fr.webp`, iar versiunea pentru ghid este `assets/guides-prague-style/strasbourg.webp`.
