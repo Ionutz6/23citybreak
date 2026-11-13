@@ -104,3 +104,5 @@ Leipzig: originalul fără etichete este `ilustratii-orase/leipzig_de.webp`, iar
 Eindhoven: originalul fără etichete este `ilustratii-orase/eindhoven_nl.webp`, iar versiunea pentru ghid este `assets/guides-prague-style/eindhoven.webp`.
 
 Newcastle: originalul fără etichete este `ilustratii-orase/newcastle_gb.webp`, iar versiunea pentru ghid este `assets/guides-prague-style/newcastle.webp`.
+
+Cagliari: originalul fără etichete este `ilustratii-orase/cagliari_it.webp`, iar versiunea pentru ghid este `assets/guides-prague-style/cagliari.webp`.
