@@ -3,14 +3,14 @@
   const illustratedGuides = window.CB_ILLUSTRATED_GUIDES, ALL_EUROPE_CITIES = window.CB_EUROPE_CITIES;
   if (!illustratedGuides || !ALL_EUROPE_CITIES) return;
   // Ordered against the original, unlabelled map assets saved for the quiz.
-  const slugs = 'edinburgh,budapesta,bruxelles,chisinau,viena,lyon,porto,bologna,paris,milano,venetia,copenhaga,madrid,barcelona,atena,roma,pisa-florenta,napoli,amsterdam,nisa,londra,istanbul,lisabona,varsovia,berlin,dublin,valencia,sevilla,cracovia,malaga,munchen,bari,split,stockholm,dubrovnik,palermo,salonic,zurich,catania,bratislava,tallinn,oslo,marsilia,bordeaux,riga,sofia,helsinki,bruges,belgrad,vilnius,ljubljana,glasgow,koln-bonn'.split(',');
+  const slugs = 'edinburgh,budapesta,bruxelles,chisinau,viena,lyon,porto,bologna,paris,milano,venetia,copenhaga,madrid,barcelona,atena,roma,pisa-florenta,napoli,amsterdam,nisa,londra,istanbul,lisabona,varsovia,berlin,dublin,valencia,sevilla,cracovia,malaga,munchen,bari,split,stockholm,dubrovnik,palermo,salonic,zurich,catania,bratislava,tallinn,oslo,marsilia,bordeaux,riga,sofia,helsinki,bruges,belgrad,vilnius,ljubljana,glasgow,koln-bonn,stuttgart,frankfurt,bremen,bilbao,dortmund,leeds,toulouse,strasbourg,lille,birmingham,genova,leipzig,eindhoven,newcastle,cagliari'.split(',');
   const questions = slugs.map((slug, i) => {
     const entry = Object.entries(illustratedGuides).find(([, guide]) => guide.image === slug);
     if (!entry) return null;
     const [id, guide] = entry;
     const city = ALL_EUROPE_CITIES.find(c => c.id === id);
     if (!city) return null;
-    return {id, guide, name: slug === 'pisa-florenta' ? 'Pisa și Florența' : slug === 'koln-bonn' ? 'Köln' : city.name, image: `ilustratii-quiz/800/ilustratie-${String(i+1).padStart(3,'0')}.webp`};
+    return {id, guide, name: slug === 'pisa-florenta' ? 'Pisa și Florența' : slug === 'koln-bonn' ? 'Köln' : city.name, image: guide.quizImage || `ilustratii-quiz/800/ilustratie-${String(i+1).padStart(3,'0')}.webp`};
   }).filter(Boolean);
   const section = document.getElementById('city-quiz');
   if (questions.length < 10) return;
