@@ -13,7 +13,7 @@
 .ev-card{position:relative;border-radius:24px;overflow:hidden;min-height:430px;color:#fff;display:flex;flex-direction:column;justify-content:space-between;background:#202b34 center/cover no-repeat;box-shadow:0 4px 20px -2px rgba(10,11,13,.08)}
 .ev-top{display:flex;justify-content:space-between;padding:14px}
 .ev-tag{background:rgba(13,16,20,.9);border:1px solid rgba(223,166,73,.5);color:#dfa649;font:800 12px 'Space Grotesk',system-ui,sans-serif;text-transform:uppercase;letter-spacing:.03em;padding:5px 10px;border-radius:99px}
-.ev-body{position:relative;display:flex;flex-direction:column;box-sizing:border-box;height:236px;padding:16px 18px 16px;margin:0 10px 10px;border-radius:18px;background:rgba(13,16,20,.88);color:#fff;text-decoration:none;transition:background .15s}
+.ev-body{position:relative;display:flex;flex-direction:column;box-sizing:border-box;height:196px;padding:16px 18px 16px;margin:0 10px 10px;border-radius:18px;background:rgba(13,16,20,.88);color:#fff;text-decoration:none;transition:background .15s}
 .ev-body:hover{background:rgba(13,16,20,.95)}
 .ev-body:focus-visible{outline:3px solid #dfa649;outline-offset:2px}
 /* Același chenar negru pe toate cardurile: orașul, titlul pe max 2 rânduri, apoi câte un rând. */
@@ -146,6 +146,8 @@ button.pk-day{cursor:pointer}
 .pk-stay-opt .go{position:absolute;top:10px;right:11px;font-weight:800;color:#2f7d55}
 .pk-row .pr small{display:block;font:700 11px 'Source Sans 3',system-ui,sans-serif;color:#5b6470;text-align:right;letter-spacing:0}
 /* Prețul zborului pe cardurile de eveniment */
+.ev-ticket{font-size:12.5px;color:#e2e8f0;margin-top:8px}
+.ev-ticket b{color:#dfa649;font-weight:800}
 .ev-flight{font-size:12.5px;color:#e2e8f0;margin:auto 0 0;padding-top:8px;min-height:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ev-flight b{color:#dfa649;font-weight:800}
 /* Pagina Evenimente (evenimente.html) */
