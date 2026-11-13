@@ -112,7 +112,7 @@
 
     const acts = el('div', 'acct-user-acts');
     const out = el('button', 'acct-link', 'Ieși din cont'); out.type = 'button';
-    out.addEventListener('click', async () => { await sb.auth.signOut(); A.updateHeader(); loggedOut(); });
+    out.addEventListener('click', async () => { await sb.auth.signOut(); A.clearPersonalData(); A.updateHeader(); loggedOut(); });
     const del = el('button', 'acct-link acct-danger', 'Șterge contul și datele'); del.type = 'button';
     acts.append(out, del);
 
@@ -128,7 +128,7 @@
       try {
         const {error} = await sb.rpc('delete_my_account'); if (error) throw error;
         await sb.auth.signOut().catch(() => {});
-        try { localStorage.removeItem('23cb-nl-banner'); } catch {}
+        A.clearPersonalData();
         A.updateHeader();
         main.replaceChildren(el('section', 'acct-card acct-card-narrow'));
         main.firstChild.append(el('h2', null, 'Contul a fost șters'), el('p', null, 'Toate datele tale au fost șterse. Mulțumim că ai folosit 23citybreak.'));

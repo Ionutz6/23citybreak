@@ -381,8 +381,18 @@
     document.body.append(bar);
   }
 
+  // Date personale păstrate local; se curăță la ieșirea din cont și la ștergerea contului.
+  // Setările neutre (EUR/RON, vreme, geolocație, cereri Kiwi, prețuri) rămân.
+  const PERSONAL_KEYS = /^23cb-(prefs|event-prefs|visited|visited-reminder|searched|quiz-best|quiz-pending|nl-banner|onetap|login-pending|synced-.*)$/;
+  const clearPersonalData = () => {
+    try {
+      for (const k of Object.keys(localStorage)) if (PERSONAL_KEYS.test(k)) localStorage.removeItem(k);
+    } catch {}
+    try { sessionStorage.removeItem('23cb-onb-nudge'); } catch {}
+  };
+
   window.Account = {
-    client, session, hasSession, preferences, savePrefs, syncPrefsToLocal, openLogin, loginForm, googleEnabled, prefsForm, saveSubscriber, isSubscribed,
+    clearPersonalData, client, session, hasSession, preferences, savePrefs, syncPrefsToLocal, openLogin, loginForm, googleEnabled, prefsForm, saveSubscriber, isSubscribed,
     afterLogin, needsOnboarding, runOnboarding, mountVisited, updateHeader, CONSENT,
   };
 
