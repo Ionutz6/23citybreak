@@ -75,7 +75,7 @@
   function accountFoot(target, email, sb) {
     const foot = el('p', 'quiz-rank-foot', `Conectat ca ${email}. `);
     const out = el('button', 'quiz-link', 'Nu ești tu? Ieși'); out.type = 'button';
-    out.addEventListener('click', async () => { await sb.auth.signOut(); target.replaceChildren(el('p', 'quiz-rank-foot', 'Ai ieșit din cont.')); updateHeader(); });
+    out.addEventListener('click', async () => { await sb.auth.signOut(); window.Account?.clearPersonalData(); target.replaceChildren(el('p', 'quiz-rank-foot', 'Ai ieșit din cont.')); updateHeader(); });
     foot.append(out);
     return foot;
   }
