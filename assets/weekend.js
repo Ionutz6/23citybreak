@@ -40,7 +40,8 @@
   const stayCity = String(slug).split('_')[0].replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
   const stayUrl = () => `https://www.booking.com/searchresults.html?${new URLSearchParams({ ss: stayCity, checkin: trip.out, checkout: trip.back, group_adults: '2', no_rooms: '1' })}`;
   const airbnbUrl = () => `https://www.airbnb.com/s/${encodeURIComponent(stayCity)}/homes?${new URLSearchParams({ checkin: trip.out, checkout: trip.back, adults: '2' })}`;
-  const ticketUrl = ev.ticket_url || `https://www.google.com/search?${new URLSearchParams({ q: ev.kind === 'football' && ev.teams?.[0] ? `${ev.teams[0]} official tickets` : `${ev.title} ${name} tickets` })}`;
+  const clubUrl = ev.kind === 'football' && window.CBClubTickets ? window.CBClubTickets.url(ev.teams?.[0]) : null;
+  const ticketUrl = ev.ticket_url || clubUrl || `https://www.google.com/search?${new URLSearchParams({ q: ev.kind === 'football' && ev.teams?.[0] ? `${ev.teams[0]} official tickets` : `${ev.title} ${name} tickets` })}`;
   const ticketLabel = ev.ticket_url ? (ev.kind === 'city_festival' || ev.kind === 'market' ? 'Vezi programul oficial' : 'Cumpără bilet la eveniment') : (ev.kind === 'football' ? 'Caută bilete pe site-ul clubului' : 'Caută bilete la eveniment');
   const mapsPlace = q => `https://www.google.com/maps/search/?${new URLSearchParams({ api: '1', query: q })}`;
   const mapsDir = stops => { const p = new URLSearchParams({ api: '1', origin: stops[0], destination: stops[stops.length - 1], travelmode: 'walking' }); if (stops.length > 2) p.set('waypoints', stops.slice(1, -1).join('|')); return `https://www.google.com/maps/dir/?${p}`; };
