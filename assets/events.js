@@ -124,6 +124,8 @@
   const isoAdd = (d, n) => { const x = new Date(`${d}T12:00:00Z`); x.setUTCDate(x.getUTCDate() + n); return x.toISOString().slice(0, 10); };
   const dowOf = d => new Date(`${d}T12:00:00Z`).getUTCDay();
   const shortDate = d => `${DOW[dowOf(d)]} ${+d.slice(8)} ${MON[+d.slice(5, 7) - 1]}`;
+  // „20–22 nov” (sau „30 ian–1 feb” când trece în altă lună)
+  const rangeLabel = (a, b) => a.slice(5, 7) === b.slice(5, 7) ? `${+a.slice(8)}–${+b.slice(8)} ${MON[+b.slice(5, 7) - 1]}` : `${+a.slice(8)} ${MON[+a.slice(5, 7) - 1]}–${+b.slice(8)} ${MON[+b.slice(5, 7) - 1]}`;
   const longDate = d => `${DOW_LONG[dowOf(d)]} ${+d.slice(8)} ${MON[+d.slice(5, 7) - 1]}`;
   const startDate = e => local(e.starts_at, e.city_id).date;
   const endDate = e => (e.ends_at ? local(e.ends_at, e.city_id).date : startDate(e));
@@ -197,19 +199,21 @@
   function cardHtml(e) {
     const img = e.image_url || '';
     const wk = mainWeekend(e);
-    const price = e.price_min_eur ? `<div><div class="ev-price">${Math.round(e.price_min_eur)} €</div><div class="ev-price-sub">bilet, de la</div></div>` : '<div></div>';
-    const note = e.kind === 'football' ? 'bilete pe site-ul clubului' : e.kind === 'market' || e.kind === 'city_festival' ? 'intrare liberă' : '';
+    const price = e.price_min_eur ? `<div class="ev-ticket">🎟 bilet de la <b>${Math.round(e.price_min_eur)} €</b></div>` : '';
+    const note = e.kind === 'market' || e.kind === 'city_festival' ? 'intrare liberă' : '';
+    const c = cityOf(e.city_id), act = isMultiDay(e) ? 'Alege zilele' : 'Vezi pachetul';
+    // Tot chenarul negru e link spre pachet; săgeata rotundă e doar semnul vizual că se apasă.
     return `<article class="ev-card" data-ev="${esc(e.id)}"${img ? ` style="background-image:url('${esc(img)}')"` : ''}>
       <div class="ev-top"><span class="ev-tag">${esc(tagLabel(e))}</span></div>
-      <div class="ev-body">
+      <a class="ev-body" href="${esc(packageUrl(e))}" aria-label="${esc(`${act}: ${e.title.replace(/ \(rugby\)$/, '')}, ${cityName(e.city_id)}`)}">
+        <span class="ev-go" aria-hidden="true">→</span>
+        <span class="ev-where">${c?.flag ? `<i aria-hidden="true">${c.flag}</i> ` : '📍 '}${esc(cityName(e.city_id))}${c?.country ? ` · ${esc(c.country)}` : ''}</span>
         <h3>${esc(e.title.replace(/ \(rugby\)$/, ''))}</h3>
         <div class="ev-meta">${e.venue ? `${esc(e.venue)} · ` : ''}${esc(whenLabel(e))}</div>
-        <div class="ev-meta">📅 ${isMultiDay(e) ? 'weekendul recomandat: ' : ''}${esc(shortDate(wk.fri))} → ${esc(shortDate(wk.sun))}</div>
-        <div class="ev-prices">${price}<div class="ev-price-alt">${note}</div></div>
+        ${isMultiDay(e) ? `<div class="ev-meta">📅 weekendul recomandat: ${esc(shortDate(wk.fri))} → ${esc(shortDate(wk.sun))}</div>` : ''}
+        ${price}${note ? `<div class="ev-meta">${esc(note)}</div>` : ''}
         <div class="ev-flight" data-flight="${esc(e.id)}" aria-live="polite"></div>
-        <div class="ev-foot"><span class="ev-where"><b>${cityOf(e.city_id)?.flag ? `<i aria-hidden="true">${cityOf(e.city_id).flag}</i> ` : '📍 '}${esc(cityName(e.city_id))}</b>${cityOf(e.city_id)?.country ? `<small>${esc(cityOf(e.city_id).country)}</small>` : ''}</span>
-          <a class="ev-btn" href="${esc(packageUrl(e))}">${isMultiDay(e) ? 'Alege zilele →' : 'Vezi pachetul →'}</a></div>
-      </div></article>`;
+      </a></article>`;
   }
 
   // Promo pentru caruselul de pe prima pagină: întâi sportul, apoi restul; doar ce începe peste 2–13 săptămâni
@@ -252,5 +256,5 @@
     });
   }
 
-  window.CBEvents = { api: { url: SUPABASE_URL, key: SUPABASE_KEY }, load, byId, promos, cardHtml, packageUrl, decorateCards, eventPhoto, cityPhoto, stadiumPhoto, venuePhoto, setBg, KINDS, COMPETITIONS, CATEGORIES, SPORTS, categoryOf, sportOf, isWeekend, helpers: { esc, cityName, cityOf, guideOf, guideImage, local, isoAdd, dowOf, shortDate, longDate, startDate, endDate, isMultiDay, lengthDays, mainWeekend, whenLabel, tagLabel, monthName, DOW, DOW_LONG, MON } };
+  window.CBEvents = { api: { url: SUPABASE_URL, key: SUPABASE_KEY }, load, byId, promos, cardHtml, packageUrl, decorateCards, eventPhoto, cityPhoto, stadiumPhoto, venuePhoto, setBg, KINDS, COMPETITIONS, CATEGORIES, SPORTS, categoryOf, sportOf, isWeekend, helpers: { rangeLabel, esc, cityName, cityOf, guideOf, guideImage, local, isoAdd, dowOf, shortDate, longDate, startDate, endDate, isMultiDay, lengthDays, mainWeekend, whenLabel, tagLabel, monthName, DOW, DOW_LONG, MON } };
 })();

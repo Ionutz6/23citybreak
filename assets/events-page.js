@@ -42,6 +42,7 @@
 
   // ---------- Prețul zborului ----------
   const tripOf = e => { const w = H.mainWeekend(e); return { origin, dest: `City:${e.city_id}`, out: w.fri, back: w.sun }; };
+  const tripLabel = e => { const w = H.mainWeekend(e); return H.rangeLabel(w.fri, w.sun); };
   const pending = new Set();
   const priceState = e => {
     const p = FP.cached(tripOf(e));
@@ -51,7 +52,7 @@
   const inBudget = e => { const p = priceState(e); return p.s === 'ok' && p.eur <= budget; };
   const priceHtml = e => {
     const p = priceState(e);
-    if (p.s === 'ok') return `<span class="evp-price ok${budget && p.eur > budget ? ' over' : ''}">✈︎ Zbor ${esc(origin)} dus-întors de la <b>${p.eur} €</b>${p.direct ? ' · direct' : p.stops ? ` · ${p.stops} escală` : ''}</span>`;
+    if (p.s === 'ok') return `<span class="evp-price ok${budget && p.eur > budget ? ' over' : ''}">✈︎ ${esc(tripLabel(e))} din ${esc(origin)}: de la <b>${p.eur} €</b>${p.direct ? ' · direct' : p.stops ? ` · ${p.stops} escală` : ''}</span>`;
     if (p.s === 'none') return `<span class="evp-price none">✈︎ Niciun zbor din ${esc(origin)} în weekendul ăsta</span>`;
     if (p.s === 'pending') return '<span class="evp-price wait">✈︎ Caut zborul…</span>';
     return '';
