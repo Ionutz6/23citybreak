@@ -131,6 +131,7 @@ button.pk-day{cursor:pointer}
 /* Vremea orientativă în pachet (assets/event-weather.js) */
 .pk-tag{display:inline-block;margin-left:4px;padding:1px 7px;border-radius:999px;background:#fff4dc;border:1px solid #ecd8b0;color:#79511b;font-size:10.5px;font-weight:700;letter-spacing:.02em;vertical-align:1px}
 .pk-wx .l{align-items:flex-start}
+.pk-timing{margin-top:4px;line-height:1.35}.pk-timing.warn{color:#9a4b00;font-weight:600}
 .pk-wx-src{font-size:11px;margin-top:2px}
 .pk-wx-src a{color:inherit}
 /* Cazare: două opțiuni clar separate (Booking / Airbnb) */

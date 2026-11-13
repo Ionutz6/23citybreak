@@ -17,10 +17,12 @@
   const cap = t => t.replace(/^./, c => c.toUpperCase());
 
   // ---------- Variantele de durată ----------
-  const wk = H.mainWeekend(ev);
+  // Zilele recomandate țin cont de ora evenimentului (events.js, H.tripPlan): ex. meci duminică la 21:00 → sâmbătă–luni.
+  const plan = H.tripPlan(ev);
+  const dw = d => H.DOW[H.dowOf(d)];
   const modes = multi
-    ? [{ key: 'weekend', label: 'Weekendul recomandat', out: wk.fri, back: wk.sun }, { key: 'full', label: 'Tot evenimentul', out: H.isoAdd(s, -1), back: H.isoAdd(en, 1) }]
-    : [{ key: 'weekend', label: 'Weekend (vin–dum)', out: wk.fri, back: wk.sun }, { key: 'long', label: 'Prelungit (joi–lun)', out: H.isoAdd(wk.fri, -1), back: H.isoAdd(wk.sun, 1) }];
+    ? [{ key: 'weekend', label: 'Weekendul recomandat', out: plan.out, back: plan.back }, { key: 'full', label: 'Tot evenimentul', out: H.isoAdd(s, -1), back: H.isoAdd(en, 1) }]
+    : [{ key: 'weekend', label: `Recomandat (${dw(plan.out)}–${dw(plan.back)})`, out: plan.out, back: plan.back }, { key: 'long', label: `Prelungit (${dw(H.isoAdd(plan.out, -1))}–${dw(H.isoAdd(plan.back, 1))})`, out: H.isoAdd(plan.out, -1), back: H.isoAdd(plan.back, 1) }];
   let trip = { out: modes[0].out, back: modes[0].back, mode: modes[0].key };
   // Banda de zile: la evenimentele de o zi lăsăm câte o zi în plus la capete (mie–mar), pentru alegerea manuală.
   const stripFrom = H.isoAdd([...modes.map(m => m.out), H.isoAdd(s, -1)].sort()[0], multi ? 0 : -1);
@@ -74,12 +76,23 @@
   const illuSmall = illu.replace(/([^/]+\.webp)$/, '800/$1');
   // Prețul zborului pentru zilele alese: o cerere Kiwi din browser, cu cache (assets/flight-price.js).
   let flight = null, flightState = 'idle', flightKey = '';
-  const flightSub = () => flightState === 'loading' ? ' · caut prețul…' : flight?.eur ? `<br>${flight.direct ? 'direct' : `${flight.stops} ${flight.stops === 1 ? 'escală' : 'escale'}`}, de persoană, găsit acum pe Kiwi` : flightState === 'none' ? '<br>nu am găsit zboruri în zilele astea' : flightState === 'na' ? '<br>prețul îl vezi la Kiwi' : '';
+  // Reguli de oră pentru zilele alese acum: indicii pentru cumpărare și avertismente (zborul ar suprapune evenimentul).
+  const rules = () => H.flightRules(ev, trip.out, trip.back);
+  const timingNotes = () => {
+    const r = rules(), n = [];
+    if (r.tbc) n.push(['warn', 'Ora evenimentului nu e anunțată încă. Verifică ora înainte să cumperi zborul.']);
+    if (r.outIssue) n.push(['warn', `Evenimentul începe la ${eventTime}: nu ajungi la timp dacă zbori chiar în ziua lui. Vino cu o zi înainte.`]);
+    else if (r.arriveBy) n.push(['hint', `Alege la dus un zbor care aterizează până la ${r.arriveBy}.`]);
+    if (r.backIssue) n.push(['warn', 'Evenimentul se termină târziu: nu prinzi zborul de întoarcere în aceeași zi. Pleacă a doua zi.']);
+    else if (r.departAfter) n.push(['hint', `Alege la întors un zbor care decolează după ${r.departAfter}.`]);
+    return n.map(([k, t]) => `<div class="s pk-timing ${k}">${k === 'warn' ? '⚠️' : 'ℹ️'} ${esc(t)}</div>`).join('');
+  };
+  const flightSub = () => flightState === 'loading' ? ' · caut prețul…' : flight?.eur ? `<br>${flight.direct ? 'direct' : `${flight.stops} ${flight.stops === 1 ? 'escală' : 'escale'}`}, de persoană, găsit acum pe Kiwi` : flightState === 'none' ? (flight?.timing ? '<br>niciun zbor nu se potrivește cu ora evenimentului în zilele astea' : '<br>nu am găsit zboruri în zilele astea') : flightState === 'na' ? '<br>prețul îl vezi la Kiwi' : '';
   function loadFlight() {
     if (!FP || !iata || !city?.id) { flightState = 'na'; return; }
-    const key = `${trip.out}|${trip.back}`; if (key === flightKey) return;
+    const r = rules(), key = `${trip.out}|${trip.back}`; if (key === flightKey) return;
     flightKey = key; flight = null; flightState = 'loading';
-    FP.get({ origin, dest: city.id, out: trip.out, back: trip.back }).then(p => {
+    FP.get({ origin, dest: city.id, out: trip.out, back: trip.back, arriveBy: r.arriveBy, departAfter: r.departAfter }).then(p => {
       if (flightKey !== key) return;
       flight = p; flightState = p?.eur ? 'ok' : p ? 'none' : 'na'; render(false);
     });
@@ -127,7 +140,7 @@
         <aside class="pk-box pk-side">
           <h3>Pachetul tău</h3>
           <div class="pk-row"><div class="l"><div class="pk-ico">${icon}</div><div><div class="t">Bilet la eveniment</div><div class="s">${ev.price_min_eur ? 'de la' : ev.kind === 'football' ? 'preț pe site-ul clubului' : ev.kind === 'city_festival' || ev.kind === 'market' ? 'intrare liberă' : 'preț la vânzător'}</div></div></div>${ev.price_min_eur ? `<div class="pr">${Math.round(ev.price_min_eur)} €</div>` : ''}</div>
-          <div class="pk-row"><div class="l"><div class="pk-ico">✈︎</div><div><div class="t">Zbor ${esc(origin)} ⇄ ${esc(iata || name)}</div><div class="s">${esc(H.shortDate(trip.out))} → ${esc(H.shortDate(trip.back))}${flightSub()}</div></div></div>${flight?.eur ? `<div class="pr"><small>de la</small> ${flight.eur} €</div>` : ''}</div>
+          <div class="pk-row"><div class="l"><div class="pk-ico">✈︎</div><div><div class="t">Zbor ${esc(origin)} ⇄ ${esc(iata || name)}</div><div class="s">${esc(H.shortDate(trip.out))} → ${esc(H.shortDate(trip.back))}${flightSub()}</div>${timingNotes()}</div></div>${flight?.eur ? `<div class="pr"><small>de la</small> ${flight.eur} €</div>` : ''}</div>
           ${wxRow()}
           <div class="pk-stack">
             <a class="pk-btn dark" href="${esc(ticketUrl)}" target="_blank" rel="noopener noreferrer">${icon} ${esc(ticketLabel)} ↗</a>
