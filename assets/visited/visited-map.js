@@ -31,6 +31,9 @@
   const plural = (n, one, many) => n === 1 ? `1 ${one}` : `${n} ${n % 100 >= 20 || n % 100 === 0 && n ? 'de ' : ''}${many}`;
   const reduceMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+  // Ilustrațiile apar aici mici (listă, fișa orașului): folosim varianta de 800 px din subfolderul 800/.
+  const smallImage = src => src.replace(/([^/]+\.webp)$/, '800/$1');
+
   function loadData() {
     if (!dataPromise) dataPromise = Promise.all(['cities-data.json', 'europe-map.json'].map(f => fetch(BASE + f).then(r => { if (!r.ok) throw new Error(f); return r.json(); })))
       .then(([cities, map]) => {
@@ -237,7 +240,7 @@
     function cityCard(c) {
       const card = el('div', 'vc-card' + (visited.has(c.id) ? ' is-on' : ''));
       const open = el('button', 'vc-card-open'); open.type = 'button'; open.dataset.open = c.id; open.setAttribute('aria-label', `Deschide ${c.name}`);
-      if (c.img) { const img = el('img'); img.src = c.img; img.alt = ''; img.loading = 'lazy'; open.append(img); }
+      if (c.img) { const img = el('img'); img.src = smallImage(c.img); img.alt = ''; img.loading = 'lazy'; open.append(img); }
       else { const ph = el('div', 'vc-ph'); ph.append(el('span', 'vc-ph-flag', flag(c.cc)), el('span', 'vc-ph-name', c.name.replace(/ \(.*\)$/, '')), el('span', 'vc-ph-note', 'Ilustrație în pregătire')); open.append(ph); }
       const cap = el('div', 'vc-card-cap'); cap.append(el('strong', null, c.name));
       const tg = el('button', 'vc-card-tg', visited.has(c.id) ? '✓ Vizitat' : '+ Bifează'); tg.type = 'button'; tg.dataset.toggle = c.id; tg.setAttribute('aria-pressed', String(visited.has(c.id)));
@@ -273,7 +276,7 @@
       cityDlg?.remove();
       const dlg = el('div', 'vc-modal'); dlg.setAttribute('role', 'dialog'); dlg.setAttribute('aria-modal', 'true'); dlg.setAttribute('aria-label', c.name);
       const box = el('div', 'vc-modal-box vc-city');
-      if (c.img) { const img = el('img', 'vc-city-img'); img.src = c.img; img.alt = `Ilustrație ${c.name}`; box.append(img); }
+      if (c.img) { const img = el('img', 'vc-city-img'); img.src = smallImage(c.img); img.alt = `Ilustrație ${c.name}`; box.append(img); }
       else { const ph = el('div', 'vc-ph vc-city-img'); ph.append(el('span', 'vc-ph-flag', flag(c.cc)), el('span', 'vc-ph-name', c.name.replace(/ \(.*\)$/, '')), el('span', 'vc-ph-note', 'Ilustrație în pregătire')); box.append(ph); }
       const info = el('div', 'vc-city-info'); info.append(el('strong', null, c.name), el('span', null, `${flag(c.cc)} ${c.country}`));
       const acts = el('div', 'vc-actions');

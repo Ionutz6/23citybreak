@@ -10,7 +10,7 @@
     const [id, guide] = entry;
     const city = ALL_EUROPE_CITIES.find(c => c.id === id);
     if (!city) return null;
-    return {id, guide, name: slug === 'pisa-florenta' ? 'Pisa și Florența' : slug === 'koln-bonn' ? 'Köln' : city.name, image: `ilustratii-quiz/ilustratie-${String(i+1).padStart(3,'0')}.webp`};
+    return {id, guide, name: slug === 'pisa-florenta' ? 'Pisa și Florența' : slug === 'koln-bonn' ? 'Köln' : city.name, image: `ilustratii-quiz/800/ilustratie-${String(i+1).padStart(3,'0')}.webp`};
   }).filter(Boolean);
   const section = document.getElementById('city-quiz');
   if (questions.length < 10) return;
