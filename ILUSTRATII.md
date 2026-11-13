@@ -86,3 +86,5 @@ Frankfurt: originalul fără etichete este `ilustratii-orase/frankfurt_de.webp`,
 Bilbao: originalul fără etichete este `ilustratii-orase/bilbao_es.webp`, iar versiunea pentru ghid este `assets/guides-prague-style/bilbao.webp`.
 
 Dortmund: originalul fără etichete este `ilustratii-orase/dortmund_de.webp`, iar versiunea pentru ghid este `assets/guides-prague-style/dortmund.webp`.
+
+Leeds: originalul fără etichete este `ilustratii-orase/leeds_gb.webp`, iar versiunea pentru ghid este `assets/guides-prague-style/leeds.webp`.
