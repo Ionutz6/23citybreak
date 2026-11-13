@@ -11,18 +11,27 @@
 // Dezabonare prin rpc('unsubscribe', {p_token}) — funcție publică (anon), din migrația quizului.
 // Cere un clic: scannerele de linkuri din clienții de email deschid linkul fără să apese butonul.
 (() => {
-  const URL_ = 'https://lsudthnrumslfscpppix.supabase.co/rest/v1/rpc/unsubscribe';
+  const BASE = 'https://lsudthnrumslfscpppix.supabase.co/rest/v1/rpc/';
   const KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxzdWR0aG5ydW1zbGZzY3BwcGl4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQzODY2MDEsImV4cCI6MjEwOTk2MjYwMX0.aw6KKBRKMdkfiAbzkHKUlpP2cuHhN-gF-GiUT5zHq5Y';
-  const token = new URLSearchParams(location.search).get('t') || '';
+  const qs = new URLSearchParams(location.search);
+  const token = qs.get('t') || '';
+  // ?tip=alerte: oprește doar emailurile de alertă pentru evenimente (rezumatul săptămânal și alertele după nume); newsletterul rămâne.
+  const alerts = qs.get('tip') === 'alerte';
+  if (alerts) {
+    document.getElementById('unsub-intro').textContent = 'Confirmă și nu mai primești alertele de evenimente: rezumatul săptămânal și alertele după nume. Newsletterul și contul rămân neschimbate.';
+    document.querySelector('h1').textContent = 'Oprește alertele de evenimente';
+    document.querySelector('.eyebrow').textContent = 'Alerte 23citybreak';
+    document.title = 'Alerte evenimente · 23CityBreak';
+  }
   const btn = document.getElementById('unsub-btn'), status = document.getElementById('unsub-status');
   const valid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(token);
   if (!valid) { btn.hidden = true; status.textContent = 'Linkul de dezabonare nu este complet. Folosește linkul din ultimul email primit sau scrie-ne la office@23ai.ro.'; return; }
   btn.addEventListener('click', async () => {
     btn.disabled = true; status.textContent = 'Se procesează…';
     try {
-      const res = await fetch(URL_, { method: 'POST', headers: { apikey: KEY, Authorization: 'Bearer ' + KEY, 'Content-Type': 'application/json' }, body: JSON.stringify({ p_token: token }) });
+      const res = await fetch(BASE + (alerts ? 'unsubscribe_alerts' : 'unsubscribe'), { method: 'POST', headers: { apikey: KEY, Authorization: 'Bearer ' + KEY, 'Content-Type': 'application/json' }, body: JSON.stringify({ p_token: token }) });
       const ok = res.ok && (await res.json()) === true;
-      if (ok) { btn.hidden = true; document.getElementById('unsub-intro').hidden = true; status.textContent = 'Gata, te-ai dezabonat. Nu mai primești newsletterul. Te poți abona din nou oricând din contul tău.'; }
+      if (ok) { btn.hidden = true; document.getElementById('unsub-intro').hidden = true; status.textContent = alerts ? 'Gata, nu mai primești alerte de evenimente. Le poți porni din nou oricând din Contul tău.' : 'Gata, te-ai dezabonat. Nu mai primești newsletterul. Te poți abona din nou oricând din contul tău.'; }
       else { btn.disabled = false; status.textContent = res.ok ? 'Linkul nu mai este valabil sau adresa a fost deja dezabonată.' : 'Nu am putut procesa cererea acum. Încearcă din nou peste câteva minute.'; }
     } catch { btn.disabled = false; status.textContent = 'Nu am putut contacta serverul. Verifică conexiunea și încearcă din nou.'; }
   });

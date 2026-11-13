@@ -51,6 +51,32 @@
     return { node: g, read: () => { commit(); return [...items]; } };
   }
 
+
+  // „Alertele tale după nume”: căutările pentru care ai cerut „Anunță-mă pe email când apare” și care încă așteaptă.
+  async function namedAlerts(sb) {
+    const g = el('fieldset', 'acct-group'); g.hidden = true;
+    g.append(el('legend', null, 'Alertele tale după nume'), el('p', 'acct-hint', 'Te anunțăm pe email o singură dată, când apare un eveniment în weekend, într-un oraș cu zbor.'));
+    const list = el('div', 'acct-chips acct-tags'); g.append(list);
+    let rows = [];
+    try { const {data} = await sb.from('event_alerts').select('id, query').is('notified_at', null).order('created_at', {ascending: false}); rows = data || []; } catch {}
+    const draw = () => {
+      list.replaceChildren(...rows.map(r => {
+        const b = el('button', 'acct-chip acct-tag'); b.type = 'button'; b.setAttribute('aria-label', `Șterge alerta ${r.query}`);
+        b.append(el('span', null, `🔔 ${r.query} ✕`));
+        b.addEventListener('click', async () => {
+          b.disabled = true;
+          const {error} = await sb.from('event_alerts').delete().eq('id', r.id);
+          if (error) { b.disabled = false; return; }
+          rows = rows.filter(x => x.id !== r.id); draw();
+        });
+        return b;
+      }));
+      g.hidden = !rows.length;
+    };
+    draw();
+    return g;
+  }
+
   async function card(sb) {
     const c = el('section', 'acct-card');
     c.append(el('span', 'acct-kicker', 'EVENIMENTE'), el('h2', null, 'Ce te aduce într-un oraș?'),
@@ -65,7 +91,7 @@
     const other = chipGroup('Alte motive de drum', null, OTHER, prefs.other_interests);
     const alertRow = el('label', 'acct-check');
     const alert = el('input'); alert.type = 'checkbox'; alert.checked = !!prefs.event_alerts;
-    alertRow.append(alert, el('span', null, 'Anunță-mă pe email când un artist sau o echipă preferată are un eveniment într-un oraș cu zbor de weekend.'));
+    alertRow.append(alert, el('span', null, 'Trimite-mi pe email, o dată pe săptămână, evenimentele noi care se potrivesc cu alegerile de mai sus (doar weekenduri, în orașe cu zbor). Mă pot opri oricând, din orice email.'));
     const save = el('button', 'acct-primary', 'Salvează'); save.type = 'button';
     const status = el('span', 'acct-status'); status.setAttribute('role', 'status');
     save.addEventListener('click', async () => {
@@ -80,6 +106,7 @@
     });
     const actions = el('div', 'acct-actions'); actions.append(save, status);
     c.append(music.node, artists.node, sports.node, comps.node, teams.node, other.node, alertRow, actions);
+    c.append(await namedAlerts(sb));
     return c;
   }
 
