@@ -100,3 +100,5 @@ Birmingham: originalul fără etichete este `ilustratii-orase/birmingham_gb.webp
 Genova: originalul fără etichete este `ilustratii-orase/genoa_it.webp`, iar versiunea pentru ghid este `assets/guides-prague-style/genova.webp`.
 
 Leipzig: originalul fără etichete este `ilustratii-orase/leipzig_de.webp`, iar versiunea pentru ghid este `assets/guides-prague-style/leipzig.webp`.
+
+Eindhoven: originalul fără etichete este `ilustratii-orase/eindhoven_nl.webp`, iar versiunea pentru ghid este `assets/guides-prague-style/eindhoven.webp`.
