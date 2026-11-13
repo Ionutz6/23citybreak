@@ -245,5 +245,5 @@
     });
   }
 
-  window.CBEvents = { load, byId, promos, cardHtml, packageUrl, decorateCards, eventPhoto, cityPhoto, stadiumPhoto, venuePhoto, setBg, KINDS, COMPETITIONS, CATEGORIES, SPORTS, categoryOf, sportOf, isWeekend, helpers: { esc, cityName, cityOf, guideOf, guideImage, local, isoAdd, dowOf, shortDate, longDate, startDate, endDate, isMultiDay, lengthDays, mainWeekend, whenLabel, tagLabel, monthName, DOW, DOW_LONG, MON } };
+  window.CBEvents = { api: { url: SUPABASE_URL, key: SUPABASE_KEY }, load, byId, promos, cardHtml, packageUrl, decorateCards, eventPhoto, cityPhoto, stadiumPhoto, venuePhoto, setBg, KINDS, COMPETITIONS, CATEGORIES, SPORTS, categoryOf, sportOf, isWeekend, helpers: { esc, cityName, cityOf, guideOf, guideImage, local, isoAdd, dowOf, shortDate, longDate, startDate, endDate, isMultiDay, lengthDays, mainWeekend, whenLabel, tagLabel, monthName, DOW, DOW_LONG, MON } };
 })();

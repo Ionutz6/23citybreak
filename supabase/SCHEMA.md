@@ -143,3 +143,10 @@ Un rând per cont, privat (RLS ca la `search_preferences`). Rândul **poate lips
 | `updated_at` | timestamptz | prin trigger |
 
 După salvare, aceleași valori sunt copiate în `localStorage['23cb-event-prefs']`, pentru filtrarea evenimentelor fără o cerere în plus.
+
+## Căutare de evenimente (20261112_events_search.sql)
+
+- `events.search_text`: coloană generată (titlu, sală, artiști, echipe, numele competiției, orașul), normalizată cu `ev_norm` (fără diacritice), index GIN trigram.
+- `search_events(q, city_ids, lim)`: RPC public, fiecare cuvânt trebuie să apară exact sau aproximativ (`word_similarity ≥ 0.4`).
+- `event_search_cache`: căutările trimise deja la Ticketmaster de funcția `events-search`; fără acces public.
+- `event_alerts`: „Anunță-mă pe email când apare”; fiecare utilizator își vede, adaugă și șterge doar alertele lui; max. 30 active.
