@@ -11,6 +11,8 @@
   const root = document.getElementById('evp-root');
   const E = window.CBEvents, H = E.helpers, esc = H.esc, FP = window.CBFlightPrice;
   const PAGE = 12;
+  // Cu cont, aeroportul de plecare și bugetul vin din cont (și pe un dispozitiv nou), nu doar din ce e salvat local.
+  await window.Account?.syncPrefsToLocal?.();
   const readLS = k => { try { return JSON.parse(localStorage.getItem(k)) || {}; } catch { return {}; } };
   const prefs = readLS('23cb-prefs'), interests = readLS('23cb-event-prefs');
   const budget = Number(prefs.budget_max_eur) > 0 ? Number(prefs.budget_max_eur) : null;

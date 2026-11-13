@@ -276,9 +276,25 @@
     const sb = await client();
     const {error} = await upsertPrefs(sb, pickPrefs(prefs));
     if (error) throw error;
-    // Și local, ca pagina de căutare să aplice moneda imediat, chiar înainte să citească din cont.
-    if (prefs.currency) store.set('23cb-prefs', {...(store.get('23cb-prefs') || {}), currency: prefs.currency});
+    // Și local, ca paginile Evenimente și Pachet (și căutarea) să aplice imediat aeroportul, bugetul și moneda.
+    store.set('23cb-prefs', {...(store.get('23cb-prefs') || {}), ...pickPrefs(prefs)});
     emit();
+  }
+  // Paginile fără personalizare.js (Evenimente, Pachet) citesc preferințele din localStorage. Cu sesiune, contul e sursa
+  // de adevăr: aducem aici aeroportul de plecare, bugetul și moneda din cont (inclusiv pe un dispozitiv nou). Fără rând
+  // în cont nu atingem ce e local, ca să nu pierdem alegerile făcute înainte de login.
+  async function syncPrefsToLocal() {
+    if (!hasSession()) return false;
+    try {
+      const sb = await client();
+      const {data} = await sb.from('search_preferences').select('*').maybeSingle();
+      if (!data) return false;
+      const local = store.get('23cb-prefs') || {};
+      const row = pickPrefs(data);
+      if (!('currency' in data) && local.currency) row.currency = local.currency; // coloana currency vine dintr-o migrare separată
+      store.set('23cb-prefs', {...local, ...row});
+      return true;
+    } catch { return false; }
   }
   async function markOnboarded() {
     const sb = await client();
@@ -366,7 +382,7 @@
   }
 
   window.Account = {
-    client, session, hasSession, preferences, savePrefs, openLogin, loginForm, googleEnabled, prefsForm, saveSubscriber, isSubscribed,
+    client, session, hasSession, preferences, savePrefs, syncPrefsToLocal, openLogin, loginForm, googleEnabled, prefsForm, saveSubscriber, isSubscribed,
     afterLogin, needsOnboarding, runOnboarding, mountVisited, updateHeader, CONSENT,
   };
 
