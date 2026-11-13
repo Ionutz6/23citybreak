@@ -82,3 +82,5 @@ Stuttgart: originalul fără etichete este `ilustratii-orase/stuttgart_de.webp`,
 Bremen: original `ilustratii-orase/bremen_de.webp`; ghid `assets/guides-prague-style/bremen.webp`.
 
 Frankfurt: originalul fără etichete este `ilustratii-orase/frankfurt_de.webp`, iar versiunea pentru ghid este `assets/guides-prague-style/frankfurt.webp`.
+
+Bilbao: originalul fără etichete este `ilustratii-orase/bilbao_es.webp`, iar versiunea pentru ghid este `assets/guides-prague-style/bilbao.webp`.
