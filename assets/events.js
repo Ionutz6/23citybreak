@@ -230,6 +230,8 @@
   const FESTIVAL_LIKE = /\|\s*blok\s*\d+\s*$|\b(day party|day fever|club night|all[- ]?dayer|after ?party|block party|rave)\b/i;
   // Sport feminin: scos după titlu (Ticketmaster nu are câmp pentru gen).
   const WOMEN = /\b(women|womens|women's|ladies|frauen|damen|dames|vrouwen|wnba|mulheres)\b|\(w\)|femenin|feminin|femmin|féminin|feminino|kobiet|ženy|\bnők\b/i;
+  // Variante de bilet („… | Logen-Seat”, „| Premium Suite Ticket”, „| VIP”): același eveniment, nu un card în plus.
+  const VARIANT = /\|\s*(logen|premium|vip|lounge|hospitality|package)/i;
   const isWomen = e => (e.kind === 'football' || e.kind === 'sport') && WOMEN.test(e.title || '');
   const fixKind = e => (e.kind === 'concert' && FESTIVAL_LIKE.test(e.title || '') ? { ...e, kind: 'festival' } : e);
   const load = () => loading ||= (async () => {
@@ -246,7 +248,7 @@
         rows.push(...page);
         if (page.length < PAGE_SIZE) break;
       }
-      return rows.filter(e => !isWomen(e)).map(fixKind);
+      return rows.filter(e => !isWomen(e) && !VARIANT.test(e.title || '')).map(fixKind);
     } catch { return []; }
   })();
   const byId = async id => (await load()).find(e => e.id === id) || null;

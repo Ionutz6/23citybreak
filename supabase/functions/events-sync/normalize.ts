@@ -57,6 +57,9 @@ export function priceInEur(ranges: { currency?: string; min?: number }[] | undef
 // Pachete de ospitalitate / upgrade-uri / parcări și meciuri de juniori sau amatori: nu sunt „evenimente” pentru un city break.
 export const JUNK_TITLE = /\b(box[- ]seats?|venue premium|vip (upgrade|package|ticket)s?|hospitality|parking|meet\s*&\s*greet|pre-?show|juniores|giovanili|primavera|attivit[aà] di base|campionati? figc|youth|junior|merchandise|tote bag|\bluxe (cap|tote|hoodie)|charm|passe-partout|gift (card|voucher)|voucher|premium (comfort|aitiolippu)|\bu-?1\d\b)\b|\b(20[01]\d)\b.*\b(club milano|campionato)\b/i;
 
+// Variante de bilet ale aceluiași eveniment („Kings Of Leon | Logen-Seat”, „… | Premium Suite Ticket”, „… | VIP”): nu sunt evenimente separate.
+export const VARIANT_TITLE = /\|\s*(logen|premium|vip|lounge|hospitality|package)/i;
+
 // Sport feminin: Ticketmaster nu are câmp de gen, deducem din titlu (doar la sport).
 export const WOMEN_TITLE = /\b(women|womens|women's|ladies|frauen|damen|dames|vrouwen|wnba|mulheres)\b|\(w\)|femenin|feminin|femmin|féminin|feminino|kobiet|ženy|\bnők\b/i;
 
@@ -134,7 +137,7 @@ export function officialFromTicketmaster(ev: any): string | null {
 export function fromTicketmaster(ev: any, city: City, rank: number, fx: Record<string, number> = {}): EventRow | null {
   const start = ev?.dates?.start;
   if (!ev?.id || !ev?.name || !start?.localDate) return null;
-  if (JUNK_TITLE.test(String(ev.name))) return null;
+  if (JUNK_TITLE.test(String(ev.name)) || VARIANT_TITLE.test(String(ev.name))) return null;
   if (ev.dates?.status?.code && ev.dates.status.code !== "onsale" && ev.dates.status.code !== "offsale" && ev.dates.status.code !== "rescheduled") return null; // anulate / amânate
   const noTime = !!start.noSpecificTime || !!start.timeTBA || !start.localTime;
   const dow = new Date(`${start.localDate}T12:00:00Z`).getUTCDay();

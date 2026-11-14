@@ -178,3 +178,10 @@ test("dedupePerformances: o reprezentație pe zi, zilele diferite rămân; premi
   const ev = { id: "p", name: "Jarry | be\u2022at Premium Comfort Experience", dates: { start: { localDate: "2026-11-21", localTime: "20:00:00" } }, classifications: [{ primary: true, segment: { name: "Music" } }] };
   assert.equal(fromTicketmaster(ev, city, 0), null);
 });
+
+test("fromTicketmaster: variantele de bilet „| Logen-Seat / Premium / VIP” sunt scoase", () => {
+  const city = { id: "x", name: "X", lat: 0, lon: 0 } as never;
+  const mk = (name: string) => ({ id: name, name, dates: { start: { localDate: "2026-11-21", localTime: "20:00:00" } }, classifications: [{ primary: true, segment: { name: "Music" } }] });
+  for (const n of ["Kings Of Leon - World Tour| Logen-Seat", "Ice Cage 9 | Premium Suite Ticket", "The Kid LAROI - A Perfect World Tour | VIP", "KoRn - EURO TOUR 2026 | Premium Packages"]) assert.equal(fromTicketmaster(mk(n), city, 0), null, n);
+  assert.ok(fromTicketmaster(mk("Kings Of Leon - World Tour"), city, 0));
+});
