@@ -55,7 +55,7 @@ export function priceInEur(ranges: { currency?: string; min?: number }[] | undef
 }
 
 // Pachete de ospitalitate / upgrade-uri / parcări și meciuri de juniori sau amatori: nu sunt „evenimente” pentru un city break.
-export const JUNK_TITLE = /\b(box[- ]seats?|venue premium|vip (upgrade|package|ticket)s?|hospitality|parking|meet\s*&\s*greet|pre-?show|juniores|giovanili|primavera|attivit[aà] di base|campionati? figc|youth|junior|merchandise|tote bag|\\bluxe (cap|tote|hoodie)|charm|passe-partout|gift (card|voucher)|voucher|\bu-?1\d\b)\b|\b(20[01]\d)\b.*\b(club milano|campionato)\b/i;
+export const JUNK_TITLE = /\b(box[- ]seats?|venue premium|vip (upgrade|package|ticket)s?|hospitality|parking|meet\s*&\s*greet|pre-?show|juniores|giovanili|primavera|attivit[aà] di base|campionati? figc|youth|junior|merchandise|tote bag|\bluxe (cap|tote|hoodie)|charm|passe-partout|gift (card|voucher)|voucher|\bu-?1\d\b)\b|\b(20[01]\d)\b.*\b(club milano|campionato)\b/i;
 
 // Turnee cu mai multe sesiuni (tenis etc.): Ticketmaster le listează ca evenimente separate cu același „participant” (turneul).
 // Păstrăm un singur card per turneu și oraș, cel mai devreme; evenimentele fără „sesiune” în titlu rămân neatinse.
