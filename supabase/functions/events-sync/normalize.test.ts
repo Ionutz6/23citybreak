@@ -150,3 +150,12 @@ test("Festival cu seturi separate („| Blok N”): un singur card cu artiști �
   assert.equal(f.ends_at, "2027-03-13T19:30:00.000Z");
   assert.ok(f.id.startsWith("tm:blk:"));
 });
+
+test("fromTicketmaster: sport feminin scos după titlu, concertele nu", () => {
+  const city = { id: "x", name: "X", lat: 0, lon: 0 } as never;
+  const mk = (name: string, seg: string) => ({ id: name, name, dates: { start: { localDate: "2026-11-21", localTime: "20:00:00" } }, classifications: [{ primary: true, segment: { name: seg }, genre: { name: "Basketball" } }] });
+  assert.equal(fromTicketmaster(mk("Lyon ASVEL Féminin - Villeneuve", "Sports"), city, 0), null);
+  assert.equal(fromTicketmaster(mk("Women's EuroLeague: A vs B", "Sports"), city, 0), null);
+  assert.ok(fromTicketmaster(mk("Real Madrid vs Olympiacos", "Sports"), city, 0));
+  assert.ok(fromTicketmaster(mk("Women of Rock", "Music"), city, 0));
+});

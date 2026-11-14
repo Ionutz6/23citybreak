@@ -85,18 +85,13 @@
     });
   }
 
-  // ---------- Grupare pe turnee ----------
-  const groupKey = e => e.kind === 'concert' && e.artists?.[0] ? `a:${e.artists[0].toLowerCase()}` : e.source === 'curated' && e.competition ? `c:${e.competition}` : null;
-  function build(list) {
-    const groups = new Map(), out = [];
-    for (const e of list) {
-      const k = groupKey(e);
-      if (!k) { out.push({ e }); continue; }
-      if (!groups.has(k)) { const g = { key: k, items: [] }; groups.set(k, g); out.push(g); }
-      groups.get(k).items.push(e);
-    }
-    return out.map(x => (x.items && x.items.length === 1 ? { e: x.items[0] } : x));
-  }
+  // Fiecare dată e un card de sine stătător (aceeași dimensiune); la concerte arătăm doar că turneul mai are și alte orașe.
+  const build = list => list.map(e => ({ e }));
+  const tourMore = e => {
+    if (e.kind !== 'concert' || !e.artists?.[0]) return 0;
+    const a = e.artists[0].toLowerCase();
+    return new Set(all.filter(x => x.id !== e.id && x.kind === 'concert' && x.artists?.[0]?.toLowerCase() === a && x.city_id !== e.city_id).map(x => x.city_id)).size;
+  };
 
   // ---------- Filtre ----------
   const inTab = () => all.filter(e => E.categoryOf(e) === state.tab).filter(e => !state.weekend || E.isWeekend(e));
@@ -108,23 +103,6 @@
   const visible = () => (state.inBudget && budget ? base().filter(inBudget) : base());
 
   // ---------- Markup ----------
-  function tourHtml(g) {
-    const first = g.items[0], open = state.open.has(g.key);
-    const name = g.key.startsWith('c:') ? (E.COMPETITIONS[first.competition] || first.competition) : first.artists[0];
-    const cities = new Set(g.items.map(e => e.city_id)).size;
-    const rows = (open ? g.items : g.items.slice(0, 5)).map(e => `
-      <li><a class="evp-tour-row" href="${esc(E.packageUrl(e))}">
-        <span class="d">${esc(H.shortDate(H.startDate(e)))}${E.isWeekend(e) ? ' <i class="evp-wk">weekend</i>' : ''}</span>
-        <span class="c">${g.key.startsWith('a:') ? `<b>${esc(H.cityName(e.city_id))}</b>${e.venue ? ` · ${esc(e.venue)}` : ''}${e.price_min_eur ? ` · bilet de la ${Math.round(e.price_min_eur)} €` : ''}` : `<b>${esc(e.title.replace(/ \(rugby\)$/, ''))}</b> · ${esc(H.cityName(e.city_id))}`}</span>
-        <span class="f" data-flight="${esc(e.id)}"></span><span class="go" aria-hidden="true">→</span></a></li>`).join('');
-    return `<article class="evp-tour" data-ev="${esc(first.id)}">
-      <div class="evp-tour-head"><span class="ev-tag">${g.key.startsWith('c:') ? `${E.SPORTS[sportOf(first)].join(' ')} · Turneu` : '🎤 Turneu european'}</span>
-        <h3>${esc(name)}</h3><p>${g.items.length} ${g.items.length === 1 ? 'dată' : 'date'} în ${cities} ${cities === 1 ? 'oraș' : 'orașe'}${state.weekend ? ', doar în weekend' : ''}</p></div>
-      <ol class="evp-tour-list">${rows}</ol>
-      ${g.items.length > 5 ? `<button type="button" class="evp-more-dates" data-tour="${esc(g.key)}" aria-expanded="${open}">${open ? 'Mai puține date' : `Toate cele ${g.items.length} date`}</button>` : ''}
-    </article>`;
-  }
-
   const n = (k, one, many) => `${k} ${k === 1 ? one : many}`;
   function catsHtml() {
     return `<div class="evp-cats" role="tablist" aria-label="Tip de eveniment">${E.CATEGORIES.map(([k, label]) => {
@@ -186,7 +164,7 @@
         ${budgetStatus()}
       </div>
       <div id="evp-panel" role="tabpanel" aria-labelledby="tab-${state.tab}">
-        ${items.length ? `<div class="ev-grid">${items.slice(0, state.shown).map(x => (x.items ? tourHtml(x) : E.cardHtml(x.e))).join('')}</div>` : `<p class="evp-empty">${emptyText()}</p>`}
+        ${items.length ? `<div class="ev-grid">${items.slice(0, state.shown).map(x => E.cardHtml(x.e, { tour: tourMore(x.e) })).join('')}</div>` : `<p class="evp-empty">${emptyText()}</p>`}
         ${items.length > state.shown ? `<div class="ev-more"><button type="button" class="evp-more-btn" data-more>Arată încă ${Math.min(PAGE, items.length - state.shown)}</button></div>` : ''}
       </div>
       ${all.some(e => e.source === 'football-data') && state.tab === 'sport' ? '<p class="ev-credit">Football data provided by the Football-Data.org API</p>' : ''}
@@ -211,7 +189,6 @@
     if (t) { state.tab = t.dataset.tab; state.comp = 'all'; state.shown = PAGE; const u = new URL(location.href); u.searchParams.set('tab', state.tab); history.replaceState(null, '', u); render(); root.querySelector(`[data-tab="${state.tab}"]`)?.focus(); return; }
     const s = ev.target.closest('[data-sport]'); if (s) { state.sport = s.dataset.sport; state.comp = 'all'; state.shown = PAGE; render(); return; }
     const c = ev.target.closest('[data-comp]'); if (c) { state.comp = c.dataset.comp; state.shown = PAGE; render(); return; }
-    const g = ev.target.closest('[data-tour]'); if (g) { const k = g.dataset.tour; state.open.has(k) ? state.open.delete(k) : state.open.add(k); render(); return; }
     if (ev.target.closest('[data-more]')) { state.shown += PAGE; render(); }
   });
   root.addEventListener('keydown', ev => { // săgeți stânga/dreapta între categorii
