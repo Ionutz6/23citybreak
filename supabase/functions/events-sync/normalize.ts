@@ -5,7 +5,7 @@ export type EventRow = {
   id: string; kind: string; title: string; city_id: string; venue: string | null;
   starts_at: string; ends_at: string | null; time_tbc: boolean;
   artists: string[]; teams: string[]; competition: string | null; genres: string[];
-  price_min_eur: number | null; ticket_url: string | null; image_url: string | null;
+  price_min_eur: number | null; ticket_url: string | null; official_url: string | null; image_url: string | null;
   popularity: number; source: string;
 };
 export type City = { id: string; cc: string; lat: number; lon: number };
@@ -98,6 +98,21 @@ export function collapseFestivalBlocks(rows: EventRow[]): EventRow[] {
   return out;
 }
 
+// Pagina oficială a evenimentului din datele Ticketmaster: site-ul (homepage) al primei atracții (artist / festival / turneu)
+// care are unul. Rețelele sociale, paginile Ticketmaster și Wikipedia nu sunt pagini oficiale.
+const NOT_OFFICIAL = /(^|\.)(facebook|instagram|twitter|x|youtube|tiktok|wikipedia|ticketmaster|livenation|spotify|itunes|apple|lastfm|musicbrainz|google)\./i;
+// deno-lint-ignore no-explicit-any
+export function officialFromTicketmaster(ev: any): string | null {
+  for (const a of ev?._embedded?.attractions ?? []) {
+    for (const h of a?.externalLinks?.homepage ?? []) {
+      const u = https(h?.url);
+      if (!u) continue;
+      try { if (!NOT_OFFICIAL.test(new URL(u).hostname + ".")) return u; } catch { /* url invalid */ }
+    }
+  }
+  return null;
+}
+
 // deno-lint-ignore no-explicit-any
 export function fromTicketmaster(ev: any, city: City, rank: number, fx: Record<string, number> = {}): EventRow | null {
   const start = ev?.dates?.start;
@@ -138,7 +153,7 @@ export function fromTicketmaster(ev: any, city: City, rank: number, fx: Record<s
     artists: kind === "concert" || kind === "festival" || kind === "comedy" ? attractions.slice(0, 10) : [],
     teams: kind === "football" || kind === "sport" ? attractions.slice(0, 2) : [],
     competition: null, genres: genre && genre !== "Undefined" ? [genre] : [],
-    price_min_eur: price, ticket_url: https(ev.url), image_url: https(img),
+    price_min_eur: price, ticket_url: https(ev.url), official_url: officialFromTicketmaster(ev), image_url: https(img),
     popularity: Math.max(10, 80 - rank * 2), source: "ticketmaster",
   };
 }
@@ -186,7 +201,7 @@ export function fromFootballData(m: any, competition: string): { row: EventRow |
       id: `fd:${m.id}`, kind: "football", title: `${m.homeTeam.shortName ?? home} – ${m.awayTeam.shortName ?? away}`, city_id: city,
       venue: null, starts_at: new Date(m.utcDate).toISOString(), ends_at: null, time_tbc: tbc,
       artists: [], teams: [home, away], competition, genres: [], price_min_eur: null,
-      ticket_url: null, image_url: null, popularity: Math.min(100, pop), source: "football-data",
+      ticket_url: null, official_url: null, image_url: null, popularity: Math.min(100, pop), source: "football-data",
     },
   };
 }
@@ -211,6 +226,6 @@ export function fromCurated(e: any, knownCities: Set<string>): EventRow | null {
     id: `cur:${e.slug}`, kind: CURATED_KINDS.has(e.kind) ? e.kind : "other", title: String(e.title).slice(0, 200), city_id: e.city_id, venue: e.venue ?? null,
     starts_at: time ? localToUtc(e.starts, time, e.city_id) : `${e.starts}T09:00:00.000Z`, ends_at: e.ends && e.ends > e.starts ? `${e.ends}T21:00:00.000Z` : null, time_tbc: !time,
     artists: strs(e.artists), teams: strs(e.teams), competition: typeof e.competition === "string" ? e.competition.slice(0, 12) : null, genres: [], price_min_eur: null,
-    ticket_url: https(e.ticket_url), image_url: https(e.image_url), popularity: Math.max(0, Math.min(100, e.popularity ?? 50)), source: "curated",
+    ticket_url: https(e.ticket_url), official_url: https(e.official_url) ?? (e.kind === "city_festival" || e.kind === "market" ? https(e.ticket_url) : null), image_url: https(e.image_url), popularity: Math.max(0, Math.min(100, e.popularity ?? 50)), source: "curated",
   };
 }

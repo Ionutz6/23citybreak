@@ -46,6 +46,13 @@
   const clubUrl = ev.kind === 'football' && window.CBClubTickets ? window.CBClubTickets.url(ev.teams?.[0]) : null;
   const ticketUrl = ev.ticket_url || clubUrl || `https://www.google.com/search?${new URLSearchParams({ q: ev.kind === 'football' && ev.teams?.[0] ? `${ev.teams[0]} official tickets` : `${ev.title} ${name} tickets` })}`;
   const ticketLabel = ev.ticket_url ? (ev.kind === 'city_festival' || ev.kind === 'market' ? 'Vezi programul oficial' : 'Cumpără bilet la eveniment') : (ev.kind === 'football' ? 'Caută bilete pe site-ul clubului' : 'Caută bilete la eveniment');
+  // Pagina oficială a evenimentului: linkul din date (site festival/artist/turneu), la fotbal site-ul competiției,
+  // iar când lipsește, o căutare Google clar etichetată (nu o prezentăm drept pagină oficială).
+  const COMP_SITES = { CL: 'https://www.uefa.com/uefachampionsleague/', PL: 'https://www.premierleague.com/', PD: 'https://www.laliga.com/en-GB', SA: 'https://www.legaseriea.it/en', BL1: 'https://www.bundesliga.com/en/bundesliga', FL1: 'https://ligue1.com/', DED: 'https://eredivisie.nl/', PPL: 'https://www.ligaportugal.pt/en/' };
+  const safeUrl = u => { try { const x = new URL(u); return x.protocol === 'https:' ? x.href : null; } catch { return null; } };
+  const officialDirect = safeUrl(ev.official_url) || (ev.kind === 'football' ? COMP_SITES[ev.competition] : null) || null;
+  const official = officialDirect && officialDirect !== ticketUrl ? { url: officialDirect, label: ev.kind === 'football' ? 'Site-ul competiției' : 'Pagina oficială a evenimentului', exact: true } : officialDirect ? null
+    : { url: `https://www.google.com/search?${new URLSearchParams({ q: `${ev.title} ${name} ${new Date(ev.starts_at).getUTCFullYear()}` })}`, label: 'Caută informații despre eveniment', exact: false };
   const mapsPlace = q => `https://www.google.com/maps/search/?${new URLSearchParams({ api: '1', query: q })}`;
   const mapsDir = stops => { const p = new URLSearchParams({ api: '1', origin: stops[0], destination: stops[stops.length - 1], travelmode: 'walking' }); if (stops.length > 2) p.set('waypoints', stops.slice(1, -1).join('|')); return `https://www.google.com/maps/dir/?${p}`; };
 
@@ -145,6 +152,7 @@
           ${wxRow()}
           <div class="pk-stack">
             <a class="pk-btn dark" href="${esc(ticketUrl)}" target="_blank" rel="noopener noreferrer">${icon} ${esc(ticketLabel)} ↗</a>
+            ${official ? `<div class="pk-official">ℹ️ <a href="${esc(official.url)}" target="_blank" rel="noopener noreferrer">${esc(official.label)} ↗</a>${official.exact ? '' : ' <small>(Google)</small>'}</div>` : ''}
             <a class="pk-btn gold" href="${esc(flightUrl())}" target="_blank" rel="noopener noreferrer">✈︎ Cumpără bilet de avion ↗</a>
             ${skyUrl() ? `<div class="pk-alt"><a href="${esc(skyUrl())}" target="_blank" rel="noopener noreferrer">sau compară prețul pe Skyscanner</a></div>` : ''}
             <section class="pk-stay" aria-labelledby="pk-stay-h">
