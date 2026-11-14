@@ -5,6 +5,7 @@ Se adaugă numele obiectivelor direct pe hărțile existente, în stilul aprobat
 ## Actualizate și publicate
 
 - Alghero
+- Düsseldorf
 - Corfu
 - Cluj-Napoca
 - Chania
@@ -137,3 +138,5 @@ Chania: originalul fără etichete pentru quiz este `ilustratii-orase/chania_gr.
 Cluj-Napoca: originalul fără etichete pentru quiz este `ilustratii-orase/cluj-napoca_ro.webp`, iar harta cu obiective este `assets/guides-prague-style/cluj-napoca.webp`.
 
 Corfu: originalul fără etichete pentru quiz este `ilustratii-orase/corfu_gr.webp`, iar harta cu obiective este `assets/guides-prague-style/corfu.webp`.
+
+Düsseldorf: originalul fără etichete pentru quiz este `ilustratii-orase/dusseldorf_de.webp`, iar harta cu obiective este `assets/guides-prague-style/dusseldorf.webp`.
