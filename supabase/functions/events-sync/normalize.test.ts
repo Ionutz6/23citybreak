@@ -120,3 +120,7 @@ test("Ticketmaster: pachete VIP și meciuri de juniori sunt excluse", () => {
     assert.equal(fromTicketmaster(tm({ name }), vienna, 0), null, name);
   assert.ok(fromTicketmaster(tm({ name: "Chelsea Women V Manchester City Women" }), vienna, 0));
 });
+
+test("Ticketmaster: fotbalul nu se ia de aici (doar din football-data.org)", () => {
+  assert.equal(fromTicketmaster(tm({ classifications: [{ primary: true, segment: { name: "Sports" }, genre: { name: "Soccer" } }] }), vienna, 0), null);
+});

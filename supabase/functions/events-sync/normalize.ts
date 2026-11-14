@@ -77,6 +77,8 @@ export function fromTicketmaster(ev: any, city: City, rank: number, fx: Record<s
   let kind = "other";
   if (seg === "music") kind = isFestival || multiDay ? "festival" : "concert";
   else if (seg === "sports") kind = /football|soccer/i.test(genre) ? "football" : "sport";
+  // Fotbalul vine doar din football-data.org (top 5 campionate + Champions League etc., masculin). Ticketmaster aduce juniori, amatori și feminin.
+  if (kind === "football") return null;
   else if (seg === "arts & theatre") kind = /comedy/i.test(genre) ? "comedy" : "theatre";
 
   const attractions: string[] = (ev._embedded?.attractions ?? []).map((a: { name?: string }) => a.name).filter(Boolean);
