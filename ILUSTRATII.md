@@ -4,6 +4,7 @@ Se adaugă numele obiectivelor direct pe hărțile existente, în stilul aprobat
 
 ## Actualizate și publicate
 
+- Hannover
 - Memmingen
 - Nürnberg
 - Nantes
@@ -206,3 +207,5 @@ Nantes: originalul fără etichete pentru quiz este `ilustratii-orase/nantes_fr.
 Nürnberg: originalul fără etichete pentru quiz este `ilustratii-orase/nuremberg_de.webp`, iar harta cu obiective este `assets/guides-prague-style/nuremberg.webp`.
 
 Memmingen: originalul fără etichete pentru quiz este `ilustratii-orase/memmingen_de.webp`, iar harta cu obiective este `assets/guides-prague-style/memmingen.webp`.
+
+Hannover: originalul fără etichete pentru quiz este `ilustratii-orase/hannover_de.webp`, iar harta cu obiective este `assets/guides-prague-style/hannover.webp`.
