@@ -1,6 +1,6 @@
 // Pagina Evenimente (evenimente.html): 3 categorii (Sport / Muzică / Alte evenimente) ca dale mari, sporturile
 // împărțite pe sport (întâi cele din profil), ligile ca filtru secundar, comutatoarele „Doar weekenduri” (activ
-// implicit) și „Doar în bugetul meu”. Fără orașe de plecare în cont: doar evenimentele importante (popularity ≥60); cu ele: doar cele cu zbor din primul aeroport ales.
+// implicit) și „Doar în bugetul meu”. Doar evenimentele cu zbor din aeroportul de plecare (cel ales în cont, altfel OTP); fără aeroport ales în cont, doar cele importante (popularity ≥60).
 // Prețul zborului vine live de la Kiwi (assets/flight-price.js). Fiecare card are o singură stare de preț:
 //   ok      → „Zbor OTP dus-întors de la 63 €”
 //   none    → Kiwi a răspuns, dar nu există zbor în weekendul acela
@@ -38,7 +38,7 @@
     tab: E.CATEGORIES.some(([k]) => k === tabParam) ? tabParam : 'sport',
     sport: hasMine ? 'mine' : 'all', comp: 'all',
     weekend: params.get('weekend') !== '0', inBudget: false,
-    onlyFlights: hasAirports, onlyTop: !hasAirports, shown: PAGE, open: new Set(),
+    onlyFlights: true, onlyTop: !hasAirports, shown: PAGE, open: new Set(),
   };
 
   const today = new Date().toISOString().slice(0, 10);
@@ -185,7 +185,8 @@
         ${compsHtml()}
         <div class="evp-switches">
           ${sw('weekend', 'Doar weekenduri', state.weekend)}
-          ${hasAirports ? sw('onlyFlights', `Doar cu zbor din ${esc(origin)}`, state.onlyFlights) : sw('onlyTop', 'Doar cele importante', state.onlyTop)}
+          ${sw('onlyFlights', `Doar cu zbor din ${esc(origin)}`, state.onlyFlights)}
+          ${hasAirports ? '' : sw('onlyTop', 'Doar cele importante', state.onlyTop)}
           ${sw('inBudget', budget ? `Doar în bugetul meu <small>zbor ≤ ${budget} €</small>` : 'Doar în bugetul meu', state.inBudget, !budget)}
           ${budget ? '' : '<a class="evp-note" href="cont.html#preferinte">Setează-ți bugetul în Contul tău →</a>'}
         </div>
@@ -207,7 +208,7 @@
   function emptyText() {
     if (state.tab === 'music' && !all.some(e => E.categoryOf(e) === 'music')) return 'Concertele apar aici imediat ce conectăm Ticketmaster. Până atunci, vezi meciurile din Sport.';
     if (state.inBudget && budget) return pending.size ? 'Caut prețurile zborurilor…' : 'Nimic în bugetul tău deocamdată. Oprește „Doar în bugetul meu” ca să vezi tot.';
-    if (state.sport === 'mine') return 'Nimic din sporturile tale în perioada asta. Alege „Toate sporturile”.';
+    if (state.sport === 'mine') return 'Nimic din sporturile tale în perioada asta. Alege un sport din listă.';
     if (state.weekend) return 'Nu avem evenimente în weekend aici. Oprește „Doar weekenduri” ca să vezi și datele din timpul săptămânii.';
     return 'Nu avem încă evenimente în această categorie.';
   }
