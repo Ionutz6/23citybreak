@@ -16,7 +16,8 @@
     concert: ['🎵', 'Concert'], festival: ['🎪', 'Festival'], football: ['⚽', 'Fotbal'], sport: ['🏟', 'Sport'],
     market: ['🎄', 'Târg'], city_festival: ['🎉', 'Sărbătoare de oraș'], theatre: ['🎭', 'Spectacol'], comedy: ['🎤', 'Stand-up'], other: ['✨', 'Eveniment'],
   };
-  const COMPETITIONS = { '6N': 'Six Nations', CL: 'Champions League', PL: 'Premier League', PD: 'La Liga', SA: 'Serie A', BL1: 'Bundesliga', FL1: 'Ligue 1', DED: 'Eredivisie', PPL: 'Primeira Liga' };
+  const COMPETITIONS = { '6N': 'Six Nations', CL: 'Champions League', PL: 'Premier League', PD: 'La Liga', SA: 'Serie A', BL1: 'Bundesliga', FL1: 'Ligue 1', DED: 'Eredivisie', PPL: 'Primeira Liga',
+    NBA: 'NBA', FIBA: 'FIBA', SLB: 'SLB (Marea Britanie)', BBL: 'Bundesliga (baschet)', NHL: 'NHL', EIHL: 'Elite League (UK)', ICEHL: 'ICE Hockey League', CZEXTRA: 'Extraliga cehă', PHL: 'Liga poloneză' };
 
   const cities = () => window.CB_EUROPE_CITIES || [];
   const cityOf = slug => cities().find(c => slugOf(c.id) === slug);
@@ -190,23 +191,32 @@
   const CATEGORIES = [['sport', 'Sport'], ['music', 'Muzică'], ['other', 'Alte evenimente']];
   const categoryOf = e => e.kind === 'football' || e.kind === 'sport' ? 'sport' : e.kind === 'concert' || e.kind === 'festival' ? 'music' : 'other';
   // Sportul unui eveniment (fotbal din football-data; rugby, baschet etc. din lista curatoriată sau Ticketmaster).
-  const SPORTS = { football: ['⚽', 'Fotbal'], rugby: ['🏉', 'Rugby'], basketball: ['🏀', 'Baschet'], tennis: ['🎾', 'Tenis'], f1: ['🏎️', 'Formula 1'], motogp: ['🏍️', 'MotoGP'], running: ['🏃', 'Maratoane'], other: ['🏟️', 'Sport'] };
+  const SPORTS = { football: ['⚽', 'Fotbal'], rugby: ['🏉', 'Rugby'], basketball: ['🏀', 'Baschet'], hockey: ['🏒', 'Hochei'], tennis: ['🎾', 'Tenis'], f1: ['🏎️', 'Formula 1'], motogp: ['🏍️', 'MotoGP'], running: ['🏃', 'Maratoane'], other: ['🏟️', 'Sport'] };
   const sportOf = e => {
     if (e.kind === 'football') return 'football';
     const t = `${(e.genres || []).join(' ')} ${e.title} ${e.competition || ''}`;
     if (e.competition === '6N' || /rugby/i.test(t)) return 'rugby';
     if (/basket/i.test(t)) return 'basketball';
+    if (/hockey|\bnhl\b/i.test(t)) return 'hockey';
     if (/tenis|tennis/i.test(t)) return 'tennis';
     if (/moto ?gp/i.test(t)) return 'motogp';
     if (/formula ?1|\bf1\b|grand prix/i.test(t)) return 'f1';
     if (/marat|marathon|running/i.test(t)) return 'running';
     return 'other';
   };
+  // Competiția dedusă din titlu (și, la hochei, din oraș) când sursa nu o dă: Ticketmaster nu are câmp de ligă.
+  const inferComp = e => {
+    if (e.competition) return e.competition;
+    const sp = sportOf(e), t = e.title || '';
+    if (sp === 'basketball') return /\bNBA\b/.test(t) ? 'NBA' : /FIBA|EuroBasket/i.test(t) ? 'FIBA' : /\bSLB\b/.test(t) ? 'SLB' : /alba berlin|towers/i.test(t) ? 'BBL' : null;
+    if (sp === 'hockey') return /\bNHL\b/.test(t) ? 'NHL' : ({ belfast_gb: 'EIHL', manchester_gb: 'EIHL', milan_it: 'ICEHL', prague_cz: 'CZEXTRA', katowice_pl: 'PHL' })[e.city_id] || null;
+    return null;
+  };
   // Eticheta cardului: la sport numele sportului și liga („⚽ Fotbal · Serie A”, „🏉 Rugby · Six Nations”).
   const tagLabel = e => {
     const isSport = e.kind === 'football' || e.kind === 'sport';
     const [icon, name] = isSport ? SPORTS[sportOf(e)] : KINDS[e.kind] || KINDS.other;
-    const comp = isSport && COMPETITIONS[e.competition] ? ` · ${COMPETITIONS[e.competition]}` : '';
+    const comp = isSport && COMPETITIONS[inferComp(e)] ? ` · ${COMPETITIONS[inferComp(e)]}` : '';
     return `${icon} ${name}${comp}${isMultiDay(e) ? ` · ${lengthDays(e)} zile` : ''}`;
   };
   const packageUrl = e => `weekend.html?e=${encodeURIComponent(e.id)}${DEMO ? '&evenimente-demo=1' : ''}`;
@@ -293,5 +303,5 @@
     });
   }
 
-  window.CBEvents = { api: { url: SUPABASE_URL, key: SUPABASE_KEY }, load, byId, promos, cardHtml, packageUrl, decorateCards, eventPhoto, cityPhoto, stadiumPhoto, venuePhoto, setBg, KINDS, COMPETITIONS, CATEGORIES, SPORTS, categoryOf, sportOf, isWeekend, helpers: { rangeLabel, esc, cityName, cityOf, guideOf, guideImage, local, isoAdd, dowOf, shortDate, longDate, startDate, endDate, isMultiDay, lengthDays, mainWeekend, tripPlan, flightRules, whenLabel, tagLabel, monthName, DOW, DOW_LONG, MON } };
+  window.CBEvents = { api: { url: SUPABASE_URL, key: SUPABASE_KEY }, load, byId, promos, cardHtml, packageUrl, decorateCards, eventPhoto, cityPhoto, stadiumPhoto, venuePhoto, setBg, KINDS, COMPETITIONS, CATEGORIES, SPORTS, categoryOf, sportOf, inferComp, isWeekend, helpers: { rangeLabel, esc, cityName, cityOf, guideOf, guideImage, local, isoAdd, dowOf, shortDate, longDate, startDate, endDate, isMultiDay, lengthDays, mainWeekend, tripPlan, flightRules, whenLabel, tagLabel, monthName, DOW, DOW_LONG, MON } };
 })();
