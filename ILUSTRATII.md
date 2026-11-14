@@ -5,6 +5,7 @@ Se adaugă numele obiectivelor direct pe hărțile existente, în stilul aprobat
 ## Actualizate și publicate
 
 - Alghero
+- Faro
 - Düsseldorf
 - Corfu
 - Cluj-Napoca
@@ -140,3 +141,5 @@ Cluj-Napoca: originalul fără etichete pentru quiz este `ilustratii-orase/cluj-
 Corfu: originalul fără etichete pentru quiz este `ilustratii-orase/corfu_gr.webp`, iar harta cu obiective este `assets/guides-prague-style/corfu.webp`.
 
 Düsseldorf: originalul fără etichete pentru quiz este `ilustratii-orase/dusseldorf_de.webp`, iar harta cu obiective este `assets/guides-prague-style/dusseldorf.webp`.
+
+Faro: originalul fără etichete pentru quiz este `ilustratii-orase/faro_pt.webp`, iar harta cu obiective este `assets/guides-prague-style/faro.webp`.
