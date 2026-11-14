@@ -58,7 +58,7 @@
 
   // ---------- Itinerar ----------
   const eventTime = ev.time_tbc ? '' : H.local(ev.starts_at, slug).time;
-  const eventBlock = d => `<div class="pk-event"><div class="t">${multi ? 'Zi de eveniment' : eventTime ? `Ora ${esc(eventTime)}` : 'Ora se anunță'}</div><div class="w">${icon} ${esc(ev.title)}</div><div class="s">${ev.venue ? `<a href="${esc(mapsPlace(`${ev.venue}, ${name}`))}" target="_blank" rel="noopener noreferrer">${esc(ev.venue)}</a>` : esc(name)}${multi ? ` · ${esc(H.whenLabel(ev))}` : ''}</div></div>`;
+  const eventBlock = d => `<div class="pk-event"><div class="t">${multi ? 'Zi de eveniment' : eventTime ? `Ora ${esc(eventTime)}` : 'Ora se anunță'}</div><div class="w">${icon} ${esc(ev.title)}</div>${official ? `<div class="pk-official"><a href="${esc(official.url)}" target="_blank" rel="noopener noreferrer">${esc(official.label)} ↗</a>${official.exact ? '' : ' <small>(Google)</small>'}</div>` : ''}<div class="s">${ev.venue ? `<a href="${esc(mapsPlace(`${ev.venue}, ${name}`))}" target="_blank" rel="noopener noreferrer">${esc(ev.venue)}</a>` : esc(name)}${multi ? ` · ${esc(H.whenLabel(ev))}` : ''}</div></div>`;
   function itinerary() {
     const days = []; for (let d = trip.out; d <= trip.back; d = H.isoAdd(d, 1)) days.push(d);
     // Traseele din ghid se pun pe zilele pline (fără ziua sosirii), întâi pe cele fără eveniment de zi întreagă.
@@ -152,7 +152,6 @@
           ${wxRow()}
           <div class="pk-stack">
             <a class="pk-btn dark" href="${esc(ticketUrl)}" target="_blank" rel="noopener noreferrer">${icon} ${esc(ticketLabel)} ↗</a>
-            ${official ? `<div class="pk-official">ℹ️ <a href="${esc(official.url)}" target="_blank" rel="noopener noreferrer">${esc(official.label)} ↗</a>${official.exact ? '' : ' <small>(Google)</small>'}</div>` : ''}
             <a class="pk-btn gold" href="${esc(flightUrl())}" target="_blank" rel="noopener noreferrer">✈︎ Cumpără bilet de avion ↗</a>
             ${skyUrl() ? `<div class="pk-alt"><a href="${esc(skyUrl())}" target="_blank" rel="noopener noreferrer">sau compară prețul pe Skyscanner</a></div>` : ''}
             <section class="pk-stay" aria-labelledby="pk-stay-h">

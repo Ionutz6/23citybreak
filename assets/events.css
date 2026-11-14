@@ -101,7 +101,7 @@ button.pk-day{cursor:pointer}
 .pk-btn:focus-visible,.pk-seg button:focus-visible,.pk-day:focus-visible{outline:3px solid #dfa649;outline-offset:2px}
 .pk-alt{text-align:center;font-size:12.5px;margin:-2px 0 2px}
 .pk-alt a{color:#5b6470}
-.pk-official{display:flex;align-items:center;justify-content:center;gap:6px;font-size:13.5px;font-weight:600;margin:2px 0}
+.pk-official{font-size:13.5px;font-weight:600;margin:2px 0 4px}
 .pk-official a{color:#0a0b0d;text-decoration:underline;text-underline-offset:3px}
 .pk-official small{font-weight:400;color:#8a95a6}
 .pk-empty{max-width:640px;margin:60px auto;padding:0 6%;text-align:center}
