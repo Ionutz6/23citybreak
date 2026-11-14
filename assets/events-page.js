@@ -86,7 +86,17 @@
   }
 
   // Fiecare dată e un card de sine stătător (aceeași dimensiune); la concerte arătăm doar că turneul mai are și alte orașe.
-  const build = list => list.map(e => ({ e }));
+  // Un turneu cu 20 de orașe nu ocupă pagina: cel mult 2 date per artist (cele mai apropiate), restul rămân semnalate pe card.
+  const PER_TOUR = 2;
+  function build(list) {
+    const seen = new Map();
+    return list.filter(e => {
+      if (e.kind !== 'concert' || !e.artists?.[0]) return true;
+      const k = e.artists[0].toLowerCase(), n = seen.get(k) || 0;
+      seen.set(k, n + 1);
+      return n < PER_TOUR;
+    }).map(e => ({ e }));
+  }
   const tourMore = e => {
     if (e.kind !== 'concert' || !e.artists?.[0]) return 0;
     const a = e.artists[0].toLowerCase();
