@@ -4,6 +4,7 @@ Se adaugă numele obiectivelor direct pe hărțile existente, în stilul aprobat
 
 ## Actualizate și publicate
 
+- Fuerteventura
 - Lanzarote
 - Tenerife
 - Menorca
@@ -188,3 +189,5 @@ Menorca: originalul fără etichete pentru quiz este `ilustratii-orase/menorca_e
 Tenerife: originalul fără etichete pentru quiz este `ilustratii-orase/tenerife_es.webp`, iar harta cu obiective este `assets/guides-prague-style/tenerife.webp`.
 
 Lanzarote: originalul fără etichete pentru quiz este `ilustratii-orase/lanzarote_es.webp`, iar harta cu obiective este `assets/guides-prague-style/lanzarote.webp`.
+
+Fuerteventura: originalul fără etichete pentru quiz este `ilustratii-orase/fuerteventura_es.webp`, iar harta cu obiective este `assets/guides-prague-style/fuerteventura.webp`.
