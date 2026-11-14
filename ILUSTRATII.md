@@ -4,6 +4,7 @@ Se adaugă numele obiectivelor direct pe hărțile existente, în stilul aprobat
 
 ## Actualizate și publicate
 
+- Tenerife
 - Menorca
 - Ibiza
 - Palma de Mallorca
@@ -182,3 +183,5 @@ Palma de Mallorca: originalul fără etichete pentru quiz este `ilustratii-orase
 Ibiza: originalul fără etichete pentru quiz este `ilustratii-orase/ibiza_es.webp`, iar harta cu obiective este `assets/guides-prague-style/ibiza.webp`.
 
 Menorca: originalul fără etichete pentru quiz este `ilustratii-orase/menorca_es.webp`, iar harta cu obiective este `assets/guides-prague-style/menorca.webp`.
+
+Tenerife: originalul fără etichete pentru quiz este `ilustratii-orase/tenerife_es.webp`, iar harta cu obiective este `assets/guides-prague-style/tenerife.webp`.
