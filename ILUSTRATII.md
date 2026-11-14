@@ -5,6 +5,7 @@ Se adaugă numele obiectivelor direct pe hărțile existente, în stilul aprobat
 ## Actualizate și publicate
 
 - Alghero
+- Bristol
 - Billund
 - Basel
 - Antalya
@@ -122,3 +123,5 @@ Antalya: originalul fără etichete pentru quiz este `ilustratii-orase/antalya_t
 Basel: originalul fără etichete pentru quiz este `ilustratii-orase/basel_ch.webp`, iar harta cu obiective este `assets/guides-prague-style/basel.webp`.
 
 Billund: originalul fără etichete pentru quiz este `ilustratii-orase/billund_dk.webp`, iar harta cu obiective este `assets/guides-prague-style/billund.webp`.
+
+Bristol: originalul fără etichete pentru quiz este `ilustratii-orase/bristol_gb.webp`, iar harta cu obiective este `assets/guides-prague-style/bristol.webp`.
