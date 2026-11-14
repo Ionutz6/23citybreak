@@ -4,6 +4,7 @@ Se adaugă numele obiectivelor direct pe hărțile existente, în stilul aprobat
 
 ## Actualizate și publicate
 
+- Zaragoza
 - Santander
 - Fuerteventura
 - Lanzarote
@@ -194,3 +195,5 @@ Lanzarote: originalul fără etichete pentru quiz este `ilustratii-orase/lanzaro
 Fuerteventura: originalul fără etichete pentru quiz este `ilustratii-orase/fuerteventura_es.webp`, iar harta cu obiective este `assets/guides-prague-style/fuerteventura.webp`.
 
 Santander: originalul fără etichete pentru quiz este `ilustratii-orase/santander_es.webp`, iar harta cu obiective este `assets/guides-prague-style/santander.webp`.
+
+Zaragoza: originalul fără etichete pentru quiz este `ilustratii-orase/zaragoza_es.webp`, iar harta cu obiective este `assets/guides-prague-style/zaragoza.webp`.
