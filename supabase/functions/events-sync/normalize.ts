@@ -72,6 +72,32 @@ export function dedupeSessions(rows: EventRow[]): EventRow[] {
   return [...out, ...first.values()];
 }
 
+// Festivaluri cu seturi vândute separat („Festival | Artist | Blok 2”): un singur card per festival, loc și zi,
+// cu primii artiști, ora primului set și sfârșitul ultimului (+ 90 min). Biletul duce la primul set.
+const BLOCK = /^(.+?)\s*\|\s*(.+?)\s*\|\s*blok\s*\d+\s*$/i;
+const slug = (t: string) => t.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+export function collapseFestivalBlocks(rows: EventRow[]): EventRow[] {
+  const groups = new Map<string, EventRow[]>();
+  const out: EventRow[] = [];
+  for (const r of rows) {
+    const m = BLOCK.exec(r.title);
+    if (!m) { out.push(r); continue; }
+    const key = `${r.city_id}|${slug(r.venue ?? "")}|${slug(m[1])}|${r.starts_at.slice(0, 10)}`;
+    (groups.get(key) ?? groups.set(key, []).get(key)!).push(r);
+  }
+  for (const [key, list] of groups) {
+    list.sort((a, b) => a.starts_at.localeCompare(b.starts_at));
+    const first = list[0], name = BLOCK.exec(first.title)![1].trim();
+    const artists = [...new Set(list.flatMap((r) => r.artists.length ? [r.artists[0]] : [BLOCK.exec(r.title)![2].trim()]))].slice(0, 10);
+    const last = new Date(new Date(list[list.length - 1].starts_at).getTime() + 90 * 6e4).toISOString();
+    out.push({
+      ...first, id: `tm:blk:${slug(key).slice(0, 80)}`, kind: "festival", title: name, artists,
+      ends_at: last, popularity: Math.max(...list.map((r) => r.popularity)),
+    });
+  }
+  return out;
+}
+
 // deno-lint-ignore no-explicit-any
 export function fromTicketmaster(ev: any, city: City, rank: number, fx: Record<string, number> = {}): EventRow | null {
   const start = ev?.dates?.start;

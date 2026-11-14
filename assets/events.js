@@ -181,7 +181,9 @@
   const whenLabel = e => {
     const s = startDate(e);
     if (isMultiDay(e)) { const en = endDate(e); return s.slice(0, 7) === en.slice(0, 7) ? `${+s.slice(8)}–${+en.slice(8)} ${MON[+s.slice(5, 7) - 1]}` : `${+s.slice(8)} ${MON[+s.slice(5, 7) - 1]} – ${+en.slice(8)} ${MON[+en.slice(5, 7) - 1]}`; }
-    return `${longDate(s)}${e.time_tbc ? ', ora se anunță' : `, ${local(e.starts_at, e.city_id).time}`}`;
+    // Festival de o zi cu mai multe seturi: arătăm intervalul („13:30–19:30”).
+    const end = e.kind === 'festival' && e.ends_at && !e.time_tbc ? local(e.ends_at, e.city_id).time : '';
+    return `${longDate(s)}${e.time_tbc ? ', ora se anunță' : `, ${local(e.starts_at, e.city_id).time}${end && end !== local(e.starts_at, e.city_id).time ? `–${end}` : ''}`}`;
   };
   const MONTHS_LONG = ['ianuarie', 'februarie', 'martie', 'aprilie', 'mai', 'iunie', 'iulie', 'august', 'septembrie', 'octombrie', 'noiembrie', 'decembrie'];
   const monthName = e => MONTHS_LONG[+startDate(e).slice(5, 7) - 1];
@@ -257,6 +259,7 @@
         <span class="ev-where">${c?.flag ? `<i aria-hidden="true">${c.flag}</i> ` : '📍 '}${esc(cityName(e.city_id))}${c?.country ? ` · ${esc(c.country)}` : ''}</span>
         <h3>${esc(e.title.replace(/ \(rugby\)$/, ''))}</h3>
         <div class="ev-meta">${e.venue ? `${esc(e.venue)} · ` : ''}${esc(whenLabel(e))}</div>
+        ${e.kind === 'festival' && (e.artists || []).length >= 2 ? `<div class="ev-meta">cu ${esc(e.artists.slice(0, 3).join(', '))}${e.artists.length > 3 ? ` și încă ${e.artists.length - 3}` : ''}</div>` : ''}
         ${isMultiDay(e) ? `<div class="ev-meta">📅 weekendul recomandat: ${esc(shortDate(wk.fri))} → ${esc(shortDate(wk.sun))}</div>` : ''}
         ${price}${note ? `<div class="ev-meta">${esc(note)}</div>` : ''}
         <div class="ev-flight" data-flight="${esc(e.id)}" aria-live="polite"></div>
