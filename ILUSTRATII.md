@@ -5,6 +5,9 @@ Se adaugă numele obiectivelor direct pe hărțile existente, în stilul aprobat
 ## Actualizate și publicate
 
 - Alghero
+- Gran Canaria
+- Geneva
+- Gdańsk
 - Faro
 - Düsseldorf
 - Corfu
@@ -143,3 +146,9 @@ Corfu: originalul fără etichete pentru quiz este `ilustratii-orase/corfu_gr.we
 Düsseldorf: originalul fără etichete pentru quiz este `ilustratii-orase/dusseldorf_de.webp`, iar harta cu obiective este `assets/guides-prague-style/dusseldorf.webp`.
 
 Faro: originalul fără etichete pentru quiz este `ilustratii-orase/faro_pt.webp`, iar harta cu obiective este `assets/guides-prague-style/faro.webp`.
+
+Gdańsk: originalul fără etichete pentru quiz este `ilustratii-orase/gdansk_pl.webp`, iar harta cu obiective este `assets/guides-prague-style/gdansk.webp`.
+
+Geneva: originalul fără etichete pentru quiz este `ilustratii-orase/geneva_ch.webp`, iar harta cu obiective este `assets/guides-prague-style/geneva.webp`.
+
+Gran Canaria: originalul fără etichete pentru quiz este `ilustratii-orase/gran-canaria_es.webp`, iar harta cu obiective este `assets/guides-prague-style/gran-canaria.webp`.
