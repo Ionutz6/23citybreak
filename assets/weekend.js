@@ -95,7 +95,7 @@
     else if (r.departAfter) n.push(['hint', `Alege la întors un zbor care decolează după ${r.departAfter}.`]);
     return n.map(([k, t]) => `<div class="s pk-timing ${k}">${k === 'warn' ? '⚠️' : 'ℹ️'} ${esc(t)}</div>`).join('');
   };
-  const flightSub = () => flightState === 'loading' ? ' · caut prețul…' : flight?.eur ? `<br>${flight.direct ? 'direct' : `${flight.stops} ${flight.stops === 1 ? 'escală' : 'escale'}`}, de persoană, găsit acum pe Kiwi` : flightState === 'none' ? (flight?.timing ? '<br>niciun zbor nu se potrivește cu ora evenimentului în zilele astea' : '<br>nu am găsit zboruri în zilele astea') : flightState === 'na' ? '<br>prețul îl vezi la Kiwi' : '';
+  const flightSub = () => flightState === 'loading' ? ' · caut prețul…' : flight?.eur ? `<br>${flight.direct ? 'direct, de persoană, găsit acum pe Kiwi' : `zbor cu ${flight.stops} ${flight.stops === 1 ? 'escală' : 'escale'}`}` : flightState === 'none' ? (flight?.timing ? '<br>niciun zbor nu se potrivește cu ora evenimentului în zilele astea' : '<br>nu am găsit zboruri în zilele astea') : flightState === 'na' ? '<br>prețul îl vezi la Kiwi' : '';
   function loadFlight() {
     if (!FP || !iata || !city?.id) { flightState = 'na'; return; }
     const r = rules(), key = `${trip.out}|${trip.back}`; if (key === flightKey) return;
