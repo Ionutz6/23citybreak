@@ -4,6 +4,7 @@ Se adaugă numele obiectivelor direct pe hărțile existente, în stilul aprobat
 
 ## Actualizate și publicate
 
+- Karlsruhe / Baden-Baden
 - Hannover
 - Memmingen
 - Nürnberg
@@ -209,3 +210,5 @@ Nürnberg: originalul fără etichete pentru quiz este `ilustratii-orase/nurembe
 Memmingen: originalul fără etichete pentru quiz este `ilustratii-orase/memmingen_de.webp`, iar harta cu obiective este `assets/guides-prague-style/memmingen.webp`.
 
 Hannover: originalul fără etichete pentru quiz este `ilustratii-orase/hannover_de.webp`, iar harta cu obiective este `assets/guides-prague-style/hannover.webp`.
+
+Karlsruhe / Baden-Baden: originalul fără etichete pentru quiz este `ilustratii-orase/karlsruhe_de.webp`, iar harta cu obiective este `assets/guides-prague-style/karlsruhe.webp`.
