@@ -123,6 +123,12 @@
     runs.clear();
     if (state.tab === 'music' && favNames.length) list = [...list].sort((a, b) => isFav(b) - isFav(a)); // trupele preferate primele (sortare stabilă: în rest rămâne ordinea pe dată)
     for (const e of list) if (RUN_KINDS.has(e.kind)) runs.set(runKey(e), (runs.get(runKey(e)) || 0) + 1);
+    const same = new Set(); // același concert/festival (oraș + loc + zi + artist sau titlu fără sufixe) apare o singură dată, chiar dacă vine și din DB, și din căutarea favoritelor
+    list = list.filter(e => {
+      if (e.kind !== 'concert' && e.kind !== 'festival') return true;
+      const k = `${e.city_id}|${norm(e.venue)}|${String(e.starts_at).slice(0, 10)}|${norm(e.artists?.[0] || String(e.title).split('|')[0])}`;
+      if (same.has(k)) return false; same.add(k); return true;
+    });
     return list.filter(e => {
       if (RUN_KINDS.has(e.kind)) { const k = runKey(e); if (seen.has(k)) return false; seen.set(k, 1); return true; }
       if (e.kind !== 'concert' || !e.artists?.[0]) return true;
