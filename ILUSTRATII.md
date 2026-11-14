@@ -4,6 +4,8 @@ Se adaugă numele obiectivelor direct pe hărțile existente, în stilul aprobat
 
 ## Actualizate și publicate
 
+- Malmö
+
 - Göteborg
 
 - Luxemburg
@@ -246,3 +248,5 @@ Graz: originalul fără etichete pentru quiz este `ilustratii-orase/graz_at.webp
 Luxemburg: originalul fără etichete pentru quiz este `ilustratii-orase/luxembourg_lu.webp`, iar harta cu obiective este `assets/guides-prague-style/luxembourg.webp`.
 
 Göteborg: originalul fără etichete pentru quiz este `ilustratii-orase/gothenburg_se.webp`, iar harta cu obiective este `assets/guides-prague-style/gothenburg.webp`.
+
+Malmö: originalul fără etichete pentru quiz este `ilustratii-orase/malmo_se.webp`, iar harta cu obiective este `assets/guides-prague-style/malmo.webp`.
