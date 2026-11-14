@@ -4,6 +4,7 @@ Se adaugă numele obiectivelor direct pe hărțile existente, în stilul aprobat
 
 ## Actualizate și publicate
 
+- Zakynthos
 - Mykonos
 - Santorini
 - Rhodos
@@ -224,3 +225,5 @@ Rhodos: originalul fără etichete pentru quiz este `ilustratii-orase/rhodes_gr.
 Santorini: originalul fără etichete pentru quiz este `ilustratii-orase/santorini_gr.webp`, iar harta cu obiective este `assets/guides-prague-style/santorini.webp`.
 
 Mykonos: originalul fără etichete pentru quiz este `ilustratii-orase/mykonos_gr.webp`, iar harta cu obiective este `assets/guides-prague-style/mykonos.webp`.
+
+Zakynthos: originalul fără etichete pentru quiz este `ilustratii-orase/zakynthos_gr.webp`, iar harta cu obiective este `assets/guides-prague-style/zakynthos.webp`.
