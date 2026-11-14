@@ -55,7 +55,7 @@ export function priceInEur(ranges: { currency?: string; min?: number }[] | undef
 }
 
 // Pachete de ospitalitate / upgrade-uri / parcări și meciuri de juniori sau amatori: nu sunt „evenimente” pentru un city break.
-export const JUNK_TITLE = /\b(box[- ]seats?|venue premium|vip (upgrade|package|ticket)s?|hospitality|parking|meet\s*&\s*greet|pre-?show|juniores|giovanili|primavera|attivit[aà] di base|campionati? figc|youth|junior|merchandise|tote bag|\bluxe (cap|tote|hoodie)|charm|passe-partout|gift (card|voucher)|voucher|\bu-?1\d\b)\b|\b(20[01]\d)\b.*\b(club milano|campionato)\b/i;
+export const JUNK_TITLE = /\b(box[- ]seats?|venue premium|vip (upgrade|package|ticket)s?|hospitality|parking|meet\s*&\s*greet|pre-?show|juniores|giovanili|primavera|attivit[aà] di base|campionati? figc|youth|junior|merchandise|tote bag|\bluxe (cap|tote|hoodie)|charm|passe-partout|gift (card|voucher)|voucher|premium (comfort|aitiolippu)|\bu-?1\d\b)\b|\b(20[01]\d)\b.*\b(club milano|campionato)\b/i;
 
 // Sport feminin: Ticketmaster nu are câmp de gen, deducem din titlu (doar la sport).
 export const WOMEN_TITLE = /\b(women|womens|women's|ladies|frauen|damen|dames|vrouwen|wnba|mulheres)\b|\(w\)|femenin|feminin|femmin|féminin|feminino|kobiet|ženy|\bnők\b/i;
@@ -73,6 +73,20 @@ export function dedupeSessions(rows: EventRow[]): EventRow[] {
     if (!cur || r.starts_at < cur.starts_at) first.set(key, r);
   }
   return [...out, ...first.values()];
+}
+
+// Reprezentații multiple în aceeași zi (matineu + seară, show de 18:00 + 21:00): un singur rând pe zi, cel mai devreme.
+// Zile diferite rămân separate (fiecare e un weekend posibil); festivalurile și rezidențele pe zile diferite nu sunt atinse.
+export function dedupePerformances(rows: EventRow[]): EventRow[] {
+  const best = new Map<string, EventRow>();
+  const out: EventRow[] = [];
+  for (const r of rows) {
+    if (r.source !== "ticketmaster" || r.kind === "festival" || r.ends_at) { out.push(r); continue; }
+    const key = `${r.city_id}|${slug(r.venue ?? "")}|${slug(r.title)}|${r.starts_at.slice(0, 10)}`;
+    const cur = best.get(key);
+    if (!cur || r.starts_at < cur.starts_at) best.set(key, r);
+  }
+  return [...out, ...best.values()];
 }
 
 // Festivaluri cu seturi vândute separat („Festival | Artist | Blok 2”): un singur card per festival, loc și zi,

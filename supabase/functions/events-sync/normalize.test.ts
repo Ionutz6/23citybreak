@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { officialFromTicketmaster, collapseFestivalBlocks, dedupeSessions, cityOfTeam, fitsWeekend, fromCurated, localToUtc, fromFootballData, fromTicketmaster, localParts, parseCityCoords } from "./normalize.ts";
+import { dedupePerformances, officialFromTicketmaster, collapseFestivalBlocks, dedupeSessions, cityOfTeam, fitsWeekend, fromCurated, localToUtc, fromFootballData, fromTicketmaster, localParts, parseCityCoords } from "./normalize.ts";
 
 const vienna = { id: "vienna_at", cc: "at", lat: 48.21, lon: 16.37 };
 const tm = (over: Record<string, unknown> = {}) => ({
@@ -168,4 +168,13 @@ test("link oficial Ticketmaster: homepage al atracției, fără rețele sociale"
   assert.equal(officialFromTicketmaster(ev), "https://www.rockwerchter.be/en");
   assert.equal(officialFromTicketmaster({ _embedded: { attractions: [{ name: "B" }] } }), null);
   assert.equal(officialFromTicketmaster({}), null);
+});
+
+test("dedupePerformances: o reprezentație pe zi, zilele diferite rămân; premium scos", () => {
+  const mk = (id: string, at: string, title = "Disney's THE LION KING") => ({ id, kind: "theatre", title, city_id: "london_gb", venue: "Lyceum Theatre", starts_at: at, ends_at: null, time_tbc: false, artists: [], teams: [], competition: null, genres: [], price_min_eur: null, ticket_url: null, official_url: null, image_url: null, popularity: 50, source: "ticketmaster" });
+  const out = dedupePerformances([mk("a", "2026-11-14T19:30:00.000Z"), mk("b", "2026-11-14T14:30:00.000Z"), mk("c", "2026-11-15T14:30:00.000Z")]);
+  assert.deepEqual(out.map((r) => r.id).sort(), ["b", "c"]);
+  const city = { id: "x", name: "X", lat: 0, lon: 0 } as never;
+  const ev = { id: "p", name: "Jarry | be\u2022at Premium Comfort Experience", dates: { start: { localDate: "2026-11-21", localTime: "20:00:00" } }, classifications: [{ primary: true, segment: { name: "Music" } }] };
+  assert.equal(fromTicketmaster(ev, city, 0), null);
 });

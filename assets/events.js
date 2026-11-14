@@ -267,6 +267,7 @@
         <h3>${esc(e.title.replace(/ \(rugby\)$/, ''))}</h3>
         <div class="ev-meta">${e.venue ? `${esc(e.venue)} · ` : ''}${esc(whenLabel(e))}</div>
         ${e.kind === 'festival' && (e.artists || []).length >= 2 ? `<div class="ev-meta">cu ${esc(e.artists.slice(0, 3).join(', '))}${e.artists.length > 3 ? ` și încă ${e.artists.length - 3}` : ''}</div>` : ''}
+        ${opt.runs ? `<div class="ev-meta">🎭 încă ${opt.runs} ${opt.runs === 1 ? 'reprezentație' : 'reprezentații'} în weekenduri</div>` : ''}
         ${opt.tour ? `<div class="ev-meta">🎤 Turneu · încă ${opt.tour} ${opt.tour === 1 ? 'oraș' : 'orașe'}</div>` : ''}
         ${isMultiDay(e) ? `<div class="ev-meta">📅 weekendul recomandat: ${esc(shortDate(wk.fri))} → ${esc(shortDate(wk.sun))}</div>` : ''}
         ${price}${note ? `<div class="ev-meta">${esc(note)}</div>` : ''}

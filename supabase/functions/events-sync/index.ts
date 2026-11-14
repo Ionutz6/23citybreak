@@ -4,7 +4,7 @@
 // Secrete: CRON_SECRET, TICKETMASTER_API_KEY, FOOTBALL_DATA_API_KEY. Folosește service role.
 // Parametri: ?only=tm|fd|cur (o singură sursă; recomandat, ca să rămână sub limita de timp), ?dry (nu scrie), ?limit=N (primele N orașe, pentru test).
 import { createClient } from "npm:@supabase/supabase-js@2.45.4";
-import { type City, type EventRow, collapseFestivalBlocks, fromCurated, dedupeSessions, fromFootballData, fromTicketmaster, parseCityCoords, TM_COUNTRIES } from "./normalize.ts";
+import { type City, type EventRow, collapseFestivalBlocks, fromCurated, dedupePerformances, dedupeSessions, fromFootballData, fromTicketmaster, parseCityCoords, TM_COUNTRIES } from "./normalize.ts";
 
 const SITE = "https://23citybreak.ro";
 const DAYS_AHEAD = 120;
@@ -47,7 +47,7 @@ async function syncTicketmaster(cities: City[], key: string, log: string[]): Pro
     }
   }
   log.push(`tm: priceRanges pe monede ${JSON.stringify(priceSeen)}, ${[...rows.values()].filter((r) => r.price_min_eur).length}/${rows.size} cu preț`);
-  return collapseFestivalBlocks(dedupeSessions([...rows.values()]));
+  return dedupePerformances(collapseFestivalBlocks(dedupeSessions([...rows.values()])));
 }
 
 async function syncFootball(key: string, log: string[]): Promise<EventRow[]> {
