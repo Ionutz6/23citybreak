@@ -5,6 +5,7 @@ Se adaugă numele obiectivelor direct pe hărțile existente, în stilul aprobat
 ## Actualizate și publicate
 
 - Alghero
+- Cluj-Napoca
 - Chania
 - București
 - Bristol
@@ -131,3 +132,5 @@ Bristol: originalul fără etichete pentru quiz este `ilustratii-orase/bristol_g
 București: originalul fără etichete pentru quiz este `ilustratii-orase/bucharest_ro.webp`, iar harta cu obiective este `assets/guides-prague-style/bucuresti.webp`.
 
 Chania: originalul fără etichete pentru quiz este `ilustratii-orase/chania_gr.webp`, iar harta cu obiective este `assets/guides-prague-style/chania.webp`.
+
+Cluj-Napoca: originalul fără etichete pentru quiz este `ilustratii-orase/cluj-napoca_ro.webp`, iar harta cu obiective este `assets/guides-prague-style/cluj-napoca.webp`.
