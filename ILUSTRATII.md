@@ -5,6 +5,7 @@ Se adaugă numele obiectivelor direct pe hărțile existente, în stilul aprobat
 ## Actualizate și publicate
 
 - Alghero
+- Hamburg
 - Gran Canaria
 - Geneva
 - Gdańsk
@@ -152,3 +153,5 @@ Gdańsk: originalul fără etichete pentru quiz este `ilustratii-orase/gdansk_pl
 Geneva: originalul fără etichete pentru quiz este `ilustratii-orase/geneva_ch.webp`, iar harta cu obiective este `assets/guides-prague-style/geneva.webp`.
 
 Gran Canaria: originalul fără etichete pentru quiz este `ilustratii-orase/gran-canaria_es.webp`, iar harta cu obiective este `assets/guides-prague-style/gran-canaria.webp`.
+
+Hamburg: originalul fără etichete pentru quiz este `ilustratii-orase/hamburg_de.webp`, iar harta cu obiective este `assets/guides-prague-style/hamburg.webp`.
