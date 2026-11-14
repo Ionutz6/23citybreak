@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { cityOfTeam, fitsWeekend, fromCurated, localToUtc, fromFootballData, fromTicketmaster, localParts, parseCityCoords } from "./normalize.ts";
+import { dedupeSessions, cityOfTeam, fitsWeekend, fromCurated, localToUtc, fromFootballData, fromTicketmaster, localParts, parseCityCoords } from "./normalize.ts";
 
 const vienna = { id: "vienna_at", cc: "at", lat: 48.21, lon: 16.37 };
 const tm = (over: Record<string, unknown> = {}) => ({
@@ -123,4 +123,13 @@ test("Ticketmaster: pachete VIP și meciuri de juniori sunt excluse", () => {
 
 test("Ticketmaster: fotbalul nu se ia de aici (doar din football-data.org)", () => {
   assert.equal(fromTicketmaster(tm({ classifications: [{ primary: true, segment: { name: "Sports" }, genre: { name: "Soccer" } }] }), vienna, 0), null);
+});
+
+test("Ticketmaster: merchandise și abonamente excluse, sesiunile aceluiași turneu devin un card", () => {
+  for (const name of ["ABN AMRO Open 2027 - Luxe tote bag", "ABN AMRO Open 2027 - Tennis bag charm", "ABN AMRO Open 2027 - Passe-partout"])
+    assert.equal(fromTicketmaster(tm({ name }), vienna, 0), null, name);
+  const base = fromTicketmaster(tm({ classifications: [{ primary: true, segment: { name: "Sports" }, genre: { name: "Tennis" } }], _embedded: { attractions: [{ name: "ABN AMRO Open" }] } }), vienna, 0)!;
+  const mk = (title: string, starts_at: string) => ({ ...base, id: title, title, starts_at });
+  const rows = dedupeSessions([mk("ABN AMRO Open 2027 - Session 11", "2027-02-10T13:00:00Z"), mk("ABN AMRO Open 2027 - Qualifications", "2027-02-08T10:00:00Z"), mk("Alt meci", "2027-02-09T10:00:00Z")]);
+  assert.deepEqual(rows.map((r) => r.title).sort(), ["ABN AMRO Open 2027 - Qualifications", "Alt meci"]);
 });
