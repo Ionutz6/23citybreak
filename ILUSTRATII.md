@@ -4,6 +4,7 @@ Se adaugă numele obiectivelor direct pe hărțile existente, în stilul aprobat
 
 ## Actualizate și publicate
 
+- Menorca
 - Ibiza
 - Palma de Mallorca
 - Trieste
@@ -179,3 +180,5 @@ Trieste: originalul fără etichete pentru quiz este `ilustratii-orase/trieste_i
 Palma de Mallorca: originalul fără etichete pentru quiz este `ilustratii-orase/palma_es.webp`, iar harta cu obiective este `assets/guides-prague-style/palma.webp`.
 
 Ibiza: originalul fără etichete pentru quiz este `ilustratii-orase/ibiza_es.webp`, iar harta cu obiective este `assets/guides-prague-style/ibiza.webp`.
+
+Menorca: originalul fără etichete pentru quiz este `ilustratii-orase/menorca_es.webp`, iar harta cu obiective este `assets/guides-prague-style/menorca.webp`.
