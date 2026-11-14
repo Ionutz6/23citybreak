@@ -43,6 +43,8 @@
 
   const today = new Date().toISOString().slice(0, 10);
   const all = (await E.load()).filter(e => H.endDate(e) >= today).sort((a, b) => a.starts_at.localeCompare(b.starts_at));
+  // Fără „Toate sporturile” (suma sporturilor individuale e aceeași, fiecare eveniment are exact un sport): fără profil pornim de la primul sport cu evenimente.
+  if (!hasMine) state.sport = (SPORTS.find(([k]) => all.some(e => E.categoryOf(e) === 'sport' && sportOf(e) === k)) || SPORTS[0])[0];
 
   // ---------- Prețul zborului ----------
   const tripOf = e => { const w = H.tripPlan(e); return { origin, dest: `City:${e.city_id}`, out: w.out, back: w.back, arriveBy: w.arriveBy, departAfter: w.departAfter }; };
@@ -140,7 +142,6 @@
     const pill = (k, label, icon, count, extra = '') => `<button type="button" class="evp-pill${state.sport === k ? ' on' : ''}${count ? '' : ' empty'}" data-sport="${k}" aria-pressed="${state.sport === k}"${count || state.sport === k ? '' : ' disabled'}>${icon ? `<span aria-hidden="true">${icon}</span>` : ''}${esc(label)}<small>${count}</small>${extra}</button>`;
     const pills = [
       hasMine ? pill('mine', 'Pentru tine', '★', list.filter(isMine).length) : '',
-      pill('all', 'Toate sporturile', '', list.length),
       ...sportOrder.filter(([k]) => mySports.includes(k) || state.sport === k || list.some(e => sportOf(e) === k)).map(([k, label, icon]) => pill(k, label, icon, list.filter(e => sportOf(e) === k).length, mySports.includes(k) ? '<i class="evp-mine" title="Din profilul tău">★</i>' : '')),
     ].join('');
     const note = hasMine ? 'Sporturile marcate cu ★ sunt cele din profilul tău.' : '<a href="cont.html#interese">Alege-ți sporturile în Contul tău</a> și le punem primele.';
