@@ -4,6 +4,7 @@ Se adaugă numele obiectivelor direct pe hărțile existente, în stilul aprobat
 
 ## Actualizate și publicate
 
+- Mykonos
 - Santorini
 - Rhodos
 - Madeira (Funchal)
@@ -221,3 +222,5 @@ Madeira (Funchal): originalul fără etichete pentru quiz este `ilustratii-orase
 Rhodos: originalul fără etichete pentru quiz este `ilustratii-orase/rhodes_gr.webp`, iar harta cu obiective este `assets/guides-prague-style/rhodes.webp`.
 
 Santorini: originalul fără etichete pentru quiz este `ilustratii-orase/santorini_gr.webp`, iar harta cu obiective este `assets/guides-prague-style/santorini.webp`.
+
+Mykonos: originalul fără etichete pentru quiz este `ilustratii-orase/mykonos_gr.webp`, iar harta cu obiective este `assets/guides-prague-style/mykonos.webp`.
