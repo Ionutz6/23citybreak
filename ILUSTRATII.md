@@ -4,6 +4,7 @@ Se adaugă numele obiectivelor direct pe hărțile existente, în stilul aprobat
 
 ## Actualizate și publicate
 
+- Madeira (Funchal)
 - Karlsruhe / Baden-Baden
 - Hannover
 - Memmingen
@@ -212,3 +213,5 @@ Memmingen: originalul fără etichete pentru quiz este `ilustratii-orase/memming
 Hannover: originalul fără etichete pentru quiz este `ilustratii-orase/hannover_de.webp`, iar harta cu obiective este `assets/guides-prague-style/hannover.webp`.
 
 Karlsruhe / Baden-Baden: originalul fără etichete pentru quiz este `ilustratii-orase/karlsruhe_de.webp`, iar harta cu obiective este `assets/guides-prague-style/karlsruhe.webp`.
+
+Madeira (Funchal): originalul fără etichete pentru quiz este `ilustratii-orase/funchal_pt.webp`, iar harta cu obiective este `assets/guides-prague-style/funchal.webp`.
