@@ -101,6 +101,9 @@ button.pk-day{cursor:pointer}
 .pk-btn:focus-visible,.pk-seg button:focus-visible,.pk-day:focus-visible{outline:3px solid #dfa649;outline-offset:2px}
 .pk-alt{text-align:center;font-size:12.5px;margin:-2px 0 2px}
 .pk-alt a{color:#5b6470}
+.pk-official{display:flex;align-items:center;justify-content:center;gap:6px;font-size:13.5px;font-weight:600;margin:2px 0}
+.pk-official a{color:#0a0b0d;text-decoration:underline;text-underline-offset:3px}
+.pk-official small{font-weight:400;color:#8a95a6}
 .pk-empty{max-width:640px;margin:60px auto;padding:0 6%;text-align:center}
 @media(max-width:900px){.pk-illu-grid{grid-template-columns:1fr}.pk-grid{grid-template-columns:1fr}.pk-hero h1{font-size:30px}.pk-side{position:static;order:-1}.pk-wrap{padding:0 16px}}
 .pk .footer-inner{box-sizing:border-box;max-width:100%;flex-wrap:wrap}
@@ -159,9 +162,9 @@ button.pk-day{cursor:pointer}
 .evp-wrap{max-width:1440px;margin:auto;padding:0 6%}
 .evp-hero{background:#111211;color:#fff;padding:46px 0 80px}
 .evp-kicker{font:700 11px 'Space Grotesk',sans-serif;letter-spacing:.16em;color:#dfa649}
-.evp-hero h1{font:700 clamp(30px,4vw,52px)/1.08 'Space Grotesk',sans-serif;letter-spacing:-.04em;margin:14px 0}
+.evp-hero h1{font:700 clamp(30px,4vw,52px)/1.08 'Space Grotesk',sans-serif;letter-spacing:-.04em;margin:0 0 14px;max-width:none}
 .evp-hero h1 em{color:#dfa649;font-style:normal}
-.evp-hero p{color:#bdbdb7;font-size:16px;line-height:1.6;margin:0}
+.evp-hero p{color:#bdbdb7;font-size:16px;line-height:1.6;margin:0;max-width:none}
 .evp-cats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:-38px 0 18px;position:relative}
 .evp-cat{display:flex;align-items:center;gap:14px;text-align:left;background:#fff;border:2px solid transparent;border-radius:20px;padding:16px 18px;cursor:pointer;box-shadow:0 10px 30px -12px rgba(10,11,13,.28);transition:transform .15s,border-color .15s,box-shadow .15s;font-family:'Source Sans 3',system-ui,sans-serif;color:#0a0b0d}
 .evp-cat:hover{transform:translateY(-2px);border-color:#ecd9b4}

@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { collapseFestivalBlocks, dedupeSessions, cityOfTeam, fitsWeekend, fromCurated, localToUtc, fromFootballData, fromTicketmaster, localParts, parseCityCoords } from "./normalize.ts";
+import { officialFromTicketmaster, collapseFestivalBlocks, dedupeSessions, cityOfTeam, fitsWeekend, fromCurated, localToUtc, fromFootballData, fromTicketmaster, localParts, parseCityCoords } from "./normalize.ts";
 
 const vienna = { id: "vienna_at", cc: "at", lat: 48.21, lon: 16.37 };
 const tm = (over: Record<string, unknown> = {}) => ({
@@ -158,4 +158,14 @@ test("fromTicketmaster: sport feminin scos după titlu, concertele nu", () => {
   assert.equal(fromTicketmaster(mk("Women's EuroLeague: A vs B", "Sports"), city, 0), null);
   assert.ok(fromTicketmaster(mk("Real Madrid vs Olympiacos", "Sports"), city, 0));
   assert.ok(fromTicketmaster(mk("Women of Rock", "Music"), city, 0));
+});
+
+test("link oficial Ticketmaster: homepage al atracției, fără rețele sociale", () => {
+  const ev = { _embedded: { attractions: [
+    { name: "A", externalLinks: { homepage: [{ url: "https://www.facebook.com/x" }], twitter: [{ url: "https://twitter.com/x" }] } },
+    { name: "Rock Werchter", externalLinks: { homepage: [{ url: "http://insecure.example" }, { url: "https://www.rockwerchter.be/en" }] } },
+  ] } };
+  assert.equal(officialFromTicketmaster(ev), "https://www.rockwerchter.be/en");
+  assert.equal(officialFromTicketmaster({ _embedded: { attractions: [{ name: "B" }] } }), null);
+  assert.equal(officialFromTicketmaster({}), null);
 });
