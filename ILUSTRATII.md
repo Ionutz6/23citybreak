@@ -4,6 +4,7 @@ Se adaugă numele obiectivelor direct pe hărțile existente, în stilul aprobat
 
 ## Actualizate și publicate
 
+- Nürnberg
 - Nantes
 - Zaragoza
 - Santander
@@ -200,3 +201,5 @@ Santander: originalul fără etichete pentru quiz este `ilustratii-orase/santand
 Zaragoza: originalul fără etichete pentru quiz este `ilustratii-orase/zaragoza_es.webp`, iar harta cu obiective este `assets/guides-prague-style/zaragoza.webp`.
 
 Nantes: originalul fără etichete pentru quiz este `ilustratii-orase/nantes_fr.webp`, iar harta cu obiective este `assets/guides-prague-style/nantes.webp`.
+
+Nürnberg: originalul fără etichete pentru quiz este `ilustratii-orase/nuremberg_de.webp`, iar harta cu obiective este `assets/guides-prague-style/nuremberg.webp`.
