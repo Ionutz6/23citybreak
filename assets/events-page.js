@@ -22,7 +22,7 @@
   const params = new URLSearchParams(location.search);
 
   // ---------- Sporturi ----------
-  const SPORTS = [['football', 'Fotbal', '⚽'], ['rugby', 'Rugby', '🏉'], ['basketball', 'Baschet', '🏀'], ['tennis', 'Tenis', '🎾'],
+  const SPORTS = [['football', 'Fotbal', '⚽'], ['rugby', 'Rugby', '🏉'], ['basketball', 'Baschet', '🏀'], ['hockey', 'Hochei', '🏒'], ['tennis', 'Tenis', '🎾'],
     ['f1', 'Formula 1', '🏎️'], ['motogp', 'MotoGP', '🏍️'], ['running', 'Maratoane', '🏃'], ['other', 'Alte sporturi', '🏟️']];
   const sportOf = E.sportOf;
 
@@ -102,7 +102,7 @@
   const inTab = () => all.filter(e => E.categoryOf(e) === state.tab).filter(e => !state.weekend || E.isWeekend(e));
   const bySport = (list, s = state.sport) => state.tab !== 'sport' || s === 'all' ? list : s === 'mine' ? list.filter(isMine) : list.filter(e => sportOf(e) === s);
   // Cheia de competiție: liga, iar la sport fără ligă (ex. baschet din Ticketmaster) sportul însuși.
-  const compKey = e => e.competition || (state.tab === 'sport' ? `s:${sportOf(e)}` : e.kind);
+  const compKey = e => E.inferComp(e) || (state.tab === 'sport' ? `s:${sportOf(e)}` : e.kind);
   const byComp = list => state.comp === 'all' ? list : list.filter(e => compKey(e) === state.comp);
   const base = () => byComp(bySport(inTab()));
   const visible = () => (state.inBudget && budget ? base().filter(inBudget) : base());
@@ -149,10 +149,12 @@
     return `<div class="evp-row"><span class="evp-row-label">Sport</span><div class="evp-pills" role="group" aria-label="Sport">${pills}</div></div><p class="evp-note">${note}</p>`;
   }
   function compsHtml() {
+    // La sport, rândul apare doar cu un sport anume ales (nu la „Pentru tine” / „Toate”) și doar dacă are cel puțin 2 competiții.
+    if (state.tab === 'sport' && (state.sport === 'all' || state.sport === 'mine')) return '';
     const list = bySport(inTab());
     const comps = [...new Set(list.map(compKey))];
     if (comps.length < 2) return '';
-    const label = c => E.COMPETITIONS[c] || (c.startsWith('s:') ? (SPORTS.find(x => x[0] === c.slice(2)) || SPORTS.at(-1))[1] : (E.KINDS[c] || E.KINDS.other)[1]);
+    const label = c => E.COMPETITIONS[c] || (c.startsWith('s:') ? 'Alte meciuri' : (E.KINDS[c] || E.KINDS.other)[1]);
     comps.sort((a, b) => (myComps.includes(b) - myComps.includes(a)) || label(a).localeCompare(label(b)));
     return `<div class="evp-row"><span class="evp-row-label">${state.tab === 'sport' ? 'Competiție' : 'Tip'}</span><div class="evp-chips" role="group" aria-label="Competiție">${[['all', 'Toate'], ...comps.map(c => [c, label(c)])].map(([c, l]) => `<button type="button" class="evp-chip${c === state.comp ? ' on' : ''}" data-comp="${esc(c)}" aria-pressed="${c === state.comp}">${myComps.includes(c) ? '★ ' : ''}${esc(l)}</button>`).join('')}</div></div>`;
   }
@@ -217,7 +219,7 @@
     const keys = E.CATEGORIES.map(([k]) => k), i = keys.indexOf(state.tab);
     root.querySelector(`[data-tab="${keys[(i + (ev.key === 'ArrowRight' ? 1 : keys.length - 1)) % keys.length]}"]`)?.click();
   });
-  root.addEventListener('change', ev => { const o = ev.target.dataset?.opt; if (o) { state[o] = ev.target.checked; state.shown = PAGE; render(); } });
+  root.addEventListener('change', ev => { const o = ev.target.dataset?.opt; if (o) { state[o] = ev.target.checked; state.comp = 'all'; state.shown = PAGE; render(); } });
 
   if (!all.length) { root.innerHTML = '<p class="evp-empty">Nu am putut încărca evenimentele acum. Reîncarcă pagina peste câteva minute.</p>'; return; }
   render();
