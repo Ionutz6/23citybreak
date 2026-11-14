@@ -162,7 +162,8 @@ button.pk-day{cursor:pointer}
 .evp-wrap{max-width:1440px;margin:auto;padding:0 clamp(16px,2vw,30px)}
 .evp-hero{background:#111211;color:#fff}
 /* Hero ca pe prima pagină: meniul negru pe toată lățimea, blocul hero negru de lățimea conținutului (1380 px), cu colțuri rotunjite jos */
-.evp-hero{width:calc(100% - 2*clamp(16px,2vw,30px));max-width:1380px;margin:0 auto;border-radius:0 0 28px 28px;padding:22px 0 26px;min-height:308px}
+.evp-hero{width:calc(100% - 2*clamp(16px,2vw,30px));max-width:1380px;margin:0 auto;border-radius:0 0 28px 28px;padding:22px 0 26px;min-height:308px;display:flex;align-items:center}
+.evp-hero .evp-wrap{width:100%}
 .evp-hero .evp-wrap{padding:0 clamp(20px,5%,72px)}
 .evp-kicker{font:700 11px 'Space Grotesk',sans-serif;letter-spacing:.16em;color:#dfa649}
 .evp-hero h1{font:700 clamp(30px,4vw,52px)/1.08 'Space Grotesk',sans-serif;letter-spacing:-.04em;margin:0 0 14px;max-width:none}
