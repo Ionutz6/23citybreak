@@ -4,6 +4,7 @@ Se adaugă numele obiectivelor direct pe hărțile existente, în stilul aprobat
 
 ## Actualizate și publicate
 
+- Ibiza
 - Palma de Mallorca
 - Trieste
 - Perugia
@@ -176,3 +177,5 @@ Perugia: originalul fără etichete pentru quiz este `ilustratii-orase/perugia_i
 Trieste: originalul fără etichete pentru quiz este `ilustratii-orase/trieste_it.webp`, iar harta cu obiective este `assets/guides-prague-style/trieste.webp`.
 
 Palma de Mallorca: originalul fără etichete pentru quiz este `ilustratii-orase/palma_es.webp`, iar harta cu obiective este `assets/guides-prague-style/palma.webp`.
+
+Ibiza: originalul fără etichete pentru quiz este `ilustratii-orase/ibiza_es.webp`, iar harta cu obiective este `assets/guides-prague-style/ibiza.webp`.
