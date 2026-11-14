@@ -4,6 +4,7 @@ Se adaugă numele obiectivelor direct pe hărțile existente, în stilul aprobat
 
 ## Actualizate și publicate
 
+- Verona
 - Belfast
 - Alghero
 - Heraklion
@@ -161,3 +162,5 @@ Hamburg: originalul fără etichete pentru quiz este `ilustratii-orase/hamburg_d
 Heraklion: originalul fără etichete pentru quiz este `ilustratii-orase/heraklion_gr.webp`, iar harta cu obiective este `assets/guides-prague-style/heraklion.webp`.
 
 Belfast: originalul fără etichete pentru quiz este `ilustratii-orase/belfast_gb.webp`, iar harta cu obiective este `assets/guides-prague-style/belfast.webp`.
+
+Verona: originalul fără etichete pentru quiz este `ilustratii-orase/verona_it.webp`, iar harta cu obiective este `assets/guides-prague-style/verona.webp`.
