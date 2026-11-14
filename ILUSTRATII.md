@@ -4,6 +4,8 @@ Se adaugă numele obiectivelor direct pe hărțile existente, în stilul aprobat
 
 ## Actualizate și publicate
 
+- Graz
+
 - Innsbruck
 
 - Salzburg
@@ -234,3 +236,5 @@ Zakynthos: originalul fără etichete pentru quiz este `ilustratii-orase/zakynth
 Salzburg: originalul fără etichete pentru quiz este `ilustratii-orase/salzburg_at.webp`, iar harta cu obiective este `assets/guides-prague-style/salzburg.webp`.
 
 Innsbruck: originalul fără etichete pentru quiz este `ilustratii-orase/innsbruck_at.webp`, iar harta cu obiective este `assets/guides-prague-style/innsbruck.webp`.
+
+Graz: originalul fără etichete pentru quiz este `ilustratii-orase/graz_at.webp`, iar harta cu obiective este `assets/guides-prague-style/graz.webp`.
