@@ -57,6 +57,9 @@ export function priceInEur(ranges: { currency?: string; min?: number }[] | undef
 // Pachete de ospitalitate / upgrade-uri / parcări și meciuri de juniori sau amatori: nu sunt „evenimente” pentru un city break.
 export const JUNK_TITLE = /\b(box[- ]seats?|venue premium|vip (upgrade|package|ticket)s?|hospitality|parking|meet\s*&\s*greet|pre-?show|juniores|giovanili|primavera|attivit[aà] di base|campionati? figc|youth|junior|merchandise|tote bag|\bluxe (cap|tote|hoodie)|charm|passe-partout|gift (card|voucher)|voucher|\bu-?1\d\b)\b|\b(20[01]\d)\b.*\b(club milano|campionato)\b/i;
 
+// Sport feminin: Ticketmaster nu are câmp de gen, deducem din titlu (doar la sport).
+export const WOMEN_TITLE = /\b(women|womens|women's|ladies|frauen|damen|dames|vrouwen|wnba|mulheres)\b|\(w\)|femenin|feminin|femmin|féminin|feminino|kobiet|ženy|\bnők\b/i;
+
 // Turnee cu mai multe sesiuni (tenis etc.): Ticketmaster le listează ca evenimente separate cu același „participant” (turneul).
 // Păstrăm un singur card per turneu și oraș, cel mai devreme; evenimentele fără „sesiune” în titlu rămân neatinse.
 const SESSION = /\b(session|sessie|qualif\w*|day pass|[0-9]-day|finale?)\b/i;
@@ -135,7 +138,8 @@ export function fromTicketmaster(ev: any, city: City, rank: number, fx: Record<s
   else if (seg === "sports") kind = /football|soccer/i.test(genre) ? "football" : "sport";
   // Fotbalul vine doar din football-data.org (top 5 campionate + Champions League etc., masculin). Ticketmaster aduce juniori, amatori și feminin.
   if (kind === "football") return null;
-  else if (seg === "arts & theatre") kind = /comedy/i.test(genre) ? "comedy" : "theatre";
+  if (kind === "sport" && WOMEN_TITLE.test(String(ev.name))) return null;
+  if (seg === "arts & theatre") kind = /comedy/i.test(genre) ? "comedy" : "theatre";
 
   const attractions: string[] = (ev._embedded?.attractions ?? []).map((a: { name?: string }) => a.name).filter(Boolean);
   // Prețul „de la” mereu în EUR: alte monede (GBP, DKK, SEK, NOK, CHF, PLN, CZK) se convertesc cu cursul BCE (fx = unități de monedă pentru 1 EUR).

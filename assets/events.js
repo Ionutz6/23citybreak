@@ -228,6 +228,9 @@
   // Ticketmaster marchează drept „concert” și sesiunile unui festival („… | Blok 2”) și serile de club („Day Fever”, „Day Party”);
   // le mutăm la Festival, ca filtrul Concerte să arate doar concerte reale.
   const FESTIVAL_LIKE = /\|\s*blok\s*\d+\s*$|\b(day party|day fever|club night|all[- ]?dayer|after ?party|block party|rave)\b/i;
+  // Sport feminin: scos după titlu (Ticketmaster nu are câmp pentru gen).
+  const WOMEN = /\b(women|womens|women's|ladies|frauen|damen|dames|vrouwen|wnba|mulheres)\b|\(w\)|femenin|feminin|femmin|féminin|feminino|kobiet|ženy|\bnők\b/i;
+  const isWomen = e => (e.kind === 'football' || e.kind === 'sport') && WOMEN.test(e.title || '');
   const fixKind = e => (e.kind === 'concert' && FESTIVAL_LIKE.test(e.title || '') ? { ...e, kind: 'festival' } : e);
   const load = () => loading ||= (async () => {
     try {
@@ -243,13 +246,13 @@
         rows.push(...page);
         if (page.length < PAGE_SIZE) break;
       }
-      return rows.map(fixKind);
+      return rows.filter(e => !isWomen(e)).map(fixKind);
     } catch { return []; }
   })();
   const byId = async id => (await load()).find(e => e.id === id) || null;
 
   // ---------- Secțiunea de pe pagina principală ----------
-  function cardHtml(e) {
+  function cardHtml(e, opt = {}) {
     const img = e.image_url || '';
     const wk = mainWeekend(e);
     const price = e.price_min_eur ? `<div class="ev-ticket">🎟 bilet de la <b>${Math.round(e.price_min_eur)} €</b></div>` : '';
@@ -264,6 +267,7 @@
         <h3>${esc(e.title.replace(/ \(rugby\)$/, ''))}</h3>
         <div class="ev-meta">${e.venue ? `${esc(e.venue)} · ` : ''}${esc(whenLabel(e))}</div>
         ${e.kind === 'festival' && (e.artists || []).length >= 2 ? `<div class="ev-meta">cu ${esc(e.artists.slice(0, 3).join(', '))}${e.artists.length > 3 ? ` și încă ${e.artists.length - 3}` : ''}</div>` : ''}
+        ${opt.tour ? `<div class="ev-meta">🎤 Turneu · încă ${opt.tour} ${opt.tour === 1 ? 'oraș' : 'orașe'}</div>` : ''}
         ${isMultiDay(e) ? `<div class="ev-meta">📅 weekendul recomandat: ${esc(shortDate(wk.fri))} → ${esc(shortDate(wk.sun))}</div>` : ''}
         ${price}${note ? `<div class="ev-meta">${esc(note)}</div>` : ''}
         <div class="ev-flight" data-flight="${esc(e.id)}" aria-live="polite"></div>

@@ -216,22 +216,9 @@ a.evp-note{margin:0}
 .evp-price{display:inline-block}
 .evp-price.none,.evp-price.wait{color:#9aa3af}
 .evp-price.over b{color:#f3a7a7}
-.evp-more-dates,.evp-more-btn{border:1.5px solid #3a3c3a;background:transparent;color:#fff;border-radius:99px;padding:7px 14px;font:700 13px 'Source Sans 3',system-ui,sans-serif;cursor:pointer;align-self:flex-start}
 .evp-more-btn{border-color:#0a0b0d;color:#0a0b0d;padding:10px 22px;font-size:14px}
 .evp-more-btn:hover{background:#0a0b0d;color:#fff}
 .evp-empty{background:#fff;border:1px dashed #d8d2c4;border-radius:16px;padding:28px;text-align:center;color:#5b6470;font-size:15px}
-.evp-tour{background:#111211;color:#fff;border-radius:24px;padding:18px;display:flex;flex-direction:column;gap:12px;min-height:430px;box-shadow:0 4px 20px -2px rgba(10,11,13,.08)}
-.evp-tour-head h3{margin:10px 0 2px;font:700 23px/1.15 'Space Grotesk',sans-serif;letter-spacing:-.02em}
-.evp-tour-head p{margin:0;color:#bdbdb7;font-size:13px}
-.evp-tour-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
-.evp-tour-row{display:grid;grid-template-columns:1fr auto;grid-template-areas:"d go" "c go" "f go";gap:2px 10px;align-items:center;background:#1d1f1d;border-radius:12px;padding:9px 12px;color:#fff;text-decoration:none;font-size:13px}
-.evp-tour-row:hover{background:#2a2c29}
-.evp-tour-row:focus-visible{outline:3px solid #dfa649;outline-offset:1px}
-.evp-tour-row .d{grid-area:d;font-weight:800;color:#dfa649;white-space:nowrap}
-.evp-tour-row .c{grid-area:c}
-.evp-tour-row .f{grid-area:f;color:#bdbdb7;font-size:12px}
-.evp-tour-row .f b{color:#dfa649}
-.evp-tour-row .go{grid-area:go;color:#dfa649}
 .evp-wk{font-style:normal;font-size:10px;text-transform:uppercase;letter-spacing:.05em;background:#dfa649;color:#0a0b0d;border-radius:99px;padding:1px 6px;margin-left:4px}
 @media(max-width:820px){.evp-cats{gap:8px;margin-top:-30px}.evp-cat{flex-direction:column;align-items:flex-start;gap:8px;padding:12px;position:relative}.evp-cat-icon{width:38px;height:38px;font-size:19px}.evp-cat-txt b{font-size:16px}.evp-cat-txt small{display:none}.evp-cat-n{position:absolute;top:10px;right:12px;font-size:18px}.evp-row{flex-direction:column;align-items:stretch;gap:6px}.evp-row-label{width:auto;padding:0}.evp-note{margin:0}}
 @media(max-width:600px){.evp-wrap{padding:0 16px}.evp-hero{padding:32px 0 50px}.evp-panel-top{padding:14px}.evp-pills{flex-wrap:nowrap;overflow-x:auto;margin:0 -14px;padding:0 14px 4px;scrollbar-width:none}.evp-pill{flex:none}}
