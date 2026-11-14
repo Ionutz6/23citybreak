@@ -126,7 +126,7 @@ test("Ticketmaster: fotbalul nu se ia de aici (doar din football-data.org)", () 
 });
 
 test("Ticketmaster: merchandise și abonamente excluse, sesiunile aceluiași turneu devin un card", () => {
-  for (const name of ["ABN AMRO Open 2027 - Luxe tote bag", "ABN AMRO Open 2027 - Tennis bag charm", "ABN AMRO Open 2027 - Passe-partout"])
+  for (const name of ["ABN AMRO Open 2027 - Luxe tote bag", "ABN AMRO Open 2027 - Luxe cap", "ABN AMRO Open 2027 - Tennis bag charm", "ABN AMRO Open 2027 - Passe-partout"])
     assert.equal(fromTicketmaster(tm({ name }), vienna, 0), null, name);
   const base = fromTicketmaster(tm({ classifications: [{ primary: true, segment: { name: "Sports" }, genre: { name: "Tennis" } }], _embedded: { attractions: [{ name: "ABN AMRO Open" }] } }), vienna, 0)!;
   const mk = (title: string, starts_at: string) => ({ ...base, id: title, title, starts_at });
