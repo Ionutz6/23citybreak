@@ -92,12 +92,20 @@
   // Fiecare dată e un card de sine stătător (aceeași dimensiune); la concerte arătăm doar că turneul mai are și alte orașe.
   // Un turneu cu 20 de orașe nu ocupă pagina: cel mult 2 date per artist (cele mai apropiate), restul rămân semnalate pe card.
   const PER_TOUR = 2;
+  // Spectacole și musicaluri cu multe reprezentații în același loc (Lion King, Disney On Ice): un singur card, cu cea mai apropiată dată
+  // și numărul celorlalte reprezentații din weekenduri.
+  const RUN_KINDS = new Set(['theatre', 'comedy', 'other']);
+  const runKey = e => `${e.city_id}|${(e.venue || '').toLowerCase()}|${(e.title || '').toLowerCase().replace(/\s+/g, ' ').trim()}`;
+  const runs = new Map();
   function build(list) {
-    const seen = new Map();
+    const seen = new Map(), perArtist = new Map();
+    runs.clear();
+    for (const e of list) if (RUN_KINDS.has(e.kind)) runs.set(runKey(e), (runs.get(runKey(e)) || 0) + 1);
     return list.filter(e => {
+      if (RUN_KINDS.has(e.kind)) { const k = runKey(e); if (seen.has(k)) return false; seen.set(k, 1); return true; }
       if (e.kind !== 'concert' || !e.artists?.[0]) return true;
-      const k = e.artists[0].toLowerCase(), n = seen.get(k) || 0;
-      seen.set(k, n + 1);
+      const k = e.artists[0].toLowerCase(), n = perArtist.get(k) || 0;
+      perArtist.set(k, n + 1);
       return n < PER_TOUR;
     }).map(e => ({ e }));
   }
@@ -193,7 +201,7 @@
         ${flightsStatus()}${budgetStatus()}
       </div>
       <div id="evp-panel" role="tabpanel" aria-labelledby="tab-${state.tab}">
-        ${items.length ? `<div class="ev-grid">${items.slice(0, state.shown).map(x => E.cardHtml(x.e, { tour: tourMore(x.e) })).join('')}</div>` : `<p class="evp-empty">${emptyText()}</p>`}
+        ${items.length ? `<div class="ev-grid">${items.slice(0, state.shown).map(x => E.cardHtml(x.e, { tour: tourMore(x.e), runs: RUN_KINDS.has(x.e.kind) ? (runs.get(runKey(x.e)) || 1) - 1 : 0 })).join('')}</div>` : `<p class="evp-empty">${emptyText()}</p>`}
         ${items.length > state.shown ? `<div class="ev-more"><button type="button" class="evp-more-btn" data-more>Arată încă ${Math.min(PAGE, items.length - state.shown)}</button></div>` : ''}
       </div>
       ${all.some(e => e.source === 'football-data') && state.tab === 'sport' ? '<p class="ev-credit">Football data provided by the Football-Data.org API</p>' : ''}
