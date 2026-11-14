@@ -223,9 +223,13 @@
 
   // ---------- Încărcare ----------
   let loading;
+  // Ticketmaster marchează drept „concert” și sesiunile unui festival („… | Blok 2”) și serile de club („Day Fever”, „Day Party”);
+  // le mutăm la Festival, ca filtrul Concerte să arate doar concerte reale.
+  const FESTIVAL_LIKE = /\|\s*blok\s*\d+\s*$|\b(day party|day fever|club night|all[- ]?dayer|after ?party|block party|rave)\b/i;
+  const fixKind = e => (e.kind === 'concert' && FESTIVAL_LIKE.test(e.title || '') ? { ...e, kind: 'festival' } : e);
   const load = () => loading ||= (async () => {
     try {
-      if (DEMO) return (await (await fetch('data/evenimente-demo.json')).json()).events;
+      if (DEMO) return (await (await fetch('data/evenimente-demo.json')).json()).events.map(fixKind);
       const since = new Date(Date.now() - 864e5).toISOString();
       // Pagini de câte 1000 (maximul pe cerere al API-ului), ca lista să nu se taie când cresc sursele de evenimente.
       const rows = [], PAGE_SIZE = 1000;
@@ -237,7 +241,7 @@
         rows.push(...page);
         if (page.length < PAGE_SIZE) break;
       }
-      return rows;
+      return rows.map(fixKind);
     } catch { return []; }
   })();
   const byId = async id => (await load()).find(e => e.id === id) || null;
