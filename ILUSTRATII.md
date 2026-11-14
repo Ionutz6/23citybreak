@@ -4,6 +4,7 @@ Se adaugă numele obiectivelor direct pe hărțile existente, în stilul aprobat
 
 ## Actualizate și publicate
 
+- Nantes
 - Zaragoza
 - Santander
 - Fuerteventura
@@ -197,3 +198,5 @@ Fuerteventura: originalul fără etichete pentru quiz este `ilustratii-orase/fue
 Santander: originalul fără etichete pentru quiz este `ilustratii-orase/santander_es.webp`, iar harta cu obiective este `assets/guides-prague-style/santander.webp`.
 
 Zaragoza: originalul fără etichete pentru quiz este `ilustratii-orase/zaragoza_es.webp`, iar harta cu obiective este `assets/guides-prague-style/zaragoza.webp`.
+
+Nantes: originalul fără etichete pentru quiz este `ilustratii-orase/nantes_fr.webp`, iar harta cu obiective este `assets/guides-prague-style/nantes.webp`.
