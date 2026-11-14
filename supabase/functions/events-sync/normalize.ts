@@ -44,10 +44,24 @@ export function fitsWeekend(dow: number, hour: number | null, multiDay = false):
 
 const https = (u: unknown) => (typeof u === "string" && u.startsWith("https://") ? u : null);
 
+export function priceInEur(ranges: { currency?: string; min?: number }[] | undefined, fx: Record<string, number>): number | null {
+  const eur = (ranges ?? []).flatMap((p) => {
+    if (typeof p.min !== "number" || !(p.min > 0)) return [];
+    const cur = String(p.currency ?? "").toUpperCase();
+    const rate = cur === "EUR" ? 1 : fx[cur];
+    return rate > 0 ? [Math.round((p.min / rate) * 100) / 100] : [];
+  });
+  return eur.length ? Math.min(...eur) : null;
+}
+
+// Pachete de ospitalitate / upgrade-uri / parcări și meciuri de juniori sau amatori: nu sunt „evenimente” pentru un city break.
+export const JUNK_TITLE = /\b(box[- ]seats?|venue premium|vip (upgrade|package|ticket)s?|hospitality|parking|meet\s*&\s*greet|pre-?show|juniores|giovanili|primavera|attivit[aà] di base|campionati? figc|youth|junior|\bu-?1\d\b)\b|\b(20[01]\d)\b.*\b(club milano|campionato)\b/i;
+
 // deno-lint-ignore no-explicit-any
-export function fromTicketmaster(ev: any, city: City, rank: number): EventRow | null {
+export function fromTicketmaster(ev: any, city: City, rank: number, fx: Record<string, number> = {}): EventRow | null {
   const start = ev?.dates?.start;
   if (!ev?.id || !ev?.name || !start?.localDate) return null;
+  if (JUNK_TITLE.test(String(ev.name))) return null;
   if (ev.dates?.status?.code && ev.dates.status.code !== "onsale" && ev.dates.status.code !== "offsale" && ev.dates.status.code !== "rescheduled") return null; // anulate / amânate
   const noTime = !!start.noSpecificTime || !!start.timeTBA || !start.localTime;
   const dow = new Date(`${start.localDate}T12:00:00Z`).getUTCDay();
@@ -66,8 +80,8 @@ export function fromTicketmaster(ev: any, city: City, rank: number): EventRow | 
   else if (seg === "arts & theatre") kind = /comedy/i.test(genre) ? "comedy" : "theatre";
 
   const attractions: string[] = (ev._embedded?.attractions ?? []).map((a: { name?: string }) => a.name).filter(Boolean);
-  const price = (ev.priceRanges ?? []).filter((p: { currency?: string; min?: number }) => p.currency === "EUR" && typeof p.min === "number" && p.min > 0)
-    .map((p: { min: number }) => p.min).sort((a: number, b: number) => a - b)[0] ?? null;
+  // Prețul „de la” mereu în EUR: alte monede (GBP, DKK, SEK, NOK, CHF, PLN, CZK) se convertesc cu cursul BCE (fx = unități de monedă pentru 1 EUR).
+  const price = priceInEur(ev.priceRanges, fx);
   // Cea mai mare imagine 16:9 (pentru bannerul paginii de pachet). La sport nu luăm imagini: materialele oficiale
   // ale echipelor și ligilor nu sunt licențiate implicit (FAQ Ticketmaster, „official artist/team/rightsholder creative”).
   const img = kind === "football" || kind === "sport" ? null : (ev.images ?? []).filter((i: { ratio?: string; width?: number }) => i.ratio === "16_9" && (i.width ?? 0) >= 600)

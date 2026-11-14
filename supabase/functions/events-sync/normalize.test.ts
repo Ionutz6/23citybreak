@@ -51,10 +51,13 @@ test("Ticketmaster: miercuri iese, anulat iese, festival pe mai multe zile răm�
   assert.equal(f.time_tbc, true);
 });
 
-test("Ticketmaster: preț în altă monedă nu e convertit, link http respins", () => {
-  const r = fromTicketmaster(tm({ priceRanges: [{ currency: "GBP", min: 50 }], url: "http://x.test/e" }), vienna, 0)!;
-  assert.equal(r.price_min_eur, null);
+test("Ticketmaster: preț în altă monedă se convertește în EUR, link http respins", () => {
+  const r = fromTicketmaster(tm({ priceRanges: [{ currency: "GBP", min: 50 }], url: "http://x.test/e" }), vienna, 0, { GBP: 0.86 })!;
+  assert.equal(r.price_min_eur, 58.14);
   assert.equal(r.ticket_url, null);
+  // fără curs pentru monedă, prețul se omite; între mai multe intervale se ia cel mai mic în EUR
+  assert.equal(fromTicketmaster(tm({ priceRanges: [{ currency: "XXX", min: 50 }] }), vienna, 0, {})!.price_min_eur, null);
+  assert.equal(fromTicketmaster(tm({ priceRanges: [{ currency: "DKK", min: 300 }, { currency: "EUR", min: 90 }] }), vienna, 0, { DKK: 7.46 })!.price_min_eur, 40.21);
 });
 
 test("Ticketmaster: la sport nu se iau imagini (materiale oficiale ale echipelor)", () => {
@@ -110,4 +113,10 @@ test("curatoriate: oră locală, echipe, competiție", () => {
   assert.equal(localToUtc("2027-03-13", "15:10", "rome_it"), "2027-03-13T14:10:00.000Z");
   assert.equal(localToUtc("2027-07-10", "20:00", "rome_it"), "2027-07-10T18:00:00.000Z");
   assert.equal(fromCurated({ slug: "y", title: "Y", kind: "hack", city_id: "rome_it", starts: "2027-01-01" }, known)!.kind, "other");
+});
+
+test("Ticketmaster: pachete VIP și meciuri de juniori sunt excluse", () => {
+  for (const name of ["Eisbären Berlin - Wild Wings | Box-Seat", "Misfits Boxing - Venue Premium Tickets", "Hot Wheels Pre-Show", "CLUB MILANO - ARCONATESE | CAMPIONATO JUNIORES NAZIONALE", "Pro Sesto Giovanili - 14/11/2026"])
+    assert.equal(fromTicketmaster(tm({ name }), vienna, 0), null, name);
+  assert.ok(fromTicketmaster(tm({ name: "Chelsea Women V Manchester City Women" }), vienna, 0));
 });

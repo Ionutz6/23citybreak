@@ -12,7 +12,19 @@ const FD_COMPETITIONS = ["CL", "PL", "PD", "SA", "BL1", "FL1", "DED", "PPL"]; //
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 const day = (d: Date) => d.toISOString().slice(0, 10);
 
+// Cursuri BCE (Frankfurter): unități de monedă pentru 1 EUR. Dacă nu răspunde, rămân doar prețurile în EUR.
+async function fetchFx(log: string[]): Promise<Record<string, number>> {
+  try {
+    const res = await fetch("https://api.frankfurter.dev/v1/latest?base=EUR");
+    if (res.ok) return (await res.json())?.rates ?? {};
+    log.push(`fx: HTTP ${res.status}`);
+  } catch (e) { log.push(`fx: ${e}`); }
+  return {};
+}
+
 async function syncTicketmaster(cities: City[], key: string, log: string[]): Promise<EventRow[]> {
+  const fx = await fetchFx(log);
+  const priceSeen: Record<string, number> = {};
   const rows = new Map<string, EventRow>();
   const from = new Date(), to = new Date(Date.now() + DAYS_AHEAD * 864e5);
   for (const city of cities.filter((c) => TM_COUNTRIES.has(c.cc))) {
@@ -27,12 +39,14 @@ async function syncTicketmaster(cities: City[], key: string, log: string[]): Pro
       if (!res.ok) { log.push(`tm ${city.id}/${segment}: HTTP ${res.status}`); await sleep(250); continue; }
       const list = (await res.json())?._embedded?.events ?? [];
       list.forEach((ev: unknown, i: number) => {
-        const row = fromTicketmaster(ev, city, i);
+        const row = fromTicketmaster(ev, city, i, fx);
+        for (const p of (ev as { priceRanges?: { currency?: string }[] })?.priceRanges ?? []) priceSeen[p.currency ?? "?"] = (priceSeen[p.currency ?? "?"] ?? 0) + 1;
         if (row && !rows.has(row.id)) rows.set(row.id, row);
       });
       await sleep(250); // sub 5 apeluri/secundă
     }
   }
+  log.push(`tm: priceRanges pe monede ${JSON.stringify(priceSeen)}, ${[...rows.values()].filter((r) => r.price_min_eur).length}/${rows.size} cu preț`);
   return [...rows.values()];
 }
 
