@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { dedupeSessions, cityOfTeam, fitsWeekend, fromCurated, localToUtc, fromFootballData, fromTicketmaster, localParts, parseCityCoords } from "./normalize.ts";
+import { collapseFestivalBlocks, dedupeSessions, cityOfTeam, fitsWeekend, fromCurated, localToUtc, fromFootballData, fromTicketmaster, localParts, parseCityCoords } from "./normalize.ts";
 
 const vienna = { id: "vienna_at", cc: "at", lat: 48.21, lon: 16.37 };
 const tm = (over: Record<string, unknown> = {}) => ({
@@ -132,4 +132,21 @@ test("Ticketmaster: merchandise și abonamente excluse, sesiunile aceluiași tur
   const mk = (title: string, starts_at: string) => ({ ...base, id: title, title, starts_at });
   const rows = dedupeSessions([mk("ABN AMRO Open 2027 - Session 11", "2027-02-10T13:00:00Z"), mk("ABN AMRO Open 2027 - Qualifications", "2027-02-08T10:00:00Z"), mk("Alt meci", "2027-02-09T10:00:00Z")]);
   assert.deepEqual(rows.map((r) => r.title).sort(), ["ABN AMRO Open 2027 - Qualifications", "Alt meci"]);
+});
+
+test("Festival cu seturi separate („| Blok N”): un singur card cu artiști și durata totală", () => {
+  const mk = (title: string, starts_at: string, artist: string) => ({ ...fromTicketmaster(tm({ name: title, classifications: [{ primary: true, segment: { name: "Music" }, genre: { name: "Rock" } }], _embedded: { venues: [{ name: "A'DAM Toren" }], attractions: [{ name: artist }] } }), vienna, 0)!, starts_at });
+  const rows = collapseFestivalBlocks([
+    mk("To the Moon and Back | Nona | Blok 2", "2027-03-13T14:45:00.000Z", "Nona"),
+    mk("To the Moon and Back | RONDÉ | Blok 1", "2027-03-13T12:30:00.000Z", "Ronde"),
+    mk("To the Moon and Back | Naaz | Blok 5", "2027-03-13T18:00:00.000Z", "Naaz"),
+    mk("Cassia", "2027-03-13T19:00:00.000Z", "Cassia"),
+  ]);
+  assert.equal(rows.length, 2);
+  const f = rows.find((r) => r.title === "To the Moon and Back")!;
+  assert.equal(f.kind, "festival");
+  assert.deepEqual(f.artists, ["Ronde", "Nona", "Naaz"]);
+  assert.equal(f.starts_at, "2027-03-13T12:30:00.000Z");
+  assert.equal(f.ends_at, "2027-03-13T19:30:00.000Z");
+  assert.ok(f.id.startsWith("tm:blk:"));
 });
