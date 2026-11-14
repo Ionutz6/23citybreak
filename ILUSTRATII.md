@@ -4,6 +4,7 @@ Se adaugă numele obiectivelor direct pe hărțile existente, în stilul aprobat
 
 ## Actualizate și publicate
 
+- Belfast
 - Alghero
 - Heraklion
 - Hamburg
@@ -158,3 +159,5 @@ Gran Canaria: originalul fără etichete pentru quiz este `ilustratii-orase/gran
 Hamburg: originalul fără etichete pentru quiz este `ilustratii-orase/hamburg_de.webp`, iar harta cu obiective este `assets/guides-prague-style/hamburg.webp`.
 
 Heraklion: originalul fără etichete pentru quiz este `ilustratii-orase/heraklion_gr.webp`, iar harta cu obiective este `assets/guides-prague-style/heraklion.webp`.
+
+Belfast: originalul fără etichete pentru quiz este `ilustratii-orase/belfast_gb.webp`, iar harta cu obiective este `assets/guides-prague-style/belfast.webp`.
