@@ -5,6 +5,7 @@ Se adaugă numele obiectivelor direct pe hărțile existente, în stilul aprobat
 ## Actualizate și publicate
 
 - Alghero
+- Antalya
 - Alicante
 
 - Roma
@@ -113,3 +114,5 @@ Cagliari: originalul fără etichete este `ilustratii-orase/cagliari_it.webp`, i
 Alghero: originalul fără etichete pentru quiz este `ilustratii-orase/alghero_it.webp`, iar harta cu obiective este `assets/guides-prague-style/alghero.webp`.
 
 Alicante: originalul fără etichete pentru quiz este `ilustratii-orase/alicante_es.webp`, iar harta cu obiective este `assets/guides-prague-style/alicante.webp`.
+
+Antalya: originalul fără etichete pentru quiz este `ilustratii-orase/antalya_tr.webp`, iar harta cu obiective este `assets/guides-prague-style/antalya.webp`.
