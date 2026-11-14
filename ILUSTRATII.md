@@ -4,6 +4,7 @@ Se adaugă numele obiectivelor direct pe hărțile existente, în stilul aprobat
 
 ## Actualizate și publicate
 
+- Salzburg
 - Zakynthos
 - Mykonos
 - Santorini
@@ -227,3 +228,5 @@ Santorini: originalul fără etichete pentru quiz este `ilustratii-orase/santori
 Mykonos: originalul fără etichete pentru quiz este `ilustratii-orase/mykonos_gr.webp`, iar harta cu obiective este `assets/guides-prague-style/mykonos.webp`.
 
 Zakynthos: originalul fără etichete pentru quiz este `ilustratii-orase/zakynthos_gr.webp`, iar harta cu obiective este `assets/guides-prague-style/zakynthos.webp`.
+
+Salzburg: originalul fără etichete pentru quiz este `ilustratii-orase/salzburg_at.webp`, iar harta cu obiective este `assets/guides-prague-style/salzburg.webp`.
