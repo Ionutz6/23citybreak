@@ -161,6 +161,11 @@ button.pk-day{cursor:pointer}
 .evp{background:#f7f5f0;margin:0;font-family:'Source Sans 3',system-ui,sans-serif;color:#0a0b0d}
 .evp-wrap{max-width:1440px;margin:auto;padding:0 6%}
 .evp-hero{background:#111211;color:#fff;padding:46px 0 80px}
+/* Fundalul negru (meniu + hero) se oprește la lățimea site-ului, ca imaginile orașelor de pe prima pagină */
+body.evp .cb-header,.evp-hero{max-width:1440px;margin-left:auto;margin-right:auto}
+.evp-hero{border-radius:0 0 28px 28px}
+@media(min-width:640px){body.evp .cb-header-inner{padding-left:6vw;padding-right:6vw}}
+@media(min-width:601px){.evp-hero .evp-wrap{padding:0 6vw}}  /* textul rămâne aliniat cu cardurile de sub hero */
 .evp-kicker{font:700 11px 'Space Grotesk',sans-serif;letter-spacing:.16em;color:#dfa649}
 .evp-hero h1{font:700 clamp(30px,4vw,52px)/1.08 'Space Grotesk',sans-serif;letter-spacing:-.04em;margin:0 0 14px;max-width:none}
 .evp-hero h1 em{color:#dfa649;font-style:normal}
