@@ -55,7 +55,22 @@ export function priceInEur(ranges: { currency?: string; min?: number }[] | undef
 }
 
 // Pachete de ospitalitate / upgrade-uri / parcări și meciuri de juniori sau amatori: nu sunt „evenimente” pentru un city break.
-export const JUNK_TITLE = /\b(box[- ]seats?|venue premium|vip (upgrade|package|ticket)s?|hospitality|parking|meet\s*&\s*greet|pre-?show|juniores|giovanili|primavera|attivit[aà] di base|campionati? figc|youth|junior|\bu-?1\d\b)\b|\b(20[01]\d)\b.*\b(club milano|campionato)\b/i;
+export const JUNK_TITLE = /\b(box[- ]seats?|venue premium|vip (upgrade|package|ticket)s?|hospitality|parking|meet\s*&\s*greet|pre-?show|juniores|giovanili|primavera|attivit[aà] di base|campionati? figc|youth|junior|merchandise|tote bag|\\bluxe (cap|tote|hoodie)|charm|passe-partout|gift (card|voucher)|voucher|\bu-?1\d\b)\b|\b(20[01]\d)\b.*\b(club milano|campionato)\b/i;
+
+// Turnee cu mai multe sesiuni (tenis etc.): Ticketmaster le listează ca evenimente separate cu același „participant” (turneul).
+// Păstrăm un singur card per turneu și oraș, cel mai devreme; evenimentele fără „sesiune” în titlu rămân neatinse.
+const SESSION = /\b(session|sessie|qualif\w*|day pass|[0-9]-day|finale?)\b/i;
+export function dedupeSessions(rows: EventRow[]): EventRow[] {
+  const first = new Map<string, EventRow>();
+  const out: EventRow[] = [];
+  for (const r of rows) {
+    if (r.kind !== "sport" || r.teams.length !== 1 || !SESSION.test(r.title)) { out.push(r); continue; }
+    const key = `${r.city_id}|${r.teams[0]}`;
+    const cur = first.get(key);
+    if (!cur || r.starts_at < cur.starts_at) first.set(key, r);
+  }
+  return [...out, ...first.values()];
+}
 
 // deno-lint-ignore no-explicit-any
 export function fromTicketmaster(ev: any, city: City, rank: number, fx: Record<string, number> = {}): EventRow | null {
