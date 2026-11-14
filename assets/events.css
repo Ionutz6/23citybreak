@@ -44,15 +44,16 @@
 .pk{font-family:'Source Sans 3',system-ui,sans-serif;color:#0a0b0d;margin:0;background:#fff}
 .pk h1,.pk h2,.pk h3{font-family:'Space Grotesk',system-ui,sans-serif;letter-spacing:-.02em}
 .pk-wrap{max-width:1240px;margin:auto;padding:0 6%}
-.pk-hero{background:#111211 center/cover no-repeat;color:#fff;position:relative;min-height:300px;display:flex;align-items:flex-end}
+.pk-hero{background:#111211 center/cover no-repeat;color:#fff;position:relative;min-height:308px;display:flex;align-items:flex-end;width:calc(100% - 2*clamp(16px,2vw,30px));max-width:1380px;margin:0 auto;border-radius:0 0 28px 28px;overflow:hidden}
+/* același hero ca pe homepage și pe Evenimente: bloc de 1380 px, colțuri rotunjite jos */
 .pk-hero .pk-wrap{width:100%}
 .pk-credit{position:absolute;right:12px;bottom:8px;z-index:2;font-size:11px;color:rgba(255,255,255,.75)!important;text-decoration:none;max-width:60%;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pk-credit:hover{color:#fff!important;text-decoration:underline}
 .pk-hero::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(10,11,13,.85) 0%,rgba(10,11,13,.55) 55%,rgba(10,11,13,.15) 100%),linear-gradient(0deg,rgba(10,11,13,.6) 0%,transparent 60%)}
-.pk-hero .pk-wrap{position:relative;z-index:1;padding-top:44px;padding-bottom:44px}
+.pk-hero .pk-wrap{position:relative;z-index:1;max-width:none;padding:34px clamp(20px,5%,72px)}
 .pk-crumb{color:#cbd5e1;font-size:13px}
 .pk-crumb a{color:#dfa649}
-.pk-hero h1{font-size:42px;margin:10px 0 8px;max-width:760px;line-height:1.06}
+.pk-hero h1{font-size:42px;margin:10px 0 8px;max-width:none;line-height:1.06}
 .pk-sub{font-size:17px;color:#e2e8f0;margin:0}
 .pk-grid{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:28px;margin:28px auto 56px;align-items:start}
 .pk-box{background:#fff;border:1.5px solid #e4e7eb;border-radius:20px;padding:20px}
@@ -116,7 +117,7 @@ button.pk-day{cursor:pointer}
   .cb-header,.site-footer,.pk-side,.pk-box,.pk-pdf,.pk-crumb,.acct-banner,dialog{display:none!important}
   .pk-credit{display:none!important}
   .pk-print-only{display:block;margin:6px 0 0;font-size:13px;color:#333}
-  .pk-hero{background:none!important;color:#000}
+  .pk-hero{background:none!important;color:#000;width:auto;max-width:none;border-radius:0;min-height:0}
   .pk-hero::after{display:none}
   .pk-hero .pk-wrap{padding:0 0 10px}
   .pk-hero h1{font-size:26px;color:#000}
