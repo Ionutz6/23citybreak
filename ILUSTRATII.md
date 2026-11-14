@@ -4,6 +4,7 @@ Se adaugă numele obiectivelor direct pe hărțile existente, în stilul aprobat
 
 ## Actualizate și publicate
 
+- Perugia
 - Pescara
 - Verona
 - Belfast
@@ -167,3 +168,5 @@ Belfast: originalul fără etichete pentru quiz este `ilustratii-orase/belfast_g
 Verona: originalul fără etichete pentru quiz este `ilustratii-orase/verona_it.webp`, iar harta cu obiective este `assets/guides-prague-style/verona.webp`.
 
 Pescara: originalul fără etichete pentru quiz este `ilustratii-orase/pescara_it.webp`, iar harta cu obiective este `assets/guides-prague-style/pescara.webp`.
+
+Perugia: originalul fără etichete pentru quiz este `ilustratii-orase/perugia_it.webp`, iar harta cu obiective este `assets/guides-prague-style/perugia.webp`.
