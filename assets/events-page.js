@@ -18,6 +18,7 @@
   const budget = Number(prefs.budget_max_eur) > 0 ? Number(prefs.budget_max_eur) : null;
   const mySports = Array.isArray(interests.sports) ? interests.sports : [];
   const myComps = Array.isArray(interests.competitions) ? interests.competitions : [];
+  const myArtists = Array.isArray(interests.favorite_artists) ? interests.favorite_artists.filter(a => typeof a === 'string' && a.trim().length >= 2).slice(0, 10) : [];
   const origin = FP.origin();
   const hasAirports = Array.isArray(prefs.departure_airports) && prefs.departure_airports.length > 0; // alese de client în cont
   const params = new URLSearchParams(location.search);
@@ -92,6 +93,26 @@
   // Fiecare dată e un card de sine stătător (aceeași dimensiune); la concerte arătăm doar că turneul mai are și alte orașe.
   // Un turneu cu 20 de orașe nu ocupă pagina: cel mult 2 date per artist (cele mai apropiate), restul rămân semnalate pe card.
   const PER_TOUR = 2;
+  // Trupe/artiști preferați din profil: primii la Muzică, inclusiv concertele anunțate peste cele 120 de zile (le cerem separat, pe nume, la Ticketmaster).
+  const norm = t => String(t || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+  const favNames = myArtists.map(norm).filter(Boolean);
+  const isFav = e => favNames.some(f => (e.artists || []).some(a => norm(a) === f) || ` ${norm(e.title)} `.includes(` ${f} `)) ? 1 : 0;
+  async function loadFavorites() {
+    const api = E.api, have = new Set(all.map(e => e.id));
+    const found = [];
+    for (let i = 0; i < myArtists.length; i += 3) {
+      const rs = await Promise.allSettled(myArtists.slice(i, i + 3).map(async name => {
+        const u = new URL(`${api.url}/functions/v1/events-search`); u.searchParams.set('q', name);
+        const r = await fetch(u, { headers: { apikey: api.key, Authorization: `Bearer ${api.key}` }, signal: AbortSignal.timeout(15000) });
+        return r.ok ? (await r.json()).events || [] : [];
+      }));
+      for (const r of rs) if (r.status === 'fulfilled') found.push(...r.value);
+    }
+    let added = 0;
+    for (const e of found) if (!have.has(e.id) && isFav(e) && (e.kind === 'concert' || e.kind === 'festival') && H.endDate(e) >= today) { have.add(e.id); all.push(e); added++; }
+    if (added) { all.sort((a, b) => a.starts_at.localeCompare(b.starts_at)); render(); }
+  }
+
   // Spectacole și musicaluri cu multe reprezentații în același loc (Lion King, Disney On Ice): un singur card, cu cea mai apropiată dată
   // și numărul celorlalte reprezentații din weekenduri.
   const RUN_KINDS = new Set(['theatre', 'comedy', 'other']);
@@ -100,6 +121,7 @@
   function build(list) {
     const seen = new Map(), perArtist = new Map();
     runs.clear();
+    if (state.tab === 'music' && favNames.length) list = [...list].sort((a, b) => isFav(b) - isFav(a)); // trupele preferate primele (sortare stabilă: în rest rămâne ordinea pe dată)
     for (const e of list) if (RUN_KINDS.has(e.kind)) runs.set(runKey(e), (runs.get(runKey(e)) || 0) + 1);
     return list.filter(e => {
       if (RUN_KINDS.has(e.kind)) { const k = runKey(e); if (seen.has(k)) return false; seen.set(k, 1); return true; }
@@ -201,7 +223,7 @@
         ${flightsStatus()}${budgetStatus()}
       </div>
       <div id="evp-panel" role="tabpanel" aria-labelledby="tab-${state.tab}">
-        ${items.length ? `<div class="ev-grid">${items.slice(0, state.shown).map(x => E.cardHtml(x.e, { tour: tourMore(x.e), runs: RUN_KINDS.has(x.e.kind) ? (runs.get(runKey(x.e)) || 1) - 1 : 0 })).join('')}</div>` : `<p class="evp-empty">${emptyText()}</p>`}
+        ${items.length ? `<div class="ev-grid">${items.slice(0, state.shown).map(x => E.cardHtml(x.e, { fav: state.tab === 'music' && isFav(x.e), tour: tourMore(x.e), runs: RUN_KINDS.has(x.e.kind) ? (runs.get(runKey(x.e)) || 1) - 1 : 0 })).join('')}</div>` : `<p class="evp-empty">${emptyText()}</p>`}
         ${items.length > state.shown ? `<div class="ev-more"><button type="button" class="evp-more-btn" data-more>Arată încă ${Math.min(PAGE, items.length - state.shown)}</button></div>` : ''}
       </div>
       ${all.some(e => e.source === 'football-data') && state.tab === 'sport' ? '<p class="ev-credit">Football data provided by the Football-Data.org API</p>' : ''}
@@ -237,4 +259,5 @@
 
   if (!all.length) { root.innerHTML = '<p class="evp-empty">Nu am putut încărca evenimentele acum. Reîncarcă pagina peste câteva minute.</p>'; return; }
   render();
+  if (myArtists.length) loadFavorites();
 })();
