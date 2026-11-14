@@ -4,6 +4,8 @@ Se adaugă numele obiectivelor direct pe hărțile existente, în stilul aprobat
 
 ## Actualizate și publicate
 
+- Alghero
+
 - Roma
 - Barcelona
 - Paris
@@ -106,3 +108,5 @@ Eindhoven: originalul fără etichete este `ilustratii-orase/eindhoven_nl.webp`,
 Newcastle: originalul fără etichete este `ilustratii-orase/newcastle_gb.webp`, iar versiunea pentru ghid este `assets/guides-prague-style/newcastle.webp`.
 
 Cagliari: originalul fără etichete este `ilustratii-orase/cagliari_it.webp`, iar versiunea pentru ghid este `assets/guides-prague-style/cagliari.webp`.
+
+Alghero: originalul fără etichete pentru quiz este `ilustratii-orase/alghero_it.webp`, iar harta cu obiective este `assets/guides-prague-style/alghero.webp`.
