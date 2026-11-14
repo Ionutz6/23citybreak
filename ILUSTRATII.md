@@ -4,6 +4,8 @@ Se adaugă numele obiectivelor direct pe hărțile existente, în stilul aprobat
 
 ## Actualizate și publicate
 
+- Luxemburg
+
 - Graz
 
 - Innsbruck
@@ -238,3 +240,5 @@ Salzburg: originalul fără etichete pentru quiz este `ilustratii-orase/salzburg
 Innsbruck: originalul fără etichete pentru quiz este `ilustratii-orase/innsbruck_at.webp`, iar harta cu obiective este `assets/guides-prague-style/innsbruck.webp`.
 
 Graz: originalul fără etichete pentru quiz este `ilustratii-orase/graz_at.webp`, iar harta cu obiective este `assets/guides-prague-style/graz.webp`.
+
+Luxemburg: originalul fără etichete pentru quiz este `ilustratii-orase/luxembourg_lu.webp`, iar harta cu obiective este `assets/guides-prague-style/luxembourg.webp`.
