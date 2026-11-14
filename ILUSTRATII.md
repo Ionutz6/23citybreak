@@ -5,6 +5,7 @@ Se adaugă numele obiectivelor direct pe hărțile existente, în stilul aprobat
 ## Actualizate și publicate
 
 - Alghero
+- Chania
 - București
 - Bristol
 - Billund
@@ -128,3 +129,5 @@ Billund: originalul fără etichete pentru quiz este `ilustratii-orase/billund_d
 Bristol: originalul fără etichete pentru quiz este `ilustratii-orase/bristol_gb.webp`, iar harta cu obiective este `assets/guides-prague-style/bristol.webp`.
 
 București: originalul fără etichete pentru quiz este `ilustratii-orase/bucharest_ro.webp`, iar harta cu obiective este `assets/guides-prague-style/bucuresti.webp`.
+
+Chania: originalul fără etichete pentru quiz este `ilustratii-orase/chania_gr.webp`, iar harta cu obiective este `assets/guides-prague-style/chania.webp`.
