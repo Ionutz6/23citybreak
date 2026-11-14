@@ -177,6 +177,8 @@ button.pk-day{cursor:pointer}
 .evp-cat[aria-selected=true] .evp-cat-n{color:#dfa649}
 .evp-panel-top{background:#fff;border:1px solid #ece7dc;border-radius:20px;padding:16px 18px;margin-bottom:20px;display:flex;flex-direction:column;gap:12px}
 .evp-row{display:flex;align-items:flex-start;gap:14px}
+.evp-row-nolabel{gap:0}
+.evp-row-nolabel+.evp-note{margin-left:0}
 .evp-row-label{flex:none;width:92px;padding-top:9px;font:700 11px 'Space Grotesk',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#8a95a6}
 .evp-pills,.evp-chips{display:flex;flex-wrap:wrap;gap:8px;min-width:0}
 .evp-pill{display:inline-flex;align-items:center;gap:7px;border:0;background:#f4f1ea;color:#0a0b0d;border-radius:99px;padding:8px 14px;font:700 14px 'Source Sans 3',system-ui,sans-serif;cursor:pointer;transition:background .15s}
