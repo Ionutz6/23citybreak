@@ -84,6 +84,15 @@
   const illuSmall = illu.replace(/([^/]+\.webp)$/, '800/$1');
   // Prețul zborului pentru zilele alese: o cerere Kiwi din browser, cu cache (assets/flight-price.js).
   let flight = null, flightState = 'idle', flightKey = '';
+  // De ce nu avem preț: Kiwi a refuzat recent (pauză de 30 min în browser, comună cu căutarea de pe prima pagină), s-a consumat
+  // bugetul de cereri pe oră sau cererea a eșuat. Arătăm motivul, ca „prețul îl vezi la Kiwi” să nu rămână un mister.
+  let flightWhy = '';
+  const whyNoPrice = () => {
+    const K = window.CBKiwi;
+    if (K?.paused()) return `pauză de protecție după un refuz Kiwi, încă ~${Math.max(1, Math.ceil((K.pausedUntil() - Date.now()) / 60000))} min`;
+    if (K && K.budgetLeft() <= 0) return `limita de căutări pe oră a fost atinsă, încă ~${K.minutesToBudget()} min`;
+    return 'Kiwi nu a răspuns acum';
+  };
   // Reguli de oră pentru zilele alese acum: indicii pentru cumpărare și avertismente (zborul ar suprapune evenimentul).
   const rules = () => H.flightRules(ev, trip.out, trip.back);
   const timingNotes = () => {
@@ -95,14 +104,14 @@
     else if (r.departAfter) n.push(['hint', `Alege la întors un zbor care decolează după ${r.departAfter}.`]);
     return n.map(([k, t]) => `<div class="s pk-timing ${k}">${k === 'warn' ? '⚠️' : 'ℹ️'} ${esc(t)}</div>`).join('');
   };
-  const flightSub = () => flightState === 'loading' ? ' · caut prețul…' : flight?.eur ? `<br>${flight.direct ? 'direct, de persoană, găsit acum pe Kiwi' : `zbor cu ${flight.stops} ${flight.stops === 1 ? 'escală' : 'escale'}`}` : flightState === 'none' ? (flight?.timing ? '<br>niciun zbor nu se potrivește cu ora evenimentului în zilele astea' : '<br>nu am găsit zboruri în zilele astea') : flightState === 'na' ? '<br>prețul îl vezi la Kiwi' : '';
+  const flightSub = () => flightState === 'loading' ? ' · caut prețul…' : flight?.eur ? `<br>${flight.direct ? 'direct, de persoană, găsit acum pe Kiwi' : `zbor cu ${flight.stops} ${flight.stops === 1 ? 'escală' : 'escale'}`}` : flightState === 'none' ? (flight?.timing ? '<br>niciun zbor nu se potrivește cu ora evenimentului în zilele astea' : '<br>nu am găsit zboruri în zilele astea') : flightState === 'na' ? `<br>prețul îl vezi la Kiwi${flightWhy ? ` <span class="pk-why">(${esc(flightWhy)})</span>` : ''}` : '';
   function loadFlight() {
     if (!FP || !iata || !city?.id) { flightState = 'na'; return; }
     const r = rules(), key = `${trip.out}|${trip.back}`; if (key === flightKey) return;
     flightKey = key; flight = null; flightState = 'loading';
     FP.get({ origin, dest: city.id, out: trip.out, back: trip.back, arriveBy: r.arriveBy, departAfter: r.departAfter }).then(p => {
       if (flightKey !== key) return;
-      flight = p; flightState = p?.eur ? 'ok' : p ? 'none' : 'na'; render(false);
+      flight = p; flightState = p?.eur ? 'ok' : p ? 'none' : 'na'; flightWhy = p ? '' : whyNoPrice(); render(false);
     });
   }
   let photo = null; // imaginea evenimentului sau fotografia orașului; se încarcă în paralel cu prima randare

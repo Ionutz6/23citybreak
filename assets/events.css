@@ -272,3 +272,5 @@ a.evp-note{margin:0}
 /* 5 carduri pe rând, în lățimea paginii (aceeași ca pe prima pagină) */
 @media(min-width:1180px){.evp .ev-grid{grid-template-columns:repeat(5,minmax(0,1fr))}}
 @media(min-width:900px) and (max-width:1179px){.evp .ev-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+
+.pk-why{color:#8a95a6;font-size:12px}
