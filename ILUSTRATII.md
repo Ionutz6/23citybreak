@@ -4,6 +4,7 @@ Se adaugă numele obiectivelor direct pe hărțile existente, în stilul aprobat
 
 ## Actualizate și publicate
 
+- Rhodos
 - Madeira (Funchal)
 - Karlsruhe / Baden-Baden
 - Hannover
@@ -215,3 +216,5 @@ Hannover: originalul fără etichete pentru quiz este `ilustratii-orase/hannover
 Karlsruhe / Baden-Baden: originalul fără etichete pentru quiz este `ilustratii-orase/karlsruhe_de.webp`, iar harta cu obiective este `assets/guides-prague-style/karlsruhe.webp`.
 
 Madeira (Funchal): originalul fără etichete pentru quiz este `ilustratii-orase/funchal_pt.webp`, iar harta cu obiective este `assets/guides-prague-style/funchal.webp`.
+
+Rhodos: originalul fără etichete pentru quiz este `ilustratii-orase/rhodes_gr.webp`, iar harta cu obiective este `assets/guides-prague-style/rhodes.webp`.
