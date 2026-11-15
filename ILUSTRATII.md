@@ -4,6 +4,8 @@ Se adaugă numele obiectivelor direct pe hărțile existente, în stilul aprobat
 
 ## Actualizate și publicate
 
+- Rovaniemi
+
 - Tromsø
 - Bergen
 - Malmö
@@ -250,3 +252,5 @@ Malmö: originalul fără etichete pentru quiz este `ilustratii-orase/malmo_se.w
 Bergen: originalul fără etichete pentru quiz este `ilustratii-orase/bergen_no.webp`, iar harta cu obiective este `assets/guides-prague-style/bergen.webp`.
 
 Tromsø: originalul fără etichete pentru quiz este `ilustratii-orase/tromso_no.webp`, iar harta cu obiective este `assets/guides-prague-style/tromso.webp`.
+
+Rovaniemi: originalul fără etichete pentru quiz este `ilustratii-orase/rovaniemi_fi.webp`, iar harta cu obiective este `assets/guides-prague-style/rovaniemi.webp`.
