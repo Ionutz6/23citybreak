@@ -4,6 +4,8 @@ Se adaugă numele obiectivelor direct pe hărțile existente, în stilul aprobat
 
 ## Actualizate și publicate
 
+- Tivat
+
 - Podgorica
 
 - Sarajevo
@@ -298,3 +300,5 @@ Pula: originalul fără etichete pentru quiz este `ilustratii-orase/pula_hr.webp
 Sarajevo: originalul fără etichete pentru quiz este `ilustratii-orase/sarajevo_ba.webp`, iar harta cu obiective este `assets/guides-prague-style/sarajevo.webp`.
 
 Podgorica: originalul fără etichete pentru quiz este `ilustratii-orase/podgorica_me.webp`, iar harta cu obiective este `assets/guides-prague-style/podgorica.webp`.
+
+Tivat: originalul fără etichete pentru quiz este `ilustratii-orase/tivat_me.webp`, iar harta cu obiective este `assets/guides-prague-style/tivat.webp`.
