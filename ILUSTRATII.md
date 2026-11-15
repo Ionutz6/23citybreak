@@ -4,6 +4,8 @@ Se adaugă numele obiectivelor direct pe hărțile existente, în stilul aprobat
 
 ## Actualizate și publicate
 
+- Timișoara
+
 - Malta
 
 - Paphos
@@ -332,3 +334,6 @@ Paphos: originalul fără etichete pentru quiz este `ilustratii-orase/paphos_cy.
 
 
 Malta: originalul fără etichete pentru quiz este `ilustratii-orase/luqa_mt.webp`, iar harta cu obiective este `assets/guides-prague-style/malta.webp`.
+
+
+Timișoara: originalul fără etichete pentru quiz este `ilustratii-orase/timisoara_ro.webp`, iar harta cu obiective este `assets/guides-prague-style/timisoara.webp`.
