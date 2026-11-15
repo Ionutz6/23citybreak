@@ -4,6 +4,8 @@ Se adaugă numele obiectivelor direct pe hărțile existente, în stilul aprobat
 
 ## Actualizate și publicate
 
+- Pula
+
 - Zadar
 
 - Zagreb
@@ -286,3 +288,5 @@ Praga: originalul fără etichete pentru quiz este `ilustratii-orase/prague_cz.w
 Zagreb: originalul fără etichete pentru quiz este `ilustratii-orase/zagreb_hr.webp`, iar harta cu obiective este `assets/guides-prague-style/zagreb.webp`.
 
 Zadar: originalul fără etichete pentru quiz este `ilustratii-orase/zadar_hr.webp`, iar harta cu obiective este `assets/guides-prague-style/zadar.webp`.
+
+Pula: originalul fără etichete pentru quiz este `ilustratii-orase/pula_hr.webp`, iar harta cu obiective este `assets/guides-prague-style/pula.webp`.
