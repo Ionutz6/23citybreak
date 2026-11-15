@@ -4,6 +4,8 @@ Se adaugă numele obiectivelor direct pe hărțile existente, în stilul aprobat
 
 ## Actualizate și publicate
 
+- Burgas
+
 - Varna
 
 - Tirana
@@ -314,3 +316,5 @@ Skopje: originalul fără etichete pentru quiz este `ilustratii-orase/skopje_mk.
 Tirana: originalul fără etichete pentru quiz este `ilustratii-orase/tirana_al.webp`, iar harta cu obiective este `assets/guides-prague-style/tirana.webp`.
 
 Varna: originalul fără etichete pentru quiz este `ilustratii-orase/varna_bg.webp`, iar harta cu obiective este `assets/guides-prague-style/varna.webp`.
+
+Burgas: originalul fără etichete pentru quiz este `ilustratii-orase/burgas_bg.webp`, iar harta cu obiective este `assets/guides-prague-style/burgas.webp`.
