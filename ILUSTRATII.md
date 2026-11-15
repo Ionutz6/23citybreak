@@ -4,6 +4,8 @@ Se adaugă numele obiectivelor direct pe hărțile existente, în stilul aprobat
 
 ## Actualizate și publicate
 
+- Bodrum
+
 - İzmir
 
 - Oradea
@@ -372,3 +374,6 @@ Oradea: originalul fără etichete pentru quiz este `ilustratii-orase/oradea_ro.
 
 
 İzmir: originalul fără etichete pentru quiz este `ilustratii-orase/izmir_tr.webp`, iar harta cu obiective este `assets/guides-prague-style/izmir.webp`.
+
+
+Bodrum: originalul fără etichete pentru quiz este `ilustratii-orase/bodrum_tr.webp`, iar harta cu obiective este `assets/guides-prague-style/bodrum.webp`.
