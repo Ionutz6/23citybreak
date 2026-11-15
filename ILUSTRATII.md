@@ -4,6 +4,8 @@ Se adaugă numele obiectivelor direct pe hărțile existente, în stilul aprobat
 
 ## Actualizate și publicate
 
+- Brașov
+
 - Erevan
 
 - Kutaisi
@@ -392,3 +394,6 @@ Kutaisi: originalul fără etichete pentru quiz este `ilustratii-orase/kutaisi_g
 
 
 Erevan: originalul fără etichete pentru quiz este `ilustratii-orase/yerevan_am.webp`, iar harta cu obiective este `assets/guides-prague-style/yerevan.webp`.
+
+
+Brașov: originalul fără etichete pentru quiz este `ilustratii-orase/brasov_ro.webp`, iar harta cu obiective este `assets/guides-prague-style/brasov.webp`.
