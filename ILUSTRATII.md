@@ -4,6 +4,8 @@ Se adaugă numele obiectivelor direct pe hărțile existente, în stilul aprobat
 
 ## Actualizate și publicate
 
+- Praga
+
 - Poznań
 
 - Wrocław
@@ -274,3 +276,5 @@ Katowice: originalul fără etichete pentru quiz este `ilustratii-orase/katowice
 Wrocław: originalul fără etichete pentru quiz este `ilustratii-orase/wroclaw_pl.webp`, iar harta cu obiective este `assets/guides-prague-style/wroclaw.webp`.
 
 Poznań: originalul fără etichete pentru quiz este `ilustratii-orase/poznan_pl.webp`, iar harta cu obiective este `assets/guides-prague-style/poznan.webp`.
+
+Praga: originalul fără etichete pentru quiz este `ilustratii-orase/prague_cz.webp`, iar harta cu obiective este `assets/guides-prague-style/prague.webp`.
