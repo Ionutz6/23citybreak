@@ -4,6 +4,8 @@ Se adaugă numele obiectivelor direct pe hărțile existente, în stilul aprobat
 
 ## Actualizate și publicate
 
+- Malta
+
 - Paphos
 
 - Larnaca
@@ -327,3 +329,6 @@ Larnaca: originalul fără etichete pentru quiz este `ilustratii-orase/larnaca_c
 
 
 Paphos: originalul fără etichete pentru quiz este `ilustratii-orase/paphos_cy.webp`, iar harta cu obiective este `assets/guides-prague-style/paphos.webp`.
+
+
+Malta: originalul fără etichete pentru quiz este `ilustratii-orase/luqa_mt.webp`, iar harta cu obiective este `assets/guides-prague-style/malta.webp`.
