@@ -4,6 +4,8 @@ Se adaugă numele obiectivelor direct pe hărțile existente, în stilul aprobat
 
 ## Actualizate și publicate
 
+- Erevan
+
 - Kutaisi
 
 - Tbilisi
@@ -387,3 +389,6 @@ Tbilisi: originalul fără etichete pentru quiz este `ilustratii-orase/tbilisi_g
 
 
 Kutaisi: originalul fără etichete pentru quiz este `ilustratii-orase/kutaisi_ge.webp`, iar harta cu obiective este `assets/guides-prague-style/kutaisi.webp`.
+
+
+Erevan: originalul fără etichete pentru quiz este `ilustratii-orase/yerevan_am.webp`, iar harta cu obiective este `assets/guides-prague-style/yerevan.webp`.
