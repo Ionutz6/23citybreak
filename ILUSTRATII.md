@@ -4,6 +4,8 @@ Se adaugă numele obiectivelor direct pe hărțile existente, în stilul aprobat
 
 ## Actualizate și publicate
 
+- Katowice
+
 - Kaunas
 
 - Reykjavík
@@ -262,3 +264,5 @@ Rovaniemi: originalul fără etichete pentru quiz este `ilustratii-orase/rovanie
 Reykjavík: originalul fără etichete pentru quiz este `ilustratii-orase/reykjavik_is.webp`, iar harta cu obiective este `assets/guides-prague-style/reykjavik.webp`.
 
 Kaunas: originalul fără etichete pentru quiz este `ilustratii-orase/kaunas_lt.webp`, iar harta cu obiective este `assets/guides-prague-style/kaunas.webp`.
+
+Katowice: originalul fără etichete pentru quiz este `ilustratii-orase/katowice_pl.webp`, iar harta cu obiective este `assets/guides-prague-style/katowice.webp`.
