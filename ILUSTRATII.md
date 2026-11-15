@@ -4,6 +4,8 @@ Se adaugă numele obiectivelor direct pe hărțile existente, în stilul aprobat
 
 ## Actualizate și publicate
 
+- Skopje
+
 - Tivat
 
 - Podgorica
@@ -302,3 +304,5 @@ Sarajevo: originalul fără etichete pentru quiz este `ilustratii-orase/sarajevo
 Podgorica: originalul fără etichete pentru quiz este `ilustratii-orase/podgorica_me.webp`, iar harta cu obiective este `assets/guides-prague-style/podgorica.webp`.
 
 Tivat: originalul fără etichete pentru quiz este `ilustratii-orase/tivat_me.webp`, iar harta cu obiective este `assets/guides-prague-style/tivat.webp`.
+
+Skopje: originalul fără etichete pentru quiz este `ilustratii-orase/skopje_mk.webp`, iar harta cu obiective este `assets/guides-prague-style/skopje.webp`.
