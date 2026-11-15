@@ -4,6 +4,8 @@ Se adaugă numele obiectivelor direct pe hărțile existente, în stilul aprobat
 
 ## Actualizate și publicate
 
+- Suceava
+
 - Sibiu
 
 - Iași
@@ -347,3 +349,6 @@ Iași: originalul fără etichete pentru quiz este `ilustratii-orase/iasi_ro.web
 
 
 Sibiu: originalul fără etichete pentru quiz este `ilustratii-orase/sibiu_ro.webp`, iar harta cu obiective este `assets/guides-prague-style/sibiu.webp`.
+
+
+Suceava: originalul fără etichete pentru quiz este `ilustratii-orase/suceava_ro.webp`, iar harta cu obiective este `assets/guides-prague-style/suceava.webp`.
