@@ -4,6 +4,8 @@ Se adaugă numele obiectivelor direct pe hărțile existente, în stilul aprobat
 
 ## Actualizate și publicate
 
+- Iași
+
 - Timișoara
 
 - Malta
@@ -337,3 +339,6 @@ Malta: originalul fără etichete pentru quiz este `ilustratii-orase/luqa_mt.web
 
 
 Timișoara: originalul fără etichete pentru quiz este `ilustratii-orase/timisoara_ro.webp`, iar harta cu obiective este `assets/guides-prague-style/timisoara.webp`.
+
+
+Iași: originalul fără etichete pentru quiz este `ilustratii-orase/iasi_ro.webp`, iar harta cu obiective este `assets/guides-prague-style/iasi.webp`.
