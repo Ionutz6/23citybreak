@@ -4,6 +4,8 @@ Se adaugă numele obiectivelor direct pe hărțile existente, în stilul aprobat
 
 ## Actualizate și publicate
 
+- Zadar
+
 - Zagreb
 
 - Praga
@@ -282,3 +284,5 @@ Poznań: originalul fără etichete pentru quiz este `ilustratii-orase/poznan_pl
 Praga: originalul fără etichete pentru quiz este `ilustratii-orase/prague_cz.webp`, iar harta cu obiective este `assets/guides-prague-style/prague.webp`.
 
 Zagreb: originalul fără etichete pentru quiz este `ilustratii-orase/zagreb_hr.webp`, iar harta cu obiective este `assets/guides-prague-style/zagreb.webp`.
+
+Zadar: originalul fără etichete pentru quiz este `ilustratii-orase/zadar_hr.webp`, iar harta cu obiective este `assets/guides-prague-style/zadar.webp`.
