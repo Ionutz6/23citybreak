@@ -4,6 +4,8 @@ Se adaugă numele obiectivelor direct pe hărțile existente, în stilul aprobat
 
 ## Actualizate și publicate
 
+- Paphos
+
 - Larnaca
 
 - Burgas
@@ -322,3 +324,6 @@ Varna: originalul fără etichete pentru quiz este `ilustratii-orase/varna_bg.we
 Burgas: originalul fără etichete pentru quiz este `ilustratii-orase/burgas_bg.webp`, iar harta cu obiective este `assets/guides-prague-style/burgas.webp`.
 
 Larnaca: originalul fără etichete pentru quiz este `ilustratii-orase/larnaca_cy.webp`, iar harta cu obiective este `assets/guides-prague-style/larnaca.webp`.
+
+
+Paphos: originalul fără etichete pentru quiz este `ilustratii-orase/paphos_cy.webp`, iar harta cu obiective este `assets/guides-prague-style/paphos.webp`.
