@@ -4,6 +4,8 @@ Se adaugă numele obiectivelor direct pe hărțile existente, în stilul aprobat
 
 ## Actualizate și publicate
 
+- Bacău
+
 - Craiova
 
 - Suceava
@@ -357,3 +359,6 @@ Suceava: originalul fără etichete pentru quiz este `ilustratii-orase/suceava_r
 
 
 Craiova: originalul fără etichete pentru quiz este `ilustratii-orase/craiova_ro.webp`, iar harta cu obiective este `assets/guides-prague-style/craiova.webp`.
+
+
+Bacău: originalul fără etichete pentru quiz este `ilustratii-orase/bacau_ro.webp`, iar harta cu obiective este `assets/guides-prague-style/bacau.webp`.
