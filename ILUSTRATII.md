@@ -4,6 +4,8 @@ Se adaugă numele obiectivelor direct pe hărțile existente, în stilul aprobat
 
 ## Actualizate și publicate
 
+- Sibiu
+
 - Iași
 
 - Timișoara
@@ -342,3 +344,6 @@ Timișoara: originalul fără etichete pentru quiz este `ilustratii-orase/timiso
 
 
 Iași: originalul fără etichete pentru quiz este `ilustratii-orase/iasi_ro.webp`, iar harta cu obiective este `assets/guides-prague-style/iasi.webp`.
+
+
+Sibiu: originalul fără etichete pentru quiz este `ilustratii-orase/sibiu_ro.webp`, iar harta cu obiective este `assets/guides-prague-style/sibiu.webp`.
