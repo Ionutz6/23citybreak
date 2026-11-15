@@ -4,6 +4,8 @@ Se adaugă numele obiectivelor direct pe hărțile existente, în stilul aprobat
 
 ## Actualizate și publicate
 
+- Wrocław
+
 - Katowice
 
 - Kaunas
@@ -266,3 +268,5 @@ Reykjavík: originalul fără etichete pentru quiz este `ilustratii-orase/reykja
 Kaunas: originalul fără etichete pentru quiz este `ilustratii-orase/kaunas_lt.webp`, iar harta cu obiective este `assets/guides-prague-style/kaunas.webp`.
 
 Katowice: originalul fără etichete pentru quiz este `ilustratii-orase/katowice_pl.webp`, iar harta cu obiective este `assets/guides-prague-style/katowice.webp`.
+
+Wrocław: originalul fără etichete pentru quiz este `ilustratii-orase/wroclaw_pl.webp`, iar harta cu obiective este `assets/guides-prague-style/wroclaw.webp`.
