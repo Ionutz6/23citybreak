@@ -4,18 +4,13 @@ Se adaugă numele obiectivelor direct pe hărțile existente, în stilul aprobat
 
 ## Actualizate și publicate
 
+- Tromsø
 - Bergen
-
 - Malmö
-
 - Göteborg
-
 - Luxemburg
-
 - Graz
-
 - Innsbruck
-
 - Salzburg
 - Zakynthos
 - Mykonos
@@ -57,7 +52,6 @@ Se adaugă numele obiectivelor direct pe hărțile existente, în stilul aprobat
 - Basel
 - Antalya
 - Alicante
-
 - Roma
 - Barcelona
 - Paris
@@ -254,3 +248,5 @@ Göteborg: originalul fără etichete pentru quiz este `ilustratii-orase/gothenb
 Malmö: originalul fără etichete pentru quiz este `ilustratii-orase/malmo_se.webp`, iar harta cu obiective este `assets/guides-prague-style/malmo.webp`.
 
 Bergen: originalul fără etichete pentru quiz este `ilustratii-orase/bergen_no.webp`, iar harta cu obiective este `assets/guides-prague-style/bergen.webp`.
+
+Tromsø: originalul fără etichete pentru quiz este `ilustratii-orase/tromso_no.webp`, iar harta cu obiective este `assets/guides-prague-style/tromso.webp`.
