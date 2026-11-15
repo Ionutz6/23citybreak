@@ -4,6 +4,8 @@ Se adaugă numele obiectivelor direct pe hărțile existente, în stilul aprobat
 
 ## Actualizate și publicate
 
+- Kutaisi
+
 - Tbilisi
 
 - Bodrum
@@ -382,3 +384,6 @@ Bodrum: originalul fără etichete pentru quiz este `ilustratii-orase/bodrum_tr.
 
 
 Tbilisi: originalul fără etichete pentru quiz este `ilustratii-orase/tbilisi_ge.webp`, iar harta cu obiective este `assets/guides-prague-style/tbilisi.webp`.
+
+
+Kutaisi: originalul fără etichete pentru quiz este `ilustratii-orase/kutaisi_ge.webp`, iar harta cu obiective este `assets/guides-prague-style/kutaisi.webp`.
