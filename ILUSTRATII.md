@@ -4,6 +4,8 @@ Se adaugă numele obiectivelor direct pe hărțile existente, în stilul aprobat
 
 ## Actualizate și publicate
 
+- Varna
+
 - Tirana
 
 - Skopje
@@ -310,3 +312,5 @@ Tivat: originalul fără etichete pentru quiz este `ilustratii-orase/tivat_me.we
 Skopje: originalul fără etichete pentru quiz este `ilustratii-orase/skopje_mk.webp`, iar harta cu obiective este `assets/guides-prague-style/skopje.webp`.
 
 Tirana: originalul fără etichete pentru quiz este `ilustratii-orase/tirana_al.webp`, iar harta cu obiective este `assets/guides-prague-style/tirana.webp`.
+
+Varna: originalul fără etichete pentru quiz este `ilustratii-orase/varna_bg.webp`, iar harta cu obiective este `assets/guides-prague-style/varna.webp`.
