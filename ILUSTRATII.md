@@ -4,6 +4,8 @@ Se adaugă numele obiectivelor direct pe hărțile existente, în stilul aprobat
 
 ## Actualizate și publicate
 
+- Reykjavík
+
 - Rovaniemi
 
 - Tromsø
@@ -254,3 +256,5 @@ Bergen: originalul fără etichete pentru quiz este `ilustratii-orase/bergen_no.
 Tromsø: originalul fără etichete pentru quiz este `ilustratii-orase/tromso_no.webp`, iar harta cu obiective este `assets/guides-prague-style/tromso.webp`.
 
 Rovaniemi: originalul fără etichete pentru quiz este `ilustratii-orase/rovaniemi_fi.webp`, iar harta cu obiective este `assets/guides-prague-style/rovaniemi.webp`.
+
+Reykjavík: originalul fără etichete pentru quiz este `ilustratii-orase/reykjavik_is.webp`, iar harta cu obiective este `assets/guides-prague-style/reykjavik.webp`.
