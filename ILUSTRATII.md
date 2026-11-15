@@ -4,6 +4,8 @@ Se adaugă numele obiectivelor direct pe hărțile existente, în stilul aprobat
 
 ## Actualizate și publicate
 
+- İzmir
+
 - Oradea
 
 - Bacău
@@ -367,3 +369,6 @@ Bacău: originalul fără etichete pentru quiz este `ilustratii-orase/bacau_ro.w
 
 
 Oradea: originalul fără etichete pentru quiz este `ilustratii-orase/oradea_ro.webp`, iar harta cu obiective este `assets/guides-prague-style/oradea.webp`.
+
+
+İzmir: originalul fără etichete pentru quiz este `ilustratii-orase/izmir_tr.webp`, iar harta cu obiective este `assets/guides-prague-style/izmir.webp`.
