@@ -4,6 +4,8 @@ Se adaugă numele obiectivelor direct pe hărțile existente, în stilul aprobat
 
 ## Actualizate și publicate
 
+- Oradea
+
 - Bacău
 
 - Craiova
@@ -362,3 +364,6 @@ Craiova: originalul fără etichete pentru quiz este `ilustratii-orase/craiova_r
 
 
 Bacău: originalul fără etichete pentru quiz este `ilustratii-orase/bacau_ro.webp`, iar harta cu obiective este `assets/guides-prague-style/bacau.webp`.
+
+
+Oradea: originalul fără etichete pentru quiz este `ilustratii-orase/oradea_ro.webp`, iar harta cu obiective este `assets/guides-prague-style/oradea.webp`.
