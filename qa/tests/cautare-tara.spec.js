@@ -46,3 +46,18 @@ test('țară: la primul refuz 403 se oprește și nu reîncearcă', async ({ pag
   await page.waitForTimeout(3500);
   expect(st.kiwi.length).toBe(n);
 });
+
+test('prețurile găsite se trimit anonim la price-report (o singură dată), pentru Home', async ({ page }) => {
+  const st = await H.install(page, { kiwi: kiwiES });
+  await pickSpain(page);
+  await page.locator('#btn-search').click();
+  await expect(page.locator('#search-status-text')).toContainText(/Căutare finalizată/, { timeout: 30000 });
+  await expect.poll(() => st.db.fn.filter(f => f.name === 'price-report').length, { timeout: 15000 }).toBeGreaterThan(0);
+  const items = st.db.fn.filter(f => f.name === 'price-report').flatMap(f => f.body.items);
+  expect(st.db.fn.find(f => f.name === 'price-report').body.origin).toBe('OTP');
+  expect(items.find(i => i.dest === 'City:barcelona_es').price).toBe(55);
+  expect(items.every(i => /^City:/.test(i.dest) && i.out < i.back)).toBe(true);
+  expect(JSON.stringify(items)).not.toMatch(/@|token|email/i);
+  const keys = items.map(i => `${i.dest}|${i.out}`);
+  expect(new Set(keys).size).toBe(keys.length); // fără duplicate
+});
