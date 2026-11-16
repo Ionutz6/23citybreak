@@ -173,7 +173,12 @@
   // Interval afișat: de la peste 2 săptămâni (mai poți face un plan) până la ~2 luni. Favoriții (artist/echipă) și evenimentele curatoriate (sport, ex. Six Nations) pot fi și mai departe și urcă primele.
   const MIN_DAYS = 14, MAX_DAYS = 60;
   const MIN_DATE = H.isoAdd(today, MIN_DAYS), MAX_DATE = H.isoAdd(today, MAX_DAYS);
-  const inRange = e => (E.categoryOf(e) !== 'music' || E.isWeekend(e)) && H.endDate(e) >= MIN_DATE && (H.startDate(e) <= MAX_DATE || (e.source === 'curated' && e.kind === 'sport') || isFav(e) || isFavTeam(e));
+  // Cu cont: sliderul de perioadă (assets/period-slider.js) înlocuiește intervalul fix; implicit tot 14 zile – 2 luni. Favoritele au secțiunea lor și respectă același interval.
+  const loggedIn = !!(window.Account && typeof window.Account.hasSession === 'function' && window.Account.hasSession()) && !!window.CBPeriodSlider;
+  const period = { from: MIN_DATE, to: MAX_DATE };
+  const inRange = loggedIn
+    ? e => (E.categoryOf(e) !== 'music' || E.isWeekend(e)) && H.endDate(e) >= period.from && H.startDate(e) <= period.to
+    : e => (E.categoryOf(e) !== 'music' || E.isWeekend(e)) && H.endDate(e) >= MIN_DATE && (H.startDate(e) <= MAX_DATE || (e.source === 'curated' && e.kind === 'sport') || isFav(e) || isFavTeam(e));
   async function loadFavorites() {
     const api = E.api, have = new Set(all.map(e => e.id));
     const found = [];
@@ -299,10 +304,17 @@
   }
   function render() {
     // Cu filtrul de buget cerem din start prețurile candidaților (cei mai apropiați întâi), în limita Kiwi pe pagină.
-    const items = build(visible());
+    // Cu cont, favoritele (artiști la Muzică, echipe la Sport) sunt într-o secțiune separată, deasupra celorlalte evenimente.
+    const favPred = state.tab === 'music' ? isFav : state.tab === 'sport' ? isFavTeam : () => 0;
+    const favOn = loggedIn && (state.tab === 'music' ? myArtists.length : state.tab === 'sport' ? myTeams.length : 0) > 0;
+    let vis = visible(), favAll = [];
+    if (favOn) { favAll = build(vis.filter(favPred)); vis = vis.filter(e => !favPred(e)); }
+    const favItems = favAll.slice(0, PAGE);
+    const favLater = favOn ? all.filter(e => E.categoryOf(e) === state.tab && favPred(e) && !inRange(e) && H.endDate(e) >= today && (state.tab !== 'music' || E.isWeekend(e))).length : 0;
+    const items = build(vis);
     // Cerem întâi prețurile cardurilor care se văd (în ordinea afișării: favoritele, apoi pe dată), nu primele 24 pe dată din tot tab-ul:
     // altfel concertele de peste câteva luni nu apucau niciodată să primească zbor și rămâneau fără rând de preț.
-    if ((state.inBudget && budget) || state.onlyFlights) items.slice(state.page * PAGE, (state.page + 1) * PAGE).map(x => x.e).filter(e => priceState(e).s === 'unknown').slice(0, 24).forEach(ask);
+    if ((state.inBudget && budget) || state.onlyFlights) [...favItems, ...items.slice(state.page * PAGE, (state.page + 1) * PAGE)].map(x => x.e).filter(e => priceState(e).s === 'unknown').slice(0, 24).forEach(ask);
     const focused = document.activeElement?.closest?.('[data-tab]')?.dataset.tab;
     root.innerHTML = `
       ${catsHtml()}
@@ -318,6 +330,11 @@
         ${flightsStatus()}${budgetStatus()}
       </div>
       <div id="evp-panel" role="tabpanel" aria-labelledby="tab-${state.tab}">
+        ${favOn && (favItems.length || favLater) ? `<section class="evp-fav" aria-labelledby="evp-fav-h"><h2 id="evp-fav-h" class="evp-sec-h">★ Favorite</h2>
+          ${favItems.length ? `<div class="ev-grid">${favItems.map(x => E.cardHtml(x.e, { tour: tourMore(x.e), runs: 0 })).join('')}</div>` : '<p class="evp-note">Niciun favorit în perioada aleasă.</p>'}
+          ${favAll.length > PAGE ? `<p class="evp-note">Ai încă ${favAll.length - PAGE} favorite în perioada aleasă; restrânge perioada ca să le vezi pe toate.</p>` : ''}
+          ${favLater ? `<p class="evp-note">Mai ai ${n(favLater, 'favorit', 'favorite')} în afara perioadei alese: mută capetele sliderului.</p>` : ''}</section>
+          <h2 class="evp-sec-h">${state.tab === 'music' ? 'Alte concerte și festivaluri' : 'Alte meciuri și curse'}</h2>` : ''}
         ${items.length ? `<div class="ev-grid">${items.slice(state.page * PAGE, (state.page + 1) * PAGE).map(x => E.cardHtml(x.e, { tour: tourMore(x.e), runs: RUN_KINDS.has(x.e.kind) ? (runs.get(runKey(x.e)) || 1) - 1 : 0 })).join('')}</div>` : `<p class="evp-empty">${emptyText()}</p>`}
         ${pagerHtml(items.length)}
       </div>
@@ -352,6 +369,12 @@
   });
   root.addEventListener('change', ev => { const o = ev.target.dataset?.opt; if (o) { state[o] = ev.target.checked; state.comp = 'all'; state.page = 0; render(); } });
 
+  if (loggedIn && all.length) {
+    const wrap = document.createElement('div'); wrap.className = 'evp-wrap evp-period'; const host = document.createElement('div'); wrap.append(host); root.insertAdjacentElement('beforebegin', wrap);
+    const t = CBPeriodSlider.parse(today), add = k => CBPeriodSlider.iso(new Date(t.getTime() + k * 864e5));
+    const slider = CBPeriodSlider.create(host, { label: 'Perioada evenimentelor', from: add(MIN_DAYS), to: add(MAX_DAYS), today, onChange: r => { period.from = r.from; period.to = r.to; state.page = 0; render(); } });
+    const r0 = slider.range(); period.from = r0.from; period.to = r0.to;
+  }
   if (!all.length) { root.innerHTML = '<p class="evp-empty">Nu am putut încărca evenimentele acum. Reîncarcă pagina peste câteva minute.</p>'; return; }
   render();
   if (myArtists.length) loadFavorites();
