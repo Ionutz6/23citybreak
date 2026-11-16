@@ -11,7 +11,7 @@
 (async () => {
   const root = document.getElementById('evp-root');
   const E = window.CBEvents, H = E.helpers, esc = H.esc, FP = window.CBFlightPrice;
-  const PAGE = 12;
+  const PAGE = 10;
   // Cu cont, aeroportul de plecare și bugetul vin din cont (și pe un dispozitiv nou), nu doar din ce e salvat local.
   await window.Account?.syncPrefsToLocal?.();
   const readLS = k => { try { return JSON.parse(localStorage.getItem(k)) || {}; } catch { return {}; } };
@@ -40,7 +40,7 @@
   const state = {
     tab: E.CATEGORIES.some(([k]) => k === tabParam) ? tabParam : 'sport',
     sport: hasMine ? 'mine' : 'all', comp: 'all',
-    weekend: params.get('weekend') !== '0', inBudget: false,
+    weekend: false, inBudget: false,
     onlyFlights: false, onlyTop: !hasAirports, onlyNotable: true, shown: PAGE, open: new Set(),
   };
 
@@ -106,7 +106,7 @@
   //   - capacitatea maximă a sălilor din turneu (aproximativă, assets/venue-capacity.js): artiștii care umplu arene și stadioane urcă;
   //   - numărul de orașe din turneu; la festival, mărimea line-up-ului; popularitatea din baza noastră (rang Ticketmaster) ca departajare.
   // Diversitate: cel mult 2 carduri per oraș și 4 per țară (în afară de favorite). Formațiile tribut nu intră niciodată.
-  const MAX_MUSIC = 10;
+  const MAX_MUSIC = 30; // pagina 1 = top 10, „Arată încă 10” duce mai departe
   const cc = e => String(e.city_id || '').split('_').pop();
   const artistKey = e => norm(e.kind === 'festival' && (e.artists || []).length !== 1 ? e.title : e.artists?.[0] || e.title);
   const isTribute = e => TRIBUTE.test(e.title || '') || (e.artists || []).some(a => TRIBUTE.test(a));
@@ -132,7 +132,10 @@
     }
     return out;
   }
-  const HORIZON = H.isoAdd(today, 120);
+  // Interval afișat: de la peste 2 săptămâni (mai poți face un plan) până la ~2 luni. Favoriții (artist/echipă) și evenimentele curatoriate (sport, ex. Six Nations) pot fi și mai departe și urcă primele.
+  const MIN_DAYS = 14, MAX_DAYS = 60;
+  const MIN_DATE = H.isoAdd(today, MIN_DAYS), MAX_DATE = H.isoAdd(today, MAX_DAYS);
+  const inRange = e => H.endDate(e) >= MIN_DATE && (H.startDate(e) <= MAX_DATE || (e.source === 'curated' && e.kind === 'sport') || isFav(e) || isFavTeam(e));
   async function loadFavorites() {
     const api = E.api, have = new Set(all.map(e => e.id));
     const found = [];
@@ -185,7 +188,7 @@
   };
 
   // ---------- Filtre ----------
-  const inTab = () => all.filter(e => E.categoryOf(e) === state.tab).filter(e => e.source !== 'football-data' || H.startDate(e) <= HORIZON || isFavTeam(e)).filter(e => !state.weekend || E.isWeekend(e) || E.ANY_DAY.has(e.competition));
+  const inTab = () => all.filter(e => E.categoryOf(e) === state.tab).filter(inRange).filter(e => !state.weekend || E.isWeekend(e) || E.ANY_DAY.has(e.competition));
   const bySport = (list, s = state.sport) => state.tab !== 'sport' || s === 'all' ? list : s === 'mine' ? list.filter(isMine) : list.filter(e => sportOf(e) === s);
   // Cheia de competiție: liga, iar la sport fără ligă (ex. baschet din Ticketmaster) sportul însuși.
   const compKey = e => E.inferComp(e) || (state.tab === 'sport' ? `s:${sportOf(e)}` : e.kind);
@@ -205,7 +208,7 @@
   const n = (k, one, many) => `${k} ${k === 1 ? one : many}`;
   function catsHtml() {
     return `<div class="evp-cats" role="tablist" aria-label="Tip de eveniment">${E.CATEGORIES.map(([k, label]) => {
-      const c = all.filter(e => E.categoryOf(e) === k && (!state.weekend || E.isWeekend(e) || E.ANY_DAY.has(e.competition))).length;
+      const c = all.filter(e => E.categoryOf(e) === k && inRange(e) && (!state.weekend || E.isWeekend(e) || E.ANY_DAY.has(e.competition))).length;
       const [icon, sub] = CAT_META[k];
       return `<button type="button" role="tab" class="evp-cat" id="tab-${k}" aria-selected="${k === state.tab}" aria-controls="evp-panel" data-tab="${k}" tabindex="${k === state.tab ? 0 : -1}">
         <span class="evp-cat-icon" aria-hidden="true">${icon}</span>
@@ -263,9 +266,7 @@
         ${sportsHtml()}
         ${compsHtml()}
         <div class="evp-switches">
-          ${sw('weekend', 'Doar weekenduri', state.weekend)}
-          ${state.tab === 'music' ? sw('onlyNotable', `Doar artiști cunoscuți <small>top ${MAX_MUSIC}</small>`, state.onlyNotable) : ''}
-          ${sw('onlyFlights', `Doar cu zbor din ${esc(origin)}`, state.onlyFlights)}
+          ${state.tab === 'music' ? sw('onlyNotable', 'Doar artiști cunoscuți <small>top, câte 10</small>', state.onlyNotable) : ''}
           ${hasAirports ? '' : sw('onlyTop', 'Doar cele importante', state.onlyTop)}
           ${sw('inBudget', budget ? `Doar în bugetul meu <small>zbor ≤ ${budget} €</small>` : 'Doar în bugetul meu', state.inBudget, !budget)}
           ${budget ? '' : '<a class="evp-note" href="cont.html#preferinte">Setează-ți bugetul în Contul tău →</a>'}
