@@ -10,19 +10,30 @@ const priceRows = () => {
     r('City:london_gb', 20, { seen_at: old })];            // prea vechi: ignorat
 };
 
-test('zborurile ieftine: 3 orașe, prețul vizitatorului suprascrie cache-ul, fără cereri la Kiwi', async ({ page }) => {
-  const db = H.makeDb(); db.tables.route_prices = priceRows();
+test('idei de evadare: 3 destinații aleatorii până la 150 €, prețul vizitatorului suprascrie cache-ul, fără Kiwi', async ({ page }) => {
+  const db = H.makeDb(); db.tables.route_prices = [...priceRows(), { origin: 'OTP', dest: 'City:london_gb', out_date: H.iso(H.friday(2)), back_date: H.iso(H.addDays(H.friday(2), 2)), price_eur: 200, direct: true, source: 'travelpayouts', seen_at: new Date().toISOString() }];
   const st = await H.install(page, { db });
   await page.goto('/');
   const cards = page.locator('#hf-grid .hm-fl');
   await expect(cards).toHaveCount(3);
-  await expect(cards.nth(0)).toContainText('55 €');
-  await expect(cards.nth(1)).toContainText('70 €');
-  await expect(cards.nth(2)).toContainText('90 €');
-  await expect(cards.nth(0)).toHaveAttribute('href', /zboruri\.html\?dest=City%3Arome_it#configurator/);
-  expect(await cards.nth(0).evaluate(n => n.style.backgroundImage)).toContain('assets/guides-prague-style/800/roma.webp');
+  await expect(page.locator('#hf-title')).toContainText('Idei de evadare la weekend din București');
+  const first = await cards.allTextContents();
+  const prices = first.map(t => +/(\d+) €/.exec(t)[1]);
+  expect(prices.every(p => p <= 150)).toBe(true);
+  expect(first.join()).not.toMatch(/\b80 €|\b200 €|\b20 €/); // 80 e înlocuit de 55 (vizitator); 200 peste plafon; 20 prea vechi
+  expect(await cards.first().getAttribute('href')).toMatch(/zboruri\.html\?dest=City%3A\w+_\w+#configurator/);
   expect(st.kiwi.length).toBe(0);
   expect(H.realErrors(st)).toEqual([]);
+});
+
+test('utilizator logat: ideile de zbor respectă bugetul din profil', async ({ page }) => {
+  const db = H.makeDb({ search_preferences: [{ user_id: 'qa-user', departure_airports: ['OTP'], budget_max_eur: 75, city_mode: 'any', currency: 'EUR' }] });
+  db.tables.route_prices = priceRows();
+  await H.install(page, { db, session: true, localStorage: { '23cb-prefs': { departure_airports: ['OTP'], budget_max_eur: 75 } } });
+  await page.goto('/');
+  const cards = page.locator('#hf-grid .hm-fl');
+  await expect(cards).toHaveCount(3); // Roma 55 € și Viena 70 € în buget, completat cu Praga 90 €
+  await expect(cards.nth(2)).toContainText('90 €');
 });
 
 test('fără prețuri în baza de date, secțiunea de zboruri rămâne ascunsă', async ({ page }) => {
@@ -32,13 +43,13 @@ test('fără prețuri în baza de date, secțiunea de zboruri rămâne ascunsă'
   await expect(page.locator('#home-flights')).toBeHidden();
 });
 
-test('evenimentele: 3 carduri din următoarele 14–60 de zile, echipa preferată prima', async ({ page }) => {
+test('evenimentele: 3 carduri din următoarele 14–60 de zile, echipa preferată prima, fără mențiunea „preferată” pe card', async ({ page }) => {
   const st = await H.install(page, { localStorage: { '23cb-event-prefs': { favorite_teams: ['Juventus'] } } });
   await page.goto('/');
   const titles = page.locator('#he-grid .ev-card h3');
   await expect(titles.first()).toContainText('Roma');
   expect(await titles.count()).toBeLessThanOrEqual(3);
-  await expect(page.locator('#he-grid')).toContainText('Echipa ta preferată');
+  await expect(page.locator('#he-grid')).not.toContainText('preferată');
   expect(H.realErrors(st)).toEqual([]);
 });
 
@@ -70,4 +81,124 @@ test('Jurnalul e pe Orașe vizitate, iar jurnal.html rămâne publicat', async (
   await expect(page.locator('#jurnal')).toContainText('Praga în 2 zile');
   await page.goto('/jurnal.html');
   await expect(page.locator('h1')).toContainText('Jurnal');
+});
+
+test('aeroportul din profil: „Idei de evadare la weekend din Valencia”', async ({ page }) => {
+  const db = H.makeDb(); db.tables.route_prices = priceRows().map(r => ({ ...r, origin: 'VLC' }));
+  await H.install(page, { db, localStorage: { '23cb-prefs': { departure_airports: ['VLC'] } } });
+  await page.goto('/');
+  await expect(page.locator('#hf-grid .hm-fl')).toHaveCount(3);
+  await expect(page.locator('#hf-title')).toContainText('din Valencia');
+});
+
+test('aeroport din profil fără prețuri: arată București, cu mențiune', async ({ page }) => {
+  const db = H.makeDb(); db.tables.route_prices = priceRows();
+  await H.install(page, { db, localStorage: { '23cb-prefs': { departure_airports: ['VLC'] } } });
+  await page.goto('/');
+  await expect(page.locator('#hf-title')).toContainText('din București');
+  await expect(page.locator('#hf-note')).toContainText('Încă nu avem prețuri din Valencia');
+});
+
+test('numele orașului din hero e alb', async ({ page }) => {
+  await H.install(page);
+  await page.goto('/');
+  expect(await page.locator('#hero-city').evaluate(n => getComputedStyle(n).color)).toBe('rgb(255, 255, 255)');
+});
+
+test('bannerul Orașe vizitate: utilizator logat vede nivelul și textul pe nivel, cu CTA către quiz', async ({ page }) => {
+  const ids = ['rome_it', 'paris_fr', 'prague_cz', 'vienna_at', 'madrid_es', 'berlin_de'];
+  const db = H.makeDb({ visited_cities: ids.map(city_id => ({ user_id: 'qa-user', city_id })) });
+  await H.install(page, { db, session: true });
+  await page.goto('/');
+  await expect(page.locator('#hc-kick')).toContainText('Călător de weekend');
+  await expect(page.locator('#hc-title')).toContainText('6 orașe europene');
+  await expect(page.locator('#hc-prog-text')).toContainText('Încă 6 orașe până la „Explorator”');
+  await expect(page.locator('.hm-cta a[href="orase-vizitate.html#city-quiz"]')).toBeVisible();
+});
+
+test('headerul negru are aceeași lățime, înălțime și colțuri pe Acasă, Zboruri și Evenimente', async ({ page }) => {
+  const read = sel => page.evaluate(s => { const n = document.querySelector(s), c = getComputedStyle(n), r = n.getBoundingClientRect(); return { w: Math.round(r.width), h: Math.round(r.height), br: c.borderBottomLeftRadius, bt: c.borderTopLeftRadius }; }, sel);
+  await H.install(page);
+  await page.setViewportSize({ width: 1440, height: 900 });
+  const out = [];
+  for (const [url, sel] of [['/', '.hero'], ['/zboruri.html', '.page-hero'], ['/evenimente.html', '.evp-hero']]) { await page.goto(url); out.push(await read(sel)); }
+  for (const o of [out[1], out[2]]) { expect(Math.abs(o.w - out[0].w)).toBeLessThanOrEqual(3); expect(Math.abs(o.h - out[0].h)).toBeLessThanOrEqual(3); expect(o.br).toBe(out[0].br); }
+  expect(out[0].br).toBe('28px');
+});
+
+test('hero Zboruri/Evenimente: carusel cu poze Commons, credit în pagină, text deasupra', async ({ page }) => {
+  await H.install(page);
+  const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==', 'base64');
+  await page.route('https://commons.wikimedia.org/w/api.php**', route => {
+    const titles = new URL(route.request().url()).searchParams.get('titles').split('|');
+    const pages = Object.fromEntries(titles.map((t, i) => [i, { title: t, imageinfo: [{ thumburl: `https://upload.wikimedia.org/qa/${i}.png`, descriptionurl: `https://commons.wikimedia.org/wiki/${encodeURIComponent(t)}`, extmetadata: { Artist: { value: '<a>Autor Test</a>' }, LicenseShortName: { value: 'CC BY-SA 4.0' } } }] }]));
+    route.fulfill({ status: 200, contentType: 'application/json', headers: { 'access-control-allow-origin': '*' }, body: JSON.stringify({ query: { pages } }) });
+  });
+  await page.route('https://upload.wikimedia.org/**', route => route.fulfill({ status: 200, contentType: 'image/png', headers: { 'access-control-allow-origin': '*' }, body: png }));
+  for (const [url, sel, n] of [['/zboruri.html', '.page-hero', 3], ['/evenimente.html', '.evp-hero', 3]]) {
+    await page.goto(url);
+    await expect(page.locator(`${sel} > div[aria-hidden]`).first()).toHaveCSS('opacity', '1');
+    await expect(page.locator('#photo-credit-list li')).toHaveCount(n);
+    await expect(page.locator('#photo-credit-list')).toContainText('Autor Test · CC BY-SA 4.0');
+    await expect(page.locator(`${sel} h1`)).toBeVisible();
+  }
+});
+
+test('evenimente Acasă: doar vineri–duminică, fără excepții (nici Champions League), cu prețul zborului din weekendul evenimentului', async ({ page }) => {
+  const f3 = H.friday(3), at = (d, t) => `${H.iso(d)}T${t}:00Z`;
+  const base = { venue: null, ends_at: null, time_tbc: false, artists: [], teams: [], genres: [], competition: null, price_min_eur: null, ticket_url: null, image_url: null, popularity: 95, source: 'football-data', kind: 'football' };
+  const events = [
+    { ...base, id: 'fd:sat', title: 'AS Roma – Juventus FC', city_id: 'rome_it', starts_at: at(H.addDays(f3, 1), '19:45'), teams: ['AS Roma', 'Juventus FC'], competition: 'SA' },
+    { ...base, id: 'fd:cl', title: 'Real Madrid CF – FC Bayern', city_id: 'madrid_es', starts_at: at(H.addDays(f3, -3), '20:00'), teams: ['Real Madrid CF', 'FC Bayern'], competition: 'CL' }, // marți
+    { ...base, id: 'fd:el', title: 'Olympiacos – Partizan', city_id: 'athens_gr', starts_at: at(H.addDays(f3, -1), '20:00'), competition: 'EL', kind: 'sport' },        // joi
+  ];
+  const db = H.makeDb(); const out = H.iso(f3), back = H.iso(H.addDays(f3, 2));
+  db.tables.route_prices = [{ origin: 'OTP', dest: 'City:rome_it', out_date: out, back_date: back, price_eur: 77, direct: true, source: 'travelpayouts', seen_at: new Date().toISOString() }];
+  await H.install(page, { db, events });
+  await page.goto('/');
+  await expect(page.locator('#he-grid .ev-card')).toHaveCount(1);
+  await expect(page.locator('#he-grid')).toContainText('Roma');
+  await expect(page.locator('#he-grid')).not.toContainText('Real Madrid');
+  await expect(page.locator('#he-grid')).not.toContainText('Olympiacos');
+  await expect(page.locator('#he-grid .ev-flight')).toContainText('77 €'); await expect(page.locator('#he-grid .ev-flight')).toContainText('zbor din București');
+});
+
+test('evenimente Acasă: cardurile se ordonează crescător după prețul zborului, cele fără preț la coadă', async ({ page }) => {
+  const f3 = H.friday(3), at = (d, t) => `${H.iso(d)}T${t}:00Z`;
+  const base = { venue: null, ends_at: null, time_tbc: false, artists: [], teams: [], genres: [], competition: null, price_min_eur: null, ticket_url: null, image_url: null, popularity: 95, source: 'football-data', kind: 'football' };
+  const events = [
+    { ...base, id: 'fd:roma', title: 'AS Roma – Juventus FC', city_id: 'rome_it', starts_at: at(H.addDays(f3, 1), '19:45'), teams: ['AS Roma', 'Juventus FC'], competition: 'SA', popularity: 99 },
+    { ...base, id: 'fd:vie', title: 'Rapid Wien – Sturm Graz', city_id: 'vienna_at', starts_at: at(H.addDays(f3, 1), '17:00'), teams: ['Rapid Wien', 'Sturm Graz'], competition: 'EL', kind: 'sport', popularity: 90 },
+    { ...base, id: 'fd:mad', title: 'Concert Madrid', city_id: 'madrid_es', kind: 'concert', source: 'curated', starts_at: at(H.addDays(f3, 1), '21:00'), artists: ['Artist Madrid'], popularity: 80 },
+  ];
+  const db = H.makeDb(); const out = H.iso(f3), back = H.iso(H.addDays(f3, 2)), seen = new Date().toISOString();
+  db.tables.route_prices = [
+    { origin: 'OTP', dest: 'City:rome_it', out_date: out, back_date: back, price_eur: 120, direct: true, source: 'travelpayouts', seen_at: seen },
+    { origin: 'OTP', dest: 'City:vienna_at', out_date: out, back_date: back, price_eur: 59, direct: true, source: 'travelpayouts', seen_at: seen },
+  ];
+  await H.install(page, { db, events });
+  await page.goto('/');
+  const cards = page.locator('#he-grid .ev-card');
+  await expect(cards).toHaveCount(3);
+  await expect(cards.nth(0)).toContainText('59 €');
+  await expect(cards.nth(1)).toContainText('120 €');
+  await expect(cards.nth(2)).toContainText('Madrid'); // fără preț, la coadă
+});
+
+test('evenimente Acasă: un singur rând de 3, cele mai ieftine după zbor, cu prețul mare auriu', async ({ page }) => {
+  const f3 = H.friday(3), at = (d, t) => `${H.iso(d)}T${t}:00Z`;
+  const base = { venue: null, ends_at: null, time_tbc: false, artists: [], teams: [], genres: [], competition: null, price_min_eur: null, ticket_url: null, image_url: null, popularity: 90, source: 'curated', kind: 'concert' };
+  const city = (id, c, kind) => ({ ...base, id, kind, title: `Eveniment ${c}`, city_id: c, starts_at: at(H.addDays(f3, 1), '20:00'), artists: ['A ' + c], teams: kind === 'football' ? ['X', 'Y'] : [], competition: kind === 'football' ? 'SA' : null });
+  const events = [city('e1', 'rome_it', 'concert'), city('e2', 'vienna_at', 'football'), city('e3', 'prague_cz', 'sport'), city('e4', 'madrid_es', 'festival')];
+  const db = H.makeDb(); const out = H.iso(f3), back = H.iso(H.addDays(f3, 2)), seen = new Date().toISOString();
+  db.tables.route_prices = [['rome_it', 140], ['vienna_at', 60], ['prague_cz', 95], ['madrid_es', 80]].map(([c, p]) => ({ origin: 'OTP', dest: `City:${c}`, out_date: out, back_date: back, price_eur: p, direct: true, source: 'travelpayouts', seen_at: seen }));
+  await H.install(page, { db, events });
+  await page.goto('/');
+  const cards = page.locator('#he-grid .ev-card');
+  await expect(cards).toHaveCount(3);
+  await expect(cards.nth(0)).toContainText('60 €');
+  await expect(cards.nth(1)).toContainText('80 €');
+  await expect(cards.nth(2)).toContainText('95 €');
+  expect(await cards.nth(0).locator('.ev-fp b').evaluate(n => getComputedStyle(n).color)).toBe('rgb(223, 166, 73)');
+  expect(await page.locator('#he-grid').evaluate(n => getComputedStyle(n).gridTemplateColumns.split(' ').length)).toBe(3);
 });

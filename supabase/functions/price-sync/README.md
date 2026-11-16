@@ -27,3 +27,7 @@ Fără token, Home folosește doar prețurile `visitor`; până sunt cel puțin 
 ## Teste
 
 `node --experimental-strip-types --test supabase/functions/price-sync/prices.test.ts`
+
+## Alt aeroport de plecare
+
+`?origin=CLJ` (sau `VLC`, `MUC`...) înlocuiește `PRICE_ORIGINS` pentru acea rulare; folosește-l în joburi cron separate, câte unul per aeroport. Home arată prețuri din aeroportul din profil doar dacă există cel puțin 3 orașe cu preț; altfel arată București, cu mențiune.
