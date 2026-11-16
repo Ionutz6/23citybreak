@@ -327,3 +327,9 @@ body.evp .site-footer{margin-top:auto}
 .pk-row.pk-total{background:#f6f1e3;border:1px solid #ecd8b0;border-radius:10px;padding:12px;margin-top:6px}.pk-row.pk-total .pr{color:#143d2a}
 /* Pastilele de sport centrate pe orizontală (pe telefon rămân derulabile) */
 @media(min-width:601px){.evp-row-nolabel .evp-pills{flex:1 1 auto;justify-content:center}}
+
+/* Chenar negru subțire (1 px), fundal transparent (2026-11-16) */
+.evp-period > div{border:1px solid #111;background:transparent;border-radius:20px}
+.evp-cat{border-width:1px;border-color:#111}
+.evp-cat[aria-selected=true]{border-color:#111}
+.evp-panel-top{border:1px solid #111;background:transparent}

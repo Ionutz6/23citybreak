@@ -121,3 +121,7 @@
 @media(max-width:600px){
   .compact-step .step-fields,.compact-step .option-fields{grid-template-columns:1fr 1fr}
 }
+
+/* Chenar negru subțire (1 px), fundal transparent (2026-11-16) */
+.compact-step{border:1px solid #111;background:transparent}
+.period-section{border:1px solid #111;border-radius:20px;padding:14px 16px;margin-top:16px;background:transparent}
