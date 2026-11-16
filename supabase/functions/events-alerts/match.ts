@@ -41,11 +41,33 @@ const OTHER_KIND: Record<string, string[]> = { festival: ["festival"], xmas_mark
 // Numele favorit apare ca cuvinte întregi în text (ca „Real Madrid” în „Real Madrid CF”, nu „Roma” în „Romania”).
 const hasName = (hay: string, name: string) => { const n = norm(name); return n.length >= 3 && ` ${hay} `.includes(` ${n} `); };
 
+// Echipa favorită = exact echipa din meci („Barcelona” nu prinde „RCD Espanyol de Barcelona”). Copie a assets/team-match.js.
+const GENERIC = new Set("fc cf ac as rcd cd ud sd sc sv ssc fk bv vfl vfb tsg fsv rb club de del da di do la le the real calcio football afc 1 04 05 09 96 1899 1846 1910".split(" "));
+const CITIES = new Set("madrid barcelona munchen munich milano milan roma rome napoli torino turin paris marseille lyon london londra manchester liverpool amsterdam lisboa lisbon porto sevilla seville valencia bilbao dortmund berlin hamburg koln cologne frankfurt stuttgart leipzig bremen lille nice".split(" "));
+const ALIAS: [RegExp, string][] = [
+  [/\binternazionale\b|\binter milan\b|\binter milano\b/, "inter"], [/\batletico\b|\batleti\b/, "atletico madrid"],
+  [/\bpsg\b|\bparis saint germain\b|\bparis sg\b/, "paris saint germain"], [/\bman utd\b|\bman united\b/, "manchester united"], [/\bman city\b/, "manchester city"],
+  [/\bspurs\b/, "tottenham"], [/\bbarca\b/, "barcelona"], [/\bbayern munchen\b|\bbayern munich\b/, "bayern"], [/\bjuve\b/, "juventus"],
+];
+const teamTokens = (name: string) => {
+  let n = norm(name);
+  for (const [rx, to] of ALIAS) if (rx.test(n)) { n = to; break; }
+  return n.split(" ").filter((w) => w && !GENERIC.has(w));
+};
+export const matchesTeam = (fav: string, team: string): boolean => {
+  const f = teamTokens(fav), t = teamTokens(team);
+  if (!f.length || !t.length || !f.every((w) => t.includes(w))) return false;
+  return t.filter((w) => !f.includes(w)).every((w) => CITIES.has(w));
+};
+
 // De ce se potrivește un eveniment: prioritate 3 = artist/echipă favorită, 2 = competiție, 1 = sport, gen sau alt motiv; 0 = deloc.
 export function matchEvent(e: Ev, p: Prefs): { score: number; why: string } {
   const hay = norm([e.title, ...(e.artists || []), ...(e.teams || [])].join(" "));
   for (const a of p.favorite_artists || []) if (hasName(hay, a)) return { score: 3, why: a };
-  for (const t of p.favorite_teams || []) if (hasName(hay, t)) return { score: 3, why: t };
+  for (const t of p.favorite_teams || []) {
+    // Cu echipele meciului cunoscute, potrivire exactă pe echipă; altfel (fără teams) pe cuvintele din titlu.
+    if ((e.teams || []).length ? e.teams.some((x) => matchesTeam(t, x)) : hasName(norm(e.title), t)) return { score: 3, why: t };
+  }
   if (e.competition && (p.competitions || []).includes(e.competition)) return { score: 2, why: e.competition };
   const sp = sportOf(e);
   if (sp && (p.sports || []).includes(sp)) return { score: 1, why: sp };

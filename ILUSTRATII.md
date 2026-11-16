@@ -4,6 +4,80 @@ Se adaugă numele obiectivelor direct pe hărțile existente, în stilul aprobat
 
 ## Actualizate și publicate
 
+- Brașov
+
+- Erevan
+
+- Kutaisi
+
+- Tbilisi
+
+- Bodrum
+
+- İzmir
+
+- Oradea
+
+- Bacău
+
+- Craiova
+
+- Suceava
+
+- Sibiu
+
+- Iași
+
+- Timișoara
+
+- Malta
+
+- Paphos
+
+- Larnaca
+
+- Burgas
+
+- Varna
+
+- Tirana
+
+- Skopje
+
+- Tivat
+
+- Podgorica
+
+- Sarajevo
+
+- Pula
+
+- Zadar
+
+- Zagreb
+
+- Praga
+
+- Poznań
+
+- Wrocław
+
+- Katowice
+
+- Kaunas
+
+- Reykjavík
+
+- Rovaniemi
+
+- Tromsø
+- Bergen
+- Malmö
+- Göteborg
+- Luxemburg
+- Graz
+- Innsbruck
+- Salzburg
 - Zakynthos
 - Mykonos
 - Santorini
@@ -44,7 +118,6 @@ Se adaugă numele obiectivelor direct pe hărțile existente, în stilul aprobat
 - Basel
 - Antalya
 - Alicante
-
 - Roma
 - Barcelona
 - Paris
@@ -227,3 +300,100 @@ Santorini: originalul fără etichete pentru quiz este `ilustratii-orase/santori
 Mykonos: originalul fără etichete pentru quiz este `ilustratii-orase/mykonos_gr.webp`, iar harta cu obiective este `assets/guides-prague-style/mykonos.webp`.
 
 Zakynthos: originalul fără etichete pentru quiz este `ilustratii-orase/zakynthos_gr.webp`, iar harta cu obiective este `assets/guides-prague-style/zakynthos.webp`.
+
+Salzburg: originalul fără etichete pentru quiz este `ilustratii-orase/salzburg_at.webp`, iar harta cu obiective este `assets/guides-prague-style/salzburg.webp`.
+
+Innsbruck: originalul fără etichete pentru quiz este `ilustratii-orase/innsbruck_at.webp`, iar harta cu obiective este `assets/guides-prague-style/innsbruck.webp`.
+
+Graz: originalul fără etichete pentru quiz este `ilustratii-orase/graz_at.webp`, iar harta cu obiective este `assets/guides-prague-style/graz.webp`.
+
+Luxemburg: originalul fără etichete pentru quiz este `ilustratii-orase/luxembourg_lu.webp`, iar harta cu obiective este `assets/guides-prague-style/luxembourg.webp`.
+
+Göteborg: originalul fără etichete pentru quiz este `ilustratii-orase/gothenburg_se.webp`, iar harta cu obiective este `assets/guides-prague-style/gothenburg.webp`.
+
+Malmö: originalul fără etichete pentru quiz este `ilustratii-orase/malmo_se.webp`, iar harta cu obiective este `assets/guides-prague-style/malmo.webp`.
+
+Bergen: originalul fără etichete pentru quiz este `ilustratii-orase/bergen_no.webp`, iar harta cu obiective este `assets/guides-prague-style/bergen.webp`.
+
+Tromsø: originalul fără etichete pentru quiz este `ilustratii-orase/tromso_no.webp`, iar harta cu obiective este `assets/guides-prague-style/tromso.webp`.
+
+Rovaniemi: originalul fără etichete pentru quiz este `ilustratii-orase/rovaniemi_fi.webp`, iar harta cu obiective este `assets/guides-prague-style/rovaniemi.webp`.
+
+Reykjavík: originalul fără etichete pentru quiz este `ilustratii-orase/reykjavik_is.webp`, iar harta cu obiective este `assets/guides-prague-style/reykjavik.webp`.
+
+Kaunas: originalul fără etichete pentru quiz este `ilustratii-orase/kaunas_lt.webp`, iar harta cu obiective este `assets/guides-prague-style/kaunas.webp`.
+
+Katowice: originalul fără etichete pentru quiz este `ilustratii-orase/katowice_pl.webp`, iar harta cu obiective este `assets/guides-prague-style/katowice.webp`.
+
+Wrocław: originalul fără etichete pentru quiz este `ilustratii-orase/wroclaw_pl.webp`, iar harta cu obiective este `assets/guides-prague-style/wroclaw.webp`.
+
+Poznań: originalul fără etichete pentru quiz este `ilustratii-orase/poznan_pl.webp`, iar harta cu obiective este `assets/guides-prague-style/poznan.webp`.
+
+Praga: originalul fără etichete pentru quiz este `ilustratii-orase/prague_cz.webp`, iar harta cu obiective este `assets/guides-prague-style/prague.webp`.
+
+Zagreb: originalul fără etichete pentru quiz este `ilustratii-orase/zagreb_hr.webp`, iar harta cu obiective este `assets/guides-prague-style/zagreb.webp`.
+
+Zadar: originalul fără etichete pentru quiz este `ilustratii-orase/zadar_hr.webp`, iar harta cu obiective este `assets/guides-prague-style/zadar.webp`.
+
+Pula: originalul fără etichete pentru quiz este `ilustratii-orase/pula_hr.webp`, iar harta cu obiective este `assets/guides-prague-style/pula.webp`.
+
+Sarajevo: originalul fără etichete pentru quiz este `ilustratii-orase/sarajevo_ba.webp`, iar harta cu obiective este `assets/guides-prague-style/sarajevo.webp`.
+
+Podgorica: originalul fără etichete pentru quiz este `ilustratii-orase/podgorica_me.webp`, iar harta cu obiective este `assets/guides-prague-style/podgorica.webp`.
+
+Tivat: originalul fără etichete pentru quiz este `ilustratii-orase/tivat_me.webp`, iar harta cu obiective este `assets/guides-prague-style/tivat.webp`.
+
+Skopje: originalul fără etichete pentru quiz este `ilustratii-orase/skopje_mk.webp`, iar harta cu obiective este `assets/guides-prague-style/skopje.webp`.
+
+Tirana: originalul fără etichete pentru quiz este `ilustratii-orase/tirana_al.webp`, iar harta cu obiective este `assets/guides-prague-style/tirana.webp`.
+
+Varna: originalul fără etichete pentru quiz este `ilustratii-orase/varna_bg.webp`, iar harta cu obiective este `assets/guides-prague-style/varna.webp`.
+
+Burgas: originalul fără etichete pentru quiz este `ilustratii-orase/burgas_bg.webp`, iar harta cu obiective este `assets/guides-prague-style/burgas.webp`.
+
+Larnaca: originalul fără etichete pentru quiz este `ilustratii-orase/larnaca_cy.webp`, iar harta cu obiective este `assets/guides-prague-style/larnaca.webp`.
+
+
+Paphos: originalul fără etichete pentru quiz este `ilustratii-orase/paphos_cy.webp`, iar harta cu obiective este `assets/guides-prague-style/paphos.webp`.
+
+
+Malta: originalul fără etichete pentru quiz este `ilustratii-orase/luqa_mt.webp`, iar harta cu obiective este `assets/guides-prague-style/malta.webp`.
+
+
+Timișoara: originalul fără etichete pentru quiz este `ilustratii-orase/timisoara_ro.webp`, iar harta cu obiective este `assets/guides-prague-style/timisoara.webp`.
+
+
+Iași: originalul fără etichete pentru quiz este `ilustratii-orase/iasi_ro.webp`, iar harta cu obiective este `assets/guides-prague-style/iasi.webp`.
+
+
+Sibiu: originalul fără etichete pentru quiz este `ilustratii-orase/sibiu_ro.webp`, iar harta cu obiective este `assets/guides-prague-style/sibiu.webp`.
+
+
+Suceava: originalul fără etichete pentru quiz este `ilustratii-orase/suceava_ro.webp`, iar harta cu obiective este `assets/guides-prague-style/suceava.webp`.
+
+
+Craiova: originalul fără etichete pentru quiz este `ilustratii-orase/craiova_ro.webp`, iar harta cu obiective este `assets/guides-prague-style/craiova.webp`.
+
+
+Bacău: originalul fără etichete pentru quiz este `ilustratii-orase/bacau_ro.webp`, iar harta cu obiective este `assets/guides-prague-style/bacau.webp`.
+
+
+Oradea: originalul fără etichete pentru quiz este `ilustratii-orase/oradea_ro.webp`, iar harta cu obiective este `assets/guides-prague-style/oradea.webp`.
+
+
+İzmir: originalul fără etichete pentru quiz este `ilustratii-orase/izmir_tr.webp`, iar harta cu obiective este `assets/guides-prague-style/izmir.webp`.
+
+
+Bodrum: originalul fără etichete pentru quiz este `ilustratii-orase/bodrum_tr.webp`, iar harta cu obiective este `assets/guides-prague-style/bodrum.webp`.
+
+
+Tbilisi: originalul fără etichete pentru quiz este `ilustratii-orase/tbilisi_ge.webp`, iar harta cu obiective este `assets/guides-prague-style/tbilisi.webp`.
+
+
+Kutaisi: originalul fără etichete pentru quiz este `ilustratii-orase/kutaisi_ge.webp`, iar harta cu obiective este `assets/guides-prague-style/kutaisi.webp`.
+
+
+Erevan: originalul fără etichete pentru quiz este `ilustratii-orase/yerevan_am.webp`, iar harta cu obiective este `assets/guides-prague-style/yerevan.webp`.
+
+
+Brașov: originalul fără etichete pentru quiz este `ilustratii-orase/brasov_ro.webp`, iar harta cu obiective este `assets/guides-prague-style/brasov.webp`.

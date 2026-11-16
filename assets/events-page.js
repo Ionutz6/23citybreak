@@ -102,6 +102,7 @@
   const isFav = e => !TRIBUTE.test(e.title || '') && favNames.some(f => (e.artists || []).some(a => norm(a) === f && !TRIBUTE.test(a))) ? 1 : 0;
   // Echipe preferate: meciurile lor (max 2) urcă primele la Sport, chiar dacă sunt peste cele 120 de zile.
   const favTeams = myTeams.map(norm).filter(Boolean);
+<<<<<<< HEAD
   const isFavTeam = e => favTeams.length && (e.teams || []).some(t => favTeams.some(f => ` ${norm(t)} `.includes(` ${f} `))) ? 1 : 0;
   // Muzică: doar concerte și festivaluri cu interes pentru publicul larg, nu o trupă locală într-un orășel. Un concert/festival e „cunoscut” dacă:
   //  1) artistul cântă în cel puțin 2 țări (sau 3 orașe) în datele noastre, adică are turneu internațional;
@@ -125,6 +126,10 @@
     if (r && (r.countries.size >= 2 || r.cities.size >= 3)) return true;
     return STADIUM.test(e.venue || '');
   };
+=======
+  const TM = window.CBTeamMatch; // potrivire exactă pe echipă (FC Barcelona ≠ Espanyol), nu pe oraș
+  const isFavTeam = e => myTeams.length && (e.teams || []).some(t => myTeams.some(f => TM.matchesTeam(f, t))) ? 1 : 0;
+>>>>>>> origin/main
   const HORIZON = H.isoAdd(today, 120);
   async function loadFavorites() {
     const api = E.api, have = new Set(all.map(e => e.id));
