@@ -1,0 +1,57 @@
+/* Ghidul de weekend deschis din cardurile de zbor (Acasă și Zboruri). Negru, auriu, verde. */
+.fg-ov{position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.75);display:none;align-items:center;justify-content:center;padding:12px}
+.fg-ov.open{display:flex}
+.fg-dlg{background:#fff;border:1px solid #ecd8b0;border-radius:24px;width:100%;max-width:1100px;max-height:94vh;display:flex;flex-direction:column;overflow:hidden;font-family:'Source Sans 3',system-ui,sans-serif;color:#0a0b0d;text-align:left}
+.fg-ban{position:relative;min-height:190px;background:#202b34 center/cover;color:#fff;padding:18px;display:flex;flex-direction:column;justify-content:space-between;flex:none}
+.fg-ban::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,11,13,.35),rgba(10,11,13,.85))}
+.fg-ban>*{position:relative}
+.fg-badge{align-self:flex-start;font:700 11px 'Space Grotesk',system-ui,sans-serif;color:#dfa649;background:rgba(0,0,0,.7);border:1px solid rgba(223,166,73,.4);border-radius:8px;padding:5px 10px}
+.fg-x{position:absolute!important;right:16px;top:16px;width:34px;height:34px;border-radius:50%;border:1px solid rgba(255,255,255,.25);background:rgba(0,0,0,.7);color:#fff;cursor:pointer;font-size:14px}
+.fg-ban h2{margin:0;font:700 32px 'Space Grotesk',system-ui,sans-serif;color:#fff;letter-spacing:-.02em}
+.fg-ct{font-size:13px;color:#cbd5e1}
+.fg-body{overflow-y:auto;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.95fr)}
+.fg-body.one{grid-template-columns:minmax(0,1fr);max-width:640px;margin:0 auto;width:100%}
+.fg-left{padding:20px;display:grid;gap:14px;align-content:start}
+.fg-right{padding:22px;background:#f4eee1;border-left:1px solid #e6d8c1;min-width:0}
+.fg-box{border-radius:18px;padding:16px;border:1px solid #ecd8b0;background:#fbf9f4}
+.fg-box h4{margin:0 0 8px;font:700 12px 'Space Grotesk',system-ui,sans-serif;text-transform:uppercase;letter-spacing:.07em;color:#8a5d14}
+.fg-buy{background:#0a0b0d;color:#fff;border-color:#0a0b0d}
+.fg-buy h4{color:#dfa649}
+.fg-big{font:700 40px/1 'Space Grotesk',system-ui,sans-serif;color:#dfa649}
+.fg-big small{font:400 13px 'Source Sans 3',system-ui,sans-serif;color:#cbd5e1;margin-left:6px}
+.fg-legs{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}
+.fg-leg{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:10px;font-size:13px}
+.fg-leg b{display:block;color:#dfa649;font-size:12px;margin-bottom:2px}
+.fg-meta{font-size:12px;color:#cbd5e1;margin-bottom:12px}
+.fg-cta{display:block;text-align:center;background:#dfa649;color:#0a0b0d;font:700 16px 'Space Grotesk',system-ui,sans-serif;border-radius:14px;padding:14px;text-decoration:none}
+.fg-cta:hover{background:#c98f33}
+.fg-alt{display:block;text-align:center;color:#cbd5e1;font-size:12px;margin-top:8px}
+.fg-est{display:grid;gap:6px;font-size:14px}
+.fg-est div{display:flex;justify-content:space-between;gap:12px}
+.fg-est .tot{border-top:1px solid #ecd8b0;padding-top:8px;font-weight:700}
+.fg-est .tot span:last-child{color:#1f7a50}
+.fg-two{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.fg-btn{border:1px solid #ecd8b0;background:#fff;border-radius:12px;padding:10px;text-align:center;font-weight:700;font-size:13px;color:#0a0b0d;text-decoration:none;cursor:pointer;font-family:inherit}
+.fg-btn:hover{border-color:#2e9d68;color:#1f7a50}
+.fg-wa{background:#2e9d68;border-color:#2e9d68;color:#fff}
+.fg-wa:hover{background:#1f7a50;color:#fff}
+.fg-fine{font-size:12px;color:#5b6573;margin:10px 0 0}
+.fg-ev{display:grid;gap:8px}
+.fg-ev a{display:block;border:1px solid #ecd8b0;background:#fff;border-radius:12px;padding:10px 12px;color:#0a0b0d;font-weight:700;text-decoration:none;font-size:14px}
+.fg-ev a:hover{border-color:#dfa649}
+.fg-simp{background:#eef7f1;border:1px dashed #2e9d68;border-radius:14px;padding:12px;font-size:13px;color:#1b4d33}
+.fg-map h3{margin:0 0 6px;font:700 18px 'Space Grotesk',system-ui,sans-serif}
+.fg-map img{width:100%;border-radius:12px;display:block}
+.fg-map ol{padding:0;list-style:none;display:grid;gap:10px;margin:14px 0 0}
+.fg-map li{display:grid;grid-template-columns:28px 1fr;gap:10px;font-size:13px}
+.fg-map li i{width:26px;height:26px;border-radius:50%;background:#0a0b0d;color:#dfa649;display:grid;place-items:center;font:700 12px 'Space Grotesk',system-ui,sans-serif;font-style:normal}
+.fg-map li small{display:block;color:#5b6573}
+.fg-day{margin-top:12px;border:1px solid #dac8ab;border-radius:12px;background:#fbf3e4;padding:12px;font-size:14px}
+.fg-day strong{display:block;font-family:'Space Grotesk',system-ui,sans-serif}
+.fg-day a{color:#79511b;font-weight:700}
+.fg-foot{padding:14px 20px;background:#fbf9f4;border-top:1px solid #ecd8b0;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;flex:none}
+.fg-jr{background:#0a0b0d;color:#dfa649;border-radius:12px;padding:10px 16px;font:700 13px 'Space Grotesk',system-ui,sans-serif;text-decoration:none}
+.fg-cl{background:#fff;border:1px solid #dce1e7;border-radius:12px;padding:10px 16px;font-weight:700;cursor:pointer;color:#475569;font-family:inherit}
+.fg-ov a:focus-visible,.fg-ov button:focus-visible{outline:3px solid #2e9d68;outline-offset:2px}
+@media(max-width:760px){.fg-body{grid-template-columns:minmax(0,1fr)}.fg-right{border-left:0;border-top:1px solid #e6d8c1}.fg-ban h2{font-size:26px}}
+[data-guide-card] .ev-badge{top:14px;cursor:default}

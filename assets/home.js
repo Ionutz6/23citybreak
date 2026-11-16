@@ -62,9 +62,14 @@
     document.getElementById('hf-grid').innerHTML = top.map(r => {
       const slug = r.dest.replace(/^City:/, ''), g = window.CB_ILLUSTRATED_GUIDES[r.dest], c = H.cityOf(slug);
       const img = `assets/guides-prague-style/800/${g.image}.webp`, img2 = `assets/guides-prague-style/${g.image}.webp`; // a doua e rezerva, dacă lipsește varianta de 800 px
-      return `<a class="hm-fl" href="zboruri.html?dest=${encodeURIComponent(r.dest)}#configurator" style="background-image:url('${esc(img)}'),url('${esc(img2)}')" aria-label="${esc(`${g.city || H.cityName(slug)}, de la ${r.price_eur} €`)}"><span class="hm-tag">${r.direct ? 'Direct' : 'Zbor'}</span><div class="hm-in"><div><h3>${esc(g.city || H.cityName(slug))}</h3><small>${c?.country ? `${esc(c.country)} · ` : ''}${esc(H.rangeLabel(r.out_date, r.back_date))}</small></div><div class="hm-price"><b>${r.price_eur} €</b><span>dus-întors / pers.</span></div></div></a>`;
+      const gd = { cityId: r.dest, city: g.city || H.cityName(slug), country: c?.country || '', iata: c?.iata || '', origin, out: r.out_date, back: r.back_date, price: r.price_eur, direct: !!r.direct };
+      return `<button type="button" class="hm-fl" data-flight-guide="${esc(JSON.stringify(gd))}" style="background-image:url('${esc(img)}'),url('${esc(img2)}')" aria-label="${esc(`${g.city || H.cityName(slug)}, de la ${r.price_eur} €. Deschide ghidul de weekend`)}"><span class="hm-tag">${r.direct ? 'Direct' : 'Zbor'}</span><div class="hm-in"><div><h3>${esc(g.city || H.cityName(slug))}</h3><small>${c?.country ? `${esc(c.country)} · ` : ''}${esc(H.rangeLabel(r.out_date, r.back_date))}</small></div><div class="hm-price"><b>${r.price_eur} €</b><span>dus-întors / pers.</span></div></div></button>`;
     }).join('');
-    document.getElementById('hf-note').textContent = (fellBack ? `Încă nu avem prețuri din ${originName(profileOrigin)}, așa că îți arătăm zborurile din ${originName(origin)}. ` : '') + 'Prețul „de la” e cel mai mic găsit recent; se poate schimba până la rezervare. Verifică-l în căutare.';
+    document.getElementById('hf-grid').onclick = ev => {
+      const b = ev.target.closest('[data-flight-guide]'); if (!b || !window.CBFlightGuide) return;
+      try { window.CBFlightGuide.open(JSON.parse(b.dataset.flightGuide)); } catch (_) {}
+    };
+    document.getElementById('hf-note').textContent = (fellBack ? `Încă nu avem prețuri din ${originName(profileOrigin)}, așa că îți arătăm zborurile din ${originName(origin)}. ` : '') + 'Prețul „de la” e cel mai mic găsit recent; se poate schimba până la rezervare. Deschide un card ca să vezi ghidul și să cumperi biletul.';
     sec.hidden = false;
   }
 

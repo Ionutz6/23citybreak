@@ -29,7 +29,7 @@ body.home{margin:0;font-family:var(--font-body);color:#0a0b0d;background:#fff;li
 .hm-more{font:700 13px var(--font-display);border-bottom:2px solid var(--gold);padding-bottom:4px;white-space:nowrap;text-decoration:none}
 .hm-more:hover{color:#8a6a33}
 .hm-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
-.hm-fl{position:relative;border-radius:24px;overflow:hidden;min-height:300px;color:#fff;display:flex;flex-direction:column;justify-content:flex-end;background:#202b34 center/cover no-repeat;text-decoration:none;box-shadow:0 4px 20px -2px rgba(10,11,13,.08)}
+.hm-fl{border:0;padding:0;font:inherit;text-align:left;cursor:pointer;position:relative;border-radius:24px;overflow:hidden;min-height:300px;color:#fff;display:flex;flex-direction:column;justify-content:flex-end;background:#202b34 center/cover no-repeat;text-decoration:none;box-shadow:0 4px 20px -2px rgba(10,11,13,.08)}
 .hm-fl::before{content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(10,11,13,.92),rgba(10,11,13,.35) 45%,rgba(10,11,13,.05) 70%)}
 .hm-fl>*{position:relative}
 .hm-fl .hm-tag{position:absolute;top:14px;left:14px;background:rgba(13,16,20,.9);border:1px solid rgba(223,166,73,.5);color:var(--gold);font:800 11px var(--font-display);letter-spacing:.03em;text-transform:uppercase;padding:5px 10px;border-radius:99px}
