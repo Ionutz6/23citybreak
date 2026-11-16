@@ -1,5 +1,5 @@
 // price-sync: aduce zilnic în public.route_prices cele mai mici prețuri dus-întors de weekend (următoarele 60 de zile)
-// din Travelpayouts Data API (aviasales/v3/prices_for_dates: prețuri găsite de utilizatori în ultimele 48 h), pentru orașele cu ilustrație.
+// din Travelpayouts Data API (aviasales/v3/prices_for_dates: prețuri găsite de utilizatori în ultimele 48 h), pentru orașele cu ilustrație și pentru orașele din events.
 // Rulează din pg_cron (vezi README.md). Secrete: CRON_SECRET, TRAVELPAYOUTS_TOKEN. Opțional: PRICE_ORIGINS="OTP,CLJ" (implicit OTP).
 // Fără cheie funcția răspunde 'missing token'. ?dry = nu scrie; ?limit=3 = doar 3 orașe; ?from=50&limit=50 = a doua jumătate.
 import { createClient } from "npm:@supabase/supabase-js@2.45.4";
@@ -18,7 +18,12 @@ Deno.serve(async (req) => {
 
   const [c, g] = await Promise.all([fetch(`${SITE}/assets/europe-cities.js`), fetch(`${SITE}/assets/illustrated-guides.js`)]);
   if (!c.ok || !g.ok) return new Response(`site: HTTP ${c.status}/${g.status}`, { status: 502 });
-  let dests = [...cityIatas(await c.text(), guideIds(await g.text()))];
+  // Orașele cu ilustrație + toate orașele care apar în evenimentele viitoare (ca fiecare card să poată avea preț real).
+  const sb = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
+  const ids = guideIds(await g.text());
+  const { data: evc } = await sb.from("events").select("city_id").gte("starts_at", new Date().toISOString()).limit(10000);
+  for (const r of evc ?? []) ids.add(`City:${r.city_id}`);
+  let dests = [...cityIatas(await c.text(), ids)].sort(([a], [b]) => a.localeCompare(b));
   if (!dests.length) return new Response("niciun oraș cu ilustrație", { status: 502 });
   dests = dests.slice(from, limit > 0 ? from + limit : undefined); // ?from=50&limit=50 = a doua jumătate (timpul funcției e limitat)
 
@@ -50,7 +55,6 @@ Deno.serve(async (req) => {
   if (dry) return Response.json({ dry: true, log, sample: rows.slice(0, 5), raw: rawFirst });
   if (!rows.length) return Response.json({ log, written: 0 }, { status: failed ? 502 : 200 });
 
-  const sb = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
   for (let k = 0; k < rows.length; k += 500) {
     const { error } = await sb.from("route_prices").upsert(rows.slice(k, k + 500), { onConflict: "origin,dest,out_date,back_date,source" });
     if (error) return Response.json({ error: error.message, log }, { status: 500 });
