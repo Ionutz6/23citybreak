@@ -107,12 +107,26 @@
     return n.map(([k, t]) => `<div class="s pk-timing ${k}">${k === 'warn' ? '⚠️' : 'ℹ️'} ${esc(t)}</div>`).join('');
   };
   const flightSub = () => flightState === 'loading' ? ' · caut prețul…' : flight?.eur ? `<br>${flight.direct ? 'direct, de persoană, găsit acum pe Kiwi' : `zbor cu ${flight.stops} ${flight.stops === 1 ? 'escală' : 'escale'}`}` : flightState === 'none' ? (flight?.timing ? '<br>niciun zbor nu se potrivește cu ora evenimentului în zilele astea' : '<br>nu am găsit zboruri în zilele astea') : flightState === 'na' ? `<br>prețul îl vezi la Kiwi${DEBUG && flightWhy ? ` <span class="pk-why">(${esc(flightWhy)})</span>` : ''}` : '';
+  // Prețul găsit live pe pagina pachetului se trimite anonim la price-report (route_prices, source='visitor'), ca cardurile din Evenimente și Acasă
+  // să arate prețuri reale fără cereri Kiwi noi. Doar zborurile fără reguli de oră (altfel prețul n-ar fi cel mai mic al weekendului);
+  // serverul validează (weekend, 25–600 €) și păstrează cel mai mic preț al zilei. Fără date personale; o dată pe zi per rută și weekend.
+  function reportPrice(p, r) {
+    try {
+      const api = E.api;
+      if (!api || r.arriveBy || r.departAfter || !/^[A-Z]{3}$/.test(origin) || !/^City:[a-z0-9-]+_[a-z]{2}$/.test(city.id)) return;
+      const k = `23cb-reported|${origin}|${city.id}|${trip.out}|${trip.back}|${Math.round(p.eur)}`;
+      if (localStorage.getItem(k) && Date.now() - +localStorage.getItem(k) < 864e5) return;
+      localStorage.setItem(k, String(Date.now()));
+      fetch(`${api.url}/functions/v1/price-report`, { method: 'POST', keepalive: true, headers: { 'Content-Type': 'application/json', apikey: api.key, Authorization: `Bearer ${api.key}` }, body: JSON.stringify({ origin, items: [{ dest: city.id, out: trip.out, back: trip.back, price: Math.round(p.eur), direct: p.direct === true }] }) }).catch(() => {});
+    } catch {}
+  }
   function loadFlight() {
     if (!FP || !iata || !city?.id) { flightState = 'na'; return; }
     const r = rules(), key = `${trip.out}|${trip.back}`; if (key === flightKey) return;
     flightKey = key; flight = null; flightState = 'loading';
     FP.get({ origin, dest: city.id, out: trip.out, back: trip.back, arriveBy: r.arriveBy, departAfter: r.departAfter }).then(p => {
       if (flightKey !== key) return;
+      if (p?.eur) reportPrice(p, r);
       flight = p; flightState = p?.eur ? 'ok' : p ? 'none' : 'na'; flightWhy = p ? '' : whyNoPrice(); if (flightWhy) console.info('[23cb] fără preț zbor:', flightWhy); render(false);
     });
   }
@@ -124,8 +138,18 @@
     const rain = wx.wet == null ? '' : ` · ploaie în ~${wx.wet} ${wx.wet === 1 ? 'zi' : 'zile'} din 10`;
     return `<div class="pk-row pk-wx"><div class="l"><div class="pk-ico">${ico}</div><div><div class="t">Vremea în ${esc(wx.month)} <span class="pk-tag">orientativ</span></div><div class="s">ziua ~${wx.hi}°C · noaptea ~${wx.lo}°C${rain}</div><div class="s pk-wx-src">Media lunii în ultimii ${wx.years} ${wx.years === 1 ? 'an' : 'ani'}, nu e prognoză. Date: <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">Open-Meteo.com</a></div></div></div></div>`;
   };
+  const EST = window.CBEstimates;
+  // Totalul pentru 2 persoane: zborul e real (Kiwi), cazarea și biletul sunt estimări. Fără zbor găsit nu adunăm nimic.
+  const totalRow = () => {
+    if (!flight?.eur || !stNow) return '';
+    const tkn = tkNow?.eur ? tkNow.eur * 2 : 0, sum = flight.eur * 2 + stNow.total + tkn;
+    const parts = [`zbor ${flight.eur * 2} € (real)`, `cazare ~${stNow.total} €`, tkn ? `bilete ~${tkn} €` : ''].filter(Boolean).join(' + ');
+    return `<div class="pk-row pk-total"><div class="l"><div><div class="t">Aproximativ pentru 2 persoane</div><div class="s">${esc(parts)}. Doar zborul e preț real, restul sunt estimări.</div></div></div><div class="pr">~${Math.round(sum / 10) * 10} €</div></div>`;
+  };
+  let stNow = null, tkNow = null;
   function render(refetch = true) {
     if (refetch) loadFlight();
+    const tk = tkNow = EST ? EST.ticket(ev) : null, st = stNow = EST ? EST.stay(slug, trip.out, trip.back, ev) : null;
     const nights = Math.round((new Date(trip.back) - new Date(trip.out)) / 864e5);
     const custom = trip.mode === 'custom';
     root.innerHTML = `
@@ -158,8 +182,10 @@
         </div>
         <aside class="pk-box pk-side">
           <h3>Pachetul tău</h3>
-          <div class="pk-row"><div class="l"><div class="pk-ico">${icon}</div><div><div class="t">Bilet la eveniment</div><div class="s">${ev.price_min_eur ? 'de la' : ev.kind === 'football' ? 'preț pe site-ul clubului' : ev.kind === 'city_festival' || ev.kind === 'market' ? 'intrare liberă' : 'preț la vânzător'}</div></div></div>${ev.price_min_eur ? `<div class="pr">${Math.round(ev.price_min_eur)} €</div>` : ''}</div>
+          <div class="pk-row"><div class="l"><div class="pk-ico">${icon}</div><div><div class="t">Bilet la eveniment${tk && !tk.real && tk.eur ? ' <span class="pk-tag">estimare</span>' : ''}</div><div class="s">${tk ? (tk.eur === 0 ? 'intrare liberă' : tk.real ? 'de la, pe persoană' : `cel mai ieftin bilet, pe persoană${ev.kind === 'football' ? '. Pe piața secundară costă de obicei mult mai mult' : ''}`) : ev.kind === 'football' ? 'preț pe site-ul clubului' : 'preț la vânzător'}</div></div></div>${tk?.eur ? `<div class="pr">${tk.real ? '' : '~'}${tk.eur} €</div>` : ''}</div>
           <div class="pk-row"><div class="l"><div class="pk-ico">✈︎</div><div><div class="t">Zbor ${esc(origin)} ⇄ ${esc(iata || name)}</div><div class="s">${esc(H.shortDate(trip.out))} → ${esc(H.shortDate(trip.back))}${flightSub()}</div>${timingNotes()}</div></div>${flight?.eur ? `<div class="pr"><small>de la</small> ${flight.eur} €</div>` : ''}</div>
+          ${st ? `<div class="pk-row"><div class="l"><div class="pk-ico">🛏</div><div><div class="t">Cazare, 2 persoane <span class="pk-tag">estimare</span></div><div class="s">~${st.perNight} €/noapte × ${st.nights} ${st.nights === 1 ? 'noapte' : 'nopți'}, hotel 3★ sau apartament simplu${st.big ? '. Preț mai mare, e eveniment mare' : ''}</div></div></div><div class="pr">~${st.total} €</div></div>` : ''}
+          ${totalRow()}
           ${wxRow()}
           <div class="pk-stack">
             <a class="pk-btn dark" href="${esc(ticketUrl)}" target="_blank" rel="noopener noreferrer">${icon} ${esc(ticketLabel)} ↗</a>
@@ -173,7 +199,7 @@
               </div>
             </section>
           </div>
-          <p class="pk-note">Prețul zborului e cel mai mic găsit acum pe Kiwi și se poate schimba. Biletele de avion, biletele la eveniment și cazarea se cumpără direct de pe site-urile furnizorilor, care stabilesc prețurile, disponibilitatea și condițiile. 23citybreak nu răspunde pentru eventualele diferențe sau erori de pe aceste site-uri și poate primi un comision, fără cost pentru tine.${ev.source === 'football-data' ? ' Football data provided by the Football-Data.org API.' : ''}</p>
+          <p class="pk-note">Prețul zborului e cel mai mic găsit acum pe Kiwi și se poate schimba. Cazarea și biletul la eveniment marcate „estimare” sunt medii orientative, nu prețuri live: pe site-urile furnizorilor pot fi mai mici sau mai mari. Biletele de avion, biletele la eveniment și cazarea se cumpără direct de pe site-urile furnizorilor, care stabilesc prețurile, disponibilitatea și condițiile. 23citybreak nu răspunde pentru eventualele diferențe sau erori de pe aceste site-uri și poate primi un comision, fără cost pentru tine.${ev.source === 'football-data' ? ' Football data provided by the Football-Data.org API.' : ''}</p>
         </aside>
       </div>`;
     document.title = `${ev.title} · ${name} · 23citybreak`;
