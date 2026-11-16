@@ -49,14 +49,17 @@ test.describe('Evenimente', () => {
     expect((new Date(to0) - new Date(to1)) / 864e5).toBe(7);
   });
 
-  test('scara: 1 ianuarie anul curent – decembrie anul următor, cu marcaje de lună', async ({ page }) => {
+  test('scara: 26 de săptămâni (~6 luni) de la săptămâna de azi, cu marcaje de lună', async ({ page }) => {
     await H.install(page, { events, session: true, localStorage: ls });
     await page.goto('/evenimente.html?tab=music'); await page.waitForSelector('.ps');
-    const y = new Date().getFullYear();
-    await expect(page.locator('.ps-jan').first()).toContainText(String(y));
-    await expect(page.locator('.ps-jan').nth(1)).toContainText(String(y + 1));
-    expect(await page.locator('.ps-tick-m').count()).toBe(24);
-    expect(await page.locator('.ps-ticks i:not(.ps-tick-m)').count()).toBeGreaterThan(100);
+    expect(await page.locator('.ps-ticks i:not(.ps-tick-m)').count()).toBe(26);
+    expect(await page.locator('.ps-tick-m').count()).toBeGreaterThanOrEqual(5);
+    expect(await page.locator('.ps-tick-m').count()).toBeLessThanOrEqual(7);
+    const track = await page.locator('[data-ps-track]').boundingBox();
+    await drag(page, '[data-ps=b]', track.x + track.width + 60);           // nu trece de capătul scalei
+    const to = await page.locator('.ps').getAttribute('data-to');
+    const max = new Date(Date.now() + 26 * 7 * 864e5 + 8 * 864e5);
+    expect(new Date(to) <= max).toBe(true);
   });
 });
 
@@ -71,7 +74,7 @@ test.describe('Zboruri', () => {
     await page.locator('[data-ps=b]').scrollIntoViewIfNeeded();
     const track = await page.locator('[data-ps-track]').boundingBox();
     await drag(page, '[data-ps=b]', track.x + track.width * 0.97);
-    await expect.poll(() => page.evaluate(() => selectedWkIds.size)).toBeGreaterThan(30);
+    await expect.poll(() => page.evaluate(() => selectedWkIds.size)).toBeGreaterThan(20);
     expect(await page.evaluate(() => [...selectedWkIds].every(id => new Date(id).getUTCDay() === 5))).toBe(true); // doar vineri → duminică
     await page.evaluate(() => selectCalendarRange('year'));
     const r = await page.evaluate(() => { const s = [...selectedWkIds].sort(); return [s[0], s.at(-1)]; });

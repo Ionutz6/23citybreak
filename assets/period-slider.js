@@ -1,5 +1,5 @@
 // Slider de perioadă cu două capete (mouse, touch, tastatură), pe săptămâni.
-// Scara: de la 1 ianuarie a anului curent până la 31 decembrie a anului următor; capătul stâng nu poate trece înapoi de săptămâna de azi.
+// Scara: 26 de săptămâni (~6 luni) începând cu săptămâna de azi; capătul stâng nu poate trece înapoi de azi.
 // Folosit pe Zboruri și pe Evenimente (separat pe fiecare pagină, nesalvat în Cont). Doar pentru utilizatorii cu cont.
 //   const s = CBPeriodSlider.create(host, { from: '2026-11-30', to: '2027-01-17', onInput(range), onChange(range) });
 //   range = { from: 'AAAA-LL-ZZ' (prima zi, luni sau azi), to: 'AAAA-LL-ZZ' (duminică), weeks: n }
@@ -18,10 +18,9 @@
   function create(host, opts = {}) {
     const today = opts.today ? parse(opts.today) : localToday();
     const year = today.getUTCFullYear();
-    const start = monday(new Date(Date.UTC(year, 0, 1)));              // luni din/înainte de 1 ianuarie
-    const endDay = new Date(Date.UTC(year + 1, 11, 31));               // 31 decembrie anul următor
-    const total = Math.floor((monday(endDay) - start) / DAY / 7) + 1;  // ultima săptămână conține 31 dec
-    const minA = Math.floor((monday(today) - start) / DAY / 7);        // săptămâna de azi: limita stângă
+    const start = monday(today);                                       // scala începe în săptămâna de azi
+    const total = opts.weeks || 26;                                    // ~6 luni înainte (city break de weekend, nu vacanțe planificate cu un an înainte)
+    const minA = 0;                                                    // săptămâna de azi: limita stângă
     const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
     const weekOf = s => clamp(Math.floor((monday(parse(s)) - start) / DAY / 7), 0, total - 1);
     const id = `ps${++uid}`;
@@ -45,17 +44,16 @@
     const pct = i => (i / total) * 100;
 
     // Marcaje: o liniuță pe săptămână, mai înaltă la început de lună; etichetele de lună se rărează pe ecrane înguste.
-    const monthStarts = []; // { week, label, jan }
-    for (let m = 0; m < 24; m++) {
-      const d = new Date(Date.UTC(year + (m > 11 ? 1 : 0), m % 12, 1));
-      monthStarts.push({ pos: (d - start) / DAY / 7, label: MONTHS[m % 12], short: MONTHS_SHORT[m % 12], year: d.getUTCFullYear(), jan: m % 12 === 0, idx: m });
+    const monthStarts = []; // { pos (în săptămâni de la început), label, jan }
+    for (let d = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth() + 1, 1)); (d - start) / DAY / 7 < total; d = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + 1, 1))) {
+      monthStarts.push({ pos: (d - start) / DAY / 7, label: MONTHS[d.getUTCMonth()], year: d.getUTCFullYear(), jan: d.getUTCMonth() === 0, idx: monthStarts.length });
     }
     ticks.innerHTML = Array.from({ length: total }, (_, i) => `<i style="left:${pct(i)}%"></i>`).join('')
       + monthStarts.map(m => `<i class="ps-tick-m" style="left:${(m.pos / total) * 100}%"></i>`).join('');
     const drawMonths = () => {
-      const px = track.clientWidth || host.clientWidth || 600, per = px / 24;
-      const step = per >= 38 ? 1 : per >= 22 ? 2 : per >= 14 ? 3 : 6;
-      monthsEl.innerHTML = monthStarts.filter(m => m.idx % step === 0 || m.jan).map(m =>
+      const px = track.clientWidth || host.clientWidth || 600, per = px / (total / 4.35);
+      const step = per >= 34 ? 1 : 2;
+      monthsEl.innerHTML = (monthStarts[0] && monthStarts[0].pos < 3 ? '' : `<span class="ps-start" style="left:0">${today.getUTCDate()} ${MONTHS[today.getUTCMonth()]}</span>`) + monthStarts.filter(m => m.idx % step === 0 || m.jan).map(m =>
         `<span class="${m.jan ? 'ps-jan' : ''}" style="left:${(m.pos / total) * 100}%">${m.label}${m.jan ? ` <b>${m.year}</b>` : ''}</span>`).join('');
     };
     if (window.ResizeObserver) new ResizeObserver(drawMonths).observe(host); else window.addEventListener('resize', drawMonths);
