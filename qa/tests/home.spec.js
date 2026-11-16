@@ -71,3 +71,64 @@ test('Jurnalul e pe Orașe vizitate, iar jurnal.html rămâne publicat', async (
   await page.goto('/jurnal.html');
   await expect(page.locator('h1')).toContainText('Jurnal');
 });
+
+test('aeroportul din profil: „Cele mai ieftine zboruri din Valencia”', async ({ page }) => {
+  const db = H.makeDb(); db.tables.route_prices = priceRows().map(r => ({ ...r, origin: 'VLC' }));
+  await H.install(page, { db, localStorage: { '23cb-prefs': { departure_airports: ['VLC'] } } });
+  await page.goto('/');
+  await expect(page.locator('#hf-grid .hm-fl')).toHaveCount(3);
+  await expect(page.locator('#hf-title')).toContainText('din Valencia');
+});
+
+test('aeroport din profil fără prețuri: arată București, cu mențiune', async ({ page }) => {
+  const db = H.makeDb(); db.tables.route_prices = priceRows();
+  await H.install(page, { db, localStorage: { '23cb-prefs': { departure_airports: ['VLC'] } } });
+  await page.goto('/');
+  await expect(page.locator('#hf-title')).toContainText('din București');
+  await expect(page.locator('#hf-note')).toContainText('Încă nu avem prețuri din Valencia');
+});
+
+test('numele orașului din hero e alb', async ({ page }) => {
+  await H.install(page);
+  await page.goto('/');
+  expect(await page.locator('#hero-city').evaluate(n => getComputedStyle(n).color)).toBe('rgb(255, 255, 255)');
+});
+
+test('bannerul Orașe vizitate: utilizator logat vede nivelul și textul pe nivel, cu CTA către quiz', async ({ page }) => {
+  const ids = ['rome_it', 'paris_fr', 'prague_cz', 'vienna_at', 'madrid_es', 'berlin_de'];
+  const db = H.makeDb({ visited_cities: ids.map(city_id => ({ user_id: 'qa-user', city_id })) });
+  await H.install(page, { db, session: true });
+  await page.goto('/');
+  await expect(page.locator('#hc-kick')).toContainText('Călător de weekend');
+  await expect(page.locator('#hc-title')).toContainText('6 orașe europene');
+  await expect(page.locator('#hc-prog-text')).toContainText('Încă 6 orașe până la „Explorator”');
+  await expect(page.locator('.hm-cta a[href="orase-vizitate.html#city-quiz"]')).toBeVisible();
+});
+
+test('headerul negru are aceeași lățime, înălțime și colțuri pe Acasă, Zboruri și Evenimente', async ({ page }) => {
+  const read = sel => page.evaluate(s => { const n = document.querySelector(s), c = getComputedStyle(n), r = n.getBoundingClientRect(); return { w: Math.round(r.width), h: Math.round(r.height), br: c.borderBottomLeftRadius, bt: c.borderTopLeftRadius }; }, sel);
+  await H.install(page);
+  await page.setViewportSize({ width: 1440, height: 900 });
+  const out = [];
+  for (const [url, sel] of [['/', '.hero'], ['/zboruri.html', '.page-hero'], ['/evenimente.html', '.evp-hero']]) { await page.goto(url); out.push(await read(sel)); }
+  for (const o of [out[1], out[2]]) { expect(Math.abs(o.w - out[0].w)).toBeLessThanOrEqual(3); expect(Math.abs(o.h - out[0].h)).toBeLessThanOrEqual(3); expect(o.br).toBe(out[0].br); }
+  expect(out[0].br).toBe('28px');
+});
+
+test('hero Zboruri/Evenimente: carusel cu poze Commons, credit în pagină, text deasupra', async ({ page }) => {
+  await H.install(page);
+  const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==', 'base64');
+  await page.route('https://commons.wikimedia.org/w/api.php**', route => {
+    const titles = new URL(route.request().url()).searchParams.get('titles').split('|');
+    const pages = Object.fromEntries(titles.map((t, i) => [i, { title: t, imageinfo: [{ thumburl: `https://upload.wikimedia.org/qa/${i}.png`, descriptionurl: `https://commons.wikimedia.org/wiki/${encodeURIComponent(t)}`, extmetadata: { Artist: { value: '<a>Autor Test</a>' }, LicenseShortName: { value: 'CC BY-SA 4.0' } } }] }]));
+    route.fulfill({ status: 200, contentType: 'application/json', headers: { 'access-control-allow-origin': '*' }, body: JSON.stringify({ query: { pages } }) });
+  });
+  await page.route('https://upload.wikimedia.org/**', route => route.fulfill({ status: 200, contentType: 'image/png', headers: { 'access-control-allow-origin': '*' }, body: png }));
+  for (const [url, sel, n] of [['/zboruri.html', '.page-hero', 3], ['/evenimente.html', '.evp-hero', 3]]) {
+    await page.goto(url);
+    await expect(page.locator(`${sel} > div[aria-hidden]`).first()).toHaveCSS('opacity', '1');
+    await expect(page.locator('#photo-credit-list li')).toHaveCount(n);
+    await expect(page.locator('#photo-credit-list')).toContainText('Autor Test · CC BY-SA 4.0');
+    await expect(page.locator(`${sel} h1`)).toBeVisible();
+  }
+});

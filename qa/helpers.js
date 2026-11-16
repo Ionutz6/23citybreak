@@ -141,7 +141,10 @@ async function install(page, opts = {}) {
           return json(state.events.slice(offset, offset + limit));
         }
         const rows = state.db.tables[table] ||= [];
-        if (req.method() === 'GET') return json(rows);
+        if (req.method() === 'GET') {
+          const o = url.searchParams.get('origin');
+          return json(table === 'route_prices' && o?.startsWith('eq.') ? rows.filter(r => r.origin === o.slice(3)) : rows);
+        }
         state.db.writes.push({ table, method: req.method(), body, query: url.search, prefer: req.headers()['prefer'] || '' });
         if (req.method() === 'POST') {
           if (opts.onInsert) { const r = opts.onInsert(table, body, state); if (r) return json(r.body, r.status); }
