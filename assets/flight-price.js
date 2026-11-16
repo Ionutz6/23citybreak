@@ -4,11 +4,11 @@
 //     (opțional arriveBy:'17:00' = aterizare dus până la ora asta în ziua `out`; departAfter:'02:00' = decolare întors după ora asta în ziua `back`)
 //     → Promise<{ eur, direct, stops, at, timing? } | null>   timing:true = sunt zboruri, dar niciunul nu respectă ora   eur = cel mai mic preț / persoană, preferând zborurile directe
 // Kiwi blochează IP-ul după prea multe cereri, așa că: cache 6 ore în localStorage, cel mult 2 cereri simultan și
-// cel mult 24 de cereri pe încărcare de pagină. Pauza de 30 de minute după un refuz și bugetul de cereri pe oră
+// cel mult 40 de cereri pe încărcare de pagină. Pauza de 30 de minute după un refuz și bugetul de cereri pe oră
 // sunt comune cu prima pagină și stau în assets/kiwi-client.js (încărcat înaintea acestui fișier).
 (() => {
   const K = window.CBKiwi;
-  const TTL = 6 * 36e5, MAX_PER_PAGE = 24, CACHE_KEY = '23cb-flight-prices';
+  const TTL = 6 * 36e5, MAX_PER_PAGE = 40, CACHE_KEY = '23cb-flight-prices';
   const QUERY = `query SearchReturn($search: SearchReturnInput, $filter: ItinerariesFilterInput, $options: ItinerariesOptionsInput) {
     returnItineraries(search: $search, filter: $filter, options: $options) { ... on Itineraries { itineraries { ... on ItineraryReturn {
       priceEur { amount } outbound { sectorSegments { segment { code destination { localTime } } } } inbound { sectorSegments { segment { code source { localTime } } } } } } } } }`;
