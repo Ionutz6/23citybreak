@@ -8,6 +8,7 @@ import { type City, type EventRow, collapseFestivalBlocks, fromCurated, dedupePe
 
 const SITE = "https://23citybreak.ro";
 const DAYS_AHEAD = 120;
+const FD_DAYS_AHEAD = 240; // fotbal: tot sezonul, ca meciurile echipelor preferate să existe și peste 120 de zile (site-ul arată restul doar până la 120)
 const FD_COMPETITIONS = ["CL", "PL", "PD", "SA", "BL1", "FL1", "DED", "PPL"]; // nivelul gratuit football-data.org
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 const day = (d: Date) => d.toISOString().slice(0, 10);
@@ -53,7 +54,7 @@ async function syncTicketmaster(cities: City[], key: string, log: string[]): Pro
 async function syncFootball(key: string, log: string[]): Promise<EventRow[]> {
   const rows: EventRow[] = [];
   const unmapped = new Set<string>();
-  const from = day(new Date()), to = day(new Date(Date.now() + DAYS_AHEAD * 864e5));
+  const from = day(new Date()), to = day(new Date(Date.now() + FD_DAYS_AHEAD * 864e5));
   for (const code of FD_COMPETITIONS) {
     const res = await fetch(`https://api.football-data.org/v4/competitions/${code}/matches?dateFrom=${from}&dateTo=${to}`, { headers: { "X-Auth-Token": key } });
     if (!res.ok) log.push(`fd ${code}: HTTP ${res.status}`);

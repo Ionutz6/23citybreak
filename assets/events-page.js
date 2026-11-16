@@ -18,6 +18,7 @@
   const budget = Number(prefs.budget_max_eur) > 0 ? Number(prefs.budget_max_eur) : null;
   const mySports = Array.isArray(interests.sports) ? interests.sports : [];
   const myComps = Array.isArray(interests.competitions) ? interests.competitions : [];
+  const myTeams = Array.isArray(interests.favorite_teams) ? interests.favorite_teams.filter(t => typeof t === 'string' && t.trim().length >= 3).slice(0, 10) : [];
   const myArtists = Array.isArray(interests.favorite_artists) ? interests.favorite_artists.filter(a => typeof a === 'string' && a.trim().length >= 2).slice(0, 10) : [];
   const origin = FP.origin();
   const hasAirports = Array.isArray(prefs.departure_airports) && prefs.departure_airports.length > 0; // alese de client în cont
@@ -96,7 +97,13 @@
   // Trupe/artiști preferați din profil: primii la Muzică, inclusiv concertele anunțate peste cele 120 de zile (le cerem separat, pe nume, la Ticketmaster).
   const norm = t => String(t || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
   const favNames = myArtists.map(norm).filter(Boolean);
-  const isFav = e => favNames.some(f => (e.artists || []).some(a => norm(a) === f) || ` ${norm(e.title)} `.includes(` ${f} `)) ? 1 : 0;
+  // Formațiile tribut („Ultimate Coldplay”, „The Bon Jovi Experience”, „A Tribute to…”) nu sunt trupa însăși: potrivirea e doar pe numele exact al artistului (attractions din Ticketmaster), nu pe titlu, și titlurile de tribut sunt excluse.
+  const TRIBUTE = /\b(ultimate|tribute|tributo|the music of|celebration of|experience|story of|reloaded|symphonic|legacy|plays|performs|revisited)\b/i;
+  const isFav = e => !TRIBUTE.test(e.title || '') && favNames.some(f => (e.artists || []).some(a => norm(a) === f && !TRIBUTE.test(a))) ? 1 : 0;
+  // Echipe preferate: meciurile lor (max 2) urcă primele la Sport, chiar dacă sunt peste cele 120 de zile.
+  const favTeams = myTeams.map(norm).filter(Boolean);
+  const isFavTeam = e => favTeams.length && (e.teams || []).some(t => favTeams.some(f => ` ${norm(t)} `.includes(` ${f} `))) ? 1 : 0;
+  const HORIZON = H.isoAdd(today, 120);
   async function loadFavorites() {
     const api = E.api, have = new Set(all.map(e => e.id));
     const found = [];
@@ -123,6 +130,10 @@
     runs.clear();
     if (state.tab === 'music' && favNames.length) list = [...list].sort((a, b) => isFav(b) - isFav(a)); // trupele preferate primele (sortare stabilă: în rest rămâne ordinea pe dată)
     for (const e of list) if (RUN_KINDS.has(e.kind)) runs.set(runKey(e), (runs.get(runKey(e)) || 0) + 1);
+    if (state.tab === 'sport' && favTeams.length) { // cel mult 2 meciuri ale echipelor preferate, primele
+      const pinned = list.filter(isFavTeam).slice(0, 2);
+      list = [...pinned, ...list.filter(e => !pinned.includes(e))];
+    }
     const same = new Set(); // același concert/festival (oraș + loc + zi + artist sau titlu fără sufixe) apare o singură dată, chiar dacă vine și din DB, și din căutarea favoritelor
     list = list.filter(e => {
       if (e.kind !== 'concert' && e.kind !== 'festival') return true;
@@ -144,7 +155,7 @@
   };
 
   // ---------- Filtre ----------
-  const inTab = () => all.filter(e => E.categoryOf(e) === state.tab).filter(e => !state.weekend || E.isWeekend(e));
+  const inTab = () => all.filter(e => E.categoryOf(e) === state.tab).filter(e => e.source !== 'football-data' || H.startDate(e) <= HORIZON || isFavTeam(e)).filter(e => !state.weekend || E.isWeekend(e));
   const bySport = (list, s = state.sport) => state.tab !== 'sport' || s === 'all' ? list : s === 'mine' ? list.filter(isMine) : list.filter(e => sportOf(e) === s);
   // Cheia de competiție: liga, iar la sport fără ligă (ex. baschet din Ticketmaster) sportul însuși.
   const compKey = e => E.inferComp(e) || (state.tab === 'sport' ? `s:${sportOf(e)}` : e.kind);
@@ -229,7 +240,7 @@
         ${flightsStatus()}${budgetStatus()}
       </div>
       <div id="evp-panel" role="tabpanel" aria-labelledby="tab-${state.tab}">
-        ${items.length ? `<div class="ev-grid">${items.slice(0, state.shown).map(x => E.cardHtml(x.e, { fav: state.tab === 'music' && isFav(x.e), tour: tourMore(x.e), runs: RUN_KINDS.has(x.e.kind) ? (runs.get(runKey(x.e)) || 1) - 1 : 0 })).join('')}</div>` : `<p class="evp-empty">${emptyText()}</p>`}
+        ${items.length ? `<div class="ev-grid">${items.slice(0, state.shown).map(x => E.cardHtml(x.e, { fav: (state.tab === 'music' && isFav(x.e)) || (state.tab === 'sport' && isFavTeam(x.e)), favLabel: state.tab === 'sport' ? 'Echipa ta preferată' : 'Trupa ta preferată', tour: tourMore(x.e), runs: RUN_KINDS.has(x.e.kind) ? (runs.get(runKey(x.e)) || 1) - 1 : 0 })).join('')}</div>` : `<p class="evp-empty">${emptyText()}</p>`}
         ${items.length > state.shown ? `<div class="ev-more"><button type="button" class="evp-more-btn" data-more>Arată încă ${Math.min(PAGE, items.length - state.shown)}</button></div>` : ''}
       </div>
       ${all.some(e => e.source === 'football-data') && state.tab === 'sport' ? '<p class="ev-credit">Football data provided by the Football-Data.org API</p>' : ''}
