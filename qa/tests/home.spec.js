@@ -43,13 +43,13 @@ test('fără prețuri în baza de date, secțiunea de zboruri rămâne ascunsă'
   await expect(page.locator('#home-flights')).toBeHidden();
 });
 
-test('evenimentele: 3 carduri din următoarele 14–60 de zile, echipa preferată prima', async ({ page }) => {
+test('evenimentele: 3 carduri din următoarele 14–60 de zile, echipa preferată prima, fără mențiunea „preferată” pe card', async ({ page }) => {
   const st = await H.install(page, { localStorage: { '23cb-event-prefs': { favorite_teams: ['Juventus'] } } });
   await page.goto('/');
   const titles = page.locator('#he-grid .ev-card h3');
   await expect(titles.first()).toContainText('Roma');
   expect(await titles.count()).toBeLessThanOrEqual(3);
-  await expect(page.locator('#he-grid')).toContainText('Echipa ta preferată');
+  await expect(page.locator('#he-grid')).not.toContainText('preferată');
   expect(H.realErrors(st)).toEqual([]);
 });
 
@@ -142,4 +142,23 @@ test('hero Zboruri/Evenimente: carusel cu poze Commons, credit în pagină, text
     await expect(page.locator('#photo-credit-list')).toContainText('Autor Test · CC BY-SA 4.0');
     await expect(page.locator(`${sel} h1`)).toBeVisible();
   }
+});
+
+test('evenimente Acasă: doar vineri–duminică, fără excepții (nici Champions League), cu prețul zborului din weekendul evenimentului', async ({ page }) => {
+  const f3 = H.friday(3), at = (d, t) => `${H.iso(d)}T${t}:00Z`;
+  const base = { venue: null, ends_at: null, time_tbc: false, artists: [], teams: [], genres: [], competition: null, price_min_eur: null, ticket_url: null, image_url: null, popularity: 95, source: 'football-data', kind: 'football' };
+  const events = [
+    { ...base, id: 'fd:sat', title: 'AS Roma – Juventus FC', city_id: 'rome_it', starts_at: at(H.addDays(f3, 1), '19:45'), teams: ['AS Roma', 'Juventus FC'], competition: 'SA' },
+    { ...base, id: 'fd:cl', title: 'Real Madrid CF – FC Bayern', city_id: 'madrid_es', starts_at: at(H.addDays(f3, -3), '20:00'), teams: ['Real Madrid CF', 'FC Bayern'], competition: 'CL' }, // marți
+    { ...base, id: 'fd:el', title: 'Olympiacos – Partizan', city_id: 'athens_gr', starts_at: at(H.addDays(f3, -1), '20:00'), competition: 'EL', kind: 'sport' },        // joi
+  ];
+  const db = H.makeDb(); const out = H.iso(f3), back = H.iso(H.addDays(f3, 2));
+  db.tables.route_prices = [{ origin: 'OTP', dest: 'City:rome_it', out_date: out, back_date: back, price_eur: 77, direct: true, source: 'travelpayouts', seen_at: new Date().toISOString() }];
+  await H.install(page, { db, events });
+  await page.goto('/');
+  await expect(page.locator('#he-grid .ev-card')).toHaveCount(1);
+  await expect(page.locator('#he-grid')).toContainText('Roma');
+  await expect(page.locator('#he-grid')).not.toContainText('Real Madrid');
+  await expect(page.locator('#he-grid')).not.toContainText('Olympiacos');
+  await expect(page.locator('#he-grid .ev-flight')).toContainText('zbor din București de la 77 €');
 });
