@@ -162,3 +162,25 @@ test('evenimente Acasă: doar vineri–duminică, fără excepții (nici Champio
   await expect(page.locator('#he-grid')).not.toContainText('Olympiacos');
   await expect(page.locator('#he-grid .ev-flight')).toContainText('zbor din București de la 77 €');
 });
+
+test('evenimente Acasă: cardurile se ordonează crescător după prețul zborului, cele fără preț la coadă', async ({ page }) => {
+  const f3 = H.friday(3), at = (d, t) => `${H.iso(d)}T${t}:00Z`;
+  const base = { venue: null, ends_at: null, time_tbc: false, artists: [], teams: [], genres: [], competition: null, price_min_eur: null, ticket_url: null, image_url: null, popularity: 95, source: 'football-data', kind: 'football' };
+  const events = [
+    { ...base, id: 'fd:roma', title: 'AS Roma – Juventus FC', city_id: 'rome_it', starts_at: at(H.addDays(f3, 1), '19:45'), teams: ['AS Roma', 'Juventus FC'], competition: 'SA', popularity: 99 },
+    { ...base, id: 'fd:vie', title: 'Rapid Wien – Sturm Graz', city_id: 'vienna_at', starts_at: at(H.addDays(f3, 1), '17:00'), teams: ['Rapid Wien', 'Sturm Graz'], competition: 'EL', kind: 'sport', popularity: 90 },
+    { ...base, id: 'fd:mad', title: 'Real Madrid CF – Sevilla', city_id: 'madrid_es', starts_at: at(H.addDays(f3, 1), '21:00'), teams: ['Real Madrid CF', 'Sevilla'], competition: 'PD', popularity: 80 },
+  ];
+  const db = H.makeDb(); const out = H.iso(f3), back = H.iso(H.addDays(f3, 2)), seen = new Date().toISOString();
+  db.tables.route_prices = [
+    { origin: 'OTP', dest: 'City:rome_it', out_date: out, back_date: back, price_eur: 120, direct: true, source: 'travelpayouts', seen_at: seen },
+    { origin: 'OTP', dest: 'City:vienna_at', out_date: out, back_date: back, price_eur: 59, direct: true, source: 'travelpayouts', seen_at: seen },
+  ];
+  await H.install(page, { db, events });
+  await page.goto('/');
+  const cards = page.locator('#he-grid .ev-card');
+  await expect(cards).toHaveCount(3);
+  await expect(cards.nth(0)).toContainText('59 €');
+  await expect(cards.nth(1)).toContainText('120 €');
+  await expect(cards.nth(2)).toContainText('Madrid'); // fără preț, la coadă
+});

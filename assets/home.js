@@ -144,7 +144,12 @@
         const best = cand.reduce((a, b) => (b.source === 'visitor' && a.source !== 'visitor') || (b.source === a.source && b.price_eur < a.price_eur) ? b : a);
         slot.innerHTML = `✈ zbor din ${esc(originName(flightOrigin()))} de la <b>${best.price_eur} €</b> <small>(dus-întors, vineri–duminică)</small>`;
         slot.classList.add('ev-flight-price');
+        card.dataset.flightPrice = String(best.price_eur);
       });
+      // Cardurile cu preț de zbor primele, crescător după preț; cele fără preț la coadă, în ordinea de dinainte.
+      const cards = [...grid.querySelectorAll('.ev-card[data-ev]')];
+      cards.map((c, i) => ({ c, i, p: c.dataset.flightPrice ? Number(c.dataset.flightPrice) : Infinity }))
+        .sort((a, b) => a.p - b.p || a.i - b.i).forEach(x => grid.append(x.c));
     } catch { grid.querySelectorAll('.ev-flight').forEach(n => n.remove()); }
     if (picked.some(fav)) document.getElementById('he-sub').textContent = 'Echipele și trupele tale preferate primele, apoi cele mai atractive din următoarele 2 luni.';
     document.getElementById('home-events').hidden = false;
