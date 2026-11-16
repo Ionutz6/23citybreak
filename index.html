@@ -1797,6 +1797,25 @@
       }
     }
 
+    // --- Destinație pe țară: toate orașele țării din lista site-ului, într-o singură căutare ---
+    const COUNTRY_SEARCH_EXCLUDE = new Set(["City:bruges_be"]); // Bruges are căutare proprie (transfer separat)
+    const COUNTRY_CHUNK = 8; // orașe per cerere către Kiwi, ca răspunsul să nu fie acaparat de 1-2 orașe
+    function cityCountryCode(city) { return (/_([a-z]{2})$/.exec(city?.id || "") || [])[1]?.toUpperCase() || ""; }
+    function countryEntries() {
+      const byCode = new Map();
+      for (const c of ALL_EUROPE_CITIES) {
+        if (c.isAll || c.dyn) continue;
+        const code = cityCountryCode(c);
+        if (code && !byCode.has(code)) byCode.set(code, { id: `Country:${code}`, isCountry: true, countryCode: code, name: c.country, country: c.country, flag: c.flag, iata: "", code: "" });
+      }
+      return [...byCode.values()];
+    }
+    function countryCities(country) {
+      return ALL_EUROPE_CITIES.filter(c => !c.isAll && cityCountryCode(c) === country.countryCode && !COUNTRY_SEARCH_EXCLUDE.has(c.id));
+    }
+    function countryLabel(country) { return `${country.flag} ${country.name} (toate orașele)`; }
+    function findDestination(id) { return ALL_EUROPE_CITIES.find(c => c.id === id) || countryEntries().find(c => c.id === id); }
+
     // --- Search As You Type Autocomplete Engine ---
     function normalizeDestQuery(val) {
       if (!val) return "";
@@ -1815,7 +1834,7 @@
 
     function isSelectedDestinationText(value) {
       if (!selectedCityObj || document.getElementById("f-destination").value !== selectedCityObj.id) return false;
-      const selectedText = selectedCityObj.isAll ? "🌟 Oricare (Toată Europa)" : `${selectedCityObj.flag} ${selectedCityObj.name} (${selectedCityObj.iata}) · ${selectedCityObj.country}`;
+      const selectedText = selectedCityObj.isAll ? "🌟 Oricare (Toată Europa)" : selectedCityObj.isCountry ? countryLabel(selectedCityObj) : `${selectedCityObj.flag} ${selectedCityObj.name} (${selectedCityObj.iata}) · ${selectedCityObj.country}`;
       return value.trim() === selectedText;
     }
 
@@ -1834,10 +1853,10 @@
       const cleanQ = q.replace(/[^\p{L}\p{N}\s]/gu, '').trim().toLowerCase();
       const tokens = cleanQ.split(/\s+/).filter(Boolean);
 
-      const countryOnly = ALL_EUROPE_CITIES.some(c => !c.isAll && normalizeDestQuery(c.country) === cleanQ);
+      const countryOnly = countryEntries().find(c => normalizeDestQuery(c.name) === cleanQ);
       if (countryOnly) {
-        updateSearchStatus("Căutarea pe țară nu este disponibilă încă. Alege un oraș din listă.", 100, "empty");
-        return false;
+        selectDestination(countryOnly.id);
+        return true;
       }
       // 1. Exact match by name or IATA
       let match = ALL_EUROPE_CITIES.find(c => !c.isAll && (normalizeDestQuery(c.name) === cleanQ || normalizeDestQuery(c.iata) === cleanQ));
@@ -1923,7 +1942,8 @@
                   country: countryName,
                   flag: flag,
                   iata: iata,
-                  code: code
+                  code: code,
+                  dyn: true
                 });
                 added = true;
               }
@@ -1985,7 +2005,13 @@
         }
       }
 
-      if (matches.length === 0) {
+      const countryMatches = [];
+      if (q) {
+        const cTokens = q.replace(/[^\p{L}\p{N}\s]/gu, '').trim().toLowerCase().split(/\s+/).filter(Boolean);
+        if (cTokens.length) countryMatches.push(...countryEntries().filter(c => cTokens.every(tok => normalizeDestQuery(c.name).includes(tok))));
+      }
+
+      if (matches.length === 0 && countryMatches.length === 0) {
         drop.innerHTML = `
           <div class="p-3 text-xs text-[#64748b] text-center font-body">
             Nu există potriviri pentru „${escapeHtml(q)}” în lista de orașe.<br>
@@ -2015,11 +2041,27 @@
         }
       }
 
+      countryMatches.forEach(c => {
+        html += `
+          <button type="button" data-destination-id="${escapeHtml(c.id)}" onclick="selectDestination('${c.id}')"
+                  class="bg-[#fff3d8] border-[#dfa649] w-full flex items-center justify-between px-3 py-2 text-xs font-bold text-left rounded-xl hover:bg-[#fce8bd] transition cursor-pointer text-[#0a0b0d] border mb-1">
+            <div class="flex items-center gap-2">
+              <span class="text-base">${c.flag || "✈️"}</span>
+              <div>
+                <span class="font-display font-black">${escapeHtml(c.name)} — toate orașele</span>
+                <span class="text-[11px] text-[#64748b] font-normal ml-1 font-body">${countryCities(c).length} orașe, orice oraș din țară</span>
+              </div>
+            </div>
+            <span class="text-xs font-bold text-[#dfa649]">Alege →</span>
+          </button>
+        `;
+      });
+
       matches.slice(0, 35).forEach((c, index) => {
         if (!q && c.isAll) return;
         html += `
           <button type="button" data-destination-id="${escapeHtml(c.id)}" onclick="selectDestination('${c.id}')"
-                  class="${q && index === 0 ? 'bg-[#fff3d8] border-[#dfa649]' : ''} w-full flex items-center justify-between px-3 py-2 text-xs font-bold text-left rounded-xl hover:bg-[#fce8bd] transition cursor-pointer text-[#0a0b0d] border border-transparent hover:border-[#dfa649]">
+                  class="${q && index === 0 && !countryMatches.length ? 'bg-[#fff3d8] border-[#dfa649]' : ''} w-full flex items-center justify-between px-3 py-2 text-xs font-bold text-left rounded-xl hover:bg-[#fce8bd] transition cursor-pointer text-[#0a0b0d] border border-transparent hover:border-[#dfa649]">
             <div class="flex items-center gap-2">
               <span class="text-base">${c.flag || "✈️"}</span>
               <div>
@@ -2036,7 +2078,7 @@
     }
 
     function selectDestination(cityId) {
-      const city = ALL_EUROPE_CITIES.find(c => c.id === cityId);
+      const city = findDestination(cityId);
       if (!city) return;
 
       selectedCityObj = city;
@@ -2054,7 +2096,7 @@
       if (!opt) {
         opt = document.createElement("option");
         opt.value = city.id;
-        opt.textContent = `${city.name} (${city.iata})`;
+        opt.textContent = city.isCountry ? city.name : `${city.name} (${city.iata})`;
         nativeSelect.appendChild(opt);
       }
       nativeSelect.value = city.id;
@@ -2067,6 +2109,11 @@
         if (searchBtnText) searchBtnText.textContent = "Caută zboruri";
         if (scanBtnText) scanBtnText.textContent = "Cel mai bun weekend din an";
 
+      } else if (city.isCountry) {
+        input.value = countryLabel(city);
+        clearBtn.classList.remove("hidden");
+        if (searchBtnText) searchBtnText.textContent = "Caută zboruri";
+        if (scanBtnText) scanBtnText.textContent = `Cel mai bun weekend în ${city.name}`;
       } else {
         input.value = `${city.flag} ${city.name} (${city.iata}) · ${city.country}`;
         clearBtn.classList.remove("hidden");
@@ -2604,6 +2651,7 @@
       const container = document.getElementById("cross-engine-links");
       const originSelect = document.getElementById("f-origin");
       const origIata = originSelect?.selectedOptions?.[0]?.dataset?.iata || "OTP";
+      if (selectedCityObj?.isCountry) { container.innerHTML = ""; return; } // comparatoarele externe cer un oraș
       const targetIata = selectedCityObj?.iata || "BGY";
       const cityName = selectedCityObj?.name || "Milano";
       const activeWks = getSelectedWeekendsList();
@@ -2882,7 +2930,10 @@
       const destVal = destSelect?.value || "any";
 
       let filteredRows = sortRowsByCityGroup(currentRows);
-      if (destVal !== "any" && selectedCityObj) {
+      if (destVal !== "any" && selectedCityObj?.isCountry) {
+        const suffix = `_${selectedCityObj.countryCode.toLowerCase()}`;
+        filteredRows = filteredRows.filter(r => (r.cityId || "").toLowerCase().endsWith(suffix));
+      } else if (destVal !== "any" && selectedCityObj) {
         filteredRows = filteredRows.filter(r => {
           const rCode = (r.code || "").toLowerCase();
           const rIata = (r.iata || "").toLowerCase();
@@ -3334,7 +3385,7 @@
       const destSelect = document.getElementById("f-destination");
       let destVal = destSelect.value;
 
-      if (destVal === "any") {
+      if (destVal === "any" || selectedCityObj?.isCountry) {
         alert("Te rugăm să scrii sau să alegi mai întâi un oraș în caseta Destinație (ex: Tallinn, Manchester, Nisa etc.)");
         document.getElementById("dest-search-input").focus();
         showDestDropdown(true);
@@ -3575,6 +3626,151 @@
       updateSearchStatus(`Căutăm zboruri prin Kiwi...`, 0, "loading");
 
       try {
+        // COUNTRY SEARCH: orice oraș din țară (orașele țării din lista site-ului), progresiv, per oraș
+        if (selectedCityObj?.isCountry) {
+          const country = selectedCityObj;
+          const countryCode = country.countryCode;
+          const cityIds = countryCities(country).map(c => c.id).filter(id => id !== originCityId);
+          const chunks = [];
+          for (let i = 0; i < cityIds.length; i += COUNTRY_CHUNK) chunks.push(cityIds.slice(i, i + COUNTRY_CHUNK));
+          const jobs = activeWks.flatMap(wk => chunks.map(ids => ({ wk, ids })));
+          if (!jobs.length) {
+            updateSearchStatus(`Nu există orașe de căutat în ${country.name} față de plecarea din ${origin.name}.`, 100, "empty");
+            return;
+          }
+          let failedRequests = 0, completedRequests = 0, providerRefused = false, totalFound = 0;
+          const cityRowsMap = new Map();
+          let lastPublish = 0;
+          const publishCountryRows = (force = false) => {
+            if (!totalFound || (!force && Date.now() - lastPublish < 300)) return;
+            lastPublish = Date.now();
+            currentRows = sortRowsByCityGroup([...cityRowsMap.values()]);
+            renderMatrix();
+          };
+          const addCountryItineraries = (wk, itins) => {
+            const tripDates = getTripDates(wk);
+            for (const it of itins) {
+              const outSegs = it.outbound?.sectorSegments || [];
+              const inSegs = it.inbound?.sectorSegments || [];
+              if (outSegs.length - 1 > maxStops || inSegs.length - 1 > maxStops) continue;
+              if (it.outbound?.duration > maxDurMin * 60 || it.inbound?.duration > maxDurMin * 60) continue;
+              const outFirst = outSegs[0]?.segment, outLast = outSegs.at(-1)?.segment;
+              const inFirst = inSegs[0]?.segment, inLast = inSegs.at(-1)?.segment;
+              if (!outFirst || !outLast || !inFirst || !inLast) continue;
+              const outOrig = outFirst.source.station.code;
+              const outDest = outLast.destination.station.code;
+              const destCity = outLast.destination.station.city;
+              if (destCity?.country?.code !== countryCode || destCity?.id === originCityId) continue;
+              const arrivalDay = outLast.destination.localTime?.slice(0, 10);
+              const departureDay = inFirst.source.localTime?.slice(0, 10);
+              const destinationNights = arrivalDay && departureDay ? nightsBetween(arrivalDay, departureDay) : NaN;
+              if (searchSimilar && (!Number.isFinite(destinationNights) || destinationNights < 2)) continue;
+              if (!withinArrivalLimit(outLast.destination.localTime, tripDates.dateOut, outArrLimit)) continue;
+              if (!withinArrivalLimit(inLast.destination.localTime, tripDates.dateIn, inArrLimit)) continue;
+              const perPaxEur = parseFloat(it.priceEur?.amount) || 9999;
+              if (perPaxEur > maxPrice1Pax) continue;
+              const outCarrier = outFirst.carrier?.code || "";
+              const inCarrier = inFirst.carrier?.code || "";
+              const same = outCarrier === inCarrier;
+              const stopsCount = Math.max(outSegs.length - 1, inSegs.length - 1);
+              const stopsLabel = stopsCount > 0 ? ` (${stopsCount} esc.)` : "";
+              const airlineLabel = (same ? carrierName(outCarrier) : `${carrierName(outCarrier)} + ${carrierName(inCarrier)}`);
+              const links = buildFlightLinks(outOrig, outDest, tripDates.dateOut, tripDates.dateIn, adults, same && outSegs.length === 1 && inSegs.length === 1 ? outCarrier : "", outFirst.source.station.slugEn, outLast.destination.station.slugEn);
+              const cellObj = {
+                perPaxEur, totalEur: perPaxEur * adults, nightsAtDestination: destinationNights,
+                outRoute: `${outOrig} → ${outDest}`,
+                outTime: `${outFirst.source.localTime.slice(11, 16)} → ${outLast.destination.localTime.slice(11, 16)}${stopsLabel}`,
+                inRoute: `${inFirst.source.station.code} → ${inLast.destination.station.code}`,
+                inTime: `${inFirst.source.localTime.slice(11, 16)} → ${inLast.destination.localTime.slice(11, 16)}`,
+                airlineLabel: airlineLabel + stopsLabel,
+                bookingUrl: links.googleFlightsUrl, googleFlightsUrl: links.googleFlightsUrl, skyscannerUrl: links.skyscannerUrl,
+                kayakUrl: links.kayakUrl, kiwiSearchUrl: links.kiwiSearchUrl, airlineUrl: links.airlineDirectUrl, stops: stopsCount
+              };
+              const key = destinationRowKey(outDest, destCity?.name);
+              if (!cityRowsMap.has(key)) {
+                const disp = resolveDestinationDisplay(outDest, destCity?.name);
+                cityRowsMap.set(key, { city: disp.city, airportName: disp.airport, cityGroup: disp.group, sub: `${outDest} · ${airlineLabel}`, code: outDest.toLowerCase(), iata: outDest, cityId: destCity?.id || "", skyTo: outDest.toLowerCase(), cellsMap: {} });
+              }
+              const row = cityRowsMap.get(key);
+              if (!row.cellsMap[wk.id] || perPaxEur < row.cellsMap[wk.id].perPaxEur) { row.cellsMap[wk.id] = cellObj; totalFound++; }
+            }
+          };
+          updateSearchStatus(`Căutăm zboruri în ${country.name} (0/${jobs.length})...`, 0, "loading");
+          const queryCountryJob = async ({ wk, ids }) => {
+            const tripDates = getTripDates(wk);
+            try {
+              const request = () => flightFetch("https://api.skypicker.com/umbrella/v2/graphql", {
+                method: "POST",
+                signal: AbortSignal.timeout(45000),
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  query: QUERY_RETURN,
+                  variables: {
+                    search: {
+                      passengers: { adults: 1, adultsHandBags: handBags, adultsHoldBags: holdBags },
+                      cabinClass: { cabinClass: "ECONOMY" },
+                      itinerary: {
+                        source: { ids: [originCityId] },
+                        destination: { ids },
+                        outboundDepartureDate: { start: `${tripDates.dateOut}T${friDep}:00`, end: `${tripDates.dateOut}T23:59:59` },
+                        inboundDepartureDate: { start: `${tripDates.dateIn}T${sunDep}:00`, end: `${tripDates.dateIn}T23:59:59` }
+                      }
+                    },
+                    filter: { allowChangeInboundSource: false, allowChangeInboundDestination: false, transportTypes: ["FLIGHT"] },
+                    options: { partner: "skypicker", sortBy: "PRICE" }
+                  }
+                })
+              });
+              let json;
+              for (let attempt = 0; attempt < 2; attempt++) {
+                try { json = await readFlightResponse(await request()); break; }
+                catch (error) {
+                  // Fără a doua încercare după un refuz (403/429) sau după ce furnizorul a refuzat deja.
+                  if (attempt === 1 || providerRefused || !isRetryableFlightError(error)) throw error;
+                  await new Promise(resolve => setTimeout(resolve, 1500 + Math.random() * 1500));
+                }
+              }
+              addCountryItineraries(wk, json?.data?.returnItineraries?.itineraries || []);
+            } catch (e) {
+              failedRequests++;
+              if (isProviderRefusal(e)) { providerRefused = true; noteProviderRefusal(e); }
+              if (failedRequests === 1) console.warn("Serviciul de zboruri nu a răspuns:", e?.message || "eroare de rețea");
+            } finally {
+              completedRequests++;
+              updateSearchStatus(`Căutăm zboruri în ${country.name} (${completedRequests}/${jobs.length})...`, Math.floor(completedRequests / jobs.length * 95), "loading");
+              publishCountryRows();
+            }
+          };
+          // După un refuz recent, trimitem o singură cerere de probă înainte de un val întreg.
+          const probeFirst = Date.now() < providerCautionUntil() && jobs.length > 1;
+          if (probeFirst) await queryCountryJob(jobs[0]);
+          const remainingJobs = probeFirst ? (providerRefused ? [] : jobs.slice(1)) : jobs;
+          await mapWithConcurrency(remainingJobs, window.CBKiwi.CONCURRENCY, queryCountryJob, () => providerRefused || (completedRequests >= window.CBKiwi.CONCURRENCY && failedRequests === completedRequests));
+          const incompleteSearch = failedRequests > 0 || completedRequests < jobs.length;
+          currentRows = sortRowsByCityGroup([...cityRowsMap.values()]);
+          const cityCount = countUniqueCities(currentRows);
+          const category = searchSimilar ? "perioade asemănătoare" : "weekenduri";
+          if (totalFound > 0) {
+            updateSearchStatus(`✅ ${incompleteSearch ? "S-au găsit" : "Căutare finalizată! S-au găsit"} zboruri în ${cityCount} ${cityCount === 1 ? "oraș" : "orașe"} din ${country.name}.${incompleteSearch ? " Unele perioade nu au putut fi verificate acum." : ""}`, 100, "success");
+          } else if (incompleteSearch) {
+            updateSearchStatus(providerRefused ? providerLimitMessage() : `Nu putem confirma disponibilitatea: unele ${category} nu au putut fi verificate. Încearcă din nou.`, 100, "error");
+            lastEmptyWasSimilar = searchSimilar;
+            document.getElementById('similar-search-button').hidden = providerRefused;
+            document.getElementById('expand-search-button').hidden = providerRefused;
+          } else {
+            updateSearchStatus(searchSimilar ? `Nu s-au găsit perioade asemănătoare cu minimum 2 nopți în ${country.name}, în filtrele alese.` : `Nu s-au găsit zboruri în ${country.name} cu criteriile actuale. Poți extinde filtrele sau căuta perioade asemănătoare.`, 100, "empty");
+            lastEmptyWasSimilar = searchSimilar;
+            document.getElementById('similar-search-button').hidden = false;
+            document.getElementById('expand-search-button').hidden = false;
+          }
+          if (searchSimilar && totalFound > 0) {
+            similarResultPeriods = activeWks.filter(wk => currentRows.some(row => row.cellsMap[wk.id]));
+            document.getElementById('similar-results-note').hidden = false;
+          }
+          renderMatrix();
+          return;
+        }
+
         // TARGETED CITY SEARCH
         if (destVal !== "any") {
           updateSearchStatus(`Interogăm live ${activeWks.length} ${searchSimilar ? "perioade asemănătoare" : "weekenduri alese"} pentru ${cityName}...`, 0, "loading");
