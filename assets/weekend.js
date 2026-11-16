@@ -8,7 +8,7 @@
   await window.Account?.syncPrefsToLocal?.(); // aeroportul de plecare din cont, înainte de linkuri și prețul zborului
   const ev = id ? await E.byId(id) : null;
   if (!ev) {
-    root.innerHTML = '<div class="pk-empty"><h1>Nu am găsit acest eveniment</h1><p>Poate s-a încheiat sau linkul nu mai e valabil.</p><p><a class="pk-btn gold" href="./">Vezi zborurile de weekend</a></p></div>';
+    root.innerHTML = '<div class="pk-empty"><h1>Nu am găsit acest eveniment</h1><p>Poate s-a încheiat sau linkul nu mai e valabil.</p><p><a class="pk-btn gold" href="zboruri.html">Vezi zborurile de weekend</a></p></div>';
     return;
   }
   const slug = ev.city_id, city = H.cityOf(slug), name = H.cityName(slug), guide = H.guideOf(slug);

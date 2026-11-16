@@ -52,7 +52,7 @@
 
   function goToFlights(cityId) {
     // Pe prima pagină (vechiul loc al quizului) selectăm direct; altfel deschidem căutarea cu orașul ales.
-    if (typeof selectDestination !== 'function' || !$('configurator')) { location.href = `./?dest=${encodeURIComponent(cityId)}#configurator`; return; }
+    if (typeof selectDestination !== 'function' || !$('configurator')) { location.href = `zboruri.html?dest=${encodeURIComponent(cityId)}#configurator`; return; }
     selectDestination(cityId);
     $('configurator').scrollIntoView({behavior: reduceMotion ? 'auto' : 'smooth'});
     $('dest-search-input').focus({preventScroll: true});
