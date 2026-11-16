@@ -17,7 +17,7 @@ test('destinația poate fi o țară întreagă', async ({ page }) => {
   await expect(page.locator('#f-destination')).toHaveValue('Country:ES');
   await page.evaluate(() => { selectedWkIds = new Set([ALL_WEEKENDS.find(w => w.fri > new Date().toISOString().slice(0, 10)).id]); });
   await page.evaluate(() => runLiveSearch());
-  await expect(page.locator('#search-status, .search-status').first()).toContainText('din Spania', { timeout: 15000 });
+  await expect(page.locator('#search-status').first()).toContainText('din Spania', { timeout: 15000 });
   expect(dests.length).toBe(1);
   expect(dests[0].every(id => id.endsWith('_es'))).toBeTruthy();
   const rows = await page.evaluate(() => currentRows.map(r => r.cityId));
