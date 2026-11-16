@@ -5,7 +5,8 @@
 //   ok      → „Zbor OTP dus-întors de la 63 €”
 //   none    → Kiwi a răspuns, dar nu există zbor în weekendul acela
 //   pending → îl căutăm acum
-//   unknown → nu l-am putut cere (limita Kiwi pe pagină sau pauză după un refuz): rândul de preț rămâne gol.
+//   unknown → nu l-am cerut (implicit la încărcare nu trimitem nimic la Kiwi): „vezi prețul în pachet”.
+// Prețurile se cer live doar cu „Doar cu zbor” sau „Doar în bugetul meu” activ (cele mai apropiate 24 de carduri), altfel doar în pagina evenimentului.
 // Cu „Doar în bugetul meu” se afișează numai evenimentele cu preț găsit ≤ buget; restul sunt numărate, nu afișate.
 (async () => {
   const root = document.getElementById('evp-root');
@@ -40,7 +41,7 @@
     tab: E.CATEGORIES.some(([k]) => k === tabParam) ? tabParam : 'sport',
     sport: hasMine ? 'mine' : 'all', comp: 'all',
     weekend: params.get('weekend') !== '0', inBudget: false,
-    onlyFlights: true, onlyTop: !hasAirports, onlyNotable: true, shown: PAGE, open: new Set(),
+    onlyFlights: false, onlyTop: !hasAirports, onlyNotable: true, shown: PAGE, open: new Set(),
   };
 
   const today = new Date().toISOString().slice(0, 10);
@@ -64,8 +65,8 @@
     if (p.s === 'none') return `<span class="evp-price none">✈︎ ${p.timing ? `Niciun zbor din ${esc(origin)} care să se potrivească cu ora evenimentului` : `Niciun zbor din ${esc(origin)} în weekendul ăsta`}</span>`;
     if (p.s === 'pending') return '<span class="evp-price wait">✈︎ Caut zborul…</span>';
     // Nu am putut cere prețul (limită de cereri sau pauză după un refuz Kiwi): nu lăsăm cardul fără rând de zbor.
-    if (tried.has(e.id) || FP.paused()) return '<span class="evp-price wait">✈︎ Prețul zborului: vezi în pachet</span>';
-    return '';
+    // La încărcare nu cerem nimic la Kiwi (pagina rămâne rapidă, iar cererile Kiwi se economisesc): prețul exact se vede la deschiderea evenimentului.
+    return `<span class="evp-price wait">✈︎ Zbor din ${esc(origin)}: vezi prețul în pachet</span>`;
   };
   let rerender = 0;
   const later = () => { clearTimeout(rerender); rerender = setTimeout(render, 150); };
@@ -79,17 +80,10 @@
       else root.querySelectorAll(`[data-flight="${CSS.escape(e.id)}"]`).forEach(slot => { slot.innerHTML = priceHtml(e); });
     });
   }
-  // Fără filtrul de buget cerem prețul doar când cardul ajunge pe ecran, ca să nu consumăm limita Kiwi degeaba.
-  const io = new IntersectionObserver(entries => entries.forEach(en => {
-    if (!en.isIntersecting) return;
-    io.unobserve(en.target);
-    const e = all.find(x => x.id === en.target.dataset.flight); if (e) { ask(e); en.target.innerHTML = priceHtml(e); }
-  }), { rootMargin: '200px' });
   function fillPrices() {
     root.querySelectorAll('[data-flight]').forEach(slot => {
       const e = all.find(x => x.id === slot.dataset.flight); if (!e) return;
       slot.innerHTML = priceHtml(e);
-      if (priceState(e).s === 'unknown') io.observe(slot);
     });
   }
 
@@ -269,7 +263,7 @@
         ${flightsStatus()}${budgetStatus()}
       </div>
       <div id="evp-panel" role="tabpanel" aria-labelledby="tab-${state.tab}">
-        ${items.length ? `<div class="ev-grid">${items.slice(0, state.shown).map(x => E.cardHtml(x.e, { fav: (state.tab === 'music' && isFav(x.e)) || (state.tab === 'sport' && isFavTeam(x.e)), favLabel: state.tab === 'sport' ? 'Echipa ta preferată' : 'Trupa ta preferată', tour: tourMore(x.e), runs: RUN_KINDS.has(x.e.kind) ? (runs.get(runKey(x.e)) || 1) - 1 : 0 })).join('')}</div>` : `<p class="evp-empty">${emptyText()}</p>`}
+        ${items.length ? `<div class="ev-grid">${items.slice(0, state.shown).map(x => E.cardHtml(x.e, { tour: tourMore(x.e), runs: RUN_KINDS.has(x.e.kind) ? (runs.get(runKey(x.e)) || 1) - 1 : 0 })).join('')}</div>` : `<p class="evp-empty">${emptyText()}</p>`}
         ${items.length > state.shown ? `<div class="ev-more"><button type="button" class="evp-more-btn" data-more>Arată încă ${Math.min(PAGE, items.length - state.shown)}</button></div>` : ''}
       </div>
       ${all.some(e => e.source === 'football-data') && state.tab === 'sport' ? '<p class="ev-credit">Football data provided by the Football-Data.org API</p>' : ''}
