@@ -103,7 +103,15 @@
     const det = (window.CB_GUIDE_DETAILS || {})[o.cityId];
     const xmasOk = (() => { const md = Number(o.out.slice(5, 7)) * 100 + Number(o.out.slice(8, 10)); return md >= 1115 && md <= 1226; })();
     const ev = (o.events || []).length ? `<div class="fg-box"><h4>În weekendul acesta</h4><div class="fg-ev">${o.events.map(e => `<a href="${esc(e.url)}">${esc(e.icon || '🎟')} ${esc(e.title)} →</a>`).join('')}</div></div>` : '';
-    const tipsList = [...(det?.tips || [])];
+    // Sfaturi generale, valabile oriunde (fără date specifice orașului); orașele cu sfaturi proprii în guide-details.js le folosesc pe acelea.
+    const GENERIC_TIPS = [
+      { icon: '🛬', title: 'De la aeroport în oraș', text: 'Verifică dinainte cum ajungi (tren, autobuz sau taxi) și ora ultimului transport spre oraș, mai ales la sosirea de vineri seara.' },
+      { icon: '🎫', title: 'Bilete la obiective', text: 'Pentru obiectivele mari, rezervă online intrarea: de obicei e mai ieftin și eviți coada.' },
+      { icon: '🕘', title: 'Program', text: 'Verifică programul pe site-ul oficial: unele muzee închid o zi pe săptămână, iar iarna programul e adesea mai scurt.' },
+      { icon: '🚇', title: 'Transport în oraș', text: 'Centrul se vizitează de obicei pe jos; pentru distanțe mai mari caută un bilet pe 24–72 de ore pentru transportul public.' },
+      { icon: '🪪', title: 'Documente', text: 'Ia cu tine cartea de identitate sau pașaportul valabil, același cu cel din rezervarea zborului.' }
+    ];
+    const tipsList = [...(det?.tips || GENERIC_TIPS)];
     if (cur) tipsList.push({ icon: '💶', title: `Moneda locală: ${cur[0]}`, text: `${cur[1]} (${cur[0]}).` });
     const tips = tipsList.length ? `<div class="fg-box"><h4>Sfaturi practice</h4><div class="fg-ev">${tipsList.map(t => `<div class="fg-tip"><b>${t.icon} ${esc(t.title)}</b><small>${esc(t.text)}</small></div>`).join('')}</div></div>` : '';
     const buy = `<div class="fg-box fg-buy"><h4>Zbor dus-întors · vineri–duminică</h4>
