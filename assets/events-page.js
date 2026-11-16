@@ -92,12 +92,15 @@
     if (p) return p.eur ? { s: 'ok', ...p } : { s: 'none', timing: p.timing };
     const rp = routePrice(e);
     if (rp) return { s: 'ok', eur: rp.eur, direct: rp.direct, rp: true };
+    // Fără preț real: estimare după distanță (cu „~”), ca fiecare card să aibă un preț de zbor. Prețul exact se vede în pachet.
+    const est = E.estimateFlight(e.city_id, rpOrigin);
+    if (est && !pending.has(e.id)) return { s: 'ok', eur: est, est: true, rp: true };
     return pending.has(e.id) ? { s: 'pending' } : { s: 'unknown' };
   };
   const inBudget = e => { const p = priceState(e); return p.s === 'ok' && p.eur <= budget; };
   const priceHtml = e => {
     const p = priceState(e);
-    if (p.s === 'ok') return E.flightHtml({ eur: p.eur, origin: p.rp ? rpOrigin : origin, label: tripLabel(e), note: p.direct ? 'direct' : p.stops ? `${p.stops} escală` : '' });
+    if (p.s === 'ok') return E.flightHtml({ eur: p.eur, origin: p.rp ? rpOrigin : origin, label: tripLabel(e), note: p.direct ? 'direct' : p.stops ? `${p.stops} escală` : '', est: p.est });
     if (p.s === 'none') return `<span class="evp-price none">✈︎ ${p.timing ? `Niciun zbor din ${esc(origin)} care să se potrivească cu ora evenimentului` : `Niciun zbor din ${esc(origin)} în weekendul ăsta`}</span>`;
     if (p.s === 'pending') return '<span class="evp-price wait">✈︎ Caut zborul…</span>';
     // Nu am putut cere prețul (limită de cereri sau pauză după un refuz Kiwi): nu lăsăm cardul fără rând de zbor.
@@ -236,7 +239,7 @@
   const TOP = 60;
   const noFlight = e => priceState(e).s === 'none';
   const visible = () => {
-    let b = base();
+    let b = base().filter(e => priceState(e).s !== 'unknown'); // fără preț real și fără estimare posibilă (oraș fără coordonate): cardul nu se afișează
     if (state.onlyTop) b = b.filter(e => (e.popularity || 0) >= TOP);
     if (state.onlyFlights) b = b.filter(e => !noFlight(e));
     return state.inBudget && budget ? b.filter(inBudget) : b;

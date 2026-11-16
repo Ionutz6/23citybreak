@@ -254,7 +254,20 @@
   const byId = async id => (await load()).find(e => e.id === id) || null;
 
   // Prețul zborului, mare și auriu, pe card (aceeași formă pe Evenimente și pe Acasă): f = { eur, origin, label?, note? }.
-  const flightHtml = f => `<span class="ev-fp"><b>${Math.round(f.eur)} €</b><small>✈︎ zbor din ${esc(f.origin)}${f.label ? ` · ${esc(f.label)}` : ''}${f.note ? ` · ${esc(f.note)}` : ''}</small></span>`;
+  const flightHtml = f => `<span class="ev-fp"><b>${f.est ? '~' : ''}${Math.round(f.eur)} €</b><small>✈︎ zbor din ${esc(f.origin)}${f.label ? ` · ${esc(f.label)}` : ''}${f.est ? ' · estimare' : f.note ? ` · ${esc(f.note)}` : ''}</small></span>`;
+
+  // Estimare de preț dus-întors când nu avem un preț real în route_prices: dreaptă calibrată pe medianele prețurilor reale din OTP
+  // (47 de orașe, 2026-11): 105 € + 0,03 €/km, eroare mediană ~30%, de aceea se afișează mereu cu „~” și „estimare”.
+  // Fără coordonate pentru oraș sau aeroport → null (cardul fără preț nu se afișează).
+  const hav = (a, b) => { const r = Math.PI / 180, x = Math.sin((b[0] - a[0]) * r / 2) ** 2 + Math.cos(a[0] * r) * Math.cos(b[0] * r) * Math.sin((b[1] - a[1]) * r / 2) ** 2; return 12742 * Math.asin(Math.sqrt(x)); };
+  function estimateFlight(cityId, originIata = 'OTP') {
+    const co = window.CB_CITY_COORDS || {}, cities = window.CB_EUROPE_CITIES || [];
+    const dest = co[`City:${cityId}`];
+    const oc = cities.find(c => c.iata === originIata);
+    const from = (oc && co[oc.id]) || (originIata === 'OTP' ? [44.43, 26.10] : null);
+    if (!dest || !from) return null;
+    return Math.min(350, Math.max(60, Math.round((105 + 0.03 * hav(from, dest)) / 5) * 5));
+  }
 
   // ---------- Secțiunea de pe pagina principală ----------
   // opt.flight = { eur, origin, label?, note? } → prețul zborului mare și auriu în josul cardului (flightHtml).
@@ -324,5 +337,5 @@
 
   // Competițiile mari europene se joacă și marți–joi: contează ca eveniment de city break chiar și când „Doar weekenduri” e activ.
   const ANY_DAY = new Set(['CL', 'EL']);
-  window.CBEvents = { ANY_DAY, flightHtml, api: { url: SUPABASE_URL, key: SUPABASE_KEY }, load, byId, promos, cardHtml, packageUrl, decorateCards, eventPhoto, cityPhoto, stadiumPhoto, venuePhoto, setBg, KINDS, COMPETITIONS, CATEGORIES, SPORTS, categoryOf, sportOf, inferComp, isWeekend, helpers: { rangeLabel, esc, cityName, cityOf, guideOf, guideImage, local, isoAdd, dowOf, shortDate, longDate, startDate, endDate, isMultiDay, lengthDays, mainWeekend, tripPlan, flightRules, whenLabel, tagLabel, monthName, DOW, DOW_LONG, MON } };
+  window.CBEvents = { ANY_DAY, flightHtml, estimateFlight, api: { url: SUPABASE_URL, key: SUPABASE_KEY }, load, byId, promos, cardHtml, packageUrl, decorateCards, eventPhoto, cityPhoto, stadiumPhoto, venuePhoto, setBg, KINDS, COMPETITIONS, CATEGORIES, SPORTS, categoryOf, sportOf, inferComp, isWeekend, helpers: { rangeLabel, esc, cityName, cityOf, guideOf, guideImage, local, isoAdd, dowOf, shortDate, longDate, startDate, endDate, isMultiDay, lengthDays, mainWeekend, tripPlan, flightRules, whenLabel, tagLabel, monthName, DOW, DOW_LONG, MON } };
 })();

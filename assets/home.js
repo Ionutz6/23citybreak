@@ -127,7 +127,9 @@
       const c = w ? rows.filter(x => x.dest === `City:${e.city_id}` && x.out_date === w.out && x.back_date === w.back) : [];
       return c.length ? c.reduce((a, b) => (b.source === 'visitor' && a.source !== 'visitor') || (b.source === a.source && b.price_eur < a.price_eur) ? b : a) : null;
     };
-    const priced = cand.map((e, i) => ({ e, i, p: priceOf(e) })).sort((a, b) => (a.p ? a.p.price_eur : Infinity) - (b.p ? b.p.price_eur : Infinity) || a.i - b.i);
+    const priced = cand.map((e, i) => ({ e, i, p: priceOf(e), est: E.estimateFlight(e.city_id, flightOrigin()) }))
+      .filter(x => x.p || x.est) // fără preț real și fără estimare posibilă: cardul nu se afișează
+      .sort((a, b) => (a.p ? 0 : 1) - (b.p ? 0 : 1) || (a.p ? a.p.price_eur : a.est) - (b.p ? b.p.price_eur : b.est) || a.i - b.i); // prețurile reale primele, estimările după
     const picked = [], cats = {};
     for (const x of priced) { // cel mult 2 din aceeași categorie, ca vitrina să nu fie 3 meciuri
       const cat = E.categoryOf(x.e);
@@ -136,7 +138,7 @@
       if (picked.length === 3) break;
     }
     const grid = document.getElementById('he-grid');
-    grid.innerHTML = picked.map(({ e, p }) => E.cardHtml(e, p ? { flight: { eur: p.price_eur, origin: originName(flightOrigin()), label: H.rangeLabel(p.out_date, p.back_date), note: p.direct ? 'direct' : '' } } : {})).join('');
+    grid.innerHTML = picked.map(({ e, p, est }) => E.cardHtml(e, p ? { flight: { eur: p.price_eur, origin: originName(flightOrigin()), label: H.rangeLabel(p.out_date, p.back_date), note: p.direct ? 'direct' : '' } } : { flight: { eur: est, est: true, origin: originName(flightOrigin()), label: wk.get(e.id) ? H.rangeLabel(wk.get(e.id).out, wk.get(e.id).back) : '' } })).join('');
     grid.querySelectorAll('.ev-card[data-ev]').forEach(card => { // imaginea evenimentului ca pe pagina Evenimente, nu ilustrația orașului
       const x = picked.find(y => y.e.id === card.dataset.ev);
       if (x) E.eventPhoto(x.e).then(ph => E.setBg(card, ph)).catch(() => {});
