@@ -53,12 +53,12 @@
 .page-hero h1{font-size:clamp(26px,2.6vw,34px);margin:6px 0 4px}
 .page-hero p{font-size:15px;max-width:none}
 .compact-step{background:var(--cream,#fdfaf3);border:1px solid #ecd8b0;border-radius:20px;padding:14px 16px 16px;margin-top:16px}
-.compact-line{display:grid;grid-template-columns:minmax(0,4.5fr) minmax(0,5.5fr);gap:20px;align-items:start}
+.compact-line{display:grid;grid-template-columns:minmax(0,4fr) minmax(0,6fr);gap:20px;align-items:start}
 .compact-group + .compact-group{border-left:1px solid #ecd8b0;padding-left:20px}
 .grp-h{display:flex;align-items:center;gap:8px;font-family:var(--font-display);font-weight:700;font-size:13px;margin-bottom:6px}
 .grp-n{width:20px;height:20px;border-radius:50%;background:#0a0b0d;color:#dfa649;display:grid;place-items:center;font-size:11px}
 .compact-step .step-fields{grid-template-columns:minmax(0,2.1fr) minmax(0,2.4fr);gap:10px}
-.compact-step .option-fields{grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.compact-step .option-fields{grid-template-columns:repeat(3,minmax(0,1fr)) minmax(0,1.5fr);gap:10px}
 .compact-step .step-fields > div,.compact-step .option-fields > div{padding:0;border:0;border-radius:0;background:transparent;box-shadow:none}
 .compact-step label,.compact-step .orar-label,.compact-step .duration-field > label{display:block;font-family:var(--font-display);font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#4b5563;margin:0 0 3px}
 .compact-step select,.compact-step #dest-search-input,.compact-step .orar-toggle{font-size:14px;font-weight:700}
@@ -68,7 +68,8 @@
 .compact-step .step-fields > div > .flex.items-center.justify-between{margin-bottom:3px!important}
 .orar-field{position:relative;min-width:0}
 .orar-toggle{display:flex;align-items:center;justify-content:space-between;gap:6px;width:100%;height:42px;border:1px solid #e4d3b5;background:#fffdf8;border-radius:12px;padding:0 10px;cursor:pointer;text-align:left}
-.orar-toggle #orar-summary{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.orar-toggle #orar-summary{white-space:nowrap}
+.compact-step .orar-toggle{font-size:13.5px;padding:0 9px}
 .orar-toggle:focus-visible{outline:3px solid #dfa649;outline-offset:2px}
 .orar-pop{position:absolute;top:calc(100% + 6px);right:0;z-index:40;width:min(560px,88vw);background:#fff;border:2px solid #dfa649;border-radius:16px;box-shadow:0 14px 34px rgba(0,0,0,.18);padding:14px}
 .orar-pop[hidden]{display:none}
@@ -107,6 +108,7 @@
   .compact-group + .compact-group{border-left:0;padding-left:0}
   .compact-step{padding:12px;border-radius:16px;margin-top:12px}
   .compact-step .step-fields,.compact-step .option-fields{grid-template-columns:1fr 1fr}
+  .compact-step .option-fields > .orar-field,.compact-step .option-fields > :nth-child(3){grid-column:1/-1}
   .period-section{padding:12px 0 0}
   .period-section .period-bar > .mt-4{max-width:100%;overflow-x:auto;scrollbar-width:none;flex:1 1 100%}
   .period-section .period-heading{flex:1 1 100%;justify-content:space-between}
