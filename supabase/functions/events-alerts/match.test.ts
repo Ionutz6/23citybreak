@@ -50,3 +50,11 @@ test("emailuri: ora locală, escapare, link de dezabonare", () => {
   assert.match(d.subject, /A, B și altele/);
   assert.match(d.html, /Încă 4 evenimente/);
 });
+test("echipă favorită exactă, nu tot orașul", () => {
+  const derby = ev({ kind: "football", title: "Espanyol – Getafe", teams: ["RCD Espanyol de Barcelona", "Getafe CF"] });
+  assert.equal(matchEvent(derby, { ...none, favorite_teams: ["Barcelona"] }).score, 0);
+  assert.equal(matchEvent(derby, { ...none, favorite_teams: ["Espanyol"] }).score, 3);
+  const inter = ev({ kind: "football", title: "Inter – Milan", teams: ["FC Internazionale Milano", "AC Milan"] });
+  assert.equal(matchEvent(inter, { ...none, favorite_teams: ["Inter"] }).score, 3);
+  assert.equal(matchEvent(ev({ kind: "football", title: "Milan – Lecce", teams: ["AC Milan", "US Lecce"] }), { ...none, favorite_teams: ["Inter"] }).score, 0);
+});
