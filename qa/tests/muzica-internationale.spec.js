@@ -21,7 +21,6 @@ test('turneu în 2 țări urcă înaintea trupei locale; tributul nu apare; făr
   ];
   const st = await open(page, events);
   await expect.poll(titles).toEqual(['Editors', 'Mala Kapela']);
-  await page.locator('input[data-opt=onlyNotable]').evaluate(el => el.click());
   await expect.poll(async () => (await titles(page)).length).toBe(5);
   expect(H.realErrors(st)).toEqual([]);
 });

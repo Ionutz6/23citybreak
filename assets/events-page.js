@@ -44,7 +44,7 @@
     tab: E.CATEGORIES.some(([k]) => k === tabParam) ? tabParam : 'sport',
     sport: hasMine ? 'mine' : 'all', comp: 'all',
     weekend: false, inBudget: false,
-    onlyFlights: false, onlyTop: !hasAirports, onlyNotable: true, page: 0, open: new Set(),
+    onlyFlights: false, onlyTop: !hasAirports, onlyNotable: true, /* filtru permanent, fără comutator */ page: 0, open: new Set(),
   };
 
   const today = new Date().toISOString().slice(0, 10);
@@ -300,10 +300,14 @@
   }
 
   const pages = n => Math.max(1, Math.ceil(n / PAGE));
+  // Săgeți + link direct către FIECARE pagină (1 2 3 … toate, fără puncte de suspensie); pe mobil se împachetează pe rânduri.
+  const pageList = (cur, last) => Array.from({ length: last + 1 }, (_, i) => i);
   function pagerHtml(n) {
     if (n <= PAGE) return '';
     const last = pages(n) - 1;
-    return `<nav class="ev-pager" aria-label="Pagini de evenimente"><button type="button" class="ev-arrow" data-page-go="-1" aria-label="Evenimentele anterioare"${state.page <= 0 ? ' disabled' : ''}>‹</button><span>${state.page + 1} / ${last + 1}</span><button type="button" class="ev-arrow" data-page-go="1" aria-label="Următoarele ${PAGE} evenimente"${state.page >= last ? ' disabled' : ''}>›</button></nav>`;
+    const nums = pageList(state.page, last).map(i => i === null ? '<span class="ev-dots" aria-hidden="true">…</span>'
+      : `<button type="button" class="ev-pg${i === state.page ? ' on' : ''}" data-page-to="${i}" aria-label="Pagina ${i + 1} din ${last + 1}"${i === state.page ? ' aria-current="page"' : ''}>${i + 1}</button>`).join('');
+    return `<nav class="ev-pager" aria-label="Pagini de evenimente"><button type="button" class="ev-arrow" data-page-go="-1" aria-label="Evenimentele anterioare"${state.page <= 0 ? ' disabled' : ''}>‹</button>${nums}<button type="button" class="ev-arrow" data-page-go="1" aria-label="Următoarele ${PAGE} evenimente"${state.page >= last ? ' disabled' : ''}>›</button></nav>`;
   }
   function render() {
     // Cu filtrul de buget cerem din start prețurile candidaților (cei mai apropiați întâi), în limita Kiwi pe pagină.
@@ -325,7 +329,6 @@
         ${sportsHtml()}
         ${compsHtml()}
         <div class="evp-switches">
-          ${state.tab === 'music' ? sw('onlyNotable', 'Doar artiști cunoscuți <small>top, câte 10</small>', state.onlyNotable) : ''}
           ${hasAirports ? '' : sw('onlyTop', 'Doar cele importante', state.onlyTop)}
         </div>
         ${flightsStatus()}${budgetStatus()}
@@ -361,7 +364,8 @@
     if (t) { state.tab = t.dataset.tab; state.comp = 'all'; state.page = 0; const u = new URL(location.href); u.searchParams.set('tab', state.tab); history.replaceState(null, '', u); render(); root.querySelector(`[data-tab="${state.tab}"]`)?.focus(); return; }
     const s = ev.target.closest('[data-sport]'); if (s) { state.sport = s.dataset.sport; state.comp = 'all'; state.page = 0; render(); return; }
     const c = ev.target.closest('[data-comp]'); if (c) { state.comp = c.dataset.comp; state.page = 0; render(); return; }
-    const g = ev.target.closest('[data-page-go]'); if (g) { state.page = Math.max(0, state.page + Number(g.dataset.pageGo)); render(); root.querySelector('.ev-grid')?.scrollIntoView({ block: 'start', behavior: 'smooth' }); }
+    const g = ev.target.closest('[data-page-go],[data-page-to]');
+    if (g) { state.page = Math.max(0, g.dataset.pageTo !== undefined ? Number(g.dataset.pageTo) : state.page + Number(g.dataset.pageGo)); render(); root.querySelector('.ev-grid')?.scrollIntoView({ block: 'start', behavior: 'smooth' }); }
   });
   root.addEventListener('keydown', ev => { // săgeți stânga/dreapta între categorii
     if (!ev.target.matches('[role=tab]') || !['ArrowLeft', 'ArrowRight'].includes(ev.key)) return;
