@@ -102,7 +102,8 @@
   const isFav = e => !TRIBUTE.test(e.title || '') && favNames.some(f => (e.artists || []).some(a => norm(a) === f && !TRIBUTE.test(a))) ? 1 : 0;
   // Echipe preferate: meciurile lor (max 2) urcă primele la Sport, chiar dacă sunt peste cele 120 de zile.
   const favTeams = myTeams.map(norm).filter(Boolean);
-  const isFavTeam = e => favTeams.length && (e.teams || []).some(t => favTeams.some(f => ` ${norm(t)} `.includes(` ${f} `))) ? 1 : 0;
+  const TM = window.CBTeamMatch; // potrivire exactă pe echipă (FC Barcelona ≠ Espanyol), nu pe oraș
+  const isFavTeam = e => myTeams.length && (e.teams || []).some(t => myTeams.some(f => TM.matchesTeam(f, t))) ? 1 : 0;
   const HORIZON = H.isoAdd(today, 120);
   async function loadFavorites() {
     const api = E.api, have = new Set(all.map(e => e.id));
