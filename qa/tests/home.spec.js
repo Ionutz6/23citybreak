@@ -10,19 +10,33 @@ const priceRows = () => {
     r('City:london_gb', 20, { seen_at: old })];            // prea vechi: ignorat
 };
 
-test('zborurile ieftine: 3 orașe, prețul vizitatorului suprascrie cache-ul, fără cereri la Kiwi', async ({ page }) => {
-  const db = H.makeDb(); db.tables.route_prices = priceRows();
+test('idei de evadare: 3 destinații aleatorii până la 150 €, prețul vizitatorului suprascrie cache-ul, stabile la reîncărcare, fără Kiwi', async ({ page }) => {
+  const db = H.makeDb(); db.tables.route_prices = [...priceRows(), { origin: 'OTP', dest: 'City:london_gb', out_date: H.iso(H.friday(2)), back_date: H.iso(H.addDays(H.friday(2), 2)), price_eur: 200, direct: true, source: 'travelpayouts', seen_at: new Date().toISOString() }];
   const st = await H.install(page, { db });
   await page.goto('/');
   const cards = page.locator('#hf-grid .hm-fl');
   await expect(cards).toHaveCount(3);
-  await expect(cards.nth(0)).toContainText('55 €');
-  await expect(cards.nth(1)).toContainText('70 €');
-  await expect(cards.nth(2)).toContainText('90 €');
-  await expect(cards.nth(0)).toHaveAttribute('href', /zboruri\.html\?dest=City%3Arome_it#configurator/);
-  expect(await cards.nth(0).evaluate(n => n.style.backgroundImage)).toContain('assets/guides-prague-style/800/roma.webp');
+  await expect(page.locator('#hf-title')).toContainText('Idei de evadare la weekend din București');
+  const first = await cards.allTextContents();
+  const prices = first.map(t => +/(\d+) €/.exec(t)[1]);
+  expect(prices.every(p => p <= 150)).toBe(true);
+  expect(first.join()).not.toMatch(/\b80 €|\b200 €|\b20 €/); // 80 e înlocuit de 55 (vizitator); 200 peste plafon; 20 prea vechi
+  expect(await cards.first().getAttribute('href')).toMatch(/zboruri\.html\?dest=City%3A\w+_\w+#configurator/);
+  await page.reload();
+  await expect(cards).toHaveCount(3);
+  expect(await cards.allTextContents()).toEqual(first);
   expect(st.kiwi.length).toBe(0);
   expect(H.realErrors(st)).toEqual([]);
+});
+
+test('utilizator logat: ideile de zbor respectă bugetul din profil', async ({ page }) => {
+  const db = H.makeDb({ search_preferences: [{ user_id: 'qa-user', departure_airports: ['OTP'], budget_max_eur: 75, city_mode: 'any', currency: 'EUR' }] });
+  db.tables.route_prices = priceRows();
+  await H.install(page, { db, session: true, localStorage: { '23cb-prefs': { departure_airports: ['OTP'], budget_max_eur: 75 } } });
+  await page.goto('/');
+  const cards = page.locator('#hf-grid .hm-fl');
+  await expect(cards).toHaveCount(2); // doar Roma 55 € și Viena 70 €
+  await expect(page.locator('#hf-sub')).toContainText('până la 75 €');
 });
 
 test('fără prețuri în baza de date, secțiunea de zboruri rămâne ascunsă', async ({ page }) => {
@@ -72,7 +86,7 @@ test('Jurnalul e pe Orașe vizitate, iar jurnal.html rămâne publicat', async (
   await expect(page.locator('h1')).toContainText('Jurnal');
 });
 
-test('aeroportul din profil: „Cele mai ieftine zboruri din Valencia”', async ({ page }) => {
+test('aeroportul din profil: „Idei de evadare la weekend din Valencia”', async ({ page }) => {
   const db = H.makeDb(); db.tables.route_prices = priceRows().map(r => ({ ...r, origin: 'VLC' }));
   await H.install(page, { db, localStorage: { '23cb-prefs': { departure_airports: ['VLC'] } } });
   await page.goto('/');
