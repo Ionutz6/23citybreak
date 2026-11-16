@@ -1,5 +1,5 @@
 {
-  "_note": "Evenimente anuale introduse manual (festivaluri, târguri, sărbători de oraș). Intră în tabela events prin funcția events-sync, cu id 'cur:<slug>'. Adaugă doar evenimente cu date verificate din sursa oficială (câmpul source_url). Ore în timpul local al orașului, fără fus (funcția le tratează ca oră locală aproximativă, UTC+1). Câmpuri opționale: time (HH:MM, ora locală exactă), teams [gazde, oaspeți], competition (ex. '6N'). Six Nations 2027: meciurile Țării Galilor acasă lipsesc, Cardiff nu e în lista de orașe. Festivaluri 2027 (kind 'festival'): orașul e cel mai apropiat aeroport din listă, distanța e în câmpul venue. Nu apar în listarea implicită decât când intră în perioada aleasă; se găsesc oricând prin căutare. Neconfirmate oficial încă: Firenze Rocks, Mad Cool, Rock im Park, TRNSMT, Tomorrowland, Roskilde, Primavera Sound, Exit.",
+  "_note": "Evenimente anuale introduse manual (festivaluri, târguri, sărbători de oraș). Intră în tabela events prin funcția events-sync, cu id 'cur:<slug>'. Adaugă doar evenimente cu date verificate din sursa oficială (câmpul source_url). Ore în timpul local al orașului, fără fus (funcția le tratează ca oră locală aproximativă, UTC+1). Câmpuri opționale: time (HH:MM, ora locală exactă), teams [gazde, oaspeți], competition (ex. '6N'). Six Nations 2027: meciurile Țării Galilor acasă lipsesc, Cardiff nu e în lista de orașe. Festivaluri 2027 (kind 'festival'): orașul e cel mai apropiat aeroport din listă, distanța e în câmpul venue. Nu apar în listarea implicită decât când intră în perioada aleasă; se găsesc oricând prin căutare. Neconfirmate oficial încă: Mad Cool, Rock im Park, TRNSMT, Tomorrowland, Roskilde, Primavera Sound, Exit.",
   "events": [
     {
       "slug": "fallas-valencia-2027",
@@ -462,6 +462,27 @@
       "popularity": 88,
       "source_url": "https://untold.com/",
       "date_rule": "date de pe site-ul oficial (verificat 2026-11-16); orașul = cel mai apropiat aeroport din lista site-ului"
+    },
+    {
+      "slug": "firenze-rocks-2027",
+      "kind": "festival",
+      "title": "Firenze Rocks",
+      "city_id": "pisa_it",
+      "venue": "Florența (la ~80 km de aeroportul Pisa)",
+      "starts": "2027-06-25",
+      "ends": "2027-06-27",
+      "artists": [
+        "Foo Fighters",
+        "Queens of the Stone Age",
+        "Fat Dog",
+        "Evanescence",
+        "Placebo",
+        "Faith No More"
+      ],
+      "ticket_url": "https://www.firenzerocks.it/",
+      "popularity": 88,
+      "source_url": "https://www.firenzerocks.it/",
+      "date_rule": "25, 26 și 27 iunie 2027, anunțat pe site-ul oficial (captură Alex, 2026-11-16); vânzare generală din 20 nov. 2026 pe Ticketmaster, Ticketone, Vivaticket"
     }
   ]
 }
