@@ -13,7 +13,7 @@ Deno.serve(async (req) => {
   const token = Deno.env.get("TRAVELPAYOUTS_TOKEN");
   if (!token) return Response.json({ error: "missing token: pune TRAVELPAYOUTS_TOKEN în secretele funcției" }, { status: 400 });
   const q = new URL(req.url).searchParams, dry = q.has("dry"), limit = +(q.get("limit") ?? 0), from = +(q.get("from") ?? 0);
-  const origins = (Deno.env.get("PRICE_ORIGINS") ?? "OTP").split(",").map((s) => s.trim()).filter((s) => /^[A-Z]{3}$/.test(s));
+  const origins = (q.get("origin") ?? Deno.env.get("PRICE_ORIGINS") ?? "OTP").split(",").map((s) => s.trim()).filter((s) => /^[A-Z]{3}$/.test(s));
   const log: string[] = [];
 
   const [c, g] = await Promise.all([fetch(`${SITE}/assets/europe-cities.js`), fetch(`${SITE}/assets/illustrated-guides.js`)]);
