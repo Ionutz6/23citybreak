@@ -277,3 +277,8 @@ a.evp-note{margin:0}
 
 .photo-credits{max-width:1380px;margin:18px auto 0;padding:0 clamp(16px,2vw,30px);color:#606b61;font-size:12px}.photo-credits summary{cursor:pointer;font-weight:700}.photo-credits ul{padding-left:18px;margin:8px 0}.photo-credits a{text-decoration:underline}
 .evp-hero{position:relative;overflow:hidden}.evp-hero .evp-wrap{position:relative;z-index:1}
+/* Footerul rămâne jos și cât timp se încarcă lista */
+body.evp{min-height:100vh;display:flex;flex-direction:column}
+body.evp .evp-main{flex:1 0 auto}
+#evp-root{min-height:70vh}
+body.evp .site-footer{margin-top:auto}
