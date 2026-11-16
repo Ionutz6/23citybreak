@@ -1,5 +1,5 @@
 {
-  "_note": "Evenimente anuale introduse manual (festivaluri, târguri, sărbători de oraș). Intră în tabela events prin funcția events-sync, cu id 'cur:<slug>'. Adaugă doar evenimente cu date verificate din sursa oficială (câmpul source_url). Ore în timpul local al orașului, fără fus (funcția le tratează ca oră locală aproximativă, UTC+1). Câmpuri opționale: time (HH:MM, ora locală exactă), teams [gazde, oaspeți], competition (ex. '6N'). Six Nations 2027: meciurile Țării Galilor acasă lipsesc, Cardiff nu e în lista de orașe. Festivaluri 2027 (kind 'festival'): orașul e cel mai apropiat aeroport din listă, distanța e în câmpul venue. Nu apar în listarea implicită decât când intră în perioada aleasă; se găsesc oricând prin căutare. Neconfirmate oficial încă: Mad Cool, TRNSMT, Tomorrowland, Roskilde, Primavera Sound, Exit.",
+  "_note": "Evenimente anuale introduse manual (festivaluri, târguri, sărbători de oraș). Intră în tabela events prin funcția events-sync, cu id 'cur:<slug>'. Adaugă doar evenimente cu date verificate din sursa oficială (câmpul source_url). Ore în timpul local al orașului, fără fus (funcția le tratează ca oră locală aproximativă, UTC+1). Câmpuri opționale: time (HH:MM, ora locală exactă), teams [gazde, oaspeți], competition (ex. '6N'). Six Nations 2027: meciurile Țării Galilor acasă lipsesc, Cardiff nu e în lista de orașe. Festivaluri 2027 (kind 'festival'): orașul e cel mai apropiat aeroport din listă, distanța e în câmpul venue. Nu apar în listarea implicită decât când intră în perioada aleasă; se găsesc oricând prin căutare. Neconfirmate oficial încă: Mad Cool, TRNSMT, Tomorrowland, Roskilde, Exit.",
   "events": [
     {
       "slug": "fallas-valencia-2027",
@@ -503,6 +503,25 @@
       "popularity": 86,
       "source_url": "https://www.rock-im-park.com/en",
       "date_rule": "4-6 iunie 2027, de pe site-ul oficial (verificat 2026-11-16)"
+    },
+    {
+      "slug": "primavera-sound-barcelona-2027",
+      "kind": "festival",
+      "title": "Primavera Sound Barcelona",
+      "city_id": "barcelona_es",
+      "venue": "Barcelona",
+      "starts": "2027-06-03",
+      "ends": "2027-06-06",
+      "artists": [
+        "Phoebe Bridgers",
+        "FKA twigs",
+        "The Chemical Brothers",
+        "Tinashe"
+      ],
+      "ticket_url": "https://www.primaverasound.com/en/barcelona",
+      "popularity": 90,
+      "source_url": "https://www.primaverasound.com/en/barcelona",
+      "date_rule": "3 iunie (joi) – 6 iunie (Primavera Bits) 2027, de pe site-ul oficial (verificat 2026-11-16, bilet de la 330 € abonament, 135 € zi)"
     }
   ]
 }
