@@ -40,7 +40,7 @@
   const state = {
     tab: E.CATEGORIES.some(([k]) => k === tabParam) ? tabParam : 'sport',
     sport: hasMine ? 'mine' : 'all', comp: 'all',
-    weekend: params.get('weekend') !== '0', inBudget: false,
+    weekend: false, inBudget: false,
     onlyFlights: false, onlyTop: !hasAirports, onlyNotable: true, shown: PAGE, open: new Set(),
   };
 
@@ -266,9 +266,7 @@
         ${sportsHtml()}
         ${compsHtml()}
         <div class="evp-switches">
-          ${sw('weekend', 'Doar weekenduri', state.weekend)}
           ${state.tab === 'music' ? sw('onlyNotable', 'Doar artiști cunoscuți <small>top, câte 10</small>', state.onlyNotable) : ''}
-          ${sw('onlyFlights', `Doar cu zbor din ${esc(origin)}`, state.onlyFlights)}
           ${hasAirports ? '' : sw('onlyTop', 'Doar cele importante', state.onlyTop)}
           ${sw('inBudget', budget ? `Doar în bugetul meu <small>zbor ≤ ${budget} €</small>` : 'Doar în bugetul meu', state.inBudget, !budget)}
           ${budget ? '' : '<a class="evp-note" href="cont.html#preferinte">Setează-ți bugetul în Contul tău →</a>'}
