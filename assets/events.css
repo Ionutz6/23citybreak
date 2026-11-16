@@ -274,3 +274,5 @@ a.evp-note{margin:0}
 @media(min-width:900px) and (max-width:1179px){.evp .ev-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
 
 .pk-why{color:#8a95a6;font-size:12px}
+
+.pk-row.pk-total{background:#f6f1e3;border:1px solid #ecd8b0;border-radius:10px;padding:12px;margin-top:6px}.pk-row.pk-total .pr{color:#143d2a}
