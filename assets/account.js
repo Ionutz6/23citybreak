@@ -17,7 +17,10 @@
     ['CRA', 'Craiova'], ['OMR', 'Oradea'], ['TGM', 'Târgu Mureș'],
     ['VLC', 'Valencia'], ['ALC', 'Alicante'], ['PAR', 'Paris (toate aeroporturile)'], ['MUC', 'München'], ['FRA', 'Frankfurt'],
   ];
-  const BUDGETS = [100, 150, 200, 300, 500, null];
+  // Aceleași praguri ca selectorul „Buget max. / persoană” din pagina Zboruri (index.html #f-max-price); null = „Oricât”.
+  const BUDGETS = [75, 100, 125, 150, 200, 250, 350, 500, null];
+  // Valorile salvate înainte de aliniere (ex. 300) se mută pe pragul următor (350), ca și căutarea.
+  const snapBudget = v => { if (v == null) return null; const n = Number(v); return BUDGETS.find(b => b != null && b >= n) ?? null; };
   // Bugetul se salvează mereu în EUR; în RON afișăm o valoare orientativă (≈5 lei/€, rotunjit la 50), ca în căutare.
   const budgetLabel = (v, cur) => v == null ? 'fără limită' : cur === 'RON' ? `până la ~${new Intl.NumberFormat('ro-RO').format(Math.round(v * 5 / 50) * 50)} RON` : `până la ${v} €`;
   const CURRENCIES = [['EUR', 'Euro (€)'], ['RON', 'Lei (RON)']];
@@ -264,6 +267,7 @@
       g.append(wrap); return g;
     };
     if (!['EUR', 'RON'].includes(state.currency)) state.currency = 'EUR';
+    state.budget_max_eur = snapBudget(state.budget_max_eur);
     const budgetItems = BUDGETS.map(v => ({v, label: budgetLabel(v, state.currency)}));
     const g2 = single('Bugetul pentru zbor', 'Dus-întors, de persoană.', budgetItems,
       it => it.v === state.budget_max_eur, it => { state.budget_max_eur = it.v; });

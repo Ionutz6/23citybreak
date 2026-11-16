@@ -139,6 +139,10 @@
   document.addEventListener('input', e => { if (e.isTrusted && e.target?.id === 'f-max-price-slider') budgetTouched = true; }, true);
   document.addEventListener('change', e => { if (e.isTrusted && e.target?.id === 'f-max-price') budgetTouched = true; }, true);
 
+  // Aceleași praguri ca #f-max-price și ca editorul din cont; o valoare veche (ex. 300) urcă la pragul următor (350).
+  const BUDGET_STEPS = [75, 100, 125, 150, 200, 250, 350, 500];
+  const snapBudget = v => v == null ? null : (BUDGET_STEPS.find(n => n >= Number(v)) ?? null);
+
   function applyBudget(force = false) {
     const sel = $('f-max-price');
     const b = prefs.budget_max_eur;
@@ -197,7 +201,7 @@
     const favs = (prefs.departure_airports || []).map(s => String(s).toUpperCase());
     return [
       { k: 'air', label: 'Plecare', value: favs.length ? favs.join(', ') : 'alegi la căutare' },
-      { k: 'budget', label: 'Buget / persoană', value: prefs.budget_max_eur == null ? 'fără limită' : prefs.currency === 'RON' ? `până la ~${new Intl.NumberFormat('ro-RO').format(Math.round(prefs.budget_max_eur * 5 / 50) * 50)} RON` : `până la ${prefs.budget_max_eur} €`, sub: prefs.currency === 'RON' ? 'prețuri în lei (curs BCE)' : 'prețuri în euro' },
+      { k: 'budget', label: 'Buget / persoană', value: snapBudget(prefs.budget_max_eur) == null ? 'fără limită' : prefs.currency === 'RON' ? `până la ~${new Intl.NumberFormat('ro-RO').format(Math.round(snapBudget(prefs.budget_max_eur) * 5 / 50) * 50)} RON` : `până la ${snapBudget(prefs.budget_max_eur)} €`, sub: prefs.currency === 'RON' ? 'prețuri în lei (curs BCE)' : 'prețuri în euro' },
       { k: 'mode', label: 'Ce orașe', value: prefs.city_mode === 'new' ? 'doar orașe noi' : 'oricare', sub: visited.size ? plural(visited.size, 'oraș văzut', 'orașe văzute') : 'niciun oraș marcat ca văzut' },
     ];
   }
