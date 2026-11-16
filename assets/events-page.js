@@ -53,18 +53,51 @@
   if (!hasMine) state.sport = (SPORTS.find(([k]) => all.some(e => E.categoryOf(e) === 'sport' && sportOf(e) === k)) || SPORTS[0])[0];
 
   // ---------- Prețul zborului ----------
+  // Prețuri din tabela route_prices (cache Travelpayouts + prețuri văzute de vizitatori, fără Kiwi live): cel mai mic dus-întors pentru weekendul evenimentului.
+  // Aeroportul din profil; dacă nu are încă prețuri, București (ca pe Acasă).
+  let rpOrigin = origin;
+  const RP = new Map(); // dest ('City:<id>') → [{ out, back, eur, direct }]
+  async function loadRoutePrices() {
+    const api = E.api;
+    const load = async code => {
+      const q = new URLSearchParams({ select: 'dest,out_date,back_date,price_eur,direct,source,seen_at', origin: `eq.${code}`, out_date: `gte.${today}`, order: 'price_eur.asc', limit: '1000' });
+      q.append('out_date', `lte.${H.isoAdd(today, 90)}`);
+      try {
+        const r = await fetch(`${api.url}/rest/v1/route_prices?${q}`, { headers: { apikey: api.key, Authorization: `Bearer ${api.key}` }, signal: AbortSignal.timeout(8000) });
+        return r.ok ? await r.json() : [];
+      } catch { return []; }
+    };
+    let rows = await load(origin);
+    if (origin !== 'OTP' && rows.length < 3) { rpOrigin = 'OTP'; rows = await load('OTP'); }
+    const now = Date.now();
+    for (const r of rows) {
+      if (now - Date.parse(r.seen_at) > (r.source === 'visitor' ? 24 : 72) * 36e5) continue;
+      const list = RP.get(r.dest) || []; list.push({ out: r.out_date, back: r.back_date, eur: r.price_eur, direct: r.direct }); RP.set(r.dest, list);
+    }
+  }
+  await loadRoutePrices();
+  const routePrice = e => {
+    const list = RP.get(`City:${e.city_id}`); if (!list) return null;
+    const w = H.tripPlan(e), d = H.startDate(e);
+    const exact = list.filter(r => r.out === w.out && r.back === w.back);
+    const near = exact.length ? exact : list.filter(r => r.out <= d && r.back >= d);
+    return near.length ? near.reduce((a, b) => (b.eur < a.eur ? b : a)) : null;
+  };
+  const priceKey = e => { const p = priceState(e); return p.s === 'ok' ? p.eur : Infinity; }; // fără preț: la coadă
   const tripOf = e => { const w = H.tripPlan(e); return { origin, dest: `City:${e.city_id}`, out: w.out, back: w.back, arriveBy: w.arriveBy, departAfter: w.departAfter }; };
   const tripLabel = e => { const w = H.tripPlan(e); return H.rangeLabel(w.out, w.back); };
   const pending = new Set();
   const priceState = e => {
     const p = FP.cached(tripOf(e));
     if (p) return p.eur ? { s: 'ok', ...p } : { s: 'none', timing: p.timing };
+    const rp = routePrice(e);
+    if (rp) return { s: 'ok', eur: rp.eur, direct: rp.direct, rp: true };
     return pending.has(e.id) ? { s: 'pending' } : { s: 'unknown' };
   };
   const inBudget = e => { const p = priceState(e); return p.s === 'ok' && p.eur <= budget; };
   const priceHtml = e => {
     const p = priceState(e);
-    if (p.s === 'ok') return `<span class="evp-price ok${budget && p.eur > budget ? ' over' : ''}">✈︎ ${esc(tripLabel(e))} din ${esc(origin)}: de la <b>${p.eur} €</b>${p.direct ? ' · direct' : p.stops ? ` · ${p.stops} escală` : ''}</span>`;
+    if (p.s === 'ok') return `<span class="evp-price ok${budget && p.eur > budget ? ' over' : ''}">✈︎ ${esc(tripLabel(e))} din ${esc(p.rp ? rpOrigin : origin)}: de la <b>${p.eur} €</b>${p.direct ? ' · direct' : p.stops ? ` · ${p.stops} escală` : ''}</span>`;
     if (p.s === 'none') return `<span class="evp-price none">✈︎ ${p.timing ? `Niciun zbor din ${esc(origin)} care să se potrivească cu ora evenimentului` : `Niciun zbor din ${esc(origin)} în weekendul ăsta`}</span>`;
     if (p.s === 'pending') return '<span class="evp-price wait">✈︎ Caut zborul…</span>';
     // Nu am putut cere prețul (limită de cereri sau pauză după un refuz Kiwi): nu lăsăm cardul fără rând de zbor.
@@ -123,6 +156,8 @@
     return Math.min(r.countries.size, 5) * 150 + Math.min(r.cities.size, 6) * 20 + Math.log10(Math.max(r.maxCap, 200)) * 60
       + (e.kind === 'festival' ? Math.min((e.artists || []).length, 10) * 12 : 0) + (e.popularity || 0) * 0.3;
   };
+  // Muzică: favoritele primele, apoi crescător după prețul zborului; cele fără preț la coadă (în ordinea relevanței/datei).
+  const byPrice = list => list.map((e, i) => ({ e, i })).sort((a, b) => (isFav(b.e) - isFav(a.e)) || (priceKey(a.e) - priceKey(b.e) || 0) || a.i - b.i).map(x => x.e);
   function topMusic(list) {
     const best = new Map(); // un card per artist: cea mai apropiată dată
     for (const e of list) if (!isTribute(e)) { const k = artistKey(e), cur = best.get(k); if (!cur || e.starts_at < cur.starts_at) best.set(k, e); }
@@ -133,12 +168,12 @@
       if (!isFav(e) && ((byCity[e.city_id] || 0) >= 2 || (byCountry[cc(e)] || 0) >= 4)) continue;
       out.push(e); byCity[e.city_id] = (byCity[e.city_id] || 0) + 1; byCountry[cc(e)] = (byCountry[cc(e)] || 0) + 1;
     }
-    return out;
+    return byPrice(out);
   }
   // Interval afișat: de la peste 2 săptămâni (mai poți face un plan) până la ~2 luni. Favoriții (artist/echipă) și evenimentele curatoriate (sport, ex. Six Nations) pot fi și mai departe și urcă primele.
   const MIN_DAYS = 14, MAX_DAYS = 60;
   const MIN_DATE = H.isoAdd(today, MIN_DAYS), MAX_DATE = H.isoAdd(today, MAX_DAYS);
-  const inRange = e => H.endDate(e) >= MIN_DATE && (H.startDate(e) <= MAX_DATE || (e.source === 'curated' && e.kind === 'sport') || isFav(e) || isFavTeam(e));
+  const inRange = e => (E.categoryOf(e) !== 'music' || E.isWeekend(e) || isFav(e)) && H.endDate(e) >= MIN_DATE && (H.startDate(e) <= MAX_DATE || (e.source === 'curated' && e.kind === 'sport') || isFav(e) || isFavTeam(e));
   async function loadFavorites() {
     const api = E.api, have = new Set(all.map(e => e.id));
     const found = [];
@@ -164,7 +199,7 @@
     if (state.tab === 'music' && state.onlyNotable) { runs.clear(); return topMusic(list).map(e => ({ e })); }
     const seen = new Map(), perArtist = new Map();
     runs.clear();
-    if (state.tab === 'music' && favNames.length) list = [...list].sort((a, b) => isFav(b) - isFav(a)); // trupele preferate primele (sortare stabilă: în rest rămâne ordinea pe dată)
+    if (state.tab === 'music') list = byPrice(list); // trupele preferate primele, apoi după prețul zborului
     for (const e of list) if (RUN_KINDS.has(e.kind)) runs.set(runKey(e), (runs.get(runKey(e)) || 0) + 1);
     if (state.tab === 'sport' && favTeams.length) { // cel mult 2 meciuri ale echipelor preferate, primele
       const pinned = list.filter(isFavTeam).slice(0, 2);

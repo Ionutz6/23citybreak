@@ -282,3 +282,5 @@ body.evp{min-height:100vh;display:flex;flex-direction:column}
 body.evp .evp-main{flex:1 0 auto}
 #evp-root{min-height:70vh}
 body.evp .site-footer{margin-top:auto}
+.evp-price.ok{color:#dfa649;font-weight:700}
+.evp-price.ok.over{color:#dfa649}
