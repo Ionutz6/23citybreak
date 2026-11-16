@@ -10,7 +10,7 @@ const kiwiES = (body) => {
 };
 
 async function pickSpain(page) {
-  await page.goto('/');
+  await page.goto('/zboruri.html');
   await page.locator('#dest-search-input').fill('spania');
   const btn = page.locator('#dest-autocomplete-dropdown [data-destination-id="Country:ES"]');
   await expect(btn).toBeVisible();
