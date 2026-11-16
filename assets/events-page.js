@@ -300,12 +300,8 @@
   }
 
   const pages = n => Math.max(1, Math.ceil(n / PAGE));
-  // Săgeți + linkuri directe către fiecare pagină (1 … 3 4 5 … 12 când sunt multe).
-  function pageList(cur, last) {
-    const set = new Set([0, last, cur - 1, cur, cur + 1].filter(i => i >= 0 && i <= last)), out = [];
-    [...set].sort((a, b) => a - b).forEach((i, k, a) => { if (k && i - a[k - 1] > 1) out.push(null); out.push(i); });
-    return out;
-  }
+  // Săgeți + link direct către FIECARE pagină (1 2 3 … toate, fără puncte de suspensie); pe mobil se împachetează pe rânduri.
+  const pageList = (cur, last) => Array.from({ length: last + 1 }, (_, i) => i);
   function pagerHtml(n) {
     if (n <= PAGE) return '';
     const last = pages(n) - 1;
