@@ -54,7 +54,7 @@
       const px = track.clientWidth || host.clientWidth || 600, per = px / (total / 4.35);
       const step = per >= 34 ? 1 : 2;
       monthsEl.innerHTML = (monthStarts[0] && monthStarts[0].pos < 3 ? '' : `<span class="ps-start" style="left:0">${today.getUTCDate()} ${MONTHS[today.getUTCMonth()]}</span>`) + monthStarts.filter(m => m.idx % step === 0 || m.jan).map(m =>
-        `<span class="${m.jan ? 'ps-jan' : ''}" style="left:${(m.pos / total) * 100}%">${m.label}${m.jan ? ` <b>${m.year}</b>` : ''}</span>`).join('');
+        `<span class="${m.jan ? 'ps-jan' : ''}" style="left:${(m.pos / total) * 100}%">${m.label}${m.jan ? `<b>${m.year}</b>` : ''}</span>`).join('');
     };
     if (window.ResizeObserver) new ResizeObserver(drawMonths).observe(host); else window.addEventListener('resize', drawMonths);
 
