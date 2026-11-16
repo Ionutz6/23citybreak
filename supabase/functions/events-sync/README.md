@@ -6,9 +6,10 @@ Aduce zilnic în `public.events` evenimentele următoarelor 120 de zile pentru o
 |---|---|---|
 | Ticketmaster Discovery API | concerte, sport, festivaluri în 16 țări (AT, BE, CH, CZ, DE, DK, ES, FI, FR, GB, IE, IT, NL, NO, PL, SE) | `TICKETMASTER_API_KEY` (gratuit, 5.000 apeluri/zi) |
 | football-data.org v4 | Champions League, Premier League, La Liga, Serie A, Bundesliga, Ligue 1, Eredivisie, Primeira Liga | `FOOTBALL_DATA_API_KEY` (gratuit, 10 apeluri/minut) |
+| api-live.euroleague.net v2 (EuroLeague, baschet) | meciurile EuroLeague din următoarele 120 de zile, fără bilet/preț | fără cheie; `?only=eb` (verifică cu `&dry`: formatul nu a putut fi testat din afara Supabase) |
 | `data/evenimente-curatoriate.json` de pe site | festivaluri și sărbători de oraș introduse manual | fără cheie |
 
-Se păstrează doar evenimentele compatibile cu un city break: vineri de la 17:00, sâmbătă, duminică până la 18:00 (ora locală). Evenimentele pe mai multe zile se păstrează mereu.
+Champions League și EuroLeague se păstrează în orice zi a săptămânii. Restul: doar evenimentele compatibile cu un city break: vineri de la 17:00, sâmbătă, duminică până la 18:00 (ora locală). Evenimentele pe mai multe zile se păstrează mereu.
 
 Orașele și coordonatele se citesc din `assets/city-coords.js` de pe site, deci un oraș nou adăugat acolo intră automat. Meciurile se leagă de oraș prin `TEAM_CITY` din `normalize.ts`; echipele fără oraș apar în răspuns la `log`.
 

@@ -2,9 +2,9 @@
 // Surse: Ticketmaster Discovery (concerte, sport, teatru), football-data.org (fotbal), lista curatoriată de pe site.
 // Rulează din pg_cron (vezi README.md), nu din browser. Cheile API stau doar aici, ca secrete.
 // Secrete: CRON_SECRET, TICKETMASTER_API_KEY, FOOTBALL_DATA_API_KEY. Folosește service role.
-// Parametri: ?only=tm|fd|cur (o singură sursă; recomandat, ca să rămână sub limita de timp), ?dry (nu scrie), ?limit=N (primele N orașe, pentru test).
+// Parametri: ?only=tm|fd|eb|cur (o singură sursă; recomandat, ca să rămână sub limita de timp), ?dry (nu scrie), ?limit=N (primele N orașe, pentru test).
 import { createClient } from "npm:@supabase/supabase-js@2.45.4";
-import { type City, type EventRow, collapseFestivalBlocks, fromCurated, dedupePerformances, dedupeSessions, fromFootballData, fromTicketmaster, parseCityCoords, TM_COUNTRIES } from "./normalize.ts";
+import { type City, type EventRow, collapseFestivalBlocks, fromCurated, dedupePerformances, dedupeSessions, fromEuroLeague, fromFootballData, fromTicketmaster, parseCityCoords, TM_COUNTRIES } from "./normalize.ts";
 
 const SITE = "https://23citybreak.ro";
 const DAYS_AHEAD = 120;
@@ -69,6 +69,27 @@ async function syncFootball(key: string, log: string[]): Promise<EventRow[]> {
   return rows;
 }
 
+// EuroLeague: sezonul „E2026” începe în octombrie 2026. Orice eroare de rețea sau de format e doar în log, nu strică celelalte surse.
+async function syncEuroLeague(log: string[]): Promise<EventRow[]> {
+  const now = new Date(), season = `E${now.getUTCMonth() >= 6 ? now.getUTCFullYear() : now.getUTCFullYear() - 1}`;
+  try {
+    const res = await fetch(`https://api-live.euroleague.net/v2/competitions/E/seasons/${season}/games?limit=500`, { headers: { accept: "application/json" } });
+    if (!res.ok) { log.push(`eb ${season}: HTTP ${res.status}`); return []; }
+    const body = await res.json();
+    const games = Array.isArray(body) ? body : body?.data ?? body?.games ?? [];
+    if (!Array.isArray(games) || !games.length) { log.push(`eb ${season}: niciun meci în răspuns (chei: ${Object.keys(body ?? {}).join(",")})`); return []; }
+    const to = Date.now() + DAYS_AHEAD * 864e5, rows: EventRow[] = [], unmapped = new Set<string>();
+    for (const g of games) {
+      const r = fromEuroLeague(g);
+      if (r.row && new Date(r.row.starts_at).getTime() <= to) rows.push(r.row);
+      if (r.unmapped) unmapped.add(r.unmapped);
+    }
+    log.push(`eb ${season}: ${games.length} meciuri, ${rows.length} păstrate`);
+    if (unmapped.size) log.push(`eb echipe fără oraș: ${[...unmapped].sort().join(", ")}`);
+    return rows;
+  } catch (e) { log.push(`eb: ${e}`); return []; }
+}
+
 async function syncCurated(cities: City[], log: string[]): Promise<EventRow[]> {
   const res = await fetch(`${SITE}/data/evenimente-curatoriate.json`);
   if (!res.ok) { log.push(`cur: HTTP ${res.status}`); return []; }
@@ -94,6 +115,7 @@ Deno.serve(async (req) => {
   const tmKey = Deno.env.get("TICKETMASTER_API_KEY"), fdKey = Deno.env.get("FOOTBALL_DATA_API_KEY");
   if (!only || only === "tm") tmKey ? rows.push(...await syncTicketmaster(cities, tmKey, log)) : log.push("tm: lipsește TICKETMASTER_API_KEY");
   if (!only || only === "fd") fdKey ? rows.push(...await syncFootball(fdKey, log)) : log.push("fd: lipsește FOOTBALL_DATA_API_KEY");
+  if (!only || only === "eb") rows.push(...await syncEuroLeague(log));
   if (!only || only === "cur") rows.push(...await syncCurated(cities, log));
 
   const bySource: Record<string, number> = {};

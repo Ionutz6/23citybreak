@@ -155,7 +155,7 @@
   };
 
   // ---------- Filtre ----------
-  const inTab = () => all.filter(e => E.categoryOf(e) === state.tab).filter(e => e.source !== 'football-data' || H.startDate(e) <= HORIZON || isFavTeam(e)).filter(e => !state.weekend || E.isWeekend(e));
+  const inTab = () => all.filter(e => E.categoryOf(e) === state.tab).filter(e => e.source !== 'football-data' || H.startDate(e) <= HORIZON || isFavTeam(e)).filter(e => !state.weekend || E.isWeekend(e) || E.ANY_DAY.has(e.competition));
   const bySport = (list, s = state.sport) => state.tab !== 'sport' || s === 'all' ? list : s === 'mine' ? list.filter(isMine) : list.filter(e => sportOf(e) === s);
   // Cheia de competiție: liga, iar la sport fără ligă (ex. baschet din Ticketmaster) sportul însuși.
   const compKey = e => E.inferComp(e) || (state.tab === 'sport' ? `s:${sportOf(e)}` : e.kind);
@@ -175,7 +175,7 @@
   const n = (k, one, many) => `${k} ${k === 1 ? one : many}`;
   function catsHtml() {
     return `<div class="evp-cats" role="tablist" aria-label="Tip de eveniment">${E.CATEGORIES.map(([k, label]) => {
-      const c = all.filter(e => E.categoryOf(e) === k && (!state.weekend || E.isWeekend(e))).length;
+      const c = all.filter(e => E.categoryOf(e) === k && (!state.weekend || E.isWeekend(e) || E.ANY_DAY.has(e.competition))).length;
       const [icon, sub] = CAT_META[k];
       return `<button type="button" role="tab" class="evp-cat" id="tab-${k}" aria-selected="${k === state.tab}" aria-controls="evp-panel" data-tab="${k}" tabindex="${k === state.tab ? 0 : -1}">
         <span class="evp-cat-icon" aria-hidden="true">${icon}</span>
