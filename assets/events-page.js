@@ -16,7 +16,10 @@
   await window.Account?.syncPrefsToLocal?.();
   const readLS = k => { try { return JSON.parse(localStorage.getItem(k)) || {}; } catch { return {}; } };
   const prefs = readLS('23cb-prefs'), interests = readLS('23cb-event-prefs');
-  const budget = Number(prefs.budget_max_eur) > 0 ? Number(prefs.budget_max_eur) : null;
+  // Aceleași praguri și aceeași afișare ca în Cont și la Zboruri: 75/100/125/150/200/250/350/500 €; valorile vechi (ex. 300) urcă la pragul următor; în RON valoare orientativă (≈5 lei/€, rotunjit la 50).
+  const BUDGET_STEPS = [75, 100, 125, 150, 200, 250, 350, 500];
+  const budget = Number(prefs.budget_max_eur) > 0 ? (BUDGET_STEPS.find(n => n >= Number(prefs.budget_max_eur)) ?? null) : null;
+  const budgetText = budget ? (prefs.currency === 'RON' ? `~${new Intl.NumberFormat('ro-RO').format(Math.round(budget * 5 / 50) * 50)} RON` : `${budget} €`) : '';
   const mySports = Array.isArray(interests.sports) ? interests.sports : [];
   const myComps = Array.isArray(interests.competitions) ? interests.competitions : [];
   const myTeams = Array.isArray(interests.favorite_teams) ? interests.favorite_teams.filter(t => typeof t === 'string' && t.trim().length >= 3).slice(0, 10) : [];
@@ -268,7 +271,7 @@
         <div class="evp-switches">
           ${state.tab === 'music' ? sw('onlyNotable', 'Doar artiști cunoscuți <small>top, câte 10</small>', state.onlyNotable) : ''}
           ${hasAirports ? '' : sw('onlyTop', 'Doar cele importante', state.onlyTop)}
-          ${sw('inBudget', budget ? `Doar în bugetul meu <small>zbor ≤ ${budget} €</small>` : 'Doar în bugetul meu', state.inBudget, !budget)}
+          ${sw('inBudget', budget ? `Doar în bugetul meu <small>zbor până la ${budgetText}</small>` : 'Doar în bugetul meu', state.inBudget, !budget)}
           ${budget ? '' : '<a class="evp-note" href="cont.html#preferinte">Setează-ți bugetul în Contul tău →</a>'}
         </div>
         ${flightsStatus()}${budgetStatus()}
