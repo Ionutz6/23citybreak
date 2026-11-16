@@ -62,3 +62,5 @@ body.home{margin:0;font-family:var(--font-body);color:#0a0b0d;background:#fff;li
 
 /* Subsol (același ca pe celelalte pagini) */
 .site-footer{background:#0a0b0d;color:#8a95a6;border-top:1px solid #232730;padding:24px 0;margin-top:48px;font-size:14px;font-weight:500}.footer-inner{max-width:1536px;width:100%;margin:auto;padding:0 32px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px}.footer-brand{display:flex;align-items:center;gap:8px}.footer-wordmark{font:700 16px var(--font-display);color:#fff}.footer-gold,.footer-brand a{color:#dfa649}.footer-brand a{font-weight:600;text-decoration:none}.footer-brand a:hover{text-decoration:underline}@media(max-width:639px){.site-footer{font-size:12px}.footer-inner{padding:0 16px}.footer-wordmark{font-size:14px}}
+
+.hm-ev .ev-flight-price{white-space:normal;font-size:13px}.hm-ev .ev-flight-price b{font-size:20px;color:#dfa649}
