@@ -262,7 +262,7 @@
       hasMine ? pill('mine', 'Pentru tine', '★', list.filter(isMine).length) : '',
       ...sportOrder.filter(([k]) => mySports.includes(k) || state.sport === k || list.some(e => sportOf(e) === k)).map(([k, label, icon]) => pill(k, label, icon, list.filter(e => sportOf(e) === k).length, mySports.includes(k) ? '<i class="evp-mine" title="Din profilul tău">★</i>' : '')),
     ].join('');
-    const note = hasMine ? 'Sporturile marcate cu ★ sunt cele din profilul tău.' : '<a href="cont.html#interese">Alege-ți sporturile în Contul tău</a> și le punem primele.';
+    const note = hasMine ? 'Pagina se deschide cu sporturile tale. Le schimbi oricând în Contul tău.' : '<a href="cont.html#interese">Alege-ți sporturile în Contul tău</a> și le punem primele.';
     return `<div class="evp-row evp-row-nolabel"><div class="evp-pills" role="group" aria-label="Sport">${pills}</div></div><p class="evp-note">${note}</p>`;
   }
   function compsHtml() {
