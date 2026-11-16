@@ -291,7 +291,7 @@
   <link rel="stylesheet" href="assets/account.css?v=6">
   <link rel="stylesheet" href="assets/personalizare.css?v=4">
 <link rel="stylesheet" href="assets/site-header.css?v=2">
-<link rel="stylesheet" href="assets/search-steps.css?v=2">
+<link rel="stylesheet" href="assets/search-steps.css?v=3">
 <script>/* Quizul s-a mutat pe pagina Orașe vizitate; linkurile vechi (emailuri, cont) ajung acolo. */ if (/^#city-quiz/.test(location.hash)) location.replace('orase-vizitate.html' + location.hash);</script>
 </head>
 <body class="antialiased min-h-screen flex flex-col bg-white text-[#0a0b0d]">
@@ -413,7 +413,7 @@
       <div class="period-heading"><div><h3>3. Alege weekendurile</h3><p id="subtitle-summary" class="text-xs text-[#64748b] mt-1">Alege tipul de weekend, apoi bifează una sau mai multe perioade din calendar.</p></div><span id="selected-wk-badge" class="period-count"></span></div>
       <div class="period-options"><button type="button" id="classic-mode" class="period-choice active" onclick="setSimpleTripMode('classic')"><strong>Weekend clasic</strong><small>Vineri – duminică · 2 nopți</small></button><button type="button" id="extended-mode" class="period-choice" onclick="setSimpleTripMode('extended')"><strong>Weekend prelungit</strong><small>Sărbători legale și zile-punte · pot necesita concediu</small></button></div>
       <div id="period-slider" hidden></div>
-      <div class="mt-4 rounded-xl border border-[#eee5d4] bg-[#fffdf8] p-3"><div class="text-[11px] font-black uppercase tracking-wider text-[#8a5d14] mb-2">Alege perioada</div><div class="flex flex-wrap gap-2"><button class="calendar-range-choice" onclick="selectCalendarRange('next-month')">Luna următoare</button><button class="calendar-range-choice" onclick="selectCalendarRange('next-2-months')">Următoarele 2 luni</button><button id="range-spring" class="calendar-range-choice" onclick="selectCalendarRange('spring')">Primăvara <span data-range-year></span></button><button id="range-summer" class="calendar-range-choice" onclick="selectCalendarRange('summer')">Vara <span data-range-year></span></button><button id="range-autumn" class="calendar-range-choice" onclick="selectCalendarRange('autumn')">Toamna <span data-range-year></span></button><button id="range-winter" class="calendar-range-choice" onclick="selectCalendarRange('winter')">Iarna <span data-range-year></span></button><button class="calendar-range-choice" onclick="selectCalendarRange('year')">Tot anul <span data-range-year></span></button></div></div>
+      <div class="mt-4 rounded-xl border border-[#eee5d4] bg-[#fffdf8] p-3"><div class="text-[11px] font-black uppercase tracking-wider text-[#8a5d14] mb-2">Alege perioada</div><div class="flex flex-wrap gap-2"><button class="calendar-range-choice" onclick="selectCalendarRange('next-month')">Luna următoare</button><button class="calendar-range-choice" onclick="selectCalendarRange('next-2-months')">Următoarele 2 luni</button><button class="calendar-range-choice" onclick="selectCalendarRange('next-4-months')">Următoarele 4 luni</button><button class="calendar-range-choice" onclick="selectCalendarRange('next-6-months')">Următoarele 6 luni</button></div></div>
       <div class="calendar-details calendar-details-open">
       <!-- Quick Preset Buttons (Clasice, Extinse, Iarnă, Primăvară) - FĂRĂ vacanțe copii -->
       <div class="hidden">
@@ -2298,6 +2298,10 @@
         end.setMonth(end.getMonth() + 1);
       } else if (range === 'next-2-months') {
         end.setMonth(end.getMonth() + 2);
+      } else if (range === 'next-4-months') {
+        end.setMonth(end.getMonth() + 4);
+      } else if (range === 'next-6-months') {
+        end.setMonth(end.getMonth() + 6);
       } else if (range === 'winter') {
         start.setFullYear(year, 11, 1); end.setFullYear(year + 1, 2, 0);
       } else if (range === 'spring') {
@@ -4348,19 +4352,42 @@
     const routeGrid = panel.querySelector(':scope > .grid');
     const fields = [...routeGrid.children];
     const period = panel.querySelector('.period-section');
-    const route = document.createElement('section'); route.className = 'journey-step route-step';
-    route.innerHTML = '<div class="step-heading"><h3>1. Alege orașele</h3></div><div class="step-fields"></div>';
-    route.querySelector('.step-fields').append(fields[1], fields[2]);
-    const options = document.createElement('section'); options.className = 'journey-step options-step';
-    options.innerHTML = '<div class="step-heading"><h3>2. Selectează opțiuni</h3></div><div class="option-fields"></div>';
-    const optionFields = options.querySelector('.option-fields'); optionFields.append(fields[3], fields[4], fields[5]);
+    // Pașii 1 și 2 pe o singură linie (drop-down-uri); orarul zborului într-un popover.
+    const compact = document.createElement('section'); compact.className = 'journey-step compact-step';
+    compact.innerHTML = '<div class="compact-line"><div class="compact-group route-group"><div class="grp-h"><span class="grp-n">1</span>Traseul</div><div class="step-fields"></div></div><div class="compact-group options-group"><div class="grp-h"><span class="grp-n">2</span>Opțiuni</div><div class="option-fields"></div></div></div>';
+    panel.insertBefore(compact, period);
+    compact.querySelector('.step-fields').append(fields[1], fields[2]);
+    const optionFields = compact.querySelector('.option-fields'); optionFields.append(fields[3], fields[4], fields[5]);
     const hours = document.getElementById('f-fri-dep').closest('.space-y-3');
     hours.querySelector('.font-display').textContent = 'Orar zbor';
     ['Plecare la dus', 'Sosire la destinație', 'Plecare la retur', 'Sosire acasă'].forEach((label, i) => hours.querySelectorAll('label')[i].textContent = label);
-    optionFields.append(hours);
+    const orar = document.createElement('div'); orar.className = 'orar-field';
+    orar.innerHTML = '<span class="orar-label">Orar zbor</span><button type="button" id="orar-toggle" class="orar-toggle" aria-haspopup="true" aria-expanded="false" aria-controls="orar-pop"><span id="orar-summary"></span><span aria-hidden="true">▾</span></button><div id="orar-pop" class="orar-pop" hidden></div>';
+    const orarPop = orar.querySelector('#orar-pop'); orarPop.append(hours);
+    const currencyRow = document.querySelector('.currency-row'); if (currencyRow) orarPop.append(currencyRow);
+    optionFields.append(orar);
+    const orarSummary = () => {
+      const t = id => (document.getElementById(id).selectedOptions[0]?.textContent.match(/\d{1,2}:\d{2}/) || ['?'])[0].replace(':', '.');
+      document.getElementById('orar-summary').textContent = `Dus ${t('f-fri-dep')} · Întors ${t('f-sun-dep')}`;
+    };
+    const orarOpen = open => { orarPop.hidden = !open; document.getElementById('orar-toggle').setAttribute('aria-expanded', String(open)); };
+    document.getElementById('orar-toggle').addEventListener('click', e => { e.stopPropagation(); orarOpen(orarPop.hidden); });
+    document.addEventListener('click', e => { if (!orarPop.hidden && !orar.contains(e.target)) orarOpen(false); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') orarOpen(false); });
+    for (const id of ['f-fri-dep', 'f-out-arr', 'f-sun-dep', 'f-in-arr']) document.getElementById(id).addEventListener('change', orarSummary);
+    window.addEventListener('load', () => setTimeout(orarSummary, 0));
+    orarSummary();
     routeGrid.remove();
-    panel.insertBefore(route, period);
-    panel.insertBefore(options, period);
+    // Pasul 3: o bară cu tipul de weekend, intervalele rapide, calendarul la cerere și butonul „Caută”.
+    const periodBar = document.createElement('div'); periodBar.className = 'period-bar';
+    const heading = period.querySelector('.period-heading'), modes = period.querySelector('.period-options');
+    const ranges = period.querySelector('.mt-4.rounded-xl'), details = period.querySelector('.calendar-details');
+    const calToggle = document.createElement('button'); calToggle.type = 'button'; calToggle.id = 'calendar-toggle'; calToggle.className = 'calendar-range-choice calendar-toggle'; calToggle.setAttribute('aria-expanded', 'false'); calToggle.innerHTML = '📅 Calendar <span aria-hidden="true">▾</span>';
+    calToggle.addEventListener('click', () => { const open = !period.classList.contains('cal-open'); period.classList.toggle('cal-open', open); calToggle.setAttribute('aria-expanded', String(open)); });
+    period.insertBefore(periodBar, period.firstChild);
+    periodBar.append(heading, modes, ranges, calToggle, panel.querySelector('.search-actions-buttons'));
+    period.append(details);
+    details.classList.remove('calendar-details-open');
     panel.querySelector('.search-actions').append(document.getElementById('search-status'));
     // ?dest=<id Kiwi> (ex. din quizul de pe Orașe vizitate): preselectează destinația.
     {
@@ -4406,7 +4433,7 @@
     document.getElementById("dest-search-input").value = "🌟 Oricare (Toată Europa)";
 
   </script>
-  <script src="assets/option-sliders.js"></script>
+  <script src="assets/option-sliders.js?v=2"></script>
   <script src="assets/account.js?v=8"></script>
   <script src="assets/city-coords.js?v=1"></script>
   <script src="assets/personalizare.js?v=8"></script>
