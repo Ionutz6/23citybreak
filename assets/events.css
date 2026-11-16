@@ -308,10 +308,13 @@ body.evp .site-footer{margin-top:auto}
 .ps-months span{position:absolute;top:0;white-space:nowrap}
 .ps-months .ps-jan{color:#0a0b0d}
 .ps-months b{font-weight:800;color:#8a5d14}
-.ps-handle{position:absolute;top:5px;width:22px;height:22px;margin-left:-11px;border-radius:50%;background:#fff;border:3px solid #c78b2d;box-shadow:0 1px 4px rgba(10,11,13,.3);cursor:grab;z-index:2;touch-action:none}
-.ps-handle.drag{cursor:grabbing;background:#fce8bd}
+.ps-handle{position:absolute;top:3px;width:20px;height:28px;margin-left:-10px;border-radius:8px;background:#fff;border:3px solid #c78b2d;box-shadow:0 1px 4px rgba(10,11,13,.3);cursor:grab;z-index:2;touch-action:none;-webkit-tap-highlight-color:transparent;background-image:linear-gradient(#c78b2d,#c78b2d),linear-gradient(#c78b2d,#c78b2d);background-size:2px 12px,2px 12px;background-position:4px 50%,10px 50%;background-repeat:no-repeat}
+.ps-handle::before{content:"";position:absolute;top:-12px;bottom:-12px}
+.ps-handle[data-ps=a]::before{left:-30px;right:-2px}
+.ps-handle[data-ps=b]::before{left:-2px;right:-30px}
+.ps-handle.drag{cursor:grabbing;background-color:#fce8bd;transform:scale(1.12)}
 .ps-handle:focus-visible{outline:3px solid #bd8c45;outline-offset:3px}
-@media(max-width:600px){.ps{padding:10px 10px 6px}.ps-track{margin:0 13px}.ps-months{margin:0 13px}.ps-handle{width:16px;height:28px;margin-left:-8px;top:3px;border-radius:8px}.ps-value{font-size:13px}}
+@media(max-width:600px){.ps{padding:10px 10px 6px}.ps-track{margin:0 15px;height:44px}.ps-track::before,.ps-past,.ps-fill{top:19px;height:8px}.ps-ticks i{top:30px}.ps-ticks i.ps-tick-m{top:28px}.ps-handle{top:7px;width:24px;height:32px;margin-left:-12px;border-radius:10px;background-position:6px 50%,13px 50%;background-size:2px 14px,2px 14px}.ps-handle[data-ps=a]::before{left:-34px}.ps-handle[data-ps=b]::before{right:-34px}.ps-months{margin:0 15px}.ps-value{font-size:13px}}
 .evp-period{margin-top:18px}
 .evp-sec-h{font:700 24px/1.2 'Space Grotesk',system-ui,sans-serif;letter-spacing:-.02em;margin:26px 0 14px;color:#0a0b0d}
 .evp-fav{margin-bottom:10px}
