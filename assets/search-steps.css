@@ -11,9 +11,9 @@
 .option-fields .duration-field > label{font-family:var(--font-display);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#0a0b0d;margin-bottom:6px}
 .option-fields .space-y-3 label{color:#1e3a5f}
 
-/* Slidere (albastru) */
-.option-fields .option-slider{width:100%;height:24px;margin:2px 0 0;accent-color:#0075ff;cursor:pointer}
-.option-fields .option-slider:focus-visible{outline:3px solid #0075ff;outline-offset:3px}
+/* Slidere (verde) */
+.option-fields .option-slider{width:100%;height:24px;margin:2px 0 0;accent-color:#2e9d68;cursor:pointer}
+.option-fields .option-slider:focus-visible{outline:3px solid #2e9d68;outline-offset:3px}
 .option-fields .slider-value{font-family:var(--font-display);font-weight:700;font-size:14px;color:#161713;min-height:1.5em}
 .option-fields .slider-ends{display:flex;justify-content:space-between;gap:12px;margin-top:2px;font-size:11px;font-weight:600;line-height:1.2;color:#7b8494}
 .option-fields .slider-ends span{padding:2px 7px;border-radius:999px;background:#f1f4f8;white-space:nowrap}
