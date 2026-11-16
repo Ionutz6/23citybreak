@@ -173,7 +173,7 @@
   // Interval afișat: de la peste 2 săptămâni (mai poți face un plan) până la ~2 luni. Favoriții (artist/echipă) și evenimentele curatoriate (sport, ex. Six Nations) pot fi și mai departe și urcă primele.
   const MIN_DAYS = 14, MAX_DAYS = 60;
   const MIN_DATE = H.isoAdd(today, MIN_DAYS), MAX_DATE = H.isoAdd(today, MAX_DAYS);
-  const inRange = e => (E.categoryOf(e) !== 'music' || E.isWeekend(e) || isFav(e)) && H.endDate(e) >= MIN_DATE && (H.startDate(e) <= MAX_DATE || (e.source === 'curated' && e.kind === 'sport') || isFav(e) || isFavTeam(e));
+  const inRange = e => (E.categoryOf(e) !== 'music' || E.isWeekend(e)) && H.endDate(e) >= MIN_DATE && (H.startDate(e) <= MAX_DATE || (e.source === 'curated' && e.kind === 'sport') || isFav(e) || isFavTeam(e));
   async function loadFavorites() {
     const api = E.api, have = new Set(all.map(e => e.id));
     const found = [];
