@@ -47,16 +47,15 @@
       const cur = bestByDest.get(r.dest);
       if (!cur || r.price_eur < cur.price_eur) bestByDest.set(r.dest, r);
     }
-    // Idei de evadare: destinații aleatorii, în bugetul din profil (utilizator logat; fără limită dacă e „Oricât”) sau până la 150 € (fără cont).
-    // Ordinea aleatorie e stabilă pe zi și aeroport, ca să nu se schimbe la fiecare reîncărcare.
+    // Idei de evadare: 3 destinații aleatorii (altele la fiecare reîncărcare) în bugetul din profil (utilizator logat; fără limită dacă e „Oricât”)
+    // sau până la 150 € (fără cont). Dacă în buget sunt mai puține de 3, completăm cu cele mai apropiate ca preț, peste buget.
     const logged = !!(await window.Account?.session?.().catch(() => null));
     const profileBudget = Number(prefs.budget_max_eur);
     const cap = logged ? (profileBudget > 0 ? profileBudget : Infinity) : 150;
-    let seed = 0; for (const ch of `${today}|${origin}`) seed = (seed * 31 + ch.charCodeAt(0)) >>> 0;
-    const rnd = () => { seed = (seed + 0x6D2B79F5) >>> 0; let t = seed; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
-    const pool = [...bestByDest.values()].filter(r => r.price_eur <= cap).sort((a, b) => a.dest.localeCompare(b.dest));
-    for (let i = pool.length - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [pool[i], pool[j]] = [pool[j], pool[i]]; }
-    const top = pool.slice(0, 3);
+    const all = [...bestByDest.values()].sort((a, b) => a.price_eur - b.price_eur);
+    const pool = all.filter(r => r.price_eur <= cap);
+    for (let i = pool.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [pool[i], pool[j]] = [pool[j], pool[i]]; }
+    const top = [...pool.slice(0, 3), ...all.filter(r => r.price_eur > cap)].slice(0, 3);
     if (!top.length) return;
     document.getElementById('hf-origin').textContent = originName(origin);
     document.getElementById('hf-grid').innerHTML = top.map(r => {

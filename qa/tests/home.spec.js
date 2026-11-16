@@ -10,7 +10,7 @@ const priceRows = () => {
     r('City:london_gb', 20, { seen_at: old })];            // prea vechi: ignorat
 };
 
-test('idei de evadare: 3 destinații aleatorii până la 150 €, prețul vizitatorului suprascrie cache-ul, stabile la reîncărcare, fără Kiwi', async ({ page }) => {
+test('idei de evadare: 3 destinații aleatorii până la 150 €, prețul vizitatorului suprascrie cache-ul, fără Kiwi', async ({ page }) => {
   const db = H.makeDb(); db.tables.route_prices = [...priceRows(), { origin: 'OTP', dest: 'City:london_gb', out_date: H.iso(H.friday(2)), back_date: H.iso(H.addDays(H.friday(2), 2)), price_eur: 200, direct: true, source: 'travelpayouts', seen_at: new Date().toISOString() }];
   const st = await H.install(page, { db });
   await page.goto('/');
@@ -22,9 +22,6 @@ test('idei de evadare: 3 destinații aleatorii până la 150 €, prețul vizita
   expect(prices.every(p => p <= 150)).toBe(true);
   expect(first.join()).not.toMatch(/\b80 €|\b200 €|\b20 €/); // 80 e înlocuit de 55 (vizitator); 200 peste plafon; 20 prea vechi
   expect(await cards.first().getAttribute('href')).toMatch(/zboruri\.html\?dest=City%3A\w+_\w+#configurator/);
-  await page.reload();
-  await expect(cards).toHaveCount(3);
-  expect(await cards.allTextContents()).toEqual(first);
   expect(st.kiwi.length).toBe(0);
   expect(H.realErrors(st)).toEqual([]);
 });
@@ -35,8 +32,8 @@ test('utilizator logat: ideile de zbor respectă bugetul din profil', async ({ p
   await H.install(page, { db, session: true, localStorage: { '23cb-prefs': { departure_airports: ['OTP'], budget_max_eur: 75 } } });
   await page.goto('/');
   const cards = page.locator('#hf-grid .hm-fl');
-  await expect(cards).toHaveCount(2); // doar Roma 55 € și Viena 70 €
-  await expect(page.locator('#hf-sub')).not.toContainText('până la');
+  await expect(cards).toHaveCount(3); // Roma 55 € și Viena 70 € în buget, completat cu Praga 90 €
+  await expect(cards.nth(2)).toContainText('90 €');
 });
 
 test('fără prețuri în baza de date, secțiunea de zboruri rămâne ascunsă', async ({ page }) => {
