@@ -27,6 +27,7 @@ Depinde de migrația `supabase/migrations/20261112_events.sql`. **Nu e încă pu
 select cron.schedule('events-sync-tm',  '10 3 * * *', $$ select net.http_post(url := 'https://lsudthnrumslfscpppix.supabase.co/functions/v1/events-sync?only=tm',  headers := jsonb_build_object('x-cron-secret', '<CRON_SECRET>'), timeout_milliseconds := 150000); $$);
 select cron.schedule('events-sync-fd',  '20 3 * * *', $$ select net.http_post(url := 'https://lsudthnrumslfscpppix.supabase.co/functions/v1/events-sync?only=fd',  headers := jsonb_build_object('x-cron-secret', '<CRON_SECRET>'), timeout_milliseconds := 150000); $$);
 select cron.schedule('events-sync-cur', '30 3 * * *', $$ select net.http_post(url := 'https://lsudthnrumslfscpppix.supabase.co/functions/v1/events-sync?only=cur', headers := jsonb_build_object('x-cron-secret', '<CRON_SECRET>'), timeout_milliseconds := 150000); $$);
+select cron.schedule('events-sync-eb',  '40 3 * * *', $$ select net.http_post(url := 'https://lsudthnrumslfscpppix.supabase.co/functions/v1/events-sync?only=eb',  headers := jsonb_build_object('x-cron-secret', '<CRON_SECRET>'), timeout_milliseconds := 150000); $$);
 ```
 
 Consum estimat: ~90 de orașe × 2 apeluri Ticketmaster = ~180 apeluri/zi; 8 apeluri football-data.org/zi.
