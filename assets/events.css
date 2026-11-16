@@ -274,3 +274,9 @@ a.evp-note{margin:0}
 @media(min-width:900px) and (max-width:1179px){.evp .ev-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
 
 .pk-why{color:#8a95a6;font-size:12px}
+
+/* Footerul rămâne jos și cât timp se încarcă lista */
+body.evp{min-height:100vh;display:flex;flex-direction:column}
+body.evp .evp-main{flex:1 0 auto}
+#evp-root{min-height:70vh}
+body.evp .site-footer{margin-top:auto}
