@@ -63,6 +63,8 @@
     if (p.s === 'ok') return `<span class="evp-price ok${budget && p.eur > budget ? ' over' : ''}">✈︎ ${esc(tripLabel(e))} din ${esc(origin)}: de la <b>${p.eur} €</b>${p.direct ? ' · direct' : p.stops ? ` · ${p.stops} escală` : ''}</span>`;
     if (p.s === 'none') return `<span class="evp-price none">✈︎ ${p.timing ? `Niciun zbor din ${esc(origin)} care să se potrivească cu ora evenimentului` : `Niciun zbor din ${esc(origin)} în weekendul ăsta`}</span>`;
     if (p.s === 'pending') return '<span class="evp-price wait">✈︎ Caut zborul…</span>';
+    // Nu am putut cere prețul (limită de cereri sau pauză după un refuz Kiwi): nu lăsăm cardul fără rând de zbor.
+    if (tried.has(e.id) || FP.paused()) return '<span class="evp-price wait">✈︎ Prețul zborului: vezi în pachet</span>';
     return '';
   };
   let rerender = 0;
@@ -222,8 +224,10 @@
 
   function render() {
     // Cu filtrul de buget cerem din start prețurile candidaților (cei mai apropiați întâi), în limita Kiwi pe pagină.
-    if ((state.inBudget && budget) || state.onlyFlights) base().filter(e => priceState(e).s === 'unknown').slice(0, 24).forEach(ask);
     const items = build(visible());
+    // Cerem întâi prețurile cardurilor care se văd (în ordinea afișării: favoritele, apoi pe dată), nu primele 24 pe dată din tot tab-ul:
+    // altfel concertele de peste câteva luni nu apucau niciodată să primească zbor și rămâneau fără rând de preț.
+    if ((state.inBudget && budget) || state.onlyFlights) items.slice(0, state.shown).map(x => x.e).filter(e => priceState(e).s === 'unknown').slice(0, 24).forEach(ask);
     const focused = document.activeElement?.closest?.('[data-tab]')?.dataset.tab;
     root.innerHTML = `
       ${catsHtml()}
