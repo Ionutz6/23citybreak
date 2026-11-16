@@ -1,8 +1,6 @@
+// Doar orarul zborului folosește slidere (în popoverul „Orar zbor”); Călători, Durată și Buget sunt drop-down-uri.
 (() => {
   const controls = [
-    {id:'f-adults', label:'Călători', min:'1', max:'4'},
-    {id:'quick-duration', label:'Durata zborului / sens', min:'2 ore', max:'6 ore'},
-    {id:'f-max-price', label:'Buget max. / persoană', min:'minim', max:'fără limită'},
     {id:'f-fri-dep', label:'Plecare la dus', min:'06:00', max:'20:00'},
     {id:'f-out-arr', label:'Sosire la destinație', min:'23:00', max:'02:00'},
     {id:'f-sun-dep', label:'Plecare la retur', min:'12:00', max:'20:00'},
