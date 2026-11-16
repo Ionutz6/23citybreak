@@ -107,12 +107,26 @@
     return n.map(([k, t]) => `<div class="s pk-timing ${k}">${k === 'warn' ? '⚠️' : 'ℹ️'} ${esc(t)}</div>`).join('');
   };
   const flightSub = () => flightState === 'loading' ? ' · caut prețul…' : flight?.eur ? `<br>${flight.direct ? 'direct, de persoană, găsit acum pe Kiwi' : `zbor cu ${flight.stops} ${flight.stops === 1 ? 'escală' : 'escale'}`}` : flightState === 'none' ? (flight?.timing ? '<br>niciun zbor nu se potrivește cu ora evenimentului în zilele astea' : '<br>nu am găsit zboruri în zilele astea') : flightState === 'na' ? `<br>prețul îl vezi la Kiwi${DEBUG && flightWhy ? ` <span class="pk-why">(${esc(flightWhy)})</span>` : ''}` : '';
+  // Prețul găsit live pe pagina pachetului se trimite anonim la price-report (route_prices, source='visitor'), ca cardurile din Evenimente și Acasă
+  // să arate prețuri reale fără cereri Kiwi noi. Doar zborurile fără reguli de oră (altfel prețul n-ar fi cel mai mic al weekendului);
+  // serverul validează (weekend, 25–600 €) și păstrează cel mai mic preț al zilei. Fără date personale; o dată pe zi per rută și weekend.
+  function reportPrice(p, r) {
+    try {
+      const api = E.api;
+      if (!api || r.arriveBy || r.departAfter || !/^[A-Z]{3}$/.test(origin) || !/^City:[a-z0-9-]+_[a-z]{2}$/.test(city.id)) return;
+      const k = `23cb-reported|${origin}|${city.id}|${trip.out}|${trip.back}|${Math.round(p.eur)}`;
+      if (localStorage.getItem(k) && Date.now() - +localStorage.getItem(k) < 864e5) return;
+      localStorage.setItem(k, String(Date.now()));
+      fetch(`${api.url}/functions/v1/price-report`, { method: 'POST', keepalive: true, headers: { 'Content-Type': 'application/json', apikey: api.key, Authorization: `Bearer ${api.key}` }, body: JSON.stringify({ origin, items: [{ dest: city.id, out: trip.out, back: trip.back, price: Math.round(p.eur), direct: p.direct === true }] }) }).catch(() => {});
+    } catch {}
+  }
   function loadFlight() {
     if (!FP || !iata || !city?.id) { flightState = 'na'; return; }
     const r = rules(), key = `${trip.out}|${trip.back}`; if (key === flightKey) return;
     flightKey = key; flight = null; flightState = 'loading';
     FP.get({ origin, dest: city.id, out: trip.out, back: trip.back, arriveBy: r.arriveBy, departAfter: r.departAfter }).then(p => {
       if (flightKey !== key) return;
+      if (p?.eur) reportPrice(p, r);
       flight = p; flightState = p?.eur ? 'ok' : p ? 'none' : 'na'; flightWhy = p ? '' : whyNoPrice(); if (flightWhy) console.info('[23cb] fără preț zbor:', flightWhy); render(false);
     });
   }

@@ -290,4 +290,33 @@ body.evp .site-footer{margin-top:auto}
 .ev-pager{display:flex;align-items:center;justify-content:center;gap:16px;margin-top:22px;font:700 14px 'Space Grotesk',sans-serif;color:#0a0b0d}
 .ev-arrow{width:46px;height:46px;border-radius:50%;border:2px solid #0a0b0d;background:#fff;color:#0a0b0d;font-size:26px;line-height:1;cursor:pointer;display:grid;place-items:center;padding:0 0 3px}
 .ev-arrow:hover:not(:disabled){background:#0a0b0d;color:#fff}.ev-arrow:disabled{opacity:.3;cursor:default}
+
+/* ---------- Slider de perioadă (assets/period-slider.js): Zboruri și Evenimente, doar cu cont ---------- */
+.ps{font-family:'Source Sans 3',system-ui,sans-serif;color:#0a0b0d;margin:14px 0 4px;padding:12px 16px 8px;border:1.5px solid #e4e7eb;border-radius:16px;background:#fffdf8;user-select:none;-webkit-user-select:none}
+.ps[hidden]{display:none}
+.ps-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:4px 14px;margin-bottom:12px}
+.ps-label{font:800 12px 'Space Grotesk',system-ui,sans-serif;text-transform:uppercase;letter-spacing:.08em;color:#8a5d14}
+.ps-value{font:700 15px 'Space Grotesk',system-ui,sans-serif}
+.ps-track{position:relative;height:34px;margin:0 11px;touch-action:none;cursor:pointer}
+.ps-track::before{content:"";position:absolute;left:0;right:0;top:12px;height:6px;border-radius:99px;background:#e9edf2}
+.ps-past{position:absolute;left:0;top:12px;height:6px;border-radius:99px 0 0 99px;background:repeating-linear-gradient(45deg,#cfd5dd,#cfd5dd 3px,#e4e8ee 3px,#e4e8ee 6px)}
+.ps-fill{position:absolute;top:12px;height:6px;background:#dfa649}
+.ps-ticks{position:absolute;inset:0;pointer-events:none}
+.ps-ticks i{position:absolute;top:22px;width:1px;height:4px;background:#c5ccd6;transform:translateX(-.5px)}
+.ps-ticks i.ps-tick-m{top:20px;height:9px;width:1.5px;background:#7b8494}
+.ps-months{position:relative;height:30px;margin:0 11px;font:700 11px 'Source Sans 3',system-ui,sans-serif;color:#5b6470}
+.ps-months span{position:absolute;top:0;white-space:nowrap}
+.ps-months .ps-jan{color:#0a0b0d}
+.ps-months b{display:block;font-weight:800;font-size:10px;line-height:1;color:#8a5d14}
+.ps-handle{position:absolute;top:3px;width:20px;height:28px;margin-left:-10px;border-radius:8px;background:#fff;border:3px solid #c78b2d;box-shadow:0 1px 4px rgba(10,11,13,.3);cursor:grab;z-index:2;touch-action:none;-webkit-tap-highlight-color:transparent;background-image:linear-gradient(#c78b2d,#c78b2d),linear-gradient(#c78b2d,#c78b2d);background-size:2px 12px,2px 12px;background-position:4px 50%,10px 50%;background-repeat:no-repeat}
+.ps-handle::before{content:"";position:absolute;top:-12px;bottom:-12px}
+.ps-handle[data-ps=a]::before{left:-30px;right:-2px}
+.ps-handle[data-ps=b]::before{left:-2px;right:-30px}
+.ps-handle.drag{cursor:grabbing;background-color:#fce8bd;transform:scale(1.12)}
+.ps-handle:focus-visible{outline:3px solid #bd8c45;outline-offset:3px}
+@media(max-width:600px){.ps{padding:10px 10px 6px}.ps-track{margin:0 15px;height:44px}.ps-track::before,.ps-past,.ps-fill{top:19px;height:8px}.ps-ticks i{top:30px}.ps-ticks i.ps-tick-m{top:28px}.ps-handle{top:7px;width:24px;height:32px;margin-left:-12px;border-radius:10px;background-position:6px 50%,13px 50%;background-size:2px 14px,2px 14px}.ps-handle[data-ps=a]::before{left:-34px}.ps-handle[data-ps=b]::before{right:-34px}.ps-months{margin:0 15px}.ps-value{font-size:13px}}
+.evp-period{margin-top:18px}
+.evp-sec-h{font:700 24px/1.2 'Space Grotesk',system-ui,sans-serif;letter-spacing:-.02em;margin:26px 0 14px;color:#0a0b0d}
+.evp-fav{margin-bottom:10px}
+.evp-fav .evp-note{margin:10px 0 0}
 .pk-row.pk-total{background:#f6f1e3;border:1px solid #ecd8b0;border-radius:10px;padding:12px;margin-top:6px}.pk-row.pk-total .pr{color:#143d2a}
