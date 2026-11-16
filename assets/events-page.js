@@ -279,7 +279,7 @@
     const list = bySport(inTab());
     const comps = [...new Set(list.map(compKey))];
     if (comps.length < 2) return '';
-    const label = c => E.COMPETITIONS[c] || (c.startsWith('s:') ? 'Alte meciuri' : (E.KINDS[c] || E.KINDS.other)[1]);
+    const label = c => E.COMPETITIONS[c] || (c.startsWith('s:') ? 'Alte evenimente sportive' : (E.KINDS[c] || E.KINDS.other)[1]);
     comps.sort((a, b) => (myComps.includes(b) - myComps.includes(a)) || label(a).localeCompare(label(b)));
     return `<div class="evp-row${state.tab === 'sport' ? '' : ' evp-row-nolabel'}">${state.tab === 'sport' ? '<span class="evp-row-label">Competiție</span>' : ''}<div class="evp-chips" role="group" aria-label="Competiție">${[['all', 'Toate'], ...comps.map(c => [c, label(c)])].map(([c, l]) => `<button type="button" class="evp-chip${c === state.comp ? ' on' : ''}" data-comp="${esc(c)}" aria-pressed="${c === state.comp}">${myComps.includes(c) ? '★ ' : ''}${esc(l)}</button>`).join('')}</div></div>`;
   }
@@ -337,7 +337,7 @@
           ${favItems.length ? `<div class="ev-grid">${favItems.map(x => E.cardHtml(x.e, { tour: tourMore(x.e), runs: 0 })).join('')}</div>` : '<p class="evp-note">Niciun favorit în perioada aleasă.</p>'}
           ${favAll.length > PAGE ? `<p class="evp-note">Ai încă ${favAll.length - PAGE} favorite în perioada aleasă; restrânge perioada ca să le vezi pe toate.</p>` : ''}
           ${favLater ? `<p class="evp-note">Mai ai ${n(favLater, 'favorit', 'favorite')} în afara perioadei alese: mută capetele sliderului.</p>` : ''}</section>
-          <h2 class="evp-sec-h">${state.tab === 'music' ? 'Alte concerte și festivaluri' : 'Alte meciuri și curse'}</h2>` : ''}
+          <h2 class="evp-sec-h">${state.tab === 'music' ? 'Alte concerte și festivaluri' : 'Alte evenimente sportive'}</h2>` : ''}
         ${items.length ? `<div class="ev-grid">${items.slice(state.page * PAGE, (state.page + 1) * PAGE).map(x => E.cardHtml(x.e, { tour: tourMore(x.e), runs: RUN_KINDS.has(x.e.kind) ? (runs.get(runKey(x.e)) || 1) - 1 : 0 })).join('')}</div>` : `<p class="evp-empty">${emptyText()}</p>`}
         ${pagerHtml(items.length)}
       </div>

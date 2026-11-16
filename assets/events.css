@@ -320,3 +320,5 @@ body.evp .site-footer{margin-top:auto}
 .evp-fav{margin-bottom:10px}
 .evp-fav .evp-note{margin:10px 0 0}
 .pk-row.pk-total{background:#f6f1e3;border:1px solid #ecd8b0;border-radius:10px;padding:12px;margin-top:6px}.pk-row.pk-total .pr{color:#143d2a}
+/* Pastilele de sport centrate pe orizontală (pe telefon rămân derulabile) */
+@media(min-width:601px){.evp-row-nolabel .evp-pills{flex:1 1 auto;justify-content:center}}
