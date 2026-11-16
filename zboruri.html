@@ -25,7 +25,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@500;600;700;800&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;0,800;1,400&family=Space+Grotesk:wght@500;600;700&family=Syne:wght@700;800&display=swap&subset=latin,latin-ext" rel="stylesheet">
   
   <link rel="stylesheet" href="assets/tailwind.css" />
-  <link rel="stylesheet" href="assets/events.css?v=33" />
+  <link rel="stylesheet" href="assets/events.css?v=34" />
   <style>
     :root {
       /* 23ai Brand Colors */
@@ -291,7 +291,8 @@
   <link rel="stylesheet" href="assets/account.css?v=6">
   <link rel="stylesheet" href="assets/personalizare.css?v=4">
 <link rel="stylesheet" href="assets/site-header.css?v=2">
-<link rel="stylesheet" href="assets/search-steps.css?v=1">
+<link rel="stylesheet" href="assets/search-steps.css?v=2">
+<link rel="stylesheet" href="assets/flight-guide.css?v=1">
 <script>/* Quizul s-a mutat pe pagina Orașe vizitate; linkurile vechi (emailuri, cont) ajung acolo. */ if (/^#city-quiz/.test(location.hash)) location.replace('orase-vizitate.html' + location.hash);</script>
 </head>
 <body class="antialiased min-h-screen flex flex-col bg-white text-[#0a0b0d]">
@@ -2746,6 +2747,27 @@
       }
     });
 
+    // Click pe tot cardul (nu doar pe un buton) deschide ghidul de weekend cu zborul, data, prețul și cumpărarea.
+    // Cardul nu are linkuri: Kiwi, Skyscanner, cazarea și WhatsApp stau în ghid.
+    async function openFlightGuideFromCard(card) {
+      let g; try { g = JSON.parse(card.dataset.flightGuide || "null"); } catch (_) { g = null; }
+      if (!g || !window.CBFlightGuide) return;
+      g.events = (window.CBEvents?.hitsFor?.(g.cityId, g.wkId) || []);
+      g.onShare = () => shareTripWhatsApp(g.city, g.dates, g.price, `${g.outTime} / ${g.inTime}`, g.kiwiUrl || "");
+      window.CBFlightGuide.open(g);
+      const photo = await getCityPhotoAsset(g.cityId).catch(() => null);
+      if (photo?.url && document.getElementById("fg-ban") && document.getElementById("fg-title")?.textContent === g.city) {
+        document.getElementById("fg-ban").style.backgroundImage = `url("${photo.url}")`;
+      }
+    }
+    document.addEventListener("click", (ev) => {
+      const card = ev.target.closest && ev.target.closest("[data-guide-card]");
+      if (card) openFlightGuideFromCard(card);
+    });
+    document.addEventListener("keydown", (ev) => {
+      if ((ev.key === "Enter" || ev.key === " ") && ev.target.matches?.("[data-guide-card]")) { ev.preventDefault(); openFlightGuideFromCard(ev.target); }
+    });
+
     function renderCardsView(filteredRows, activeWks, maxBudget) {
       const cardsGrid = document.getElementById("cards-grid");
       if (!cardsGrid) return;
@@ -2812,16 +2834,15 @@
           airportNote = `<div class="text-[11px] text-[#cbd5e1] mt-1 font-body">✈ ${escapeHtml(airportLabel(bestIata))} (${escapeHtml(bestIata)}) · și ${otherAirports.map(a => `${escapeHtml(a.name)} de la ${formatMoney(currentMode === 1 ? a.minPrice : a.minPrice * (parseInt(document.getElementById("f-adults").value, 10) || 2))}`).join(", ")}</div>`;
         }
 
+        const guideData = {
+          cityId: r.cityId || "", city: r.city, country: (ALL_EUROPE_CITIES.find(c => c.id === r.cityId)?.country) || "", iata: bestIata || r.iata || r.code || "",
+          origin: getOrigin().iata, out: tripD?.dateOut || "", back: tripD?.dateIn || "", price: bestCell ? Math.round(bestCell.perPaxEur) : 0,
+          outTime: flightTimeOut, inTime: flightTimeIn, airline: bestCell ? airline : "", direct: bestCell ? bestCell.stops === 0 : null,
+          kiwiUrl: bestCell ? kiwiTargetUrl(bestCell) : "", skyUrl: bestCell?.skyscannerUrl || "", wkId: bestWk?.id || "", dates: datesLabel
+        };
         cardsHtml += `
-          <div data-city-id="${escapeHtml(r.cityId || '')}" data-wk-id="${escapeHtml(bestWk?.id || '')}" class="card-23ai city-card-bg rounded-3xl overflow-hidden flex flex-col justify-between border border-[#e4e7eb] shadow-sm relative group"
+          <div data-city-id="${escapeHtml(r.cityId || '')}" data-wk-id="${escapeHtml(bestWk?.id || '')}" data-guide-card data-flight-guide="${escapeHtml(JSON.stringify(guideData))}" role="button" tabindex="0" aria-label="${escapeHtml(`Ghid de weekend ${r.city}, ${priceDisplay}`)}" class="card-23ai city-card-bg rounded-3xl overflow-hidden flex flex-col justify-end border border-[#e4e7eb] shadow-sm relative group cursor-pointer"
                style="background-color:#202b34; min-height: 340px;">
-            
-            <div class="p-4 z-10">
-              <button type="button" data-action="city-guide" data-city-key="${escapeHtml(cityKey)}" data-city-name="${escapeHtml(r.city)}" data-iata="${escapeHtml(r.iata || r.code)}" data-guide-city-id="${escapeHtml(r.cityId || '')}"
-                      class="w-full bg-black/60 hover:bg-black text-[#dfa649] hover:text-white border border-[#dfa649]/40 text-xs font-bold px-4 py-2 rounded-lg transition cursor-pointer font-display">
-                Ghid turistic →
-              </button>
-            </div>
 
             <!-- Bottom Card Content: Price, Route, Schedule & Booking -->
             <div class="p-5 z-10 space-y-3">
@@ -2856,19 +2877,6 @@
                 <div>
                   <div class="font-num text-2xl font-black text-[#dfa649] leading-none">${priceDisplay}</div>
                   <div class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">${priceSub}</div>
-                </div>
-                <div class="ml-auto flex flex-wrap items-center gap-1.5" style="justify-content:flex-end">
-                  <button type="button" data-action="share-whatsapp" data-city-name="${escapeHtml(r.city)}" data-dates="${escapeHtml(datesLabel)}" data-price="${bestCell ? Number(bestCell.perPaxEur) || 0 : 0}" data-flight-info="${escapeHtml(flightTimeOut + ' / ' + flightTimeIn)}" data-book-url="${escapeHtml(bookUrl)}"
-                          title="Trimite pe WhatsApp"
-                          class="whatsapp-share bg-emerald-700 hover:bg-emerald-600 text-white h-10 box-border px-3 py-0 rounded-xl transition cursor-pointer shadow-xs font-display flex items-center justify-center gap-1.5 font-bold text-xs whitespace-nowrap" aria-label="Trimite oferta pe WhatsApp">
-                    <svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.65 15.02L2 22l5.13-1.34A10 10 0 1 0 12 2zm0 18a7.94 7.94 0 0 1-4.05-1.1l-.29-.17-3.04.79.81-2.96-.19-.3A8 8 0 1 1 12 20zm4.4-5.96c-.24-.12-1.42-.7-1.64-.78-.22-.08-.38-.12-.54.12-.16.24-.62.78-.76.94-.14.16-.28.18-.52.06-.24-.12-1.02-.38-1.94-1.2-.72-.64-1.2-1.42-1.34-1.66-.14-.24-.02-.37.11-.49.11-.11.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.54-1.3-.74-1.78-.2-.46-.4-.4-.54-.41h-.46c-.16 0-.42.06-.64.3-.22.24-.84.82-.84 2s.86 2.32.98 2.48c.12.16 1.7 2.6 4.12 3.64.58.25 1.04.4 1.4.51.59.19 1.13.16 1.56.1.48-.07 1.42-.58 1.62-1.14.2-.56.2-1.04.14-1.14-.06-.1-.22-.16-.46-.28z"/></svg><span>WhatsApp</span>
-                  </button>
-                  <a href="${escapeHtml(bookUrl)}" target="_blank" rel="noopener noreferrer"
-                     class="bg-[#dfa649] hover:bg-[#c98f33] active:bg-[#b57f2a] text-[#0a0b0d] font-black text-xs h-10 box-border px-3.5 py-0 rounded-xl transition shadow-xs font-display flex items-center justify-center whitespace-nowrap">
-                    <span>Verifică oferta</span>
-                  </a>
-                  ${cardKiwiUrl ? `<a href="${escapeHtml(cardKiwiUrl)}" target="_blank" rel="noopener noreferrer" title="Deschide oferta pe Kiwi.com"
-                     style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.35);color:#fff" class="font-bold text-xs h-10 box-border px-3 py-0 rounded-xl transition font-display flex items-center justify-center whitespace-nowrap">Kiwi</a>` : ""}
                 </div>
               </div>
 
@@ -4410,7 +4418,9 @@
   <script src="assets/account.js?v=8"></script>
   <script src="assets/city-coords.js?v=1"></script>
   <script src="assets/personalizare.js?v=8"></script>
-  <script src="assets/events.js?v=21"></script>
+  <script src="assets/events.js?v=23"></script>
+  <script src="assets/estimates.js?v=1"></script>
+  <script src="assets/flight-guide.js?v=1"></script>
   <script src="assets/period-slider.js?v=4"></script>
   <script src="assets/zboruri-period.js?v=1"></script>
 <script src="assets/site-header.js?v=2"></script>

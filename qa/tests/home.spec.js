@@ -21,7 +21,16 @@ test('idei de evadare: 3 destinații aleatorii până la 150 €, prețul vizita
   const prices = first.map(t => +/(\d+) €/.exec(t)[1]);
   expect(prices.every(p => p <= 150)).toBe(true);
   expect(first.join()).not.toMatch(/\b80 €|\b200 €|\b20 €/); // 80 e înlocuit de 55 (vizitator); 200 peste plafon; 20 prea vechi
-  expect(await cards.first().getAttribute('href')).toMatch(/zboruri\.html\?dest=City%3A\w+_\w+#configurator/);
+  expect(await cards.first().getAttribute('href')).toBeNull(); // cardul nu mai e link: click deschide ghidul de weekend
+  await cards.first().click();
+  const dlg = page.locator('.fg-ov.open');
+  await expect(dlg).toBeVisible();
+  await expect(dlg.locator('.fg-cta')).toHaveText('Cumpără bilet de avion');
+  await expect(dlg.locator('.fg-cta')).toHaveAttribute('href', /kiwi\.com/);
+  await expect(dlg.locator('.fg-big')).toContainText('€');
+  await expect(dlg.locator('.fg-meta')).toContainText('Vineri');
+  await page.keyboard.press('Escape');
+  await expect(dlg).toHaveCount(0);
   expect(st.kiwi.length).toBe(0);
   expect(H.realErrors(st)).toEqual([]);
 });
