@@ -945,6 +945,17 @@
 
     // Full European Destinations Database with flags and IATA codes (150+ Skyscanner cities)
     const ALL_EUROPE_CITIES = window.CB_EUROPE_CITIES; // assets/europe-cities.js
+    // Țări ca destinație („un weekend oriunde în Spania”): una pe țară, cu orașele ei din listă. Căutarea cere Kiwi acele orașe dintr-o singură cerere pe weekend.
+    const COUNTRY_OPTIONS = (() => {
+      const by = new Map();
+      for (const c of ALL_EUROPE_CITIES) {
+        const cc = /^City:[a-z0-9-]+_([a-z]{2})$/.exec(c.id || "")?.[1];
+        if (!cc || c.isAll) continue;
+        if (!by.has(cc)) by.set(cc, { id: `Country:${cc.toUpperCase()}`, cc: cc.toUpperCase(), name: `${c.country} (orice oraș)`, country: c.country, flag: c.flag, iata: "", isCountry: true, cityIds: [] });
+        by.get(cc).cityIds.push(c.id);
+      }
+      return [...by.values()].filter(c => c.cityIds.length >= 2);
+    })();
 
     function getCountryFlag(code) {
       if (!code || code.length !== 2) return "✈️";
@@ -1408,7 +1419,7 @@
       const hidden = Math.max(0, discoverySummary.total - shown);
       const cityWord = n => n === 1 ? "1 oraș" : `${n} orașe`;
       const hiddenNote = hidden ? ` (${hidden === 1 ? "încă 1 oraș ascuns" : `încă ${hidden} orașe ascunse`} de filtre)` : "";
-      const text = `${discoverySummary.failed ? "S-au găsit" : "Căutare finalizată! S-au găsit"} zboruri în ${cityWord(shown)} din Europa${hiddenNote}.${discoverySummary.failed ? " Unele weekenduri nu au putut fi verificate acum." : ""}`;
+      const text = `${discoverySummary.failed ? "S-au găsit" : "Căutare finalizată! S-au găsit"} zboruri în ${cityWord(shown)} ${selectedCityObj?.isCountry ? "din " + selectedCityObj.country : "din Europa"}${hiddenNote}.${discoverySummary.failed ? " Unele weekenduri nu au putut fi verificate acum." : ""}`;
       const el = document.getElementById("search-status-text");
       if (el) el.textContent = text;
     }
@@ -1815,7 +1826,7 @@
 
     function isSelectedDestinationText(value) {
       if (!selectedCityObj || document.getElementById("f-destination").value !== selectedCityObj.id) return false;
-      const selectedText = selectedCityObj.isAll ? "🌟 Oricare (Toată Europa)" : `${selectedCityObj.flag} ${selectedCityObj.name} (${selectedCityObj.iata}) · ${selectedCityObj.country}`;
+      const selectedText = selectedCityObj.isAll ? "🌟 Oricare (Toată Europa)" : selectedCityObj.isCountry ? `${selectedCityObj.flag} ${selectedCityObj.name}` : `${selectedCityObj.flag} ${selectedCityObj.name} (${selectedCityObj.iata}) · ${selectedCityObj.country}`;
       return value.trim() === selectedText;
     }
 
@@ -1834,11 +1845,8 @@
       const cleanQ = q.replace(/[^\p{L}\p{N}\s]/gu, '').trim().toLowerCase();
       const tokens = cleanQ.split(/\s+/).filter(Boolean);
 
-      const countryOnly = ALL_EUROPE_CITIES.some(c => !c.isAll && normalizeDestQuery(c.country) === cleanQ);
-      if (countryOnly) {
-        updateSearchStatus("Căutarea pe țară nu este disponibilă încă. Alege un oraș din listă.", 100, "empty");
-        return false;
-      }
+      const countryOnly = COUNTRY_OPTIONS.find(c => normalizeDestQuery(c.name) === cleanQ || normalizeDestQuery(c.country) === cleanQ);
+      if (countryOnly) { selectDestination(countryOnly.id); return true; }
       // 1. Exact match by name or IATA
       let match = ALL_EUROPE_CITIES.find(c => !c.isAll && (normalizeDestQuery(c.name) === cleanQ || normalizeDestQuery(c.iata) === cleanQ));
 
@@ -1963,7 +1971,7 @@
         const tokens = cleanQ.split(/\s+/).filter(Boolean);
 
         if (tokens.length > 0) {
-          matches = ALL_EUROPE_CITIES.filter(c => {
+          matches = [...COUNTRY_OPTIONS, ...ALL_EUROPE_CITIES].filter(c => {
             if (c.isAll) return false;
             const name = normalizeDestQuery(c.name);
             const country = normalizeDestQuery(c.country);
@@ -1977,8 +1985,9 @@
           matches.sort((a, b) => {
             const aName = normalizeDestQuery(a.name);
             const bName = normalizeDestQuery(b.name);
-            const aStarts = aName.startsWith(tokens[0]) ? 0 : 1;
-            const bStarts = bName.startsWith(tokens[0]) ? 0 : 1;
+            // Țara întreagă prima, când numele ei începe cu ce scrie clientul („spania” → Toată Spania).
+            const aStarts = a.isCountry && normalizeDestQuery(a.country).startsWith(tokens[0]) ? -1 : aName.startsWith(tokens[0]) ? 0 : 1;
+            const bStarts = b.isCountry && normalizeDestQuery(b.country).startsWith(tokens[0]) ? -1 : bName.startsWith(tokens[0]) ? 0 : 1;
             if (aStarts !== bStarts) return aStarts - bStarts;
             return aName.localeCompare(bName);
           });
@@ -2024,7 +2033,7 @@
               <span class="text-base">${c.flag || "✈️"}</span>
               <div>
                 <span class="font-display font-black">${escapeHtml(c.name)}</span>
-                <span class="text-[11px] text-[#64748b] font-normal ml-1 font-body">(${c.iata || "EUR"}) · ${escapeHtml(c.country || "Europa")}</span>
+                <span class="text-[11px] text-[#64748b] font-normal ml-1 font-body">${c.isCountry ? `· ${c.cityIds.length} orașe` : `(${c.iata || "EUR"}) · ${escapeHtml(c.country || "Europa")}`}</span>
               </div>
             </div>
             ${c.isAll ? '<span class="text-[10px] font-bold text-[#5c3b06] bg-[#fce8bd] px-1.5 py-0.5 rounded">Default</span>' : '<span class="text-xs font-bold text-[#dfa649]">Alege →</span>'}
@@ -2036,7 +2045,7 @@
     }
 
     function selectDestination(cityId) {
-      const city = ALL_EUROPE_CITIES.find(c => c.id === cityId);
+      const city = ALL_EUROPE_CITIES.find(c => c.id === cityId) || COUNTRY_OPTIONS.find(c => c.id === cityId);
       if (!city) return;
 
       selectedCityObj = city;
@@ -2068,10 +2077,10 @@
         if (scanBtnText) scanBtnText.textContent = "Cel mai bun weekend din an";
 
       } else {
-        input.value = `${city.flag} ${city.name} (${city.iata}) · ${city.country}`;
+        input.value = city.isCountry ? `${city.flag} ${city.name}` : `${city.flag} ${city.name} (${city.iata}) · ${city.country}`;
         clearBtn.classList.remove("hidden");
         if (searchBtnText) searchBtnText.textContent = "Caută zboruri";
-        if (scanBtnText) scanBtnText.textContent = `Cel mai bun weekend în ${city.name}`;
+        if (scanBtnText) scanBtnText.textContent = city.isCountry ? "Cel mai bun weekend din an" : `Cel mai bun weekend în ${city.name}`;
 
       }
 
@@ -2602,6 +2611,7 @@
     // Render Cross-Engine Search Bar
     function renderCrossEngineBar() {
       const container = document.getElementById("cross-engine-links");
+      if (selectedCityObj?.isCountry) { container.innerHTML = ""; return; }
       const originSelect = document.getElementById("f-origin");
       const origIata = originSelect?.selectedOptions?.[0]?.dataset?.iata || "OTP";
       const targetIata = selectedCityObj?.iata || "BGY";
@@ -2882,7 +2892,7 @@
       const destVal = destSelect?.value || "any";
 
       let filteredRows = sortRowsByCityGroup(currentRows);
-      if (destVal !== "any" && selectedCityObj) {
+      if (destVal !== "any" && selectedCityObj && !selectedCityObj.isCountry) {
         filteredRows = filteredRows.filter(r => {
           const rCode = (r.code || "").toLowerCase();
           const rIata = (r.iata || "").toLowerCase();
@@ -3334,7 +3344,7 @@
       const destSelect = document.getElementById("f-destination");
       let destVal = destSelect.value;
 
-      if (destVal === "any") {
+      if (destVal === "any" || selectedCityObj?.isCountry) {
         alert("Te rugăm să scrii sau să alegi mai întâi un oraș în caseta Destinație (ex: Tallinn, Manchester, Nisa etc.)");
         document.getElementById("dest-search-input").focus();
         showDestDropdown(true);
@@ -3555,7 +3565,7 @@
       const destIata = selectedCityObj?.iata || "";
 
       const selectedWeekends = getSelectedWeekendsList();
-      if (searchSimilar && destVal === "any") return;
+      if (searchSimilar && (destVal === "any" || selectedCityObj?.isCountry)) return;
       const activeWks = searchSimilar ? makeSimilarPeriods(selectedWeekends) : selectedWeekends;
       similarResultPeriods = null;
       document.getElementById('similar-results-note').hidden = true;
@@ -3576,7 +3586,7 @@
 
       try {
         // TARGETED CITY SEARCH
-        if (destVal !== "any") {
+        if (destVal !== "any" && !selectedCityObj?.isCountry) {
           updateSearchStatus(`Interogăm live ${activeWks.length} ${searchSimilar ? "perioade asemănătoare" : "weekenduri alese"} pentru ${cityName}...`, 0, "loading");
 
           let failedRequests = 0;
@@ -3802,7 +3812,8 @@
           return;
         }
 
-        // DISCOVERY SEARCH (Toată Europa)
+        // DISCOVERY SEARCH (Toată Europa sau o țară întreagă)
+        const countryMode = !!selectedCityObj?.isCountry;
         const cityRowsMap = new Map();
         currentRows.forEach(r => {
           const key = destinationRowKey(r.iata || r.code, r.cityGroup || r.city);
@@ -3837,6 +3848,9 @@
 
           const tripDates = getTripDates(wk);
           try {
+            const destCityIds = new Set();
+            if (countryMode) selectedCityObj.cityIds.forEach(id => { if (id !== originCityId) destCityIds.add(id); }); // țară: cerem direct orașele țării din listă
+            else {
             const resOut = await flightFetch("https://api.skypicker.com/umbrella/v2/graphql", {
               method: "POST",
               signal: AbortSignal.timeout(45000),
@@ -3861,7 +3875,6 @@
             const jsonOut = await readFlightResponse(resOut);
             const outItins = jsonOut?.data?.onewayItineraries?.itineraries || [];
 
-            const destCityIds = new Set();
             for (const it of outItins) {
               const segs = it.sector?.sectorSegments || [];
               if (segs.length - 1 > maxStops) continue;
@@ -3874,6 +3887,7 @@
               if (destCity?.id && destCity.id !== originCityId) destCityIds.add(destCity.id);
             }
 
+            }
             if (destCityIds.size === 0) continue;
 
             const resRet = await flightFetch("https://api.skypicker.com/umbrella/v2/graphql", {
@@ -3924,8 +3938,9 @@
               const destCity = outLast.destination.station.city;
               const destCountry = outLast.destination.station.city?.country?.code;
 
-              if (!EUROPE_COUNTRIES.has(destCountry) || (!includeDomestic && destCountry === origin.country)) continue;
+              if (!EUROPE_COUNTRIES.has(destCountry) || (!includeDomestic && !countryMode && destCountry === origin.country)) continue;
               if (destCity?.id === originCityId) continue;
+              if (countryMode && destCountry !== selectedCityObj.cc) continue;
 
               const outArrTime = outLast.destination.localTime.slice(11, 16);
               if (!withinArrivalLimit(outLast.destination.localTime, tripDates.dateOut, outArrLimit)) continue;
@@ -3998,7 +4013,7 @@
 
         if (totalFound > 0) {
           discoverySummary = { total: countUniqueCities(currentRows), failed: failedRequests > 0 };
-          updateSearchStatus(`✅ ${failedRequests ? "S-au găsit" : "Căutare finalizată! S-au găsit"} zboruri în ${discoverySummary.total} orașe din Europa.${failedRequests ? " Unele weekenduri nu au putut fi verificate acum." : ""}`, 100, "success");
+          updateSearchStatus(`✅ ${failedRequests ? "S-au găsit" : "Căutare finalizată! S-au găsit"} zboruri în ${discoverySummary.total} ${discoverySummary.total === 1 ? 'oraș' : 'orașe'} ${selectedCityObj?.isCountry ? 'din ' + selectedCityObj.name : 'din Europa'}.${failedRequests ? " Unele weekenduri nu au putut fi verificate acum." : ""}`, 100, "success");
         } else if (failedRequests) {
           updateSearchStatus(discoveryRefused ? providerLimitMessage() : `Nu putem confirma disponibilitatea: ${failedRequests} weekenduri nu au putut fi verificate. Încearcă din nou.`, 100, "error");
         } else {
