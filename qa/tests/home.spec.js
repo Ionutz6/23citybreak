@@ -160,7 +160,7 @@ test('evenimente Acasă: doar vineri–duminică, fără excepții (nici Champio
   await expect(page.locator('#he-grid')).toContainText('Roma');
   await expect(page.locator('#he-grid')).not.toContainText('Real Madrid');
   await expect(page.locator('#he-grid')).not.toContainText('Olympiacos');
-  await expect(page.locator('#he-grid .ev-flight')).toContainText('zbor din București de la 77 €');
+  await expect(page.locator('#he-grid .ev-flight')).toContainText('77 €'); await expect(page.locator('#he-grid .ev-flight')).toContainText('zbor din București');
 });
 
 test('evenimente Acasă: cardurile se ordonează crescător după prețul zborului, cele fără preț la coadă', async ({ page }) => {
@@ -183,4 +183,22 @@ test('evenimente Acasă: cardurile se ordonează crescător după prețul zborul
   await expect(cards.nth(0)).toContainText('59 €');
   await expect(cards.nth(1)).toContainText('120 €');
   await expect(cards.nth(2)).toContainText('Madrid'); // fără preț, la coadă
+});
+
+test('evenimente Acasă: un singur rând de 3, cele mai ieftine după zbor, cu prețul mare auriu', async ({ page }) => {
+  const f3 = H.friday(3), at = (d, t) => `${H.iso(d)}T${t}:00Z`;
+  const base = { venue: null, ends_at: null, time_tbc: false, artists: [], teams: [], genres: [], competition: null, price_min_eur: null, ticket_url: null, image_url: null, popularity: 90, source: 'curated', kind: 'concert' };
+  const city = (id, c, kind) => ({ ...base, id, kind, title: `Eveniment ${c}`, city_id: c, starts_at: at(H.addDays(f3, 1), '20:00'), artists: ['A ' + c], teams: kind === 'football' ? ['X', 'Y'] : [], competition: kind === 'football' ? 'SA' : null });
+  const events = [city('e1', 'rome_it', 'concert'), city('e2', 'vienna_at', 'football'), city('e3', 'prague_cz', 'sport'), city('e4', 'madrid_es', 'festival')];
+  const db = H.makeDb(); const out = H.iso(f3), back = H.iso(H.addDays(f3, 2)), seen = new Date().toISOString();
+  db.tables.route_prices = [['rome_it', 140], ['vienna_at', 60], ['prague_cz', 95], ['madrid_es', 80]].map(([c, p]) => ({ origin: 'OTP', dest: `City:${c}`, out_date: out, back_date: back, price_eur: p, direct: true, source: 'travelpayouts', seen_at: seen }));
+  await H.install(page, { db, events });
+  await page.goto('/');
+  const cards = page.locator('#he-grid .ev-card');
+  await expect(cards).toHaveCount(3);
+  await expect(cards.nth(0)).toContainText('60 €');
+  await expect(cards.nth(1)).toContainText('80 €');
+  await expect(cards.nth(2)).toContainText('95 €');
+  expect(await cards.nth(0).locator('.ev-fp b').evaluate(n => getComputedStyle(n).color)).toBe('rgb(223, 166, 73)');
+  expect(await page.locator('#he-grid').evaluate(n => getComputedStyle(n).gridTemplateColumns.split(' ').length)).toBe(3);
 });

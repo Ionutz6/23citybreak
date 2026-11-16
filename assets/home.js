@@ -100,29 +100,8 @@
     // Doar evenimente de vineri–duminică, fără excepții (nici Champions League sau EuroLeague), în următoarele 14–60 de zile.
     const fav = e => (isFavTeam(e) || isFavArtist(e)) ? 1 : 0;
     const score = e => fav(e) * 1000 + (e.popularity || 0);
-    const pick = days => {
-      const from = addDays(today, 14), to = addDays(today, days);
-      const pool = all.filter(e => H.startDate(e) >= from && H.startDate(e) <= to && E.isWeekend(e) && isNotable(e));
-      const ranked = pool.filter(e => fav(e) || (e.popularity || 0) >= TOP).sort((a, b) => score(b) - score(a) || a.starts_at.localeCompare(b.starts_at));
-      // Cel mult un eveniment pe oraș și 2 din aceeași categorie, ca vitrina să nu fie 3 meciuri; favoritele nu sunt limitate de categorie.
-      const out = [], cities = new Set(), cats = {};
-      for (const e of ranked) {
-        const cat = E.categoryOf(e);
-        if (cities.has(e.city_id) || (!fav(e) && (cats[cat] || 0) >= 2)) continue;
-        out.push(e); cities.add(e.city_id); cats[cat] = (cats[cat] || 0) + 1;
-        if (out.length === 3) break;
-      }
-      return out;
-    };
-    const picked = pick(60);
-    if (!picked.length) return;
-    const grid = document.getElementById('he-grid');
-    grid.innerHTML = picked.map(e => E.cardHtml(e)).join('');
-    grid.querySelectorAll('.ev-card[data-ev]').forEach(card => { // imaginea evenimentului ca pe pagina Evenimente, nu ilustrația orașului
-      const e = picked.find(x => x.id === card.dataset.ev);
-      if (e) E.eventPhoto(e).then(p => E.setBg(card, p)).catch(() => {});
-    });
-    // Prețul zborului: weekendul evenimentului, vineri → duminică, din route_prices (aeroportul din profil sau București), fără cereri la Kiwi.
+    // Candidați: evenimente de weekend, un singur eveniment pe oraș, cei mai importanți 40. Apoi cele mai ieftine 3 după prețul zborului
+    // (weekendul evenimentului, vineri → duminică, din route_prices; fără cereri la Kiwi); cele fără preț vin după cele cu preț.
     const dowOf = d => new Date(`${d}T12:00:00Z`).getUTCDay();
     const weekendOf = e => {
       for (let d = H.startDate(e), n = 0; d <= H.endDate(e) && n < 40; d = addDays(d, 1), n++) {
@@ -130,28 +109,40 @@
       }
       return null;
     };
-    const wk = new Map(picked.map(e => [e.id, weekendOf(e)]));
-    const fq = new URLSearchParams({ select: 'dest,out_date,back_date,price_eur,source,seen_at', origin: `eq.${flightOrigin()}`, dest: `in.(${[...new Set(picked.map(e => `City:${e.city_id}`))].join(',')})`, out_date: `in.(${[...new Set([...wk.values()].filter(Boolean).map(w => w.out))].join(',')})`, limit: '200' });
+    const from = addDays(today, 14), to = addDays(today, 60);
+    const ranked = all.filter(e => H.startDate(e) >= from && H.startDate(e) <= to && E.isWeekend(e) && isNotable(e) && (fav(e) || (e.popularity || 0) >= TOP))
+      .sort((a, b) => score(b) - score(a) || a.starts_at.localeCompare(b.starts_at));
+    const cand = [], seenCity = new Set();
+    for (const e of ranked) { if (seenCity.has(e.city_id)) continue; seenCity.add(e.city_id); cand.push(e); if (cand.length >= 40) break; }
+    if (!cand.length) return;
+    const wk = new Map(cand.map(e => [e.id, weekendOf(e)]));
+    let rows = [];
     try {
+      const fq = new URLSearchParams({ select: 'dest,out_date,back_date,price_eur,direct,source,seen_at', origin: `eq.${flightOrigin()}`, dest: `in.(${[...seenCity].map(c => `City:${c}`).join(',')})`, out_date: `in.(${[...new Set([...wk.values()].filter(Boolean).map(w => w.out))].join(',')})`, limit: '1000' });
       const r = await fetch(`${API.url}/rest/v1/route_prices?${fq}`, { headers: { apikey: API.key, Authorization: `Bearer ${API.key}` }, signal: AbortSignal.timeout(10000) });
-      const rows = r.ok ? (await r.json()).filter(x => Date.now() - Date.parse(x.seen_at) < (x.source === 'visitor' ? 24 : 72) * 36e5) : [];
-      grid.querySelectorAll('.ev-card[data-ev]').forEach(card => {
-        const e = picked.find(x => x.id === card.dataset.ev), w = wk.get(e?.id);
-        const cand = w ? rows.filter(x => x.dest === `City:${e.city_id}` && x.out_date === w.out && x.back_date === w.back) : [];
-        const slot = card.querySelector('.ev-flight');
-        if (!slot) return;
-        if (!cand.length) { slot.remove(); return; }
-        const best = cand.reduce((a, b) => (b.source === 'visitor' && a.source !== 'visitor') || (b.source === a.source && b.price_eur < a.price_eur) ? b : a);
-        slot.innerHTML = `✈ zbor din ${esc(originName(flightOrigin()))} de la <b>${best.price_eur} €</b> <small>(dus-întors, vineri–duminică)</small>`;
-        slot.classList.add('ev-flight-price');
-        card.dataset.flightPrice = String(best.price_eur);
-      });
-      // Cardurile cu preț de zbor primele, crescător după preț; cele fără preț la coadă, în ordinea de dinainte.
-      const cards = [...grid.querySelectorAll('.ev-card[data-ev]')];
-      cards.map((c, i) => ({ c, i, p: c.dataset.flightPrice ? Number(c.dataset.flightPrice) : Infinity }))
-        .sort((a, b) => a.p - b.p || a.i - b.i).forEach(x => grid.append(x.c));
-    } catch { grid.querySelectorAll('.ev-flight').forEach(n => n.remove()); }
-    if (picked.some(fav)) document.getElementById('he-sub').textContent = 'Echipele și trupele tale preferate primele, apoi cele mai atractive din următoarele 2 luni.';
+      if (r.ok) rows = (await r.json()).filter(x => Date.now() - Date.parse(x.seen_at) < (x.source === 'visitor' ? 24 : 72) * 36e5);
+    } catch {}
+    const priceOf = e => {
+      const w = wk.get(e.id);
+      const c = w ? rows.filter(x => x.dest === `City:${e.city_id}` && x.out_date === w.out && x.back_date === w.back) : [];
+      return c.length ? c.reduce((a, b) => (b.source === 'visitor' && a.source !== 'visitor') || (b.source === a.source && b.price_eur < a.price_eur) ? b : a) : null;
+    };
+    const priced = cand.map((e, i) => ({ e, i, p: priceOf(e) })).sort((a, b) => (a.p ? a.p.price_eur : Infinity) - (b.p ? b.p.price_eur : Infinity) || a.i - b.i);
+    const picked = [], cats = {};
+    for (const x of priced) { // cel mult 2 din aceeași categorie, ca vitrina să nu fie 3 meciuri
+      const cat = E.categoryOf(x.e);
+      if ((cats[cat] || 0) >= 2) continue;
+      picked.push(x); cats[cat] = (cats[cat] || 0) + 1;
+      if (picked.length === 3) break;
+    }
+    const grid = document.getElementById('he-grid');
+    grid.innerHTML = picked.map(({ e, p }) => E.cardHtml(e, p ? { flight: { eur: p.price_eur, origin: originName(flightOrigin()), label: H.rangeLabel(p.out_date, p.back_date), note: p.direct ? 'direct' : '' } } : {})).join('');
+    grid.querySelectorAll('.ev-card[data-ev]').forEach(card => { // imaginea evenimentului ca pe pagina Evenimente, nu ilustrația orașului
+      const x = picked.find(y => y.e.id === card.dataset.ev);
+      if (x) E.eventPhoto(x.e).then(ph => E.setBg(card, ph)).catch(() => {});
+    });
+    grid.querySelectorAll('.ev-flight:empty').forEach(n => n.remove());
+    document.getElementById('he-sub').textContent = 'Cele mai ieftine zboruri spre evenimentele din următoarele 2 luni, vineri–duminică.';
     document.getElementById('home-events').hidden = false;
   }
 
