@@ -11,9 +11,9 @@
 .option-fields .duration-field > label{font-family:var(--font-display);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#0a0b0d;margin-bottom:6px}
 .option-fields .space-y-3 label{color:#1e3a5f}
 
-/* Slidere (verde, a treia culoare a site-ului) */
-.option-fields .option-slider{width:100%;height:24px;margin:2px 0 0;accent-color:#2f9e63;cursor:pointer}
-.option-fields .option-slider:focus-visible{outline:3px solid #2f9e63;outline-offset:3px}
+/* Slidere (verde) */
+.option-fields .option-slider{width:100%;height:24px;margin:2px 0 0;accent-color:#2e9d68;cursor:pointer}
+.option-fields .option-slider:focus-visible{outline:3px solid #2e9d68;outline-offset:3px}
 .option-fields .slider-value{font-family:var(--font-display);font-weight:700;font-size:14px;color:#161713;min-height:1.5em}
 .option-fields .slider-ends{display:flex;justify-content:space-between;gap:12px;margin-top:2px;font-size:11px;font-weight:600;line-height:1.2;color:#7b8494}
 .option-fields .slider-ends span{padding:2px 7px;border-radius:999px;background:#f1f4f8;white-space:nowrap}
@@ -45,4 +45,79 @@
   #configurator.search-panel{padding:14px 0 0;border-radius:0}
   .option-fields{grid-template-columns:1fr}
   .option-fields > .space-y-3{grid-column:auto}
+}
+
+/* ===== Varianta A (2026-11-16): pașii 1+2 pe o linie, orar în popover, pas 3 compact, „Caută” la vedere ===== */
+.page-hero{min-height:0}
+.page-hero-inner{padding:22px 9% 26px}
+.page-hero h1{font-size:clamp(26px,2.6vw,34px);margin:6px 0 4px}
+.page-hero p{font-size:15px;max-width:none}
+.compact-step{background:var(--cream,#fdfaf3);border:1px solid #ecd8b0;border-radius:20px;padding:14px 16px 16px;margin-top:16px}
+.compact-line{display:grid;grid-template-columns:minmax(0,4fr) minmax(0,6fr);gap:20px;align-items:start}
+.compact-group + .compact-group{border-left:1px solid #ecd8b0;padding-left:20px}
+.grp-h{display:flex;align-items:center;gap:8px;font-family:var(--font-display);font-weight:700;font-size:13px;margin-bottom:6px}
+.grp-n{width:20px;height:20px;border-radius:50%;background:#0a0b0d;color:#dfa649;display:grid;place-items:center;font-size:11px}
+.compact-step .step-fields{grid-template-columns:minmax(0,2.1fr) minmax(0,2.4fr);gap:10px}
+.compact-step .option-fields{grid-template-columns:repeat(3,minmax(0,1fr)) minmax(0,1.5fr);gap:10px}
+.compact-step .step-fields > div,.compact-step .option-fields > div{padding:0;border:0;border-radius:0;background:transparent;box-shadow:none}
+.compact-step label,.compact-step .orar-label,.compact-step .duration-field > label{display:block;font-family:var(--font-display);font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#4b5563;margin:0 0 3px}
+.compact-step select,.compact-step #dest-search-input,.compact-step .orar-toggle{font-size:14px;font-weight:700}
+.compact-step select{height:42px;width:100%;border:1px solid #e4d3b5;background:#fffdf8;border-radius:12px;padding:0 8px}
+.compact-step .relative > .relative > div.flex{height:42px;border-radius:12px;padding:0 10px}
+.compact-step #dest-type-badge{display:none}
+.compact-step .step-fields > div > .flex.items-center.justify-between{margin-bottom:3px!important}
+.orar-field{position:relative;min-width:0}
+.orar-toggle{display:flex;align-items:center;justify-content:space-between;gap:6px;width:100%;height:42px;border:1px solid #e4d3b5;background:#fffdf8;border-radius:12px;padding:0 10px;cursor:pointer;text-align:left}
+.orar-toggle #orar-summary{white-space:nowrap}
+.compact-step .orar-toggle{font-size:13.5px;padding:0 9px}
+.orar-toggle:focus-visible{outline:3px solid #dfa649;outline-offset:2px}
+.orar-pop{position:absolute;top:calc(100% + 6px);right:0;z-index:40;width:min(560px,88vw);background:#fff;border:2px solid #dfa649;border-radius:16px;box-shadow:0 14px 34px rgba(0,0,0,.18);padding:14px}
+.orar-pop[hidden]{display:none}
+.orar-pop .space-y-3{margin:0;padding:0;border:0;background:transparent;box-shadow:none}
+.orar-pop .currency-row{margin-top:10px;display:flex;align-items:center;gap:8px}
+.orar-pop .currency-row select{width:auto;height:34px}
+.orar-pop .space-y-3 .grid{column-gap:clamp(16px,3vw,40px)}
+
+/* Pasul 3 compact */
+.period-section{background:transparent;border:0;border-top:1px dashed #e4d3b5;border-radius:0;padding:12px 16px 0;margin:0}
+.period-section .period-bar{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+.period-section .period-heading{display:flex;align-items:center;gap:10px}
+.period-section .period-heading h3{font-size:14px;margin:0}
+.period-section #subtitle-summary{display:none}
+.period-section .period-options{margin:0;gap:0;border:1px solid #e4d3b5;border-radius:10px;overflow:hidden}
+.period-section .period-choice{min-width:0;border:0;border-radius:0;padding:7px 12px;background:#fff}
+.period-section .period-choice small{display:none}
+.period-section .period-choice.active{background:#2e9d68;color:#fff;box-shadow:none}
+.period-section .period-bar > .mt-4{margin:0;padding:0;border:0;background:transparent}
+.period-section .period-bar > .mt-4 > .text-\[11px\]{display:none}
+.period-section .period-bar > .mt-4 > .flex{flex-wrap:nowrap;gap:8px}
+.period-section .calendar-range-choice{white-space:nowrap}
+.period-section #range-spring,.period-section #range-summer{display:none}
+.period-section .calendar-details{display:none;margin-top:12px;background:#e8edf5;border:1px solid #cdd6e4;border-radius:16px;padding:14px}
+.period-section.cal-open .calendar-details{display:block}
+.period-section #period-slider{margin-top:10px}
+.search-actions-buttons{margin-left:auto}
+#configurator.search-panel > .compact-step{order:2}
+.search-actions{margin-top:0;padding-top:0;border-top:0}
+
+@media(max-width:900px){
+  .page-hero-inner{padding:16px 18px 18px}
+  .page-hero h1{font-size:23px;margin:6px 0 0}
+  .page-hero p{display:none}
+  .compact-line{grid-template-columns:1fr;gap:10px}
+  .compact-group + .compact-group{border-left:0;padding-left:0}
+  .compact-step{padding:12px;border-radius:16px;margin-top:12px}
+  .compact-step .step-fields,.compact-step .option-fields{grid-template-columns:1fr 1fr}
+  .compact-step .option-fields > .orar-field,.compact-step .option-fields > :nth-child(3){grid-column:1/-1}
+  .period-section{padding:12px 0 0}
+  .period-section .period-bar > .mt-4{max-width:100%;overflow-x:auto;scrollbar-width:none;flex:1 1 100%}
+  .period-section .period-heading{flex:1 1 100%;justify-content:space-between}
+  /* „Caută zboruri” rămâne mereu vizibil jos */
+  .search-actions-buttons{position:fixed;left:0;right:0;bottom:0;z-index:50;margin:0;padding:10px 12px calc(10px + env(safe-area-inset-bottom));background:#fff;border-top:1px solid #ecd8b0;box-shadow:0 -6px 20px rgba(0,0,0,.12)}
+  .search-actions-buttons #btn-search{flex:1;justify-content:center;min-height:48px;font-size:15px}
+  .orar-pop{position:fixed;left:12px;right:12px;top:auto;bottom:80px;width:auto;max-height:70vh;overflow:auto}
+  body{padding-bottom:78px}
+}
+@media(max-width:600px){
+  .compact-step .step-fields,.compact-step .option-fields{grid-template-columns:1fr 1fr}
 }

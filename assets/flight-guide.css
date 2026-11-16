@@ -29,17 +29,17 @@
 .fg-est{display:grid;gap:6px;font-size:14px}
 .fg-est div{display:flex;justify-content:space-between;gap:12px}
 .fg-est .tot{border-top:1px solid #ecd8b0;padding-top:8px;font-weight:700}
-.fg-est .tot span:last-child{color:#1f7a49}
+.fg-est .tot span:last-child{color:#1f7a50}
 .fg-two{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
 .fg-btn{border:1px solid #ecd8b0;background:#fff;border-radius:12px;padding:10px;text-align:center;font-weight:700;font-size:13px;color:#0a0b0d;text-decoration:none;cursor:pointer;font-family:inherit}
-.fg-btn:hover{border-color:#2f9e63;color:#1f7a49}
-.fg-wa{background:#2f9e63;border-color:#2f9e63;color:#fff}
-.fg-wa:hover{background:#1f7a49;color:#fff}
+.fg-btn:hover{border-color:#2e9d68;color:#1f7a50}
+.fg-wa{background:#2e9d68;border-color:#2e9d68;color:#fff}
+.fg-wa:hover{background:#1f7a50;color:#fff}
 .fg-fine{font-size:12px;color:#5b6573;margin:10px 0 0}
 .fg-ev{display:grid;gap:8px}
 .fg-ev a{display:block;border:1px solid #ecd8b0;background:#fff;border-radius:12px;padding:10px 12px;color:#0a0b0d;font-weight:700;text-decoration:none;font-size:14px}
 .fg-ev a:hover{border-color:#dfa649}
-.fg-simp{background:#eef7f1;border:1px dashed #2f9e63;border-radius:14px;padding:12px;font-size:13px;color:#1b4d33}
+.fg-simp{background:#eef7f1;border:1px dashed #2e9d68;border-radius:14px;padding:12px;font-size:13px;color:#1b4d33}
 .fg-map h3{margin:0 0 6px;font:700 18px 'Space Grotesk',system-ui,sans-serif}
 .fg-map img{width:100%;border-radius:12px;display:block}
 .fg-map ol{padding:0;list-style:none;display:grid;gap:10px;margin:14px 0 0}
@@ -52,6 +52,6 @@
 .fg-foot{padding:14px 20px;background:#fbf9f4;border-top:1px solid #ecd8b0;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;flex:none}
 .fg-jr{background:#0a0b0d;color:#dfa649;border-radius:12px;padding:10px 16px;font:700 13px 'Space Grotesk',system-ui,sans-serif;text-decoration:none}
 .fg-cl{background:#fff;border:1px solid #dce1e7;border-radius:12px;padding:10px 16px;font-weight:700;cursor:pointer;color:#475569;font-family:inherit}
-.fg-ov a:focus-visible,.fg-ov button:focus-visible{outline:3px solid #2f9e63;outline-offset:2px}
+.fg-ov a:focus-visible,.fg-ov button:focus-visible{outline:3px solid #2e9d68;outline-offset:2px}
 @media(max-width:760px){.fg-body{grid-template-columns:minmax(0,1fr)}.fg-right{border-left:0;border-top:1px solid #e6d8c1}.fg-ban h2{font-size:26px}}
 [data-guide-card] .ev-badge{top:14px;cursor:default}

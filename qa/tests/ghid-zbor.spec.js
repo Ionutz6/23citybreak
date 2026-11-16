@@ -15,6 +15,7 @@ test('card de zbor: fără linkuri, click pe card deschide ghidul cu Kiwi și es
   await page.locator('#dest-search-input').fill('spania');
   await page.locator('#dest-autocomplete-dropdown [data-destination-id="Country:ES"]').click();
   page.on('dialog', d => d.dismiss());
+  await page.locator('#calendar-toggle').click();
   const days = page.locator('.calendar-day.available');
   await days.first().click(); await days.nth(8).click();
   await page.locator('#btn-search').click();
@@ -39,7 +40,7 @@ test('sliderele din Zboruri (buget și perioadă) sunt verzi', async ({ page }) 
   await H.install(page, { session: true });
   await page.goto('/zboruri.html');
   const accent = await page.locator('.option-fields .option-slider').first().evaluate(e => getComputedStyle(e).accentColor);
-  expect(accent).toBe('rgb(47, 158, 99)');
+  expect(accent).toBe('rgb(46, 157, 104)');
   const fill = await page.locator('.ps-fill').first().evaluate(e => getComputedStyle(e).backgroundColor);
-  expect(fill).toBe('rgb(47, 158, 99)');
+  expect(fill).toBe('rgb(46, 157, 104)');
 });

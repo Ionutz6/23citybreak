@@ -17,6 +17,7 @@ async function pickSpain(page) {
   await btn.click();
   await expect(page.locator('#dest-search-input')).toHaveValue(/Spania \(toate orașele\)/);
   page.on('dialog', d => d.dismiss());
+  await page.locator('#calendar-toggle').click(); // calendarul e ascuns implicit (formular compact)
   const days = page.locator('.calendar-day.available');
   await days.first().click();
   await days.nth(8).click();
