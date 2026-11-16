@@ -4,7 +4,7 @@ Prețurile din secțiunea „Cele mai ieftine zboruri” de pe Home (`assets/hom
 
 | Sursă | Cum ajunge în tabelă | Valabilitate pe Home |
 |---|---|---|
-| `travelpayouts` | `price-sync`, zilnic: Travelpayouts Data API (`aviasales/v3/prices_for_dates`), cel mai mic preț găsit de utilizatori în ultimele 48 h, vineri → duminică, următoarele 8 weekenduri, cele 100 de orașe ilustrate | 72 h |
+| `travelpayouts` | `price-sync`, zilnic: Travelpayouts Data API (`aviasales/v3/prices_for_dates`), cel mai mic preț găsit de utilizatori în ultimele 48 h, vineri → duminică, următoarele 8 weekenduri, cele peste 150 de orașe cu ilustrație | 72 h |
 | `visitor` | `price-report`: când cineva caută pe `zboruri.html`, browserul trimite prețurile găsite (validate) | 24 h |
 
 Pentru aceeași rută și dată, prețul `visitor` înlocuiește pe cel `travelpayouts`. Prețul din cache Travelpayouts poate diferi de Kiwi (de obicei cu câteva zeci de euro, uneori mai mult), de aceea Home arată „de la” și trimite la căutare.
@@ -18,8 +18,8 @@ Pentru aceeași rută și dată, prețul `visitor` înlocuiește pe cel `travelp
 5. Joburi zilnice (două jumătăți, ca fiecare să încapă în timpul funcției):
 
 ```sql
-select cron.schedule('price-sync-a', '50 3 * * *', $$ select net.http_post(url := 'https://lsudthnrumslfscpppix.supabase.co/functions/v1/price-sync?from=0&limit=50',  headers := jsonb_build_object('x-cron-secret', '<CRON_SECRET>'), timeout_milliseconds := 150000); $$);
-select cron.schedule('price-sync-b', '55 3 * * *', $$ select net.http_post(url := 'https://lsudthnrumslfscpppix.supabase.co/functions/v1/price-sync?from=50&limit=50', headers := jsonb_build_object('x-cron-secret', '<CRON_SECRET>'), timeout_milliseconds := 150000); $$);
+select cron.schedule('price-sync-a', '50 3 * * *', $$ select net.http_post(url := 'https://lsudthnrumslfscpppix.supabase.co/functions/v1/price-sync?from=0&limit=80',  headers := jsonb_build_object('x-cron-secret', '<CRON_SECRET>'), timeout_milliseconds := 150000); $$);
+select cron.schedule('price-sync-b', '55 3 * * *', $$ select net.http_post(url := 'https://lsudthnrumslfscpppix.supabase.co/functions/v1/price-sync?from=80&limit=80', headers := jsonb_build_object('x-cron-secret', '<CRON_SECRET>'), timeout_milliseconds := 150000); $$);
 ```
 
 Fără token, Home folosește doar prețurile `visitor`; până sunt cel puțin 3 orașe cu preț proaspăt, secțiunea rămâne ascunsă.
