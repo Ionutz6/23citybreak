@@ -270,17 +270,23 @@ a.evp-note{margin:0}
 @media(max-width:600px){.evs{margin-top:18px}.evs-box{padding-left:12px}.evs-box input{font-size:16px}.evs-go-btn{padding:0 14px}.evs-row{grid-template-columns:34px minmax(0,1fr) auto;gap:10px}.evs-ic{width:34px;height:34px;font-size:17px}.evs-go{display:none}.evs-panel{max-height:62vh}}
 
 /* 5 carduri pe rând, în lățimea paginii (aceeași ca pe prima pagină) */
-@media(min-width:1180px){.evp .ev-grid{grid-template-columns:repeat(5,minmax(0,1fr))}}
-@media(min-width:900px) and (max-width:1179px){.evp .ev-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media(min-width:1000px){.evp .ev-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
 
 .pk-why{color:#8a95a6;font-size:12px}
 
 .photo-credits{max-width:1380px;margin:18px auto 0;padding:0 clamp(16px,2vw,30px);color:#606b61;font-size:12px}.photo-credits summary{cursor:pointer;font-weight:700}.photo-credits ul{padding-left:18px;margin:8px 0}.photo-credits a{text-decoration:underline}
-.evp-hero{position:relative;overflow:hidden}.evp-hero .evp-wrap{position:relative;z-index:1}
+.evp-hero{position:relative;z-index:5}.evp-hero .evp-wrap{position:relative;z-index:1}
 /* Footerul rămâne jos și cât timp se încarcă lista */
 body.evp{min-height:100vh;display:flex;flex-direction:column}
 body.evp .evp-main{flex:1 0 auto}
 #evp-root{min-height:70vh}
 body.evp .site-footer{margin-top:auto}
-.evp-price.ok{color:#dfa649;font-weight:700}
-.evp-price.ok.over{color:#dfa649}
+/* Prețul zborului, mare și auriu (Evenimente și Acasă) */
+.ev-flight-big,.ev-flight:has(.ev-fp){white-space:normal;overflow:visible;padding-top:10px}
+.ev-fp{display:block}
+.ev-fp b{display:block;font:400 46px/1 'Bebas Neue','Space Grotesk',sans-serif;letter-spacing:.01em;color:#dfa649;text-shadow:0 2px 12px rgba(0,0,0,.6)}
+.ev-fp small{display:block;margin-top:3px;font-size:12px;font-weight:700;color:#e2e8f0}
+/* Paginare cu săgeți */
+.ev-pager{display:flex;align-items:center;justify-content:center;gap:16px;margin-top:22px;font:700 14px 'Space Grotesk',sans-serif;color:#0a0b0d}
+.ev-arrow{width:46px;height:46px;border-radius:50%;border:2px solid #0a0b0d;background:#fff;color:#0a0b0d;font-size:26px;line-height:1;cursor:pointer;display:grid;place-items:center;padding:0 0 3px}
+.ev-arrow:hover:not(:disabled){background:#0a0b0d;color:#fff}.ev-arrow:disabled{opacity:.3;cursor:default}

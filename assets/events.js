@@ -253,7 +253,11 @@
   })();
   const byId = async id => (await load()).find(e => e.id === id) || null;
 
+  // Prețul zborului, mare și auriu, pe card (aceeași formă pe Evenimente și pe Acasă): f = { eur, origin, label?, note? }.
+  const flightHtml = f => `<span class="ev-fp"><b>${Math.round(f.eur)} €</b><small>✈︎ zbor din ${esc(f.origin)}${f.label ? ` · ${esc(f.label)}` : ''}${f.note ? ` · ${esc(f.note)}` : ''}</small></span>`;
+
   // ---------- Secțiunea de pe pagina principală ----------
+  // opt.flight = { eur, origin, label?, note? } → prețul zborului mare și auriu în josul cardului (flightHtml).
   function cardHtml(e, opt = {}) {
     const img = e.image_url || '';
     const wk = mainWeekend(e);
@@ -274,7 +278,7 @@
         ${opt.tour ? `<div class="ev-meta">🎤 Turneu · încă ${opt.tour} ${opt.tour === 1 ? 'oraș' : 'orașe'}</div>` : ''}
         ${isMultiDay(e) ? `<div class="ev-meta">📅 weekendul recomandat: ${esc(shortDate(wk.fri))} → ${esc(shortDate(wk.sun))}</div>` : ''}
         ${price}${note ? `<div class="ev-meta">${esc(note)}</div>` : ''}
-        <div class="ev-flight" data-flight="${esc(e.id)}" aria-live="polite"></div>
+        <div class="ev-flight${opt.flight ? ' ev-flight-big' : ''}" data-flight="${esc(e.id)}" aria-live="polite">${opt.flight ? flightHtml(opt.flight) : ''}</div>
       </a></article>`;
   }
 
@@ -320,5 +324,5 @@
 
   // Competițiile mari europene se joacă și marți–joi: contează ca eveniment de city break chiar și când „Doar weekenduri” e activ.
   const ANY_DAY = new Set(['CL', 'EL']);
-  window.CBEvents = { ANY_DAY, api: { url: SUPABASE_URL, key: SUPABASE_KEY }, load, byId, promos, cardHtml, packageUrl, decorateCards, eventPhoto, cityPhoto, stadiumPhoto, venuePhoto, setBg, KINDS, COMPETITIONS, CATEGORIES, SPORTS, categoryOf, sportOf, inferComp, isWeekend, helpers: { rangeLabel, esc, cityName, cityOf, guideOf, guideImage, local, isoAdd, dowOf, shortDate, longDate, startDate, endDate, isMultiDay, lengthDays, mainWeekend, tripPlan, flightRules, whenLabel, tagLabel, monthName, DOW, DOW_LONG, MON } };
+  window.CBEvents = { ANY_DAY, flightHtml, api: { url: SUPABASE_URL, key: SUPABASE_KEY }, load, byId, promos, cardHtml, packageUrl, decorateCards, eventPhoto, cityPhoto, stadiumPhoto, venuePhoto, setBg, KINDS, COMPETITIONS, CATEGORIES, SPORTS, categoryOf, sportOf, inferComp, isWeekend, helpers: { rangeLabel, esc, cityName, cityOf, guideOf, guideImage, local, isoAdd, dowOf, shortDate, longDate, startDate, endDate, isMultiDay, lengthDays, mainWeekend, tripPlan, flightRules, whenLabel, tagLabel, monthName, DOW, DOW_LONG, MON } };
 })();
