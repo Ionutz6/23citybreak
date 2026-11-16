@@ -2898,7 +2898,35 @@
     }
 
     // Render Matrix Table & Cards View
+    // Prețurile găsite aici se trimit anonim la price-report (route_prices), ca Home să arate prețuri reale fără cereri Kiwi de pe server.
+    // Doar căutările obișnuite de weekend (vineri → duminică), fără date personale; ce a fost trimis o dată nu se mai trimite în sesiune.
+    const reportedPrices = new Set();
+    let reportTimer = 0;
+    function schedulePriceReport() { clearTimeout(reportTimer); reportTimer = setTimeout(reportPrices, 2500); }
+    function reportPrices() {
+      try {
+        const api = window.CBEvents?.api;
+        if (!api || currentTripMode !== "classic" || similarResultPeriods) return;
+        const origin = getOrigin().iata;
+        if (!/^[A-Z]{3}$/.test(origin)) return;
+        const items = [];
+        for (const row of currentRows) {
+          if (!/^City:[a-z0-9-]+_[a-z]{2}$/.test(row.cityId || "")) continue;
+          for (const wk of getSelectedWeekendsList()) {
+            const cell = row.cellsMap?.[wk.id];
+            if (!cell || !(cell.perPaxEur > 0)) continue;
+            const d = getTripDates(wk), price = Math.round(cell.perPaxEur), k = `${origin}|${row.cityId}|${d.dateOut}|${d.dateIn}|${price}`;
+            if (reportedPrices.has(k)) continue;
+            reportedPrices.add(k);
+            items.push({ dest: row.cityId, out: d.dateOut, back: d.dateIn, price, direct: cell.stops === 0 });
+          }
+        }
+        if (!items.length) return;
+        fetch(`${api.url}/functions/v1/price-report`, { method: "POST", keepalive: items.length < 40, headers: { "Content-Type": "application/json", apikey: api.key, Authorization: `Bearer ${api.key}` }, body: JSON.stringify({ origin, items: items.slice(0, 300) }) }).catch(() => {});
+      } catch (_) {}
+    }
     function renderMatrix() {
+      schedulePriceReport();
       document.getElementById("quick-duration").value = document.getElementById("f-max-dur").value;
       const thead = document.getElementById("matrix-head");
       const tbody = document.getElementById("matrix-body");

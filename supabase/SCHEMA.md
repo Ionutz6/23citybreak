@@ -144,6 +144,22 @@ Un rând per cont, privat (RLS ca la `search_preferences`). Rândul **poate lips
 
 După salvare, aceleași valori sunt copiate în `localStorage['23cb-event-prefs']`, pentru filtrarea evenimentelor fără o cerere în plus.
 
+### `route_prices` (prețuri de zbor pentru Home)
+
+Cache public, **doar citire** din browser (`anon` și `authenticated`). Scriu doar funcțiile `price-sync` (zilnic, Travelpayouts) și `price-report` (prețurile găsite de vizitatori), cu service role. Detalii și activare: `supabase/functions/price-sync/README.md`.
+
+| Coloană | Tip | Note |
+|---|---|---|
+| `origin` | text | cod IATA de plecare (`OTP`) |
+| `dest` | text | id Kiwi, `City:rome_it` |
+| `out_date`, `back_date` | date | weekend vineri → duminică |
+| `price_eur` | int | dus-întors, per persoană (15–1500) |
+| `direct` | boolean | zbor direct |
+| `source` | text | `travelpayouts` (valabil 72 h pe Home) sau `visitor` (24 h, înlocuiește `travelpayouts` pe aceeași rută și dată) |
+| `seen_at` | timestamptz | când a fost văzut prețul |
+
+PK: `(origin, dest, out_date, back_date, source)`. Migrația: `20261116_route_prices.sql`.
+
 ## Căutare de evenimente (20261112_events_search.sql)
 
 - `events.search_text`: coloană generată (titlu, sală, artiști, echipe, numele competiției, orașul), normalizată cu `ev_norm` (fără diacritice), index GIN trigram.
