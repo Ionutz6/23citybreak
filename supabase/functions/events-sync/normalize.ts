@@ -191,6 +191,11 @@ export const TEAM_CITY: [string, string][] = [
   ["milan", "milan_it"], ["inter", "milan_it"], ["internazionale", "milan_it"], ["roma", "rome_it"], ["lazio", "rome_it"], ["napoli", "naples_it"], ["juventus", "turin_it"], ["torino", "turin_it"], ["bologna", "bologna_it"], ["genoa", "genoa_it"], ["verona", "verona_it"], ["cagliari", "cagliari_it"], ["pisa", "pisa_it"],
   ["paris", "paris_fr"], ["marseille", "marseille_fr"], ["lyon", "lyon_fr"], ["nice", "nice_fr"], ["lille", "lille_fr"], ["toulouse", "toulouse_fr"], ["nantes", "nantes_fr"], ["strasbourg", "strasbourg_fr"],
   ["ajax", "amsterdam_nl"], ["feyenoord", "rotterdam_nl"], ["sparta rotterdam", "rotterdam_nl"], ["psv", "eindhoven_nl"],
+  ["celtic", "glasgow_gb"], ["rangers", "glasgow_gb"], ["club brugge", "bruges_be"], ["anderlecht", "brussels_be"], ["union saint-gilloise", "brussels_be"],
+  ["galatasaray", "istanbul_tr"], ["fenerbahce", "istanbul_tr"], ["besiktas", "istanbul_tr"], ["olympiacos", "athens_gr"], ["olympiakos", "athens_gr"], ["panathinaikos", "athens_gr"], ["aek athens", "athens_gr"], ["paok", "thessaloniki_gr"],
+  ["salzburg", "salzburg_at"], ["sturm graz", "graz_at"], ["basel", "basel_ch"], ["slavia praha", "prague_cz"], ["sparta praha", "prague_cz"], ["copenhagen", "copenhagen_dk"], ["dinamo zagreb", "zagreb_hr"],
+  ["crvena zvezda", "belgrade_rs"], ["red star", "belgrade_rs"], ["partizan", "belgrade_rs"], ["slovan bratislava", "bratislava_sk"], ["zalgiris", "kaunas_lt"], ["efes", "istanbul_tr"],
+  ["olimpia milano", "milan_it"], ["virtus", "bologna_it"], ["asvel", "lyon_fr"],
   ["benfica", "lisbon_pt"], ["sporting clube de portugal", "lisbon_pt"], ["sporting cp", "lisbon_pt"], ["porto", "porto_pt"],
 ];
 const ascii = (s: string) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
@@ -213,7 +218,8 @@ export function fromFootballData(m: any, competition: string): { row: EventRow |
   if (!city) return { row: null, unmapped: home };
   const tbc = m.status === "SCHEDULED"; // data e orientativă, ora nu e anunțată
   const { dow, hour } = localParts(m.utcDate, city);
-  if (!fitsWeekend(dow, tbc ? null : hour)) return { row: null };
+  // Champions League se joacă marți–joi: le păstrăm pe toate (un city break de 2-3 zile merită și în timpul săptămânii); restul ligilor doar în weekend.
+  if (competition !== "CL" && !fitsWeekend(dow, tbc ? null : hour)) return { row: null };
   let pop = competition === "CL" ? 85 : 55;
   if (isBig(home)) pop += 10;
   if (isBig(home) && isBig(away)) pop += 10;
@@ -248,5 +254,34 @@ export function fromCurated(e: any, knownCities: Set<string>): EventRow | null {
     starts_at: time ? localToUtc(e.starts, time, e.city_id) : `${e.starts}T09:00:00.000Z`, ends_at: e.ends && e.ends > e.starts ? `${e.ends}T21:00:00.000Z` : null, time_tbc: !time,
     artists: strs(e.artists), teams: strs(e.teams), competition: typeof e.competition === "string" ? e.competition.slice(0, 12) : null, genres: [], price_min_eur: null,
     ticket_url: https(e.ticket_url), official_url: https(e.official_url) ?? (e.kind === "city_festival" || e.kind === "market" ? https(e.ticket_url) : null), image_url: https(e.image_url), popularity: Math.max(0, Math.min(100, e.popularity ?? 50)), source: "curated",
+  };
+}
+
+// EuroLeague (baschet): api-live.euroleague.net v2, fără cheie. Meciurile se joacă între joi și vineri seara, deci nu aplicăm filtrul de weekend
+// (pagina Evenimente le arată și cu „Doar weekenduri” activ). Parsare tolerantă: formatul nu a putut fi verificat din mediul de dezvoltare,
+// iar un meci care nu poate fi citit sau fără oraș din matrice e ignorat; verifică cu ?only=eb&dry.
+const EL_BIG = ["real madrid", "barcelona", "olympiacos", "panathinaikos", "fenerbahce", "efes", "partizan", "crvena zvezda", "zalgiris", "bayern", "olimpia milano", "virtus"];
+// deno-lint-ignore no-explicit-any
+export function fromEuroLeague(g: any): { row: EventRow | null; unmapped?: string } {
+  const name = (t: any) => t?.club?.name ?? t?.name ?? t?.team?.name ?? (typeof t === "string" ? t : null);
+  const home = name(g?.local ?? g?.home ?? g?.homeTeam), away = name(g?.road ?? g?.away ?? g?.awayTeam);
+  const when = g?.date ?? g?.startDate ?? g?.utcDate ?? g?.gameDate;
+  const id = g?.gameCode ?? g?.code ?? g?.id;
+  if (!id || !home || !away || !when) return { row: null };
+  const t = new Date(when);
+  if (Number.isNaN(t.getTime()) || t.getTime() < Date.now() - 36e5) return { row: null };
+  if (g?.played === true || /final|finished|played/i.test(String(g?.status ?? ""))) return { row: null };
+  const city = cityOfTeam(home);
+  if (!city) return { row: null, unmapped: home };
+  const tbc = !/T\d{2}:\d{2}/.test(String(when)) || /T00:00(:00)?(\.0+)?Z?$/.test(String(when));
+  let pop = 55;
+  if (EL_BIG.some((b) => ascii(home).includes(b))) pop += 10;
+  if (EL_BIG.some((b) => ascii(home).includes(b)) && EL_BIG.some((b) => ascii(away).includes(b))) pop += 10;
+  return {
+    row: {
+      id: `el:${id}`, kind: "sport", title: `${home} – ${away}`, city_id: city, venue: g?.venue?.name ?? null,
+      starts_at: t.toISOString(), ends_at: null, time_tbc: tbc, artists: [], teams: [home, away], competition: "EL", genres: ["Basketball"],
+      price_min_eur: null, ticket_url: null, official_url: "https://www.euroleaguebasketball.net/euroleague/", image_url: null, popularity: Math.min(100, pop), source: "euroleague",
+    },
   };
 }

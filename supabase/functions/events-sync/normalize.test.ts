@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { dedupePerformances, officialFromTicketmaster, collapseFestivalBlocks, dedupeSessions, cityOfTeam, fitsWeekend, fromCurated, localToUtc, fromFootballData, fromTicketmaster, localParts, parseCityCoords } from "./normalize.ts";
+import { dedupePerformances, officialFromTicketmaster, collapseFestivalBlocks, dedupeSessions, cityOfTeam, fitsWeekend, fromCurated, localToUtc, fromEuroLeague, fromFootballData, fromTicketmaster, localParts, parseCityCoords } from "./normalize.ts";
 
 const vienna = { id: "vienna_at", cc: "at", lat: 48.21, lon: 16.37 };
 const tm = (over: Record<string, unknown> = {}) => ({
@@ -88,7 +88,8 @@ test("football-data: meci de sâmbătă, ora locală", () => {
 
 test("football-data: marți iese, echipă nemapată raportată, dată orientativă marcată", () => {
   const base = { id: 1, homeTeam: { name: "Arsenal FC" }, awayTeam: { name: "Chelsea FC" } };
-  assert.equal(fromFootballData({ ...base, utcDate: "2027-03-09T20:00:00Z", status: "TIMED" }, "CL").row, null);
+  assert.equal(fromFootballData({ ...base, utcDate: "2027-03-09T20:00:00Z", status: "TIMED" }, "PL").row, null); // marți, nu e weekend
+  assert.equal(fromFootballData({ ...base, utcDate: "2027-03-09T20:00:00Z", status: "TIMED" }, "CL").row!.competition, "CL"); // Champions League rămâne și marți
   assert.equal(fromFootballData({ ...base, utcDate: "2027-03-06T15:00:00Z", status: "FINISHED" }, "PL").row, null);
   assert.equal(fromFootballData({ ...base, homeTeam: { name: "Girona FC" }, utcDate: "2027-03-06T15:00:00Z", status: "TIMED" }, "PD").unmapped, "Girona FC");
   assert.equal(fromFootballData({ ...base, utcDate: "2027-03-07T00:00:00Z", status: "SCHEDULED" }, "PL").row!.time_tbc, true);
@@ -184,4 +185,15 @@ test("fromTicketmaster: variantele de bilet „| Logen-Seat / Premium / VIP” s
   const mk = (name: string) => ({ id: name, name, dates: { start: { localDate: "2026-11-21", localTime: "20:00:00" } }, classifications: [{ primary: true, segment: { name: "Music" } }] });
   for (const n of ["Kings Of Leon - World Tour| Logen-Seat", "Ice Cage 9 | Premium Suite Ticket", "The Kid LAROI - A Perfect World Tour | VIP", "KoRn - EURO TOUR 2026 | Premium Packages"]) assert.equal(fromTicketmaster(mk(n), city, 0), null, n);
   assert.ok(fromTicketmaster(mk("Kings Of Leon - World Tour"), city, 0));
+});
+
+test("EuroLeague: meci în orice zi, legat de orașul gazdei; ignoră cele fără oraș sau terminate", () => {
+  const future = new Date(Date.now() + 10 * 864e5); future.setUTCHours(19, 0, 0, 0);
+  const g = { gameCode: "E2026_42", date: future.toISOString(), local: { club: { name: "Real Madrid" } }, road: { club: { name: "Panathinaikos AKTOR Athens" } }, venue: { name: "Movistar Arena" } };
+  const { row } = fromEuroLeague(g);
+  assert.equal(row!.id, "el:E2026_42"); assert.equal(row!.city_id, "madrid_es"); assert.equal(row!.competition, "EL");
+  assert.equal(row!.kind, "sport"); assert.deepEqual(row!.genres, ["Basketball"]); assert.equal(row!.popularity, 75);
+  assert.equal(fromEuroLeague({ ...g, local: { club: { name: "Hapoel Tel Aviv" } } }).unmapped, "Hapoel Tel Aviv");
+  assert.equal(fromEuroLeague({ ...g, date: "2020-01-01T19:00:00Z" }).row, null);
+  assert.equal(fromEuroLeague({ gameCode: "x" }).row, null);
 });
