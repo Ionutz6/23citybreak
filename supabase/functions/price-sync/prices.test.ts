@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { weekendPairs, cityIatas, guideIds, cheapest, validateReport, plausible } from "./prices.ts";
+import { weekendPairs, cityIatas, guideIds, cheapest, validateReport, plausible, monthsAhead, weekendTrips } from "./prices.ts";
 
 test("weekendPairs: vinerea → duminica, doar în viitor, în 60 de zile", () => {
   const w = weekendPairs("2026-11-16"); // luni
@@ -30,4 +30,18 @@ test("validateReport: weekend, dată în interval, preț plauzibil", () => {
 });
 test("plausible: ×2 / ÷2 față de cache", () => {
   assert.ok(plausible(60, 80)); assert.ok(!plausible(20, 80)); assert.ok(!plausible(200, 80)); assert.ok(plausible(500, undefined));
+});
+test("weekendTrips: o lună de rezultate → cel mai mic preț pe weekend, doar dus joi–sâmbătă și 2–3 nopți", () => {
+  const body = { data: [
+    { departure_at: "2026-12-04T19:30:00+02:00", return_at: "2026-12-06T18:00:00+02:00", price: 80, transfers: 1 },
+    { departure_at: "2026-12-04T07:30:00+02:00", return_at: "2026-12-06T21:00:00+02:00", price: 64.2, transfers: 0, return_transfers: 0 },
+    { departure_at: "2026-12-02T07:30:00+02:00", return_at: "2026-12-04T21:00:00+02:00", price: 30, transfers: 0 },   // miercuri
+    { departure_at: "2026-12-04T07:30:00+02:00", return_at: "2026-12-12T21:00:00+02:00", price: 40, transfers: 0 },  // 8 nopți
+    { departure_at: "2026-12-11T07:30:00+02:00", return_at: "2026-12-13T21:00:00+02:00", price: 90, transfers: 0 },
+  ] };
+  const m = weekendTrips(body, "2026-11-16");
+  assert.equal(m.size, 2);
+  assert.deepEqual(m.get("2026-12-04|2026-12-06"), { out: "2026-12-04", back: "2026-12-06", price: 64, direct: true });
+  assert.equal(weekendTrips({ data: [] }, "2026-11-16").size, 0);
+  assert.deepEqual(monthsAhead("2026-11-16"), ["2026-11", "2026-12", "2027-01"]);
 });

@@ -21,7 +21,7 @@ export function cityIatas(citiesJs: string, guides: Set<string>): Map<string, st
   return m;
 }
 export function guideIds(guidesJs: string): Set<string> {
-  return new Set([...guidesJs.matchAll(/"(City:[a-z0-9-]+_[a-z]{2})"\s*:\s*\{\s*"quizImage"/g)].map((x) => x[1]));
+  return new Set([...guidesJs.matchAll(/"(City:[a-z0-9-]+_[a-z]{2})"\s*:\s*\{\s*"(?:quizImage|image)"/g)].map((x) => x[1]));
 }
 
 /** Răspuns Travelpayouts `prices_for_dates` → cel mai mic preț (EUR) pentru data cerută, sau null. */
@@ -55,3 +55,29 @@ export function validateReport(r: unknown, today: string): Report | null {
 
 /** Un preț raportat care se abate mult de cache-ul Travelpayouts pentru aceeași rută și dată e ignorat (protecție la date false). */
 export const plausible = (reported: number, cached: number | undefined) => cached === undefined || (reported >= cached * 0.5 && reported <= cached * 2);
+
+/** Lunile (AAAA-LL) în care cad weekendurile din următoarele `days` zile. */
+export const monthsAhead = (today: string, days = 60): string[] => [...new Set(weekendPairs(today, days).map((w) => w.out.slice(0, 7)))];
+
+/**
+ * Răspuns Travelpayouts pe LUNĂ (departure_at=AAAA-LL&return_at=AAAA-LL) → cel mai mic preț pentru fiecare weekend (dus joi–sâmbătă,
+ * 2–3 nopți, în următoarele 75 de zile). Cererile pe zi exacte întorc aproape mereu gol: cache-ul are puține perechi de date.
+ */
+export function weekendTrips(body: unknown, today: string): Map<string, { out: string; back: string; price: number; direct: boolean }> {
+  // deno-lint-ignore no-explicit-any
+  const list = ((body as any)?.data ?? []) as any[];
+  const res = new Map<string, { out: string; back: string; price: number; direct: boolean }>();
+  for (const it of list) {
+    const out = String(it?.departure_at ?? "").slice(0, 10), back = String(it?.return_at ?? "").slice(0, 10);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(out) || !/^\d{4}-\d{2}-\d{2}$/.test(back)) continue;
+    if (out <= today || out > addDays(today, 75) || ![4, 5, 6].includes(dow(out))) continue;
+    const nights = Math.round((Date.parse(back) - Date.parse(out)) / 864e5);
+    if (nights < 2 || nights > 3) continue;
+    const price = Math.round(Number(it?.price));
+    if (!(price >= 15 && price <= 1500)) continue;
+    const direct = Number(it?.transfers ?? 0) === 0 && Number(it?.return_transfers ?? 0) === 0;
+    const k = `${out}|${back}`, cur = res.get(k);
+    if (!cur || price < cur.price || (price === cur.price && direct && !cur.direct)) res.set(k, { out, back, price, direct });
+  }
+  return res;
+}
