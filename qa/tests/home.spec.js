@@ -36,7 +36,7 @@ test('utilizator logat: ideile de zbor respectă bugetul din profil', async ({ p
   await page.goto('/');
   const cards = page.locator('#hf-grid .hm-fl');
   await expect(cards).toHaveCount(2); // doar Roma 55 € și Viena 70 €
-  await expect(page.locator('#hf-sub')).toContainText('până la 75 €');
+  await expect(page.locator('#hf-sub')).not.toContainText('până la');
 });
 
 test('fără prețuri în baza de date, secțiunea de zboruri rămâne ascunsă', async ({ page }) => {

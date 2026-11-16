@@ -58,7 +58,6 @@
     for (let i = pool.length - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [pool[i], pool[j]] = [pool[j], pool[i]]; }
     const top = pool.slice(0, 3);
     if (!top.length) return;
-    document.getElementById('hf-sub').textContent = `Weekenduri din următoarele 2 luni, dus-întors, pentru o persoană${cap === Infinity ? '' : `, până la ${cap} €`}.`;
     document.getElementById('hf-origin').textContent = originName(origin);
     document.getElementById('hf-grid').innerHTML = top.map(r => {
       const slug = r.dest.replace(/^City:/, ''), g = window.CB_ILLUSTRATED_GUIDES[r.dest], c = H.cityOf(slug);
