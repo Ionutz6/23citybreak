@@ -40,7 +40,7 @@
     tab: E.CATEGORIES.some(([k]) => k === tabParam) ? tabParam : 'sport',
     sport: hasMine ? 'mine' : 'all', comp: 'all',
     weekend: params.get('weekend') !== '0', inBudget: false,
-    onlyFlights: true, onlyTop: !hasAirports, shown: PAGE, open: new Set(),
+    onlyFlights: true, onlyTop: !hasAirports, onlyNotable: true, shown: PAGE, open: new Set(),
   };
 
   const today = new Date().toISOString().slice(0, 10);
@@ -106,6 +106,28 @@
   const favTeams = myTeams.map(norm).filter(Boolean);
   const TM = window.CBTeamMatch; // potrivire exactă pe echipă (FC Barcelona ≠ Espanyol), nu pe oraș
   const isFavTeam = e => myTeams.length && (e.teams || []).some(t => myTeams.some(f => TM.matchesTeam(f, t))) ? 1 : 0;
+  // Muzică: doar concerte și festivaluri cu interes pentru publicul larg, nu o trupă locală într-un orășel. Un concert/festival e „cunoscut” dacă:
+  //  1) artistul cântă în cel puțin 2 țări (sau 3 orașe) în datele noastre, adică are turneu internațional;
+  //  2) e un festival cu cel puțin 4 artiști în line-up;
+  //  3) are loc pe un stadion / în aer liber de mari dimensiuni (loc cu „stadion”, „stadium”, „olympi…”, „park”…) și nu e o formație tribut;
+  //  4) e trupa favorită din profil sau evenimentul vine din lista curatoriată.
+  // Formațiile tribut nu trec niciodată. Comutatorul „Doar artiști internaționali” poate fi oprit pentru a vedea tot.
+  const cc = e => String(e.city_id || '').split('_').pop();
+  const reach = new Map(); // artist → { countries, cities }
+  for (const e of all) if ((e.kind === 'concert' || e.kind === 'festival') && e.artists?.[0]) {
+    const k = norm(e.artists[0]), r = reach.get(k) || { countries: new Set(), cities: new Set() };
+    r.countries.add(cc(e)); r.cities.add(e.city_id); reach.set(k, r);
+  }
+  const STADIUM = /\b(stadion|stadium|stade|stadio|olympi\w*|wembley|park|parc|dome|festival ?(ground|site|area)|messe|open ?air|race ?course|hippodrom\w*)\b/i;
+  const isNotable = e => {
+    if (e.kind !== 'concert' && e.kind !== 'festival') return true;
+    if (TRIBUTE.test(e.title || '') || (e.artists || []).some(a => TRIBUTE.test(a))) return false;
+    if (isFav(e) || e.source !== 'ticketmaster') return true;
+    if (e.kind === 'festival' && (e.artists || []).length >= 4) return true;
+    const r = e.artists?.[0] && reach.get(norm(e.artists[0]));
+    if (r && (r.countries.size >= 2 || r.cities.size >= 3)) return true;
+    return STADIUM.test(e.venue || '');
+  };
   const HORIZON = H.isoAdd(today, 120);
   async function loadFavorites() {
     const api = E.api, have = new Set(all.map(e => e.id));
@@ -170,6 +192,7 @@
   const visible = () => {
     let b = base();
     if (state.onlyTop) b = b.filter(e => (e.popularity || 0) >= TOP);
+    if (state.tab === 'music' && state.onlyNotable) b = b.filter(isNotable);
     if (state.onlyFlights) b = b.filter(e => !noFlight(e));
     return state.inBudget && budget ? b.filter(inBudget) : b;
   };
@@ -237,6 +260,7 @@
         ${compsHtml()}
         <div class="evp-switches">
           ${sw('weekend', 'Doar weekenduri', state.weekend)}
+          ${state.tab === 'music' ? sw('onlyNotable', 'Doar artiști internaționali', state.onlyNotable) : ''}
           ${sw('onlyFlights', `Doar cu zbor din ${esc(origin)}`, state.onlyFlights)}
           ${hasAirports ? '' : sw('onlyTop', 'Doar cele importante', state.onlyTop)}
           ${sw('inBudget', budget ? `Doar în bugetul meu <small>zbor ≤ ${budget} €</small>` : 'Doar în bugetul meu', state.inBudget, !budget)}
