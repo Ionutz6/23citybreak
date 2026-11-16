@@ -13,12 +13,13 @@
 .ev-card{position:relative;border-radius:24px;overflow:hidden;min-height:430px;color:#fff;display:flex;flex-direction:column;justify-content:space-between;background:#202b34 center/cover no-repeat;box-shadow:0 4px 20px -2px rgba(10,11,13,.08)}
 .ev-top{display:flex;justify-content:space-between;padding:14px}
 .ev-tag{background:rgba(13,16,20,.9);border:1px solid rgba(223,166,73,.5);color:#dfa649;font:800 12px 'Space Grotesk',system-ui,sans-serif;text-transform:uppercase;letter-spacing:.03em;padding:5px 10px;border-radius:99px}
-.ev-body{position:relative;display:flex;flex-direction:column;box-sizing:border-box;height:210px;padding:16px 18px 16px;margin:0 10px 10px;border-radius:18px;background:rgba(13,16,20,.88);color:#fff;text-decoration:none;transition:background .15s}
+.ev-body{position:relative;display:flex;flex-direction:column;box-sizing:border-box;min-height:262px;padding:16px 18px 16px;margin:0 10px 10px;border-radius:18px;background:rgba(13,16,20,.88);color:#fff;text-decoration:none;transition:background .15s}
 .ev-body:hover{background:rgba(13,16,20,.95)}
 .ev-body:focus-visible{outline:3px solid #dfa649;outline-offset:2px}
 /* Același chenar negru pe toate cardurile: orașul, titlul pe max 2 rânduri, apoi câte un rând. */
 .ev-where{font:800 11px 'Space Grotesk',system-ui,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#dfa649;margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:52px}
 .ev-where i{font-style:normal;font-size:13px;letter-spacing:0}
+.ev-body>*{flex-shrink:0}
 .ev-go{position:absolute;right:16px;top:-22px;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:#dfa649;color:#0a0b0d;font:800 20px 'Space Grotesk',system-ui,sans-serif;box-shadow:0 6px 16px rgba(0,0,0,.4);transition:transform .15s,background .15s}
 .ev-body:hover .ev-go{background:#c98f33;transform:translateX(2px)}
 .ev-body h3{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;min-height:3.54em}
@@ -289,6 +290,10 @@ body.evp .site-footer{margin-top:auto}
 /* Paginare cu săgeți */
 .ev-pager{display:flex;align-items:center;justify-content:center;gap:16px;margin-top:22px;font:700 14px 'Space Grotesk',sans-serif;color:#0a0b0d}
 .ev-arrow{width:46px;height:46px;border-radius:50%;border:2px solid #0a0b0d;background:#fff;color:#0a0b0d;font-size:26px;line-height:1;cursor:pointer;display:grid;place-items:center;padding:0 0 3px}
+.ev-pg{min-width:40px;height:40px;padding:0 8px;border-radius:50%;border:2px solid transparent;background:transparent;color:#0a0b0d;font:700 14px 'Space Grotesk',sans-serif;cursor:pointer}
+.ev-pg:hover{border-color:#0a0b0d}.ev-pg.on{background:#0a0b0d;color:#fff;border-color:#0a0b0d;cursor:default}
+.ev-dots{color:#5b6470}
+@media(max-width:520px){.ev-pager{gap:6px;flex-wrap:wrap}.ev-pg{min-width:36px;height:36px}}
 .ev-arrow:hover:not(:disabled){background:#0a0b0d;color:#fff}.ev-arrow:disabled{opacity:.3;cursor:default}
 
 /* ---------- Slider de perioadă (assets/period-slider.js): Zboruri și Evenimente, doar cu cont ---------- */

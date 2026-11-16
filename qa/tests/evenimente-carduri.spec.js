@@ -13,14 +13,13 @@ test('8 pe pagină, săgeți, preț auriu mare, ordine după preț, căutarea vi
   await H.install(page, { events, db, localStorage: { '23cb-prefs': { departure_airports: ['OTP'] } } });
   await page.goto('/evenimente.html?tab=music');
   await page.waitForSelector('.ev-card');
-  await page.locator('input[data-opt=onlyNotable]').evaluate(el => el.click());
   const titles = () => page.locator('.ev-card h3').allInnerTexts();
   await expect.poll(async () => (await titles()).length).toBe(8);
   expect((await titles())[0]).toBe('Trupa 15');
   expect(await page.locator('.ev-grid').evaluate(g => getComputedStyle(g).gridTemplateColumns.split(' ').length)).toBe(4);
   expect(await page.locator('.ev-fp b').first().evaluate(e => getComputedStyle(e).color)).toBe('rgb(223, 166, 73)');
-  await page.click('[data-page-go="1"]');
-  await expect(page.locator('.ev-pager span')).toHaveText('2 / 2');
+  await page.click('[data-page-to="1"]');
+  await expect(page.locator('.ev-pg.on')).toHaveAttribute('aria-current', 'page');
   await page.fill('#evs-q', 'trupa');
   await expect.poll(() => page.evaluate(() => { const p = document.getElementById('evs-panel'), r = p.getBoundingClientRect(); return !p.hidden && !!document.elementFromPoint(r.left + 50, r.top + 20)?.closest('#evs-panel'); })).toBe(true);
 });
