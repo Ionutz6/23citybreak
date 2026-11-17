@@ -323,6 +323,7 @@
             <optgroup label="Europa">
             <option value="City:valencia_es" data-sky="vlc" data-iata="VLC" data-country="ES" data-holidays="ES-VC">Valencia (VLC)</option>
             <option value="City:alicante_es" data-sky="alc" data-iata="ALC" data-country="ES" data-holidays="ES-VC">Alicante (ALC)</option>
+            <option value="City:barcelona_es" data-sky="bcn" data-iata="BCN" data-country="ES" data-holidays="ES-CT">Barcelona (BCN)</option>
             <option value="City:paris_fr" data-sky="pari" data-iata="PAR" data-country="FR" data-holidays="FR">Paris (CDG / ORY / BVA)</option>
             <option value="City:munich_de" data-sky="muc" data-iata="MUC" data-country="DE" data-holidays="DE-BY">München (MUC)</option>
             <option value="City:frankfurt_de" data-sky="fra" data-iata="FRA" data-country="DE" data-holidays="DE-HE">Frankfurt (FRA)</option>
@@ -799,11 +800,15 @@
     }
 
     // Public holidays of the departure region (fixed dates + offsets from western Easter).
-    // ES-VC: national Spain + Comunitat Valenciana; DE-BY: Bavaria (München); DE-HE: Hesse (Frankfurt).
+    // ES-VC: national Spain + Comunitat Valenciana; ES-CT: Catalonia (Barcelona); DE-BY: Bavaria (München); DE-HE: Hesse (Frankfurt).
     const REGION_HOLIDAYS = {
       'ES-VC': {
         fixed: { '01-01': 'Anul Nou', '01-06': 'Bobotează', '03-19': 'Sf. Iosif', '05-01': 'Ziua Muncii', '06-24': 'Sf. Ioan', '08-15': 'Adormirea Maicii Domnului', '10-09': 'Ziua Comunității Valenciene', '10-12': 'Ziua Națională a Spaniei', '11-01': 'Ziua Tuturor Sfinților', '12-06': 'Ziua Constituției', '12-08': 'Imaculata Concepție', '12-25': 'Crăciun' },
         easter: [[-2, 'Vinerea Mare'], [1, 'A doua zi de Paște']]
+      },
+      'ES-CT': {
+        fixed: { '01-01': 'Anul Nou', '01-06': 'Bobotează', '05-01': 'Ziua Muncii', '06-24': 'Sf. Ioan', '08-15': 'Adormirea Maicii Domnului', '09-11': 'Diada Cataloniei', '10-12': 'Ziua Națională a Spaniei', '11-01': 'Ziua Tuturor Sfinților', '12-06': 'Ziua Constituției', '12-08': 'Imaculata Concepție', '12-25': 'Crăciun', '12-26': 'Sf. Ștefan' },
+        easter: [[-2, 'Vinerea Mare'], [1, 'A doua zi de Paște'], [50, 'A doua zi de Rusalii']]
       },
       FR: {
         fixed: { '01-01': 'Anul Nou', '05-01': 'Ziua Muncii', '05-08': 'Ziua Victoriei 1945', '07-14': 'Ziua Națională a Franței', '08-15': 'Adormirea Maicii Domnului', '11-01': 'Ziua Tuturor Sfinților', '11-11': 'Armistițiul 1918', '12-25': 'Crăciun' },

@@ -10,7 +10,7 @@
   const addDays = (d, n) => { const x = new Date(`${d}T12:00:00Z`); x.setUTCDate(x.getUTCDate() + n); return x.toISOString().slice(0, 10); };
   await window.Account?.syncPrefsToLocal?.().catch?.(() => {});
   const prefs = readLS('23cb-prefs'), interests = readLS('23cb-event-prefs');
-  const ORIGINS = { OTP: 'București', BBU: 'București', CLJ: 'Cluj-Napoca', IAS: 'Iași', TSR: 'Timișoara', SBZ: 'Sibiu', BCM: 'Bacău', SCV: 'Suceava', CND: 'Constanța', CRA: 'Craiova', OMR: 'Oradea', TGM: 'Târgu Mureș', VLC: 'Valencia', ALC: 'Alicante', PAR: 'Paris', MUC: 'München', FRA: 'Frankfurt' };
+  const ORIGINS = { OTP: 'București', BBU: 'București', CLJ: 'Cluj-Napoca', IAS: 'Iași', TSR: 'Timișoara', SBZ: 'Sibiu', BCM: 'Bacău', SCV: 'Suceava', CND: 'Constanța', CRA: 'Craiova', OMR: 'Oradea', TGM: 'Târgu Mureș', VLC: 'Valencia', ALC: 'Alicante', BCN: 'Barcelona', PAR: 'Paris', MUC: 'München', FRA: 'Frankfurt' };
   const first = Array.isArray(prefs.departure_airports) ? prefs.departure_airports[0] : null;
   const profileOrigin = /^[A-Z]{3}$/.test(first || '') ? first : 'OTP';
   let origin = profileOrigin;
