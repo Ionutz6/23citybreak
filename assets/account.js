@@ -15,7 +15,7 @@
     ['OTP', 'București Otopeni'], ['BBU', 'București Băneasa'], ['CLJ', 'Cluj-Napoca'], ['IAS', 'Iași'],
     ['TSR', 'Timișoara'], ['SBZ', 'Sibiu'], ['BCM', 'Bacău'], ['SCV', 'Suceava'], ['CND', 'Constanța'],
     ['CRA', 'Craiova'], ['OMR', 'Oradea'], ['TGM', 'Târgu Mureș'],
-    ['VLC', 'Valencia'], ['ALC', 'Alicante'], ['PAR', 'Paris (toate aeroporturile)'], ['MUC', 'München'], ['FRA', 'Frankfurt'],
+    ['VLC', 'Valencia'], ['ALC', 'Alicante'], ['BCN', 'Barcelona'], ['PAR', 'Paris (toate aeroporturile)'], ['MUC', 'München'], ['FRA', 'Frankfurt'],
   ];
   // Aceleași praguri ca selectorul „Buget max. / persoană” din pagina Zboruri (index.html #f-max-price); null = „Oricât”.
   const BUDGETS = [75, 100, 125, 150, 200, 250, 350, 500, null];
