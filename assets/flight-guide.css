@@ -35,7 +35,8 @@
 .fg-two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .fg-bk{display:block;text-align:center;border-radius:12px;padding:13px 10px;font:700 15px 'Space Grotesk',system-ui,sans-serif;color:#fff;text-decoration:none}
 .fg-bk small{display:block;font:400 11px 'Source Sans 3',system-ui,sans-serif;opacity:.85}
-.fg-b{background:#003b95}.fg-a{background:#ff385c}
+.fg-box .fg-bk,.fg-box .fg-bk small{color:#fff!important}
+.fg-box .fg-b{background:#006ce4}.fg-box .fg-a{background:#e61e4d}
 .fg-bk:hover{filter:brightness(1.1)}
 .fg-tp{margin:12px 0 0;font-size:13px;color:#3b4450}
 .fg-sec h3{margin:6px 0 10px;font:700 19px 'Space Grotesk',system-ui,sans-serif;display:flex;flex-wrap:wrap;gap:4px 8px;align-items:baseline}
