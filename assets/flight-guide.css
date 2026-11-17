@@ -98,3 +98,8 @@
 .fg-ov a:focus-visible,.fg-ov button:focus-visible{outline:3px solid #2e9d68;outline-offset:2px}
 [data-guide-card] .ev-badge{cursor:default}
 [data-guide-card] .ev-badge-in{position:static;margin-top:10px;box-shadow:none;font-size:12px}
+/* chenarul evenimentului ancorat jos: aceeași distanță de marginea cardului, indiferent de restul conținutului */
+[data-guide-card]{display:flex;flex-direction:column}
+[data-guide-card]>.p-5{display:flex;flex-direction:column;flex:1 1 auto}
+[data-guide-card]>.p-5>.ev-badge-in{margin-top:auto!important;flex:none}
+[data-guide-card]>.p-5>:has(+.ev-badge-in){margin-bottom:10px}
