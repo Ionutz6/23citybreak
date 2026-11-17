@@ -333,3 +333,6 @@ body.evp .site-footer{margin-top:auto}
 .evp-cat{border-width:1px;border-color:#111}
 .evp-cat[aria-selected=true]{border-color:#111}
 .evp-panel-top{border:1px solid #111;background:transparent}
+
+/* Stratul foto (page-hero-photo.js) urmează colțurile rotunjite ale hero-ului: fără overflow:hidden (ar tăia panoul de căutare) */
+.evp-hero>div[aria-hidden="true"]{border-radius:inherit}
