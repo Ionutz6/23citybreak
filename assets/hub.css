@@ -26,3 +26,16 @@
 @media(max-width:800px){.hub-stats{grid-template-columns:1fr}.hub-login{flex-direction:column;align-items:stretch}.hub-login .hub-btn{justify-content:center}}
 /* Textul de sub titlu ocupă toată lățimea conținutului (preferința lui Alex, valabilă pe toate paginile). */
 .hub-hero .intro,.hub-section>.hub-lead{max-width:none}
+/* Header negru ca pe Acasă și Evenimente: același bloc (min 320 px, lățime 1380 px, colțuri rotunjite jos), în afara <main>. */
+.hub-top{width:calc(100% - 2*clamp(16px,2vw,30px));max-width:1380px;margin:0 auto;border-radius:0 0 28px 28px;padding:22px 0 26px;min-height:320px;display:flex;align-items:center;background:#111211;color:#fff}
+.hub-top-inner{width:100%;padding:0 clamp(20px,5%,72px)}
+.hub-eyebrow{font:700 10px var(--font-display);letter-spacing:.16em;text-transform:uppercase;color:#dfa649}
+.hub-top h1{font:700 clamp(30px,4vw,52px)/1.08 var(--font-display);letter-spacing:-.04em;margin:18px 0 14px;color:#fff}
+.hub-top-intro{color:#bdbdb7;font-size:16px;line-height:1.6;margin:0;max-width:none}
+.hub-top .hub-jump{margin-top:22px}
+.hub-top .hub-btn{background:transparent;border-color:#3a3c3a;color:#fff}.hub-top .hub-btn:hover{border-color:#dfa649}
+.hub-top .hub-primary{background:#dfa649;border-color:#dfa649;color:#15130f}.hub-top .hub-primary:hover{background:#e9b862}
+.hub-top .hub-btn:focus-visible{outline-color:#fff}
+.hub-hero{margin-top:0}
+main:has(>.hub-hero){padding-top:32px}
+@media(max-width:600px){.hub-top{padding:32px 0 36px;min-height:0}.hub-top-inner{padding:0 20px}}
