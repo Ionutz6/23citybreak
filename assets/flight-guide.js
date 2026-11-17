@@ -122,11 +122,11 @@
     let objHtml = '', daysHtml = '', right = '', mtail = '';
     if (g) {
       const wd = i => { const d = new Date(`${o.out}T12:00:00Z`); d.setUTCDate(d.getUTCDate() + 1 + i); return DOW[d.getUTCDay()]; };
-      objHtml = `<div class="fg-sec"><h3>Ce vezi în ${esc(g.city || city)} <span>${g.legend.length} obiective de pe hartă${det ? ' · prețurile de intrare sunt orientative' : ''}</span></h3><div class="fg-obj">${g.legend.map(([n, name, d], i) => {
+      objHtml = `<div class="fg-sec fg-objectives"><h3>Ce vezi în ${esc(g.city || city)} <span>${g.legend.length} obiective de pe hartă${det ? ' · prețurile de intrare sunt orientative' : ''}</span></h3><div class="fg-obj">${g.legend.map(([n, name, d], i) => {
         const x = det?.objectives?.[i];
         return `<div class="fg-o"><i>${esc(n)}</i><div><b>${esc(name)}</b><p>${esc(x?.text || d)}</p>${x?.chips ? `<div class="fg-chips">${x.chips.map(([k, t]) => `<span class="${esc(k)}">${k === 't' ? '⏱ ' : ''}${esc(t)}</span>`).join('')}</div>` : ''}</div></div>`;
       }).join('')}</div></div>`;
-      daysHtml = `<div class="fg-sec"><h3>Planul pe zile <span>${esc(wd(0).toLowerCase())} și ${esc(wd(1).toLowerCase())}</span></h3>${g.days.map((d, i) => {
+      daysHtml = `<div class="fg-sec fg-days"><h3>Planul pe zile <span>${esc(wd(0).toLowerCase())} și ${esc(wd(1).toLowerCase())}</span></h3>${g.days.map((d, i) => {
         const dd = det?.days?.[i];
         const body = dd ? `<ul class="fg-tl">${dd.items.filter(it => !it[2] || xmasOk).map(([t, tx]) => `<li><b>${esc(t)}</b>${esc(tx)}</li>`).join('')}</ul>` : `<p>${esc(d.story)}</p>`;
         return `<div class="fg-day"><h5>Ziua ${i + 1} · ${esc(wd(i))}${dd ? ` · ${esc(dd.title)}` : ''}</h5>${body}<a href="${esc(directions(d.stops))}" target="_blank" rel="noopener noreferrer">Deschide traseul în Google Maps ↗</a></div>`;
@@ -136,8 +136,8 @@
       mtail = `<div class="fg-mtail">${ev}${tips}</div>`;
     }
     const left = g
-      ? buy + share + fine + stayBox + objHtml + daysHtml
-      : `${buy}${share}${fine}${stayBox}${ev}${tips}<div class="fg-simp"><b>Ghid simplificat.</b> Pentru acest oraș nu avem încă ilustrație și traseu pe două zile.</div>`;
+      ? `<div class="fg-left">${buy}${share}${fine}${stayBox}${objHtml}${daysHtml}</div>`
+      : `<div class="fg-left">${buy}${share}${fine}${stayBox}${ev}${tips}<div class="fg-simp"><b>Ghid simplificat.</b> Pentru acest oraș nu avem încă ilustrație și traseu pe două zile.</div></div>`;
     const body = document.getElementById('fg-body');
     body.className = 'fg-body' + (g ? '' : ' one');
     body.innerHTML = left + right + mtail;
