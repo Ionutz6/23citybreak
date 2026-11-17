@@ -143,7 +143,7 @@
   const totalRow = () => {
     if (!flight?.eur || !stNow) return '';
     const tkn = tkNow?.eur ? tkNow.eur * 2 : 0, sum = flight.eur * 2 + stNow.total + tkn;
-    const parts = [`zbor ${flight.eur * 2} € (real)`, `cazare ~${stNow.total} €`, tkn ? `bilete ~${tkn} €` : ''].filter(Boolean).join(' + ');
+    const parts = [`zbor ${flight.eur * 2} € (real)`, `cazare ~${stNow.total} €`, tkn ? `${tkNow.pass ? 'abonamente tot festivalul' : 'bilete'} ~${tkn} €` : ''].filter(Boolean).join(' + ');
     return `<div class="pk-row pk-total"><div class="l"><div><div class="t">Aproximativ pentru 2 persoane</div><div class="s">${esc(parts)}. Doar zborul e preț real, restul sunt estimări.</div></div></div><div class="pr">~${Math.round(sum / 10) * 10} €</div></div>`;
   };
   let stNow = null, tkNow = null;
@@ -182,7 +182,7 @@
         </div>
         <aside class="pk-box pk-side">
           <h3>Pachetul tău</h3>
-          <div class="pk-row"><div class="l"><div class="pk-ico">${icon}</div><div><div class="t">Bilet la eveniment${tk && !tk.real && tk.eur ? ' <span class="pk-tag">estimare</span>' : ''}</div><div class="s">${tk ? (tk.eur === 0 ? 'intrare liberă' : tk.real ? 'de la, pe persoană' : `cel mai ieftin bilet, pe persoană${ev.kind === 'football' ? '. Pe piața secundară costă de obicei mult mai mult' : ''}`) : ev.kind === 'football' ? 'preț pe site-ul clubului' : 'preț la vânzător'}</div></div></div>${tk?.eur ? `<div class="pr">${tk.real ? '' : '~'}${tk.eur} €</div>` : ''}</div>
+          <div class="pk-row"><div class="l"><div class="pk-ico">${icon}</div><div><div class="t">Bilet la eveniment${tk && !tk.real && tk.eur ? ' <span class="pk-tag">estimare</span>' : ''}</div><div class="s">${tk ? (tk.eur === 0 ? 'intrare liberă' : tk.real ? 'de la, pe persoană' : tk.pass ? `abonament pe tot festivalul (${tk.days} zile), pe persoană${tk.official ? ', preț oficial' : `, estimat ~${tk.eur / tk.days} €/zi × ${tk.days} zile`}` : `cel mai ieftin bilet, pe persoană${ev.kind === 'football' ? '. Pe piața secundară costă de obicei mult mai mult' : ''}`) : ev.kind === 'football' ? 'preț pe site-ul clubului' : 'preț la vânzător'}</div></div></div>${tk?.eur ? `<div class="pr">${tk.real ? '' : '~'}${tk.eur} €</div>` : ''}</div>
           <div class="pk-row"><div class="l"><div class="pk-ico">✈︎</div><div><div class="t">Zbor ${esc(origin)} ⇄ ${esc(iata || name)}</div><div class="s">${esc(H.shortDate(trip.out))} → ${esc(H.shortDate(trip.back))}${flightSub()}</div>${timingNotes()}</div></div>${flight?.eur ? `<div class="pr"><small>de la</small> ${flight.eur} €</div>` : ''}</div>
           ${st ? `<div class="pk-row"><div class="l"><div class="pk-ico">🛏</div><div><div class="t">Cazare, 2 persoane <span class="pk-tag">estimare</span></div><div class="s">~${st.perNight} €/noapte × ${st.nights} ${st.nights === 1 ? 'noapte' : 'nopți'}, hotel 3★ sau apartament simplu${st.big ? '. Preț mai mare, e eveniment mare' : ''}</div></div></div><div class="pr">~${st.total} €</div></div>` : ''}
           ${totalRow()}
