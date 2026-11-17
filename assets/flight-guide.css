@@ -95,4 +95,5 @@
 .fg-jr{background:#0a0b0d;color:#dfa649;border-radius:12px;padding:10px 16px;font:700 13px 'Space Grotesk',system-ui,sans-serif;text-decoration:none}
 .fg-cl{background:#fff;border:1px solid #dce1e7;border-radius:12px;padding:10px 16px;font-weight:700;cursor:pointer;color:#475569;font-family:inherit}
 .fg-ov a:focus-visible,.fg-ov button:focus-visible{outline:3px solid #2e9d68;outline-offset:2px}
-[data-guide-card] .ev-badge{top:14px;cursor:default}
+[data-guide-card] .ev-badge{cursor:default}
+[data-guide-card] .ev-badge-in{position:static;margin-top:10px;box-shadow:none;font-size:12px}

@@ -337,7 +337,9 @@
       const a = document.createElement(card.hasAttribute('data-guide-card') ? 'span' : 'a'); // pe cardurile de zbor nu există linkuri: pachetul se deschide din ghid
       a.className = 'ev-badge'; if (a.tagName === 'A') a.href = packageUrl(e);
       a.innerHTML = `<span aria-hidden="true">${icon}</span><span>${isMultiDay(e) ? '' : `${esc(DOW_LONG[dowOf(startDate(e))].replace(/^./, c => c.toUpperCase()))}: `}<b>${esc(e.title)}</b>${hits.length > 1 ? ` și încă ${hits.length - 1}` : ''} · vezi pachetul →</span>`;
-      card.prepend(a);
+      // pe cardurile de zbor ilustrația are numele orașului sus: badge-ul stă jos, în chenarul negru, sub preț
+      const body = card.hasAttribute('data-guide-card') ? card.querySelector('.p-5') : null;
+      if (body) { a.classList.add('ev-badge-in'); body.append(a); } else card.prepend(a);
     });
   }
 
