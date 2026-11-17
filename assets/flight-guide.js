@@ -132,12 +132,12 @@
         return `<div class="fg-day"><h5>Ziua ${i + 1} · ${esc(wd(i))}${dd ? ` · ${esc(dd.title)}` : ''}</h5>${body}<a href="${esc(directions(d.stops))}" target="_blank" rel="noopener noreferrer">Deschide traseul în Google Maps ↗</a></div>`;
       }).join('')}</div>`;
       const keys = `<div class="fg-keys">${g.legend.map(([n, name]) => `<span><i>${esc(n)}</i>${esc(name)}</span>`).join('')}</div>`;
-      right = `<aside class="fg-right fg-map"><div class="fg-stick"><img src="assets/guides-prague-style/${esc(g.image)}.${esc(g.extension || 'png')}" alt="Ilustrație ${esc(g.city || city)}" loading="lazy"><p class="fg-fine">Ilustrație schematică: pozițiile și traseul sunt orientative. Numerele de pe hartă corespund obiectivelor din stânga.</p>${keys}<div class="fg-rtail">${ev}${tips}${share}${fine}</div></div></aside>`;
-      mtail = `<div class="fg-mtail">${ev}${tips}${share}${fine}</div>`;
+      right = `<aside class="fg-right fg-map"><div class="fg-stick"><img src="assets/guides-prague-style/${esc(g.image)}.${esc(g.extension || 'png')}" alt="Ilustrație ${esc(g.city || city)}" loading="lazy"><p class="fg-fine">Ilustrație schematică: pozițiile și traseul sunt orientative. Numerele de pe hartă corespund obiectivelor din stânga.</p>${keys}<div class="fg-rtail">${ev}${tips}</div></div></aside>`;
+      mtail = `<div class="fg-mtail">${ev}${tips}</div>`;
     }
     const left = g
-      ? buy + stayBox + objHtml + daysHtml
-      : `${buy}${stayBox}${ev}${tips}<div class="fg-simp"><b>Ghid simplificat.</b> Pentru acest oraș nu avem încă ilustrație și traseu pe două zile.</div>${share}${fine}`;
+      ? buy + share + fine + stayBox + objHtml + daysHtml
+      : `${buy}${share}${fine}${stayBox}${ev}${tips}<div class="fg-simp"><b>Ghid simplificat.</b> Pentru acest oraș nu avem încă ilustrație și traseu pe două zile.</div>`;
     const body = document.getElementById('fg-body');
     body.className = 'fg-body' + (g ? '' : ' one');
     body.innerHTML = left + right + mtail;
