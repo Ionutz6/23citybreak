@@ -1216,11 +1216,41 @@
       return true;
     }
 
-    function shareTripWhatsApp(cityName, dates, price, flightInfo, bookUrl) {
-      const text = `Am găsit escapada asta pe 23citybreak ✈️\n\n📍 ${cityName}\n📅 Weekend: ${dates}\n💰 De la ${formatMoney(Number(price))} / persoană, tur-retur\n🔗 Vezi oferta: ${bookUrl || 'https://23citybreak.ro/zboruri.html'}\n\nDescoperă și alte zboruri: https://23citybreak.ro/zboruri.html`;
-      const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
-      window.open(url, '_blank');
+    // Link permanent către ghidul călătoriei pe 23citybreak (fără Kiwi): redeschide popup-ul cu ilustrația, zborul, data și prețul.
+    function tripShareUrl(g) {
+      const p = new URLSearchParams();
+      if (g.cityId) p.set('guide', g.cityId);
+      if (g.iata) p.set('to', g.iata);
+      if (g.origin) p.set('origin', g.origin);
+      if (g.out) p.set('out', g.out);
+      if (g.back) p.set('back', g.back);
+      if (g.price) p.set('price', String(g.price));
+      return 'https://23citybreak.ro/zboruri.html?' + p.toString();
     }
+
+    function shareTripWhatsApp(g) {
+      const text = `Am găsit escapada asta pe 23citybreak ✈️\n\n📍 ${g.city}\n📅 Weekend: ${g.dates}\n💰 De la ${formatMoney(Number(g.price))} / persoană, tur-retur\n🔗 Vezi călătoria: ${tripShareUrl(g)}\n\nDescoperă și alte escapade: https://23citybreak.ro`;
+      window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+    }
+
+    // Deschide ghidul direct din linkul distribuit (?guide=...&out=...&back=...&price=...).
+    function openGuideFromUrl() {
+      const q = new URLSearchParams(location.search), cityId = q.get('guide'), out = q.get('out'), back = q.get('back');
+      const iso = /^\d{4}-\d{2}-\d{2}$/;
+      if (!cityId || !iso.test(out || '') || !iso.test(back || '') || !window.CBFlightGuide) return;
+      const c = ALL_EUROPE_CITIES.find(x => x.id === cityId && !x.isAll);
+      if (!c) return;
+      const fmt = d => new Date(d + 'T12:00:00Z').toLocaleDateString('ro-RO', { day: 'numeric', month: 'short', timeZone: 'UTC' });
+      const g = { cityId, city: c.name || c.city || cityId, country: c.country || '', iata: (q.get('to') || '').toUpperCase().replace(/[^A-Z]/g, '').slice(0, 3),
+        origin: (q.get('origin') || 'OTP').toUpperCase().replace(/[^A-Z]/g, '').slice(0, 3), out, back, price: Math.max(0, parseInt(q.get('price'), 10) || 0),
+        dates: `${fmt(out)} – ${fmt(back)}`, events: [] };
+      g.onShare = () => shareTripWhatsApp(g);
+      window.CBFlightGuide.open(g);
+      getCityPhotoAsset(g.cityId).then(photo => {
+        if (photo?.url && document.getElementById('fg-ban') && document.getElementById('fg-title')?.textContent === g.city) document.getElementById('fg-ban').style.backgroundImage = `url("${photo.url}")`;
+      }).catch(() => {});
+    }
+    window.addEventListener('load', () => setTimeout(openGuideFromUrl, 0), { once: true });
 
     function toggleAdvancedFilters() {
       const panel = document.getElementById("advanced-filters-panel");
@@ -2752,7 +2782,7 @@
       if (d.action === "city-guide") {
         openCityGuideModal(d.cityKey, d.cityName, d.iata, d.guideCityId);
       } else if (d.action === "share-whatsapp") {
-        shareTripWhatsApp(d.cityName, d.dates, d.price, d.flightInfo, d.bookUrl);
+        shareTripWhatsApp({ city: d.cityName, dates: d.dates, price: d.price, cityId: d.cityId, origin: d.originIata, out: d.out, back: d.back, iata: d.iata });
       }
     });
 
@@ -2762,7 +2792,7 @@
       let g; try { g = JSON.parse(card.dataset.flightGuide || "null"); } catch (_) { g = null; }
       if (!g || !window.CBFlightGuide) return;
       g.events = (window.CBEvents?.hitsFor?.(g.cityId, g.wkId) || []);
-      g.onShare = () => shareTripWhatsApp(g.city, g.dates, g.price, `${g.outTime} / ${g.inTime}`, g.kiwiUrl || "");
+      g.onShare = () => shareTripWhatsApp(g);
       window.CBFlightGuide.open(g);
       const photo = await getCityPhotoAsset(g.cityId).catch(() => null);
       if (photo?.url && document.getElementById("fg-ban") && document.getElementById("fg-title")?.textContent === g.city) {
@@ -4405,6 +4435,12 @@
     // ?dest=<id Kiwi> (ex. din quizul de pe Orașe vizitate): preselectează destinația.
     {
       const destParam = new URLSearchParams(location.search).get('dest');
+      const originParam = (new URLSearchParams(location.search).get('origin') || '').toUpperCase();
+      if (originParam) window.addEventListener('load', () => setTimeout(() => {
+        const sel = document.getElementById('f-origin');
+        const opt = sel && [...sel.options].find(o => (o.dataset.iata || '').toUpperCase() === originParam);
+        if (opt && sel.value !== opt.value) { sel.value = opt.value; sel.dispatchEvent(new Event('change')); }
+      }, 0), {once: true});
       if (destParam && ALL_EUROPE_CITIES.some(c => c.id === destParam && !c.isAll)) window.addEventListener('load', () => setTimeout(() => selectDestination(destParam), 0), {once: true}); // după init-ul formularului
     }
     document.getElementById('currency-select').addEventListener('change', async e => {
