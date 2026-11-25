@@ -117,7 +117,20 @@
     const stayBox = `<div class="fg-box fg-stay"><h4>Cazare</h4><p class="fg-st">Caută cazare în ${esc(city)}</p><p class="fg-ss">${nights} ${nights === 1 ? 'noapte' : 'nopți'} · ${esc(day(o.out))} – ${esc(day(o.back))} · 2 adulți (completate automat)</p>
       <div class="fg-two"><a class="fg-bk fg-b" href="${esc(bookingUrl)}" target="_blank" rel="noopener noreferrer">Booking<small>hoteluri și pensiuni</small></a><a class="fg-bk fg-a" href="${esc(airbnbUrl)}" target="_blank" rel="noopener noreferrer">Airbnb<small>apartamente</small></a></div>
       <p class="fg-tp">💡 Vineri și sâmbătă seara sunt cele mai scumpe nopți: rezervă din timp, cu anulare gratuită. Caută aproape de o stație de metrou sau tramvai, nu neapărat în centru.</p></div>`;
-    const share = o.onShare ? `<button type="button" class="fg-btn fg-wa" id="fg-share">Trimite pe WhatsApp</button>` : '';
+    // Butonul apare mereu; fără onShare propriu (ex. deschis din Acasă) trimite același mesaj ca pe Zboruri: link către itinerar pe 23citybreak.ro, fără Kiwi.
+    const defaultShare = () => {
+      const p = new URLSearchParams();
+      if (o.cityId) p.set('guide', o.cityId);
+      if (o.iata) p.set('to', o.iata);
+      if (o.origin) p.set('origin', o.origin);
+      if (o.out) p.set('out', o.out);
+      if (o.back) p.set('back', o.back);
+      if (price) p.set('price', String(price));
+      const text = `Am găsit escapada asta pe 23citybreak ✈️\n\n📍 ${city}\n📅 Weekend: ${o.dates || `${day(o.out)} – ${day(o.back)}`}\n💰 De la ${price} € / persoană, tur-retur\n🔗 Vezi călătoria: https://23citybreak.ro/zboruri.html?${p}\n\nDescoperă și alte escapade: https://23citybreak.ro`;
+      window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+    };
+    const shareFn = o.onShare || defaultShare;
+    const share = `<button type="button" class="fg-btn fg-wa" id="fg-share">Trimite pe WhatsApp</button>`;
     const fine = `<p class="fg-fine">Prețul zborului se poate schimba până la rezervare.</p>`;
     let objHtml = '', daysHtml = '', right = '', mtail = '';
     if (g) {
@@ -142,7 +155,7 @@
     body.className = 'fg-body' + (g ? '' : ' one');
     body.innerHTML = left + right + mtail;
     body.scrollTop = 0;
-    document.getElementById('fg-share')?.addEventListener('click', o.onShare);
+    document.getElementById('fg-share')?.addEventListener('click', shareFn);
     document.querySelector('.fg-jr').setAttribute('href', slug === 'prague_cz' ? 'praga-doua-zile.html' : 'jurnal.html');
     ov.classList.add('open');
     document.documentElement.style.overflow = 'hidden';
