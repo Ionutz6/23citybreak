@@ -190,6 +190,7 @@
           <div class="pk-stack">
             <a class="pk-btn dark" href="${esc(ticketUrl)}" target="_blank" rel="noopener noreferrer">${icon} ${esc(ticketLabel)} ↗</a>
             <a class="pk-btn gold" href="${esc(flightUrl())}" target="_blank" rel="noopener noreferrer">✈︎ Cumpără bilet de avion ↗</a>
+            <button type="button" class="pk-btn wa" data-wa-pk>${E.WA_ICON} Trimite pe WhatsApp</button>
             ${skyUrl() ? `<div class="pk-alt"><a href="${esc(skyUrl())}" target="_blank" rel="noopener noreferrer">sau compară prețul pe Skyscanner</a></div>` : ''}
             <section class="pk-stay" aria-labelledby="pk-stay-h">
               <div class="pk-stay-head"><h4 id="pk-stay-h">🛏 Cazare</h4><span>${nights} ${nights === 1 ? 'noapte' : 'nopți'} · ${esc(H.shortDate(trip.out))} → ${esc(H.shortDate(trip.back))}</span></div>
@@ -212,6 +213,7 @@
     const back = new URL(location.href); back.searchParams.set('pdf', '1'); back.hash = '';
     window.Account?.openLogin({ title: 'Descarcă itinerarul', intro: 'Itinerarul în PDF e gratuit pentru cei cu cont. Fără parolă: îți trimitem un link pe email și revii direct aici.', source: 'itinerar-pdf', redirect: back.href });
   }
+  root.addEventListener('click', e => { if (e.target.closest('[data-wa-pk]')) E.shareWhatsApp(ev, flight?.eur); });
   let pick = null; // prima zi apăsată în modul „Aleg eu zilele”
   root.addEventListener('click', e => {
     if (e.target.closest('[data-pdf]')) { downloadPdf(); return; }
