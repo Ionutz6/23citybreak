@@ -172,3 +172,8 @@ PK: `(origin, dest, out_date, back_date, source)`. Migrația: `20261116_route_pr
 - `events.first_seen_at`: când a intrat evenimentul la noi (nu se schimbă la sincronizări); folosit pentru „nou”.
 - `event_mail_log`: ce alerte s-au trimis și cui (dedupe + limită de frecvență); fără acces public, scrie doar funcția `events-alerts`.
 - `unsubscribe_alerts(token)`: dezabonare fără cont, din linkul din email; oprește `event_preferences.event_alerts` și anulează `event_alerts` neîmplinite. Același token ca la newsletter, dar newsletterul nu se schimbă.
+
+## Click-uri pe linkuri ieșite (20261125_outbound_clicks.sql)
+
+- `outbound_clicks`: partener, pagină sursă, oraș/eveniment, moment. Fără IP sau alți identificatori. RLS activ, fără politici: scriu/citesc doar `click-log` și `click-digest` (service role).
+- `digested_at`: null până când click-ul intră într-un rezumat trimis; rândurile trimise se șterg după 90 de zile. Detalii: `supabase/functions/click-digest/README.md`.
