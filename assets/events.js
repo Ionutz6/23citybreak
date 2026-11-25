@@ -222,6 +222,19 @@
     return `${icon} ${name}${comp}${isMultiDay(e) ? ` · ${lengthDays(e)} zile` : ''}`;
   };
   const packageUrl = e => `weekend.html?e=${encodeURIComponent(e.id)}${DEMO ? '&evenimente-demo=1' : ''}`;
+  // Trimitere pe WhatsApp: doar linkuri 23citybreak (pachetul evenimentului + pagina principală), fără linkuri directe către furnizori.
+  const shareUrl = e => `https://23citybreak.ro/weekend.html?e=${encodeURIComponent(e.id)}`;
+  function shareWhatsApp(e, flightEur) {
+    const text = `Am găsit un weekend la ${cityName(e.city_id)} pe 23citybreak 🎟\n\n📍 ${cityName(e.city_id)}\n🎫 ${e.title.replace(/ \(rugby\)$/, '')}\n📅 ${whenLabel(e)}${flightEur ? `\n✈︎ Zbor de la ${Math.round(flightEur)} € / persoană` : ''}\n🔗 Vezi pachetul: ${shareUrl(e)}\n\nDescoperă și alte evenimente de weekend: https://23citybreak.ro`;
+    window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank', 'noopener');
+  }
+  document.addEventListener('click', ev => {
+    const b = ev.target.closest('[data-wa-share]');
+    if (!b) return;
+    ev.preventDefault();
+    const card = b.closest('[data-ev]');
+    load().then(list => { const e = list.find(x => x.id === card?.dataset.ev); if (e) shareWhatsApp(e); });
+  });
 
   // ---------- Încărcare ----------
   let loading;
@@ -269,6 +282,8 @@
     return Math.min(350, Math.max(60, Math.round((105 + 0.03 * hav(from, dest)) / 5) * 5));
   }
 
+  const WA_ICON = '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21l1.7-5A9 9 0 1 1 8 19.3z"/><path d="M9 9c0 3 3 6 6 6l1.3-1.5-2-1-1 .8c-1-.4-2-1.400-2.400-2.400l.8-1-1-2z" fill="currentColor" stroke="none"/></svg>';
+
   // ---------- Secțiunea de pe pagina principală ----------
   // opt.flight = { eur, origin, label?, note? } → prețul zborului mare și auriu în josul cardului (flightHtml).
   function cardHtml(e, opt = {}) {
@@ -279,7 +294,7 @@
     const c = cityOf(e.city_id), act = isMultiDay(e) ? 'Alege zilele' : 'Vezi pachetul';
     // Tot chenarul negru e link spre pachet; săgeata rotundă e doar semnul vizual că se apasă.
     return `<article class="ev-card" data-ev="${esc(e.id)}"${img ? ` style="background-image:url('${esc(img)}')"` : ''}>
-      <div class="ev-top"><span class="ev-tag">${esc(tagLabel(e))}</span></div>
+      <div class="ev-top"><span class="ev-tag">${esc(tagLabel(e))}</span><button type="button" class="ev-wa" data-wa-share aria-label="Trimite pe WhatsApp: ${esc(e.title.replace(/ \(rugby\)$/, ''))}" title="Trimite pe WhatsApp">${WA_ICON}</button></div>
       <a class="ev-body" href="${esc(packageUrl(e))}" aria-label="${esc(`${act}: ${e.title.replace(/ \(rugby\)$/, '')}, ${cityName(e.city_id)}`)}">
         <span class="ev-go" aria-hidden="true">→</span>
         <span class="ev-where">${c?.flag ? `<i aria-hidden="true">${c.flag}</i> ` : '📍 '}${esc(cityName(e.city_id))}${c?.country ? ` · ${esc(c.country)}` : ''}</span>
@@ -345,5 +360,5 @@
 
   // Competițiile mari europene se joacă și marți–joi: contează ca eveniment de city break chiar și când „Doar weekenduri” e activ.
   const ANY_DAY = new Set(['CL', 'EL']);
-  window.CBEvents = { ANY_DAY, hitsFor, flightHtml, estimateFlight, api: { url: SUPABASE_URL, key: SUPABASE_KEY }, load, byId, promos, cardHtml, packageUrl, decorateCards, eventPhoto, cityPhoto, stadiumPhoto, venuePhoto, setBg, KINDS, COMPETITIONS, CATEGORIES, SPORTS, categoryOf, sportOf, inferComp, isWeekend, helpers: { rangeLabel, esc, cityName, cityOf, guideOf, guideImage, local, isoAdd, dowOf, shortDate, longDate, startDate, endDate, isMultiDay, lengthDays, mainWeekend, tripPlan, flightRules, whenLabel, tagLabel, monthName, DOW, DOW_LONG, MON } };
+  window.CBEvents = { ANY_DAY, shareWhatsApp, WA_ICON, hitsFor, flightHtml, estimateFlight, api: { url: SUPABASE_URL, key: SUPABASE_KEY }, load, byId, promos, cardHtml, packageUrl, decorateCards, eventPhoto, cityPhoto, stadiumPhoto, venuePhoto, setBg, KINDS, COMPETITIONS, CATEGORIES, SPORTS, categoryOf, sportOf, inferComp, isWeekend, helpers: { rangeLabel, esc, cityName, cityOf, guideOf, guideImage, local, isoAdd, dowOf, shortDate, longDate, startDate, endDate, isMultiDay, lengthDays, mainWeekend, tripPlan, flightRules, whenLabel, tagLabel, monthName, DOW, DOW_LONG, MON } };
 })();
