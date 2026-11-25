@@ -2800,6 +2800,7 @@
       }
     }
     document.addEventListener("click", (ev) => {
+      if (ev.target.closest && ev.target.closest('[data-action="share-whatsapp"]')) return;
       const card = ev.target.closest && ev.target.closest("[data-guide-card]");
       if (card) openFlightGuideFromCard(card);
     });
@@ -2917,6 +2918,7 @@
                   <div class="font-num text-2xl font-black text-[#dfa649] leading-none">${priceDisplay}</div>
                   <div class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">${priceSub}</div>
                 </div>
+                ${bestCell ? `<button type="button" class="whatsapp-share rounded-full px-3 py-1.5 text-xs font-bold font-body" data-action="share-whatsapp" data-city-id="${escapeHtml(r.cityId || '')}" data-city-name="${escapeHtml(r.city)}" data-dates="${escapeHtml(datesLabel)}" data-price="${guideData.price}" data-origin-iata="${escapeHtml(guideData.origin)}" data-out="${escapeHtml(guideData.out)}" data-back="${escapeHtml(guideData.back)}" data-iata="${escapeHtml(guideData.iata)}" aria-label="Trimite ${escapeHtml(r.city)} pe WhatsApp">Trimite pe WhatsApp</button>` : ''}
               </div>
 
             </div>
