@@ -97,7 +97,13 @@
 .fg-ev a:hover{border-color:#dfa649}
 .fg-simp{background:#eef7f1;border:1px dashed #2e9d68;border-radius:14px;padding:12px;font-size:13px;color:#1b4d33}
 .fg-foot{padding:14px 20px;background:#fbf9f4;border-top:1px solid #ecd8b0;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;flex:none}
-.fg-jr{background:#0a0b0d;color:#dfa649;border-radius:12px;padding:10px 16px;font:700 13px 'Space Grotesk',system-ui,sans-serif;text-decoration:none}
+.fg-foot .fg-jr,.fg-foot .fg-jr:visited,.fg-foot .fg-jr:hover{color:#dfa649!important;-webkit-text-fill-color:#dfa649}
+.fg-foot .fg-cl{color:#475569!important;-webkit-text-fill-color:#475569}
+.fg-buy .fg-cta,.fg-buy .fg-cta:visited{color:#0a0b0d!important;-webkit-text-fill-color:#0a0b0d}
+.fg-buy .fg-alt,.fg-buy .fg-alt:visited{color:#cbd5e1!important;-webkit-text-fill-color:#cbd5e1}
+.fg-ov .fg-wa{color:#fff!important;-webkit-text-fill-color:#fff}
+.fg-ov{color-scheme:light}
+.fg-jr{background:#0a0b0d;color:#dfa649;display:inline-block;border-radius:12px;padding:10px 16px;font:700 13px 'Space Grotesk',system-ui,sans-serif;text-decoration:none}
 .fg-cl{background:#fff;border:1px solid #dce1e7;border-radius:12px;padding:10px 16px;font-weight:700;cursor:pointer;color:#475569;font-family:inherit}
 .fg-ov a:focus-visible,.fg-ov button:focus-visible{outline:3px solid #2e9d68;outline-offset:2px}
 [data-guide-card] .ev-badge{cursor:default}

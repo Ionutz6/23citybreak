@@ -228,13 +228,7 @@
     const text = `Am găsit un weekend la ${cityName(e.city_id)} pe 23citybreak 🎟\n\n📍 ${cityName(e.city_id)}\n🎫 ${e.title.replace(/ \(rugby\)$/, '')}\n📅 ${whenLabel(e)}${flightEur ? `\n✈︎ Zbor de la ${Math.round(flightEur)} € / persoană` : ''}\n🔗 Vezi pachetul: ${shareUrl(e)}\n\nDescoperă și alte evenimente de weekend: https://23citybreak.ro`;
     window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank', 'noopener');
   }
-  document.addEventListener('click', ev => {
-    const b = ev.target.closest('[data-wa-share]');
-    if (!b) return;
-    ev.preventDefault();
-    const card = b.closest('[data-ev]');
-    load().then(list => { const e = list.find(x => x.id === card?.dataset.ev); if (e) shareWhatsApp(e); });
-  });
+
 
   // ---------- Încărcare ----------
   let loading;
@@ -294,7 +288,7 @@
     const c = cityOf(e.city_id), act = isMultiDay(e) ? 'Alege zilele' : 'Vezi pachetul';
     // Tot chenarul negru e link spre pachet; săgeata rotundă e doar semnul vizual că se apasă.
     return `<article class="ev-card" data-ev="${esc(e.id)}"${img ? ` style="background-image:url('${esc(img)}')"` : ''}>
-      <div class="ev-top"><span class="ev-tag">${esc(tagLabel(e))}</span><button type="button" class="ev-wa" data-wa-share aria-label="Trimite pe WhatsApp: ${esc(e.title.replace(/ \(rugby\)$/, ''))}" title="Trimite pe WhatsApp">${WA_ICON}</button></div>
+      <div class="ev-top"><span class="ev-tag">${esc(tagLabel(e))}</span></div>
       <a class="ev-body" href="${esc(packageUrl(e))}" aria-label="${esc(`${act}: ${e.title.replace(/ \(rugby\)$/, '')}, ${cityName(e.city_id)}`)}">
         <span class="ev-go" aria-hidden="true">→</span>
         <span class="ev-where">${c?.flag ? `<i aria-hidden="true">${c.flag}</i> ` : '📍 '}${esc(cityName(e.city_id))}${c?.country ? ` · ${esc(c.country)}` : ''}</span>

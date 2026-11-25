@@ -337,8 +337,6 @@ body.evp .site-footer{margin-top:auto}
 /* Stratul foto (page-hero-photo.js) urmează colțurile rotunjite ale hero-ului: fără overflow:hidden (ar tăia panoul de căutare) */
 .evp-hero>div[aria-hidden="true"]{border-radius:inherit}
 
-.ev-wa{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;border:1.5px solid #65d98a;background:#127b39;color:#fff;cursor:pointer;padding:0}
-.ev-wa:hover{background:#0c6b30}.ev-wa:focus-visible{outline:3px solid #b2f4c4;outline-offset:2px}
 .pk-btn.wa{background:#127b39;color:#fff;border:1.5px solid #65d98a;cursor:pointer}
 .pk-btn.wa:hover{background:#0c6b30}
-@media print{.ev-wa,.pk-btn.wa{display:none}}
+@media print{.pk-btn.wa{display:none}}
